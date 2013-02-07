@@ -1,0 +1,8 @@
+<%# -*- Encoding: UTF-8 -*- -%>
+<% default_settings.each do |element| -%>
+<% element[:help].split("\n").each do |help_line| -%>
+; <%= help_line %>
+<% end -%>
+<%= element[:name] %> = <%= element[:value] %>
+
+<% end -%>

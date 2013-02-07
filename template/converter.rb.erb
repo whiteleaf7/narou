@@ -1,0 +1,17 @@
+# -*- Encoding: UTF-8 -*-
+
+#
+# 対象小説情報
+# タイトル: <%= @setting["title"] %>
+# 作者: <%= @setting["author"] %>
+# URL: <%= @setting["toc_url"] %>
+#
+class Converter < ConverterBase
+  def before_convert(io, text_type)
+    super
+  end
+
+  def after_convert(io, text_type)
+    super
+  end
+end

@@ -1,0 +1,35 @@
+<%# -*- Encoding: UTF-8 -*- -%>
+<%= toc["title"] %>
+<%= toc["author"] %>
+
+［＃区切り線］
+<%= toc["story"] %>
+
+掲載ページ: <%= toc["toc_url"] %>
+［＃区切り線］
+
+<% sections.each_with_index do |section, i| -%>
+［＃改ページ］
+<% if i == 0 -%>
+［＃ここから大見出し］<%= toc["title"] %>［＃ここで大見出し終わり］
+［＃地付き］<%= toc["author"] %>
+
+<% end -%>
+<% if section["chapter"] != "" -%>
+<%= section["chapter"] %>
+
+<% end -%>
+［＃１字下げ］［＃ここから中見出し］<%= section["subtitle"].sub(/\n\z/,"") %>［＃ここで中見出し終わり］
+<% if section["element"]["introduction"] != "" -%>
+［＃ここから前書き］
+<%= section["element"]["introduction"] %>
+［＃ここで前書き終わり］
+<% end -%>
+
+<%= section["element"]["body"] %>
+<% if section["element"]["postscript"] != "" -%>
+［＃ここから後書き］
+<%= section["element"]["postscript"] %>
+［＃ここで後書き終わり］
+<% end -%>
+<% end -%>
