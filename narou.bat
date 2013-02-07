@@ -7,7 +7,7 @@ ruby -x narou.bat %1 %2 %3 %4 %5 %6 %7 %8 %9
 ruby -x "%~f0" %*
 @goto endofruby
 #! ruby
-# -*- Encoding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 #
 # Narou.rb ― 小説家になろうダウンロード＆整形スクリプト
 #

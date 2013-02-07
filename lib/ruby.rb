@@ -1,4 +1,4 @@
-# -*- Encoding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 #
 # Copyright 2012 whiteleaf. All rights reserved.
 #
