@@ -12,8 +12,8 @@ module Command
       @opt.separator <<-EOS
 
   ・管理対象の小説を更新します。
-  　更新したい小説のNコード、URL、タイトルもしくはIDを指定して下さい。
-  　IDは #{@opt.program_name} list を参照して下さい。
+    更新したい小説のNコード、URL、タイトルもしくはIDを指定して下さい。
+    IDは #{@opt.program_name} list を参照して下さい。
   ・対象を指定しなかった場合、すべての小説の更新をチェックします。
   ・一度に複数の小説を指定する場合は空白で区切って下さい。
 
@@ -34,7 +34,7 @@ module Command
       super
       update_target_list = argv
       if update_target_list.empty?
-        Downloader.get_database.each do |id, _|
+        Database.instance.each do |id, _|
           update_target_list << id.to_s
         end
       end

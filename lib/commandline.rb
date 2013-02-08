@@ -8,6 +8,8 @@ require_relative "helper"
 
 module CommandLine
   def self.run(argv)
+    unless already_init?
+    end
     if Helper.os_windows?
       argv.map! do |arg|
         arg.encode(Encoding::UTF_8)
@@ -24,5 +26,8 @@ module CommandLine
       arg = "help"
     end
     Command.get_list[arg].execute(argv)
+  end
+
+  def self.already_init?
   end
 end

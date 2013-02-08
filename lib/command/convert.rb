@@ -7,6 +7,8 @@ require_relative "../novelconverter"
 
 module Command
   class Convert < CommandBase
+    @@database = Database.instance
+
     def initialize
       super("<target> [<target2> ...] [option]")
       @opt.separator <<-EOS
@@ -29,7 +31,7 @@ module Command
 
   Options:
       EOS
-      @opt.on("-o FILE", "--output FILE", "出力ファイル先を指定する") { |filename|
+      @opt.on("-o FILE", "--output FILE", "出力ファイルパスを指定する") { |filename|
         @options["output"] = filename
       }
       @opt.on("-e ENCODING", "--enc ENCODING", "テキストファイルのエンコーディングを指定する") { |encoding|

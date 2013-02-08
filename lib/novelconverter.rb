@@ -138,7 +138,7 @@ class NovelConverter
   end
 
   def load_novel_section(subtitle_info)
-    path = "#{@section_save_dir}#{subtitle_info["index"]} #{subtitle_info["subtitle"]}.yaml"
+    path = File.join(@section_save_dir, "#{subtitle_info["index"]} #{subtitle_info["subtitle"]}.yaml")
     YAML.load_file(path)
   end
 
@@ -193,10 +193,10 @@ class NovelConverter
     inspect_novel(result)
 
     if @output_filename
-      save_path = @output_filename
+      save_path = File.basename(@output_filename)
     else
-      save_path = "#{@setting.archive_path}#{CONVERTED_FILENAME_PREFIX}#{@novel_name}"
-      if @novel_name !~ /\.\w+$/
+      save_path = File.join(@setting.archive_path, CONVERTED_FILENAME_PREFIX + @novel_name)
+      if save_path !~ /\.\w+$/
         save_path += CONVERTED_FILE_EXT
       end
     end
@@ -209,7 +209,7 @@ class NovelConverter
 
   def make_midashi_and_save(text)
     midashi_list = listup_midashi(text)
-    open("#{@setting.archive_path}/見出しリスト.txt", "w") do |fp|
+    open(File.join(@setting.archive_path, "見出しリスト.txt"), "w") do |fp|
       fp.write(midashi_list)
     end
   end

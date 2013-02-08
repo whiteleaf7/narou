@@ -55,7 +55,7 @@ class Inspector
   end
 
   def save(path = nil)
-    path = "#{@setting.archive_path}エラーログ.txt" if path.nil?
+    path = File.join(@setting.archive_path, "エラーログ.txt") if path.nil?
     open(path, "w") do |fp|
       fp.puts "--- エラーログ出力 #{Time.now} ---"
       display(ALL, fp)

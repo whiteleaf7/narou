@@ -48,7 +48,10 @@ module Command
           puts "title: #{data["title"]}"
           next
         end
-        Downloader.start(target, @options["force"])
+        unless Downloader.start(target, @options["force"])
+          puts "ダウンロードに失敗しました(#{target})"
+          next
+        end
         unless @options["no-convert"]
           Convert.execute_and_rescue_exit([target])
         end

@@ -6,21 +6,63 @@
 require "fileutils"
 require_relative "sitesetting"
 require_relative "template"
+require_relative "database"
 
 #
 # 小説サイトからのダウンロード
 #
 class Downloader
-  ARCHIVE_DIR = "./小説データ/"
-  NOVEL_SITE_SETTING_DIR = "./webnovel/"
+  NOVEL_SITE_SETTING_DIR = "webnovel/"
   SECTION_SAVE_DIR_NAME = "本文"    # 本文を保存するディレクトリの名前(否パス)
-  DATABASE_PATH = ARCHIVE_DIR + "database.yaml"
   TOC_FILE_NAME = "toc.yaml"
   WAITING_TIME_FOR_503 = 20   # 503 のときに待機する秒数
   RETRY_MAX_FOR_503 = 5   # 503 のときに何回再試行するか
 
-  unless File.exists?(ARCHIVE_DIR)
-    FileUtils.mkdir_p(ARCHIVE_DIR)
+  #
+  # ターゲット(ID、URL、Nコード、小説名)を指定して小説データのダウンロードを開始する
+  #
+  # force が true なら全話強制ダウンロード
+  #
+  def self.start(target, force = false)
+    setting = nil
+    case get_target_type(target)
+    when :url, :ncode
+      toc_url = get_toc_url(target)
+      setting = @@settings.find { |s| s.multi_match(toc_url, "url") }
+      unless setting
+        puts "対応外のURLです(#{target})"
+        exit 1
+      end
+    when :id
+      data = @@database[target.to_i]
+      unless data
+        puts "指定のID(#{target})は存在しません"
+        exit 1
+      end
+      setting = get_setting(data["sitename"])
+      setting.multi_match(data["toc_url"], "url")
+    when :other
+      detected = false
+      data = @@database.get_data_by_type("title", target)
+      if data
+        setting = get_setting(data["sitename"])
+        setting.multi_match(data["toc_url"], "url")
+      else
+        puts "指定の小説(#{target})は存在しません"
+        exit 1
+      end
+    end
+    downloader = Downloader.new(setting)
+    result = downloader.start_download(force)
+    setting.clear
+    result
+  end
+
+  #
+  # 本文格納用ディレクトリを取得
+  #
+  def self.get_novel_section_save_dir(archive_path)
+    File.join(archive_path, SECTION_SAVE_DIR_NAME)
   end
 
   #
@@ -37,13 +79,6 @@ class Downloader
     else
       :other
     end
-  end
-
-  #
-  # 本文格納用ディレクトリを取得
-  #
-  def self.get_novel_section_save_dir(archive_path)
-    archive_path + SECTION_SAVE_DIR_NAME + "/"
   end
 
   #
@@ -76,7 +111,7 @@ class Downloader
       data = @@database[target.to_i]
     end
     return nil unless data
-    path = "#{ARCHIVE_DIR + data["sitename"]}/#{data["title"]}/"
+    path = File.join(Database.archive_root_path, data["sitename"], data["title"])
     if File.exists?(path)
       return path
     else
@@ -89,6 +124,29 @@ class Downloader
   end
 
   #
+  # target のIDを取得
+  #
+  def self.get_id_by_database(target)
+    toc_url = get_toc_url(target)
+    @@database.get_id("toc_url", toc_url)
+  end
+
+  #
+  # target からデータベースのデータを取得
+  #
+  def self.get_data_by_database(target)
+    toc_url = get_toc_url(target)
+    @@database.get_data("toc_url", toc_url)
+  end
+
+  #
+  # toc 読込
+  #
+  def self.get_toc_data(archive_path)
+    YAML.load_file(File.join(archive_path, TOC_FILE_NAME))
+  end
+
+  #
   # 指定の小説の目次ページのURLを取得する
   #
   # 書式にのっとって生成しているだけで、存在しないURLが返ってくる可能性もある
@@ -96,11 +154,8 @@ class Downloader
   def self.get_toc_url(target)
     case get_target_type(target)
     when :url
-      @@settings.each do |setting|
-        if setting.multi_match(target, "url")
-          return setting["toc_url"]
-        end
-      end
+      setting = @@setting.find { |s| s.multi_match(target, "url") }
+      return setting["toc_url"] if setting
     when :ncode
       return "#{@@narou["domain"]}/#{target}/"
     when :id
@@ -118,71 +173,14 @@ class Downloader
     nil
   end
 
-  def self.get_toc_data(archive_path)
-    YAML.load_file(archive_path + TOC_FILE_NAME)
-  end
-
-  #
-  # ターゲット(ID、URL、Nコード、小説名)を指定して小説データのダウンロードを開始する
-  #
-  # force が true なら全話強制ダウンロード
-  #
-  def self.start(target, force = false)
-    setting = nil
-    case get_target_type(target)
-    when :url
-      detected = false
-      @@settings.each do |s|
-        setting = s
-        if setting.multi_match(target, "url")
-          detected = true
-          break
-        end
-      end
-      unless detected
-        puts "対応外のURLです(#{target})"
-        exit 1
-      end
-    when :ncode
-      # 小説家になろうNコード
-      setting = @@narou
-      unless setting
-        puts "小説家になろうの設定ファイルが見つかりません"
-        exit 1
-      end
-      url = "#{setting["domain"]}/#{target}"
-      setting.multi_match(url, "url")
-    when :id
-      data = @@database[target.to_i]
-      unless data
-        puts "指定のID(#{target})は存在しません"
-        exit 1
-      end
-      setting = get_setting(data["sitename"])
-      setting.multi_match(data["toc_url"], "url")
-    when :other
-      detected = false
-      data = get_data_by_database(target)
-      if data
-        setting = get_setting(data["sitename"])
-        setting.multi_match(data["toc_url"], "url")
-      else
-        puts "指定の小説(#{target})は存在しません"
-        exit 1
-      end
-    end
-    downloader = Downloader.new(setting)
-    result = downloader.start_download(force)
-    setting.clear
-    result
+  def self.novel_exists?(target)
+    id = get_id_by_database(target) or return nil
+    @@database.novel_exists?(id)
   end
 
   def self.get_setting(sitename)
-    @@settings.each do |setting|
-      if setting["name"] == sitename
-        return setting
-      end
-    end
+    setting = @@settings.find { |s| s["name"] == sitename }
+    return setting if setting
     puts "#{data["sitename"]} の設定ファイルが見つかりません"
     exit 1
   end
@@ -192,7 +190,7 @@ class Downloader
   #
   def self.load_settings
     settings = []
-    Dir.glob(NOVEL_SITE_SETTING_DIR + "*.yaml") do |path|
+    Dir.glob(File.join(Narou.get_root_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")) do |path|
       setting = SiteSetting.load_file(path)
       if setting["name"] == "小説家になろう"
         @@narou = setting
@@ -200,110 +198,25 @@ class Downloader
       settings << setting
     end
     if settings.empty?
-      raise "小説サイトの定義ファイルがひとつもありません"
+      puts "小説サイトの定義ファイルがひとつもありません"
+      exit 1
+    end
+    unless @@narou
+      puts "小説家になろうの定義ファイルが見つかりませんでした"
+      exit 1
     end
     settings
   end
 
-  #
-  # データベース読み込み
-  #
-  def self.load_database
-    database = YAML.load_file(DATABASE_PATH)
-  rescue Errno::ENOENT
-    database = {}
-  ensure
-    database
-  end
-
-  #
-  # データベース取得
-  #
-  def self.get_database
-    @@database
-  end
-
-  #
-  # データベース保存
-  #
-  def self.save_database
-    open(DATABASE_PATH, "w") do |fp|
-      fp.write(YAML.dump(@@database))
-    end
-  end
-
   @@settings = load_settings
-  @@database = load_database
-
-  #
-  # 指定の小説は存在するか？
-  #
-  def self.novel_exists?(target)
-    toc_url = get_toc_url(target)
-    @@database.each do |_, data|
-      return true if data["toc_url"] == toc_url
-    end
-    false
-  end
-
-  #
-  # データベースのデータを取得
-  #
-  def self.get_data_by_database(target)
-    toc_url = get_toc_url(target)
-    @@database.each do |_, data|
-      return data if data["toc_url"] == toc_url
-    end
-    nil
-  end
-
-  #
-  # データベースから小説名を取得
-  #
-  def self.get_title_by_database(target)
-    data = get_data_by_database(target)
-    if data
-      return data["title"]
-    end
-    nil
-  end
-
-  #
-  # データベースから作者名を取得
-  #
-  def self.get_author_by_database(target)
-    data = get_data_by_database(target)
-    if data
-      return data["author"]
-    end
-    nil
-  end
-
-  #
-  # データベースからID取得
-  #
-  def self.get_id_by_database(toc_url)
-    @@database.each do |id, data|
-      return id if data["toc_url"] == toc_url
-    end
-    nil
-  end
-
-  #
-  # 新規ID取得
-  #
-  def self.get_new_id
-    max_id = @@database.keys.max
-    id = max_id ? max_id + 1 : 0
-    id
-  end
+  @@database = Database.instance
 
   #
   # コンストラクタ
   #
   def initialize(site_setting)
     @setting = site_setting
-    @id = Downloader.get_id_by_database(@setting["toc_url"]) || Downloader.get_new_id
+    @id = @@database.get_id("toc_url", @setting["toc_url"]) || @@database.get_new_id
   end
 
   #
@@ -350,7 +263,7 @@ class Downloader
       "sitename" => @setting["name"],
       "last_update" => Time.now
     }
-    Downloader.save_database
+    @@database.save_database
   end
 
   #
@@ -433,6 +346,7 @@ class Downloader
   # subtitles にダウンロードしたいものをまとめた subtitle info を渡す
   #
   def sections_download_and_save(subtitles)
+    puts "hogehogehoge"
     max = subtitles.count
     return if max == 0
     puts @title
@@ -447,7 +361,7 @@ class Downloader
       puts "第#{index}部分　#{subtitle} (#{i+1}/#{max})"
       section_element = a_section_download(subtitle_info)
       subtitle_info["element"] = section_element
-      save_novel_data("#{SECTION_SAVE_DIR_NAME}/#{index} #{subtitle}.yaml", subtitle_info)
+      save_novel_data(File.join(SECTION_SAVE_DIR_NAME, "#{index} #{subtitle}.yaml"), subtitle_info)
     end
   end
 
@@ -535,16 +449,17 @@ class Downloader
   # 小説データの格納ディレクトリパス
   def get_novel_data_dir
     raise "小説名がまだ設定されていません" unless @title
-    "#{ARCHIVE_DIR + @setting["name"]}/#{@title}/"
+    File.join(Database.archive_root_path, @setting["name"], @title)
   end
 
   #
   # 小説データの格納ディレクトリに保存
   #
   def save_novel_data(filename, object)
-    path = get_novel_data_dir + filename
-    unless File.exists?(File.dirname(path))
-      FileUtils.mkdir_p(File.dirname(path))
+    path = File.join(get_novel_data_dir, filename)
+    dir_path = File.dirname(path)
+    unless File.exists?(dir_path)
+      FileUtils.mkdir(dir_path)
     end
     open(path, "w") do |fp|
       fp.write(YAML.dump(object))
@@ -555,7 +470,7 @@ class Downloader
   # 小説データの格納ディレクトリから読み込む
   def load_novel_data(filename)
     dir_path = get_novel_data_dir
-    YAML.load_file(dir_path + filename)
+    YAML.load_file(File.join(dir_path, filename))
   rescue Errno::ENOENT
     nil
   end

@@ -23,13 +23,13 @@ module Command
 
   Options:
       EOS
-      @opt.on("-l", "--latest", "最近更新のあった順に小説を表示します。") {
+      @opt.on("-l", "--latest", "最近更新のあった順に小説を表示する") {
         @options["latest"] = true
       }
-      @opt.on("-r", "--reverse", "逆順に表示します。") {
+      @opt.on("-r", "--reverse", "逆順に表示する") {
         @options["reverse"] = true
       }
-      @opt.on("-u", "--url", "小説の掲載ページも表示します。") {
+      @opt.on("-u", "--url", "小説の掲載ページも表示する") {
         @options["url"] = true
       }
     end
@@ -58,7 +58,7 @@ module Command
 
     def execute(argv)
       super
-      database = Downloader.get_database.values
+      database = Database.instance.get_object.values
       if !argv.empty? && argv.first =~ /^\d+$/
         num = argv.first.to_i
       else

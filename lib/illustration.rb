@@ -64,7 +64,7 @@ class Illustration
   end
 
   def make_illust_path(id1, id2, ext = "*", check = true)
-    path = @setting.archive_path + ILLUST_DIR + "#{id1},#{id2}.#{ext}"
+    path = File.join(@setting.archive_path, ILLUST_DIR, "#{id1},#{id2}.#{ext}")
     if check
       Dir.glob(path)[0]
     else
