@@ -256,7 +256,7 @@ class ConverterBase
   #
   def replace_dakuten_font(data)
     data.gsub!(/(.)[゛ﾞ]/) do
-      "<span class=\"dakuten\">#{$1}</span>"
+      "［＃濁点］#{$1}［＃濁点終わり］"
     end
     #data.gsub!(/(.)[゛ﾞ]/, "\\1ﾞ［＃「\\1ﾞ」は縦中横］")
     #data.gsub!(/(.)[゜ﾟ]/, "\\1ﾟ［＃「\\1ﾟ」は縦中横］")
