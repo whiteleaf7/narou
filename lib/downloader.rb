@@ -155,7 +155,7 @@ class Downloader
   def self.get_toc_url(target)
     case get_target_type(target)
     when :url
-      setting = @@setting.find { |s| s.multi_match(target, "url") }
+      setting = @@settings.find { |s| s.multi_match(target, "url") }
       return setting["toc_url"] if setting
     when :ncode
       return "#{@@narou["domain"]}/#{target}/"
@@ -177,6 +177,18 @@ class Downloader
   def self.novel_exists?(target)
     id = get_id_by_database(target) or return nil
     @@database.novel_exists?(id)
+  end
+
+  def self.remove_novel(target, with_file = false)
+    data = get_data_by_database(target) or return nil
+    data_dir = get_novel_data_dir_by_target(target)
+    if with_file
+      FileUtils.remove_entry_secure(data_dir)
+      puts "#{data_dir} を完全に削除しました"
+    end
+    @@database.delete(data["id"])
+    @@database.save_database
+    data["title"]
   end
 
   def self.get_setting(sitename)
@@ -497,7 +509,7 @@ class Downloader
     restor_entity(src.force_encoding(@setting["encoding"])).gsub("\r", "")
   end
 
-  ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "c" }
+  ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)" }
   #
   # エンティティ復号
   #
@@ -508,9 +520,4 @@ class Downloader
     end
     result
   end
-end
-
-if __FILE__ == $0
-  Encoding.default_external = Encoding::UTF_8
-  Downloader.start "http://ncode.syosetu.com/n4259s/1/"
 end

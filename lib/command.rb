@@ -24,6 +24,7 @@ module Command
     #"new" => New.new,
     "convert" => Convert.new,
     #"interactive" => Interactive.new,
+    "remove" => Remove.new,
     "help" => Help.new,
     "version" => Version.new,
     "init" => Init.new

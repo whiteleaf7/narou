@@ -35,6 +35,10 @@ class Database
     end
   end
 
+  def delete(key)
+    @database.delete(key)
+  end
+
   def initialize
     if Narou.already_init?
       @database = self.class.load_database
