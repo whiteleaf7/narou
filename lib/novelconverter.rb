@@ -101,7 +101,6 @@ class NovelConverter
   #
   def self.epub_to_mobi(epub_path)
     kindlegen_path = File.join(File.dirname(Helper.get_aozoraepub3_path), "kindlegen")
-    puts kindlegen_path
     return nil if Dir.glob(kindlegen_path + "*").empty?
 
     if Helper.os_windows?
