@@ -24,7 +24,7 @@ module Command
     end
 
     #
-    # 普通にコマンドを実行するけど、exitを補足してexitstatusを返す
+    # 普通にコマンドを実行するけど、exit(2) を補足してexitstatus を返す
     # 正常終了なら0
     #
     def self.execute_and_rescue_exit(argv)

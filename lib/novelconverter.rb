@@ -17,7 +17,6 @@ class NovelConverter
   NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
   CONVERTED_FILENAME_PREFIX = "[変換]"
   CONVERTED_FILE_EXT = ".txt"
-  AOZORAEPUB3_PATH = "./AozoraEpub3/AozoraEpub3.jar"
 
   #
   # 指定の小説を整形・変換する
@@ -55,36 +54,80 @@ class NovelConverter
   end
 
   #
-  # AozoraEpub3でepub化
+  # AozoraEpub3でEPUBファイル作成
   #
   # AozoraEpub3は.jarがあるところがカレントディレクトリじゃないとうまく動かない
   # TODO:
   # 逆にカレントディレクトリにAozoraEpub3の必須ファイルを置いて手を加えることで、
   # テンプレート等の差し替えが容易になる
   #
-  # 返り値：AozoraEpub3の標準出力のキャプチャ
+  # 返り値：正常終了nil、エラー終了:error
   #
-  def self.convert_to_epub(filename, dst_dir = nil)
+  def self.txt_to_epub(filename, dst_dir = nil)
     abs_srcpath = File.expand_path(filename)
     dst_option = ""
     if dst_dir
       dst_option = %!-dst "#{File.expand_path(dst_dir)}"!
     end
     pwd = Dir.pwd
-    aozoraepub3_basename = File.basename(AOZORAEPUB3_PATH)
-    Dir.chdir(File.expand_path(File.dirname(AOZORAEPUB3_PATH)))
-    command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -i narou.ini -enc UTF-8 #{dst_option} "#{abs_srcpath}"!
+    aozoraepub3_path = Helper.get_aozoraepub3_path
+    aozoraepub3_basename = File.basename(aozoraepub3_path)
+    Dir.chdir(File.dirname(aozoraepub3_path))
+    command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 #{dst_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
-    print "AozoraEPUB3でEPUBに変換しています"
+    print "AozoraEpub3でEPUBに変換しています"
+    res = Helper::AsyncCommand.exec(command) do
+      print "."
+    end
+    stdout_capture = res[0].force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
+    Dir.chdir(pwd)
+    if stdout_capture =~ /^\[ERROR\]/
+      puts
+      puts "AozoraEpub3実行中にエラーが発生したため、EPUBが出力出来ませんでした"
+      puts stdout_capture.rstrip
+      return :error
+    end
+    puts "変換しました"
+    :success
+  end
+
+  #
+  # EPUBファイルをkindlegenでMOBIへ
+  # AozoraEpub3.jar と同じ場所に kindlegen が無ければ何もしない
+  #
+  # 返り値：正常終了 :success、エラー終了 :error、中断終了 :abort、kindlegenがなかった nil
+  #
+  def self.epub_to_mobi(epub_path)
+    kindlegen_path = File.join(File.dirname(Helper.get_aozoraepub3_path), "kindlegen")
+    puts kindlegen_path
+    return nil if Dir.glob(kindlegen_path + "*").empty?
+
+    if Helper.os_windows?
+      epub_path.encode!(Encoding::Windows_31J)
+    end
+    command = "#{kindlegen_path} \"#{epub_path}\""
+    print "kindlegen実行中"
     res = Helper::AsyncCommand.exec(command) do
       print "."
     end
     puts
-    result = res[0].force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
-    Dir.chdir(pwd)
-    result
+    stdout_capture, _, proccess_status = res
+    stdout_capture.force_encoding(Encoding::UTF_8)
+    if proccess_status.exited?
+      if proccess_status.exitstatus == 2
+        puts "kindlegen実行中にエラーが発生したため、MOBIが出力出来ませんでした"
+        if stdout_capture.scan(/(エラー\(.+?\):\w+?:.+)$/)
+          puts $1
+        end
+        return :error
+      end
+    else
+      puts "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
+      return :abort
+    end
+    :success
   end
 
   def initialize(setting, output_filename = nil)

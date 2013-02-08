@@ -11,10 +11,10 @@ Narou.rb ― 小説家になろうダウンローダ＆縦書用整形スクリ�
 
 必須ツール
 ------------
-Ruby 1.9.3以上
-AozoraEpub3 1.1.0系
-Java 6以降（AozoraEpub3で必須）
-kindlegen（できるだけ最新版）
+* Ruby 1.9.3以上
+* AozoraEpub3 1.1.0系
+* Java 6以降（AozoraEpub3で必須）
+* kindlegen（できるだけ最新版）
 
 使い方
 ------------

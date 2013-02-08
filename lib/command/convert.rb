@@ -81,50 +81,19 @@ module Command
           # epub
           # TODO: 出力ファイル名をこっちで指定する
           dst_dir = output_filename ? File.dirname(output_filename) : nil
-          res = NovelConverter.convert_to_epub(converted_txt_path, dst_dir)
-          if res =~ /^\[ERROR\]/
-            puts res.rstrip
-            next
-          end
+          res = NovelConverter.txt_to_epub(converted_txt_path, dst_dir)
+          next if res != :success
           # mobi
           data = Downloader.get_data_by_database(target)
           epub_path = File.join(File.dirname(converted_txt_path), %![#{data["author"]}] #{data["title"]}.epub!)
-          #epub_path = Dir.glob(File.join(File.dirname(converted_txt_path), "*.epub"))[0]
-          if Helper.os_windows?
-            epub_path.encode!(Encoding::Windows_31J)
-          end
-          command = "./kindlegen \"#{epub_path}\""
-          print "kindlegen実行中"
-          res = Helper::AsyncCommand.exec(command) do
-            print "."
-          end
-          puts
-          kindlegen_response, _, proccess_status = res
-          kindlegen_response.force_encoding(Encoding::UTF_8)
-          if proccess_status.exited?
-            if proccess_status.exitstatus == 2
-              puts "kindlegen実行中にエラーが発生したため、MOBIが出力出来ませんでした"
-              if kindlegen_response.scan(/(エラー\(.+?\):\w+?:.+)$/)
-                puts $1
-              end
-              next
-            end
-          else
-            puts "kindlegenが中断させられたぽいのでMOBIは出来ませんでした"
-          end
+          res = NovelConverter.epub_to_mobi(epub_path)
+          next if res != :success
           # strip
           mobi_path = epub_path.sub(/\.epub$/, "") + ".mobi"
           command = "python kindlestrip.py \"#{mobi_path}\" \"#{mobi_path}\""
           `#{command}`
-=begin
-          case proccess_status.exitstatus
-          when 0
-            puts "MOBIファイルを出力しました"
-          when 1
-            puts "MOBIファイルは出力しましたが警告があります！"
-          end
-=end
-          puts "MOBIファイルを出力しました"   # AozorazEPUB3じゃどう頑張っても警告が出ちゃう
+
+          puts "MOBIファイルを出力しました"
         end
       end
     end
