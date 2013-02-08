@@ -4,6 +4,7 @@
 #
 
 require "fileutils"
+require_relative "narou"
 require_relative "sitesetting"
 require_relative "template"
 require_relative "database"
@@ -208,8 +209,10 @@ class Downloader
     settings
   end
 
-  @@settings = load_settings
-  @@database = Database.instance
+  if Narou.already_init?
+    @@settings = load_settings
+    @@database = Database.instance
+  end
 
   #
   # コンストラクタ

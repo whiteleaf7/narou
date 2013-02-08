@@ -13,7 +13,7 @@ module Narou
 
   def self.get_root_dir
     return @@root_dir if @@root_dir
-    path = File.expand_path(File.dirname($0))
+    path = File.expand_path(File.dirname("."))
     drive_letter = ""
     if Helper.os_windows?
       path.gsub!(/^[a-z]:/i, "")
@@ -36,6 +36,8 @@ module Narou
   def self.init
     return nil if already_init?
     FileUtils.mkdir(LOCAL_SETTING_DIR)
+    puts LOCAL_SETTING_DIR + "/ を作成しました"
     Database.init
+    puts "初期化が完了しました"
   end
 end

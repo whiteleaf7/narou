@@ -25,7 +25,8 @@ module Command
     "convert" => Convert.new,
     #"interactive" => Interactive.new,
     "help" => Help.new,
-    "version" => Version.new
+    "version" => Version.new,
+    "init" => Init.new
   }
 
   Shortcuts = Hash[*get_list.keys.map { |s|

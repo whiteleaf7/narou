@@ -14,8 +14,10 @@ class Database
   ARCHIVE_ROOT_DIR_PATH = "小説データ/"
   DATABASE_FILE_PATH = ARCHIVE_ROOT_DIR_PATH + "database.yaml"
 
-  @@archive_root_path = File.expand_path(File.join(Narou.get_root_dir, ARCHIVE_ROOT_DIR_PATH))
-  @@database_path = File.expand_path(File.join(Narou.get_root_dir, DATABASE_FILE_PATH))
+  if Narou.already_init?
+    @@archive_root_path = File.expand_path(File.join(Narou.get_root_dir, ARCHIVE_ROOT_DIR_PATH))
+    @@database_path = File.expand_path(File.join(Narou.get_root_dir, DATABASE_FILE_PATH))
+  end
 
   def [](key)
     @database[key]
@@ -34,7 +36,9 @@ class Database
   end
 
   def initialize
-    @database = self.class.load_database
+    if Narou.already_init?
+      @database = self.class.load_database
+    end
   end
 
   #
@@ -43,6 +47,7 @@ class Database
   def self.init
     unless File.exists?(ARCHIVE_ROOT_DIR_PATH)
       FileUtils.mkdir(ARCHIVE_ROOT_DIR_PATH)
+      puts ARCHIVE_ROOT_DIR_PATH + " を作成しました"
     end
   end
 

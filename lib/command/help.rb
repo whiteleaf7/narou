@@ -8,11 +8,19 @@ module Command
     def execute(argv)
       puts "Narou.rb ― 小説家になろうダウンローダ＆縦書用整形スクリプト"
       puts
-      puts " Usage: #{@opt.program_name} <command> [arguments...] [options...]"
-      #puts "   <command>: [" + Command.get_list.keys.join(", ") + "]"
+      if Narou.already_init?
+        puts " Usage: #{@opt.program_name} <command> [arguments...] [options...]"
+      else
+        puts " Usage: #{@opt.program_name} <command>"
+      end
       puts
       puts " コマンドの簡単な説明:"
-      Command.get_list.each do |key, command|
+      if Narou.already_init?
+        cmd_list = Command.get_list
+      else
+        cmd_list = Command.get_list.select { |k, v| k == "init" }
+      end
+      cmd_list.each do |key, command|
         oneline = command.oneline_help.split("\n")
         puts "   #{key.ljust(12)} #{oneline.shift}"
         oneline.each do |h|
