@@ -10,7 +10,7 @@ module Command
     end
 
     def oneline_help
-      "対話モードを起動します。"
+      "対話モードを起動します"
     end
   end
 end

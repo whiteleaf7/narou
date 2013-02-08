@@ -6,7 +6,7 @@
 module Command
   class New < CommandBase
     def oneline_help
-      "新しく管理する小説を追加します。"
+      "新しく管理する小説を追加します"
     end
   end
 end

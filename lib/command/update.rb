@@ -59,7 +59,7 @@ module Command
     end
 
     def oneline_help
-      "指定した小説を更新します。\n指定がない場合、すべての小説が対象になります。"
+      "指定した小説を更新します\n指定がない場合、すべての小説が対象になります"
     end
   end
 end

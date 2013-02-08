@@ -59,7 +59,7 @@ module Command
     end
 
     def oneline_help
-      "指定した小説をダウンロードします。"
+      "指定した小説をダウンロードします"
     end
   end
 end

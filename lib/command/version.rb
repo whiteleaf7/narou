@@ -10,7 +10,7 @@ module Command
     end
 
     def oneline_help
-      "バージョンを表示します。"
+      "バージョンを表示します"
     end
   end
 end

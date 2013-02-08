@@ -74,7 +74,7 @@ module Command
     end
 
     def oneline_help
-      "現在管理している小説の一覧を表示します。"
+      "現在管理している小説の一覧を表示します"
     end
   end
 end

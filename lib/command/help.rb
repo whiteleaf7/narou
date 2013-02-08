@@ -26,7 +26,7 @@ module Command
     end
 
     def oneline_help
-      "このヘルプを表示します。"
+      "このヘルプを表示します"
     end
   end
 end
