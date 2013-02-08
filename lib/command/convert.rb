@@ -100,15 +100,6 @@ module Command
       end
     end
 
-    def txt_to_epub
-    end
-
-    def epub_to_mobi
-    end
-
-    def mobistrip
-    end
-
     def oneline_help
       "小説を整形します。管理小説以外にテキストファイルも変換可能"
     end

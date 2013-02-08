@@ -4,6 +4,7 @@
 #
 
 require "open3"
+require_relative "narou"
 
 #
 # 雑多なお助けメソッド群
@@ -16,7 +17,7 @@ module Helper
   end
 
   def self.get_aozoraepub3_path
-    File.expand_path(AOZORAEPUB3_PATH)
+    File.expand_path(File.join(Narou.get_root_dir, AOZORAEPUB3_PATH))
   end
 
   #

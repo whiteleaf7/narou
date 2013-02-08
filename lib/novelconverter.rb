@@ -61,7 +61,7 @@ class NovelConverter
   # 逆にカレントディレクトリにAozoraEpub3の必須ファイルを置いて手を加えることで、
   # テンプレート等の差し替えが容易になる
   #
-  # 返り値：正常終了nil、エラー終了:error
+  # 返り値：正常終了 :success、エラー終了 :error、AozoraEpub3が見つからなかった nil
   #
   def self.txt_to_epub(filename, dst_dir = nil)
     abs_srcpath = File.expand_path(filename)
@@ -72,7 +72,12 @@ class NovelConverter
     pwd = Dir.pwd
     aozoraepub3_path = Helper.get_aozoraepub3_path
     aozoraepub3_basename = File.basename(aozoraepub3_path)
-    Dir.chdir(File.dirname(aozoraepub3_path))
+    aozoraepub3_dir = File.dirname(aozoraepub3_path)
+    unless File.exists?(aozoraepub3_path)
+      puts "AozoraEpub3が見つからなかったので、EPUBが出力出来ませんでした"
+      return nil
+    end
+    Dir.chdir(aozoraepub3_dir)
     command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 #{dst_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)

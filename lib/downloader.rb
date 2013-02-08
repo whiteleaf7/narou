@@ -191,7 +191,7 @@ class Downloader
   #
   def self.load_settings
     settings = []
-    Dir.glob(File.join(Narou.get_root_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")) do |path|
+    Dir.glob(File.join(Narou.get_script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")) do |path|
       setting = SiteSetting.load_file(path)
       if setting["name"] == "小説家になろう"
         @@narou = setting

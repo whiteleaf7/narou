@@ -29,6 +29,10 @@ module Narou
     @@root_dir
   end
 
+  def self.get_script_dir
+    File.expand_path(File.dirname($0))
+  end
+
   def self.already_init?
     !!get_root_dir
   end

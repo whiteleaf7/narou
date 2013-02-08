@@ -4,9 +4,10 @@
 #
 
 require "erb"
+require_relative "narou"
 
 class Template
-  TEMPLATE_DIR = "./template/"
+  TEMPLATE_DIR = "template/"
 
   #
   # テンプレートを元にファイルを作成
@@ -29,7 +30,8 @@ class Template
   # テンプレートを元にデータを作成
   #
   def self.get(src_filename, _binding)
-    result = ERB.new(File.read(TEMPLATE_DIR + src_filename + ".erb"), nil, "-").result(_binding)
+    src = File.read(File.join(Narou.get_script_dir, TEMPLATE_DIR, src_filename + ".erb"))
+    result = ERB.new(src, nil, "-").result(_binding)
     result
   end
 end
