@@ -185,6 +185,9 @@ class Downloader
     if with_file
       FileUtils.remove_entry_secure(data_dir)
       puts "#{data_dir} を完全に削除しました"
+    else
+      # TOCは消しておかないと再DL時に古いデータがあると誤認する
+      File.delete(File.join(data_dir, TOC_FILE_NAME))
     end
     @@database.delete(data["id"])
     @@database.save_database
