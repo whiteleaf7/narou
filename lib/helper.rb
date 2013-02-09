@@ -20,6 +20,21 @@ module Helper
     File.expand_path(File.join(Narou.get_root_dir, AOZORAEPUB3_PATH))
   end
 
+  def self.confirm(message)
+    confirm_msg = "#{message} (y/n)?: "
+    print confirm_msg
+    while input = STDIN.gets
+      case input[0].downcase
+      when "y"
+        return true
+      when "n"
+        return false
+      else
+        print confirm_msg
+      end
+    end
+  end
+
   #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #

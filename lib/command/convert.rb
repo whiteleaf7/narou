@@ -27,7 +27,7 @@ module Command
     narou convert http://ncode.syosetu.com/n9669bk/
     narou convert 異世界迷宮で奴隷ハーレムを
     narou convert 1 -o "ハーレム -変換済み-.txt"
-    narou convert mynovel.txt
+    narou convert mynovel.txt --enc sjis
 
   Options:
       EOS
@@ -39,6 +39,9 @@ module Command
       }
       @opt.on("--no-epub", "AozoraEpub3でEPUB化しない") {
         @options["no-epub"] = true
+      }
+      @opt.on("--no-open", "出力時に保存ディレクトリを開かない") {
+        @options["no-open"] = true
       }
     end
 
@@ -79,29 +82,35 @@ module Command
           converted_txt_path = NovelConverter.convert(target, output_filename)
           next unless converted_txt_path
         end
-        if @options["no-epub"]
-          next
-        end
-        # epub
-        res = NovelConverter.txt_to_epub(converted_txt_path)
-        next if res != :success
-        # mobi
-        if argument_target_type == :file
-          data = get_title_and_author_by_textfile(converted_txt_path)
-        else
-          data = Downloader.get_data_by_database(target)
-        end
-        epub_path = File.join(File.dirname(converted_txt_path), %![#{data["author"]}] #{data["title"]}.epub!)
-        res = NovelConverter.epub_to_mobi(epub_path)
-        next if res != :success
-        # strip
-        mobi_path = epub_path.sub(/\.epub$/, "") + ".mobi"
-        puts "kindlestrip実行中"
-        kindlestrip_path = File.join(Narou.get_script_dir, "kindlestrip.py")
-        command = "python #{kindlestrip_path} \"#{mobi_path}\" \"#{mobi_path}\""
-        `#{command}`
+        converted_txt_dir = File.dirname(converted_txt_path)
+        unless @options["no-epub"]
+          # epub
+          res = NovelConverter.txt_to_epub(converted_txt_path)
+          next if res != :success
+          # mobi
+          if argument_target_type == :file
+            data = get_title_and_author_by_textfile(converted_txt_path)
+          else
+            data = Downloader.get_data_by_database(target)
+          end
+          epub_path = File.join(converted_txt_dir, %![#{data["author"]}] #{data["title"]}.epub!)
+          res = NovelConverter.epub_to_mobi(epub_path)
+          next if res != :success
+          # strip
+          mobi_path = epub_path.sub(/\.epub$/, "") + ".mobi"
+          puts "kindlestrip実行中"
+          kindlestrip_path = File.join(Narou.get_script_dir, "kindlestrip.py")
+          command = %!python "#{kindlestrip_path}" "#{mobi_path}" "#{mobi_path}"!
+          `#{command}`
 
-        puts "MOBIファイルを出力しました"
+          puts "MOBIファイルを出力しました"
+        end
+
+        if !@options["no-open"] && Helper.os_windows?
+          if Helper.confirm("小説の保存ディレクトリを開きますか")
+            `explorer "file:///#{converted_txt_dir.encode(Encoding::Windows_31J)}"`
+          end
+        end
       end
     end
 

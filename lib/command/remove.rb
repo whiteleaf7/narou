@@ -3,6 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "../helper"
 require_relative "../template"
 
 module Command
@@ -34,21 +35,6 @@ module Command
       }
     end
 
-    def confirm(message)
-      confirm_msg = "#{message} (y/n): "
-      print confirm_msg
-      while input = STDIN.gets
-        case input[0].downcase
-        when "y"
-          return true
-        when "n"
-          return false
-        else
-          print confirm_msg
-        end
-      end
-    end
-
     def execute(argv)
       super
       argv.each_with_index do |target, i|
@@ -61,7 +47,7 @@ module Command
         end
         title = Downloader.get_data_by_database(target)["title"]
         unless @options["yes"]
-          next unless confirm("#{title} を#{(@options["with-file"] ? "“完全に”" : "")}削除しますか？")
+          next unless Helper.confirm("#{title} を#{(@options["with-file"] ? "“完全に”" : "")}削除しますか")
         end
         Downloader.remove_novel(target, @options["with-file"])
         puts "削除しました"

@@ -349,7 +349,6 @@ class Downloader
   # subtitles にダウンロードしたいものをまとめた subtitle info を渡す
   #
   def sections_download_and_save(subtitles)
-    puts "hogehogehoge"
     max = subtitles.count
     return if max == 0
     puts @title

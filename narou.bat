@@ -19,7 +19,7 @@ require_relative "lib/commandline"
 $debug = false
 
 Encoding.default_external = Encoding::UTF_8
-Version = "0.0"
+Version = "0.1"
 
 if $debug
   begin

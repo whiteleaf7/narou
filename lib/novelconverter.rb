@@ -78,7 +78,7 @@ class NovelConverter
       return nil
     end
     Dir.chdir(aozoraepub3_dir)
-    command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 #{dst_option} "#{abs_srcpath}"!
+    command = %!java -cp "#{aozoraepub3_basename}" AozoraEpub3 -enc UTF-8 #{dst_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
@@ -117,7 +117,7 @@ class NovelConverter
     if Helper.os_windows?
       epub_path.encode!(Encoding::Windows_31J)
     end
-    command = "#{kindlegen_path} \"#{epub_path}\""
+    command = %!"#{kindlegen_path}" "#{epub_path}"!
     print "kindlegen実行中"
     res = Helper::AsyncCommand.exec(command) do
       print "."
