@@ -60,7 +60,8 @@ class Illustration
   end
 
   def make_illust_chuki(illust_path)
-    "［＃挿絵（#{ILLUST_DIR + File.basename(illust_path)}）入る］"
+    rel_illust_path = to_rel(@setting.archive_path, illust_path)
+    "［＃挿絵（#{rel_illust_path}）入る］"
   end
 
   def make_illust_path(id1, id2, ext = "*", check = true)
@@ -74,5 +75,19 @@ class Illustration
 
   def make_url(id1, id2)
     ILLUST_URL % [id2, id1]
+  end
+
+  #
+  # 絶対パスから相対パスを作成
+  # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-list/36985
+  #
+  def to_rel(base, target)
+    sep = /#{File::SEPARATOR}+/o
+    base = base.split(sep)
+    base.pop
+    target = target.split(sep)
+    while base.shift == target.shift
+    end
+    File.join([".."]*base.size+target)
   end
 end
