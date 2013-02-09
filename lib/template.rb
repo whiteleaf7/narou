@@ -18,7 +18,7 @@ class Template
   #
   def self.write(src_filename, dest_filepath, _binding)
     result = get(src_filename, _binding)
-    if File::ftype(dest_filepath) == "directory"
+    if File.directory?(dest_filepath)
       dest_filepath = File.join(dest_filepath, src_filename)
     end
     open(dest_filepath, "w") do |fp|

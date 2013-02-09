@@ -56,7 +56,7 @@ module Command
           puts "―" * 30
         end
         output_filename = "#{basename} (#{i})#{ext}" if basename
-        if File.exists?(target) && File::ftype(target) == "file"
+        if File.file?(target)
           begin
             NovelConverter.convert_file(target, enc, output_filename)
           rescue ArgumentError => e
