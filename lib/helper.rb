@@ -35,6 +35,15 @@ module Helper
     end
   end
 
+  def self.open_directory_by_os_filer(path, message = nil)
+    if Helper.os_windows?
+      if message
+        return unless confirm(message)
+      end
+      `explorer "file:///#{path.encode(Encoding::Windows_31J)}"`
+    end
+  end
+
   #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #

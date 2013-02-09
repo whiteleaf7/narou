@@ -29,7 +29,7 @@ module Command
       @opt.on("-y", "--yes", "削除確認メッセージを表示しない") {
         @options["yes"] = true
       }
-      @opt.on("--with-file", "小説の保存ディレクトリ・ファイルも全て削除する") {
+      @opt.on("--with-file", "小説の保存フォルダ・ファイルも全て削除する") {
         @options["with-file"] = true
       }
     end

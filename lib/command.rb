@@ -26,6 +26,7 @@ module Command
     #"interactive" => Interactive.new,
     "remove" => Remove.new,
     "alias" => Alias.new,
+    "folder" => Folder.new,
     "help" => Help.new,
     "version" => Version.new,
     "init" => Init.new   # 特殊コマンドなので一覧には表示されない

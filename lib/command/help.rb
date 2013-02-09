@@ -16,9 +16,9 @@ module Command
       puts
       puts " コマンドの簡単な説明:"
       if Narou.already_init?
-        cmd_list = Command.get_list
+        cmd_list = Command.get_list.select { |k, _| k != "init" }
       else
-        cmd_list = Command.get_list.select { |k, v| k == "init" }
+        cmd_list = Command.get_list.select { |k, _| k == "init" }
       end
       cmd_list.each do |key, command|
         oneline = command.oneline_help.split("\n")

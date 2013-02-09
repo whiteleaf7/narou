@@ -19,7 +19,7 @@ module Command
   ・変換したい小説のNコード、URL、タイトルもしくはIDを指定して下さい。
     IDは #{@opt.program_name} list を参照して下さい。
   ・一度に複数の小説を指定する場合は空白で区切って下さい。
-  ※-oオプションがない場合、[変換]小説名.txtが小説の保存ディレクトリに出力されます。
+  ※-oオプションがない場合、[変換]小説名.txtが小説の保存フォルダに出力されます。
   ※複数指定した場合に-oオプションがあった場合、ファイル名に連番がつきます。
   ・管理小説以外にもテキストファイルを変換出来ます。
     テキストファイルのファイルパスを指定します。
@@ -34,7 +34,7 @@ module Command
 
   Options:
       EOS
-      @opt.on("-o FILE", "--output FILE", "出力ファイル名を指定する。ディレクトリパス部分は無視される") { |filename|
+      @opt.on("-o FILE", "--output FILE", "出力ファイル名を指定する。フォルダパス部分は無視される") { |filename|
         @options["output"] = filename
       }
       @opt.on("-e ENCODING", "--enc ENCODING", "テキストファイル指定時のエンコーディングを指定する") { |encoding|
@@ -46,7 +46,7 @@ module Command
       @opt.on("--no-mobi", "kindlegenでMOBI化しない") {
         @options["no-mobi"] = true
       }
-      @opt.on("--no-open", "出力時に保存ディレクトリを開かない") {
+      @opt.on("--no-open", "出力時に保存フォルダを開かない") {
         @options["no-open"] = true
       }
     end
@@ -115,10 +115,8 @@ module Command
           end
         end
 
-        if !@options["no-open"] && Helper.os_windows?
-          if Helper.confirm("小説の保存ディレクトリを開きますか")
-            `explorer "file:///#{converted_txt_dir.encode(Encoding::Windows_31J)}"`
-          end
+        unless @options["no-open"]
+          Helper.open_directory_by_os_filer(converted_txt_dir, "小説の保存フォルダを開きますか")
         end
       end
     end
