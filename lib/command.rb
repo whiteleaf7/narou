@@ -25,9 +25,10 @@ module Command
     "convert" => Convert.new,
     #"interactive" => Interactive.new,
     "remove" => Remove.new,
+    "alias" => Alias.new,
     "help" => Help.new,
     "version" => Version.new,
-    "init" => Init.new
+    "init" => Init.new   # 特殊コマンドなので一覧には表示されない
   }
 
   Shortcuts = Hash[*get_list.keys.map { |s|

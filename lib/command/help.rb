@@ -28,7 +28,7 @@ module Command
         end
       end
       puts
-      puts "  各コマンドの詳細は narou <command> --help を参照してください。"
+      puts "  各コマンドの詳細は narou <command> -h/--help を参照してください。"
       puts "  各コマンドは頭文字の一文字のみでも指定できます。"
       puts "  (e.g. '#{@opt.program_name} d n4259s')"
     end

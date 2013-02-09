@@ -5,6 +5,7 @@
 
 require "fileutils"
 require_relative "helper"
+require_relative "localsetting"
 
 module Narou
   LOCAL_SETTING_DIR = ".narou"
@@ -29,6 +30,10 @@ module Narou
     @@root_dir
   end
 
+  def self.get_local_setting_dir
+    File.join(get_root_dir, LOCAL_SETTING_DIR)
+  end
+
   def self.get_script_dir
     File.expand_path(File.dirname($0))
   end
@@ -43,5 +48,13 @@ module Narou
     puts LOCAL_SETTING_DIR + "/ を作成しました"
     Database.init
     puts "初期化が完了しました"
+  end
+
+  def self.alias_to_id(target)
+    aliases = LocalSetting.get["alias"]
+    if aliases[target]
+      return aliases[target]
+    end
+    target
   end
 end

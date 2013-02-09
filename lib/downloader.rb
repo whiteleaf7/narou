@@ -8,6 +8,7 @@ require_relative "narou"
 require_relative "sitesetting"
 require_relative "template"
 require_relative "database"
+require_relative "localsetting"
 
 #
 # 小説サイトからのダウンロード
@@ -26,6 +27,7 @@ class Downloader
   #
   def self.start(target, force = false)
     setting = nil
+    target = Narou.alias_to_id(target)
     case get_target_type(target)
     when :url, :ncode
       toc_url = get_toc_url(target)
@@ -75,7 +77,7 @@ class Downloader
       :url
     when /^n\d+[a-z]+$/
       :ncode
-    when /^\d+$/
+    when /^\d+$/, Fixnum
       :id
     else
       :other
@@ -86,6 +88,7 @@ class Downloader
   # 指定されたIDとかから小説の保存ディレクトリを取得
   #
   def self.get_novel_data_dir_by_target(target)
+    target = Narou.alias_to_id(target)
     type = get_target_type(target)
     data = nil
     id = nil
@@ -118,6 +121,7 @@ class Downloader
   # target のIDを取得
   #
   def self.get_id_by_database(target)
+    target = Narou.alias_to_id(target)
     toc_url = get_toc_url(target)
     @@database.get_id("toc_url", toc_url)
   end
@@ -126,6 +130,7 @@ class Downloader
   # target からデータベースのデータを取得
   #
   def self.get_data_by_database(target)
+    target = Narou.alias_to_id(target)
     toc_url = get_toc_url(target)
     @@database.get_data("toc_url", toc_url)
   end
@@ -143,6 +148,7 @@ class Downloader
   # 書式にのっとって生成しているだけで、存在しないURLが返ってくる可能性もある
   #
   def self.get_toc_url(target)
+    target = Narou.alias_to_id(target)
     case get_target_type(target)
     when :url
       setting = @@settings.find { |s| s.multi_match(target, "url") }
@@ -160,11 +166,13 @@ class Downloader
   end
 
   def self.novel_exists?(target)
+    target = Narou.alias_to_id(target)
     id = get_id_by_database(target) or return nil
     @@database.novel_exists?(id)
   end
 
   def self.remove_novel(target, with_file = false)
+    target = Narou.alias_to_id(target)
     data = get_data_by_database(target) or return nil
     data_dir = get_novel_data_dir_by_target(target)
     if with_file
