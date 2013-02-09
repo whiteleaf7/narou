@@ -44,7 +44,7 @@ class Downloader
       setting.multi_match(data["toc_url"], "url")
     when :other
       detected = false
-      data = @@database.get_data_by_type("title", target)
+      data = @@database.get_data("title", target)
       if data
         setting = get_setting(data["sitename"])
         setting.multi_match(data["toc_url"], "url")
@@ -92,24 +92,14 @@ class Downloader
     case type
     when :url, :ncode
       toc_url = get_toc_url(target)
-      @@database.each do |i, d|
-        if d["toc_url"] == toc_url
-          id = i
-          data = d
-          break
-        end
-      end
+      data = @@database.get_data("toc_url", toc_url)
+      id = data["id"]
     when :other
-      @@database.each do |i, d|
-        if d["title"] == target
-          id = i
-          data = d
-          break
-        end
-      end
+      data = @@database.get_data("title", target)
+      id = data["id"]
     when :id
       id = target.to_i
-      data = @@database[target.to_i]
+      data = @@database[id]
     end
     return nil unless data
     path = File.join(Database.archive_root_path, data["sitename"], data["title"])
@@ -161,15 +151,10 @@ class Downloader
       return "#{@@narou["domain"]}/#{target}/"
     when :id
       data = @@database[target.to_i]
-      if data
-        return data["toc_url"]
-      end
+      return data["toc_url"] if data
     when :other
-      @@database.each do |id, data|
-        if data["title"] == target
-          return data["toc_url"]
-        end
-      end
+      data = @@database.get_data("title", target)
+      return data["toc_url"] if data
     end
     nil
   end
