@@ -13,6 +13,7 @@ module Command
       super("<target> [<target2> ...] [option]")
       @opt.separator <<-EOS
 
+  ・指定した小説を縦書用に整形及びEPUB、MOBIに変換します。
   ・変換したい小説のNコード、URL、タイトルもしくはIDを指定して下さい。
     IDは #{@opt.program_name} list を参照して下さい。
   ・一度に複数の小説を指定する場合は空白で区切って下さい。
@@ -39,6 +40,9 @@ module Command
       }
       @opt.on("--no-epub", "AozoraEpub3でEPUB化しない") {
         @options["no-epub"] = true
+      }
+      @opt.on("--no-mobi", "kindlegenでMOBI化しない") {
+        @options["no-mobi"] = true
       }
       @opt.on("--no-open", "出力時に保存ディレクトリを開かない") {
         @options["no-open"] = true
@@ -87,23 +91,26 @@ module Command
           # epub
           res = NovelConverter.txt_to_epub(converted_txt_path)
           next if res != :success
-          # mobi
-          if argument_target_type == :file
-            data = get_title_and_author_by_textfile(converted_txt_path)
-          else
-            data = Downloader.get_data_by_database(target)
-          end
-          epub_path = File.join(converted_txt_dir, %![#{data["author"]}] #{data["title"]}.epub!)
-          res = NovelConverter.epub_to_mobi(epub_path)
-          next if res != :success
-          # strip
-          mobi_path = epub_path.sub(/\.epub$/, "") + ".mobi"
-          puts "kindlestrip実行中"
-          kindlestrip_path = File.join(Narou.get_script_dir, "kindlestrip.py")
-          command = %!python "#{kindlestrip_path}" "#{mobi_path}" "#{mobi_path}"!
-          `#{command}`
 
-          puts "MOBIファイルを出力しました"
+          unless @options["no-mobi"]
+            # mobi
+            if argument_target_type == :file
+              data = get_title_and_author_by_textfile(converted_txt_path)
+            else
+              data = Downloader.get_data_by_database(target)
+            end
+            epub_path = File.join(converted_txt_dir, %![#{data["author"]}] #{data["title"]}.epub!)
+            res = NovelConverter.epub_to_mobi(epub_path)
+            next if res != :success
+            # strip
+            mobi_path = epub_path.sub(/\.epub$/, "") + ".mobi"
+            puts "kindlestrip実行中"
+            kindlestrip_path = File.join(Narou.get_script_dir, "kindlestrip.py")
+            command = %!python "#{kindlestrip_path}" "#{mobi_path}" "#{mobi_path}"!
+            `#{command}`
+
+            puts "MOBIファイルを出力しました"
+          end
         end
 
         if !@options["no-open"] && Helper.os_windows?
@@ -127,7 +134,7 @@ module Command
     end
 
     def oneline_help
-      "小説を整形します。管理小説以外にテキストファイルも変換可能"
+      "小説を変換します。管理小説以外にテキストファイルも変換可能"
     end
   end
 end
