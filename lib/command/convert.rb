@@ -31,13 +31,13 @@ module Command
 
   Options:
       EOS
-      @opt.on("-o FILE", "--output FILE", "出力ファイルパスを指定する") { |filename|
+      @opt.on("-o FILE", "--output FILE", "出力ファイル名を指定する。ディレクトリパス部分は無視される") { |filename|
         @options["output"] = filename
       }
-      @opt.on("-e ENCODING", "--enc ENCODING", "テキストファイルのエンコーディングを指定する") { |encoding|
+      @opt.on("-e ENCODING", "--enc ENCODING", "テキストファイル指定時のエンコーディングを指定する") { |encoding|
         @options["encoding"] = encoding
       }
-      @opt.on("--no-epub", "AozoraEpub3でEPUB化はしない") {
+      @opt.on("--no-epub", "AozoraEpub3でEPUB化しない") {
         @options["no-epub"] = true
       }
     end
@@ -57,8 +57,10 @@ module Command
         end
         output_filename = "#{basename} (#{i})#{ext}" if basename
         if File.file?(target)
+          argument_target_type = :file
           begin
-            NovelConverter.convert_file(target, enc, output_filename)
+            converted_txt_path = NovelConverter.convert_file(target, enc, output_filename)
+            next unless converted_txt_path
           rescue ArgumentError => e
             if e.message =~ /invalid byte sequence in UTF-8/
               puts "テキストファイルの文字コードがUTF-8ではありません。--enc オプションでテキストのエンコーディングを指定して下さい"
@@ -69,35 +71,50 @@ module Command
             end
           end
         else
+          argument_target_type = :novel
           unless Downloader.novel_exists?(target)
             puts "#{target} は存在しません"
             next
           end
           converted_txt_path = NovelConverter.convert(target, output_filename)
-          unless converted_txt_path
-            next
-          end
-          if @options["no-epub"]
-            next
-          end
-          # epub
-          # TODO: 出力ファイル名をこっちで指定する
-          dst_dir = output_filename ? File.dirname(output_filename) : nil
-          res = NovelConverter.txt_to_epub(converted_txt_path, dst_dir)
-          next if res != :success
-          # mobi
-          data = Downloader.get_data_by_database(target)
-          epub_path = File.join(File.dirname(converted_txt_path), %![#{data["author"]}] #{data["title"]}.epub!)
-          res = NovelConverter.epub_to_mobi(epub_path)
-          next if res != :success
-          # strip
-          mobi_path = epub_path.sub(/\.epub$/, "") + ".mobi"
-          command = "python kindlestrip.py \"#{mobi_path}\" \"#{mobi_path}\""
-          `#{command}`
-
-          puts "MOBIファイルを出力しました"
+          next unless converted_txt_path
         end
+        if @options["no-epub"]
+          next
+        end
+        # epub
+        res = NovelConverter.txt_to_epub(converted_txt_path)
+        next if res != :success
+        # mobi
+        if argument_target_type == :file
+          data = get_title_and_author_by_textfile(converted_txt_path)
+        else
+          data = Downloader.get_data_by_database(target)
+        end
+        epub_path = File.join(File.dirname(converted_txt_path), %![#{data["author"]}] #{data["title"]}.epub!)
+        res = NovelConverter.epub_to_mobi(epub_path)
+        next if res != :success
+        # strip
+        mobi_path = epub_path.sub(/\.epub$/, "") + ".mobi"
+        puts "kindlestrip実行中"
+        kindlestrip_path = File.join(Narou.get_script_dir, "kindlestrip.py")
+        command = "python #{kindlestrip_path} \"#{mobi_path}\" \"#{mobi_path}\""
+        `#{command}`
+
+        puts "MOBIファイルを出力しました"
       end
+    end
+
+    #
+    # テキストファイル先頭二行からタイトルと作者名を取得
+    #
+    def get_title_and_author_by_textfile(textfile_path)
+      title = author = ""
+      open(textfile_path) do |fp|
+        title = fp.gets.rstrip
+        author = fp.gets.rstrip
+      end
+      { "title" => title, "author" => author }
     end
 
     def oneline_help

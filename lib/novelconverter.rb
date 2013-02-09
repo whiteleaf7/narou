@@ -122,11 +122,11 @@ class NovelConverter
     res = Helper::AsyncCommand.exec(command) do
       print "."
     end
-    puts
     stdout_capture, _, proccess_status = res
     stdout_capture.force_encoding(Encoding::UTF_8)
     if proccess_status.exited?
       if proccess_status.exitstatus == 2
+        puts
         puts "kindlegen実行中にエラーが発生したため、MOBIが出力出来ませんでした"
         if stdout_capture.scan(/(エラー\(.+?\):\w+?:.+)$/)
           puts $1
@@ -134,9 +134,11 @@ class NovelConverter
         return :error
       end
     else
+      puts
       puts "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
       return :abort
     end
+    puts "変換しました"
     :success
   end
 
@@ -204,7 +206,7 @@ class NovelConverter
     inspect_novel(result)
 
     if @output_filename
-      save_path = File.basename(@output_filename)
+      save_path = File.join(@setting.archive_path, File.basename(@output_filename))
     else
       save_path = File.join(@setting.archive_path, CONVERTED_FILENAME_PREFIX + @novel_name)
       if save_path !~ /\.\w+$/
