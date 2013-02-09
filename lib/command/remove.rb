@@ -4,7 +4,6 @@
 #
 
 require_relative "../helper"
-require_relative "../template"
 
 module Command
   class Remove < CommandBase

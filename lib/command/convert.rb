@@ -3,6 +3,8 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "../database"
+require_relative "../downloader"
 require_relative "../novelconverter"
 
 module Command

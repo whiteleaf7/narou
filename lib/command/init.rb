@@ -3,8 +3,6 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require_relative "../template"
-
 module Command
   class Init < CommandBase
     def initialize

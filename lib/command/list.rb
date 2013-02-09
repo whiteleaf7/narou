@@ -3,7 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require_relative "../template"
+require_relative "../database"
 
 module Command
   class List < CommandBase
