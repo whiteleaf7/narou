@@ -32,6 +32,7 @@ module Command
           next
         end
         Helper.open_url_by_browser(toc_url)
+        puts toc_url
       end
     end
 

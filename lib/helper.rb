@@ -9,11 +9,28 @@ require_relative "narou"
 #
 # 雑多なお助けメソッド群
 #
+# MacOSX 関連は確認してないので動作するか不明
+#
 module Helper
   AOZORAEPUB3_PATH = "./AozoraEpub3/AozoraEpub3.jar"
 
   def self.os_windows?
     @@os_is_windows ||= RUBY_PLATFORM =~ /mswin(?!ce)|mingw|cygwin|bccwin/i
+  end
+
+  def self.os_mac?
+    @@os_is_mac ||= RUBY_PLATFORM =~ /darwin/
+  end
+
+  def self.determine_os
+    case
+    when os_windows?
+      :windows
+    when os_mac?
+      :mac
+    else
+      :other
+    end
   end
 
   def self.get_aozoraepub3_path
@@ -36,18 +53,26 @@ module Helper
   end
 
   def self.open_directory_by_os_filer(path, confirm_message = nil)
-    if os_windows?
-      if confirm_message
-        return unless confirm(confirm_message)
-      end
+    os = determine_os
+    return if os == :other
+    if confirm_message
+      return unless confirm(confirm_message)
+    end
+    case os
+    when :windows
       `explorer "file:///#{path.encode(Encoding::Windows_31J)}"`
+    when :mac
+      `open "#{path}"`
     end
   end
 
   def self.open_url_by_browser(url)
-    if os_windows?
+    case determine_os
+    when :windows
       escaped_url = url.gsub("%", "%^").gsub("&", "^&")
       `start #{url}`
+    when :mac
+      `open "#{url}"`
     end
   end
 
