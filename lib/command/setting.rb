@@ -20,7 +20,7 @@ module Command
 
     class InvalidVariableType < StandardError
       def initialize(type)
-        super("値の型が #{type} ではありません")
+        super("値の型が #{Setting.variable_type_to_description(type)} ではありません")
       end
     end
 
@@ -35,9 +35,10 @@ module Command
   Variable List:
       EOS
 
-      @opt.separator("    名前               値の型           説明")
+      @opt.separator("        <name>           <value>              説明")
       SETTING_VARIABLES.each do |name, info|
-        @opt.separator("    #{name.ljust(18)} #{info[0]} #{info[1]}")
+        type_description = self.class.variable_type_to_description(info[0])
+        @opt.separator("    #{name.ljust(18)} #{type_description.ljust(10)} #{info[1]}")
       end
 
       @opt.separator <<-EOS
@@ -53,6 +54,19 @@ module Command
         output_setting_list
         exit 0
       }
+    end
+
+    def self.variable_type_to_description(type)
+      case type
+      when :boolean
+        "true/false"
+      when :integer
+        "数値"
+      when :string
+        "文字列"
+      else
+        ""
+      end
     end
 
     def valid_variable_name?(name)
