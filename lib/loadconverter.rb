@@ -47,7 +47,7 @@ class Converter < ConverterBase; end
 #   end
 # end
 def load_converter(path)
-  converter_path = "#{path}converter.rb"
+  converter_path = File.join(path, "converter.rb")
   if File.exists?(converter_path)
     if RUBY_PLATFORM =~ /mswin(?!ce)|mingw|cygwin|bccwin/i
       load converter_path.encode(Encoding::Windows_31J)
