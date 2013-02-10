@@ -35,12 +35,19 @@ module Helper
     end
   end
 
-  def self.open_directory_by_os_filer(path, message = nil)
-    if Helper.os_windows?
-      if message
-        return unless confirm(message)
+  def self.open_directory_by_os_filer(path, confirm_message = nil)
+    if os_windows?
+      if confirm_message
+        return unless confirm(confirm_message)
       end
       `explorer "file:///#{path.encode(Encoding::Windows_31J)}"`
+    end
+  end
+
+  def self.open_url_by_browser(url)
+    if os_windows?
+      escaped_url = url.gsub("%", "%^").gsub("&", "^&")
+      `start #{url}`
     end
   end
 
