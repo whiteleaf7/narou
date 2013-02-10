@@ -53,7 +53,10 @@ module Command
 
     def execute(argv)
       super
-      return if argv.empty?
+      if argv.empty?
+        puts @opt.help
+        return
+      end
       output_filename = @options["output"]
       if output_filename && argv.length > 1
         ext = File.extname(output_filename)

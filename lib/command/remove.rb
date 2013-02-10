@@ -36,6 +36,10 @@ module Command
 
     def execute(argv)
       super
+      if argv.empty?
+        puts @opt.help
+        return
+      end
       argv.each_with_index do |target, i|
         if i > 0
           puts "―" * 30

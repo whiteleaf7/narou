@@ -21,7 +21,10 @@ module Command
 
     def execute(argv)
       super
-      return if argv.empty?
+      if argv.empty?
+        puts @opt.help
+        return
+      end
       argv.each do |target|
         Helper.open_directory_by_os_filer(Downloader.get_novel_data_dir_by_target(target))
       end

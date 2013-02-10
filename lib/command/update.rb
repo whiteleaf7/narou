@@ -19,7 +19,7 @@ module Command
   ・一度に複数の小説を指定する場合は空白で区切って下さい。
 
   Example:
-    narou update
+    narou update               # 全て更新
     narou update 0 1 2 4
     narou update n9669bk 異世界迷宮で奴隷ハーレムを
     narou update http://ncode.syosetu.com/n9669bk/
@@ -33,14 +33,14 @@ module Command
 
     def execute(argv)
       super
-      update_target_list = argv
+      update_target_list = argv.dup
       if update_target_list.empty?
         Database.instance.each do |id, _|
-          update_target_list << id.to_s
+          update_target_list << id
         end
       end
-      update_target_list.each.with_index(1) do |target, i|
-        if i > 1
+      update_target_list.each_with_index do |target, i|
+        if i > 0
           puts "―" * 30
         end
         data = Downloader.get_data_by_database(target)
