@@ -8,7 +8,7 @@ require_relative "../localsetting"
 module Command
   class Alias < CommandBase
     def initialize
-      super("[<alias_name>=<target> ...]")
+      super("[<alias_name>=<target> ...] [options]")
       @opt.separator <<-EOS
 
   ・小説のIDに紐付けた好きな別名を作ることが出来ます。IDやNコード等を覚える必要がなくなります。
@@ -17,12 +17,18 @@ module Command
   ・引数なしで実行すると現在の別名の割り当て一覧を表示します
 
   Example:
-    narou alias            # 現在の割り当て一覧を表示する
+    narou alias --list
     narou alias musyoku=n9669bk
     narou alias harem=1
     narou convert harem    # 他のコマンドで別名が使えるようになる
     narou alias harem=     # 右辺に何も書かないとその別名を解除できる
+
+  Options:
       EOS
+      @opt.on("-l", "--list", "現在の割り当て一覧を表示する") {
+        output_aliases_list
+        exit 0
+      }
     end
 
     def output_aliases_list
@@ -37,7 +43,7 @@ module Command
     def execute(argv)
       super
       if argv.empty?
-        output_aliases_list
+        puts @opt.help
         return
       end
       aliases = LocalSetting.get["alias"]
