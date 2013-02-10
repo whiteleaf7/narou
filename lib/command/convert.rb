@@ -85,7 +85,7 @@ module Command
           puts "―" * 30
         end
         output_filename = "#{basename} (#{i})#{ext}" if basename
-        if File.file?(target)
+        if File.file?(target.to_s)
           argument_target_type = :file
           begin
             converted_txt_path = NovelConverter.convert_file(target, enc, output_filename)

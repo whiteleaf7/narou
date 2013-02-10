@@ -122,7 +122,7 @@ class Downloader
   #
   def self.get_id_by_database(target)
     target = Narou.alias_to_id(target)
-    toc_url = get_toc_url(target)
+    toc_url = get_toc_url(target) or return nil
     @@database.get_id("toc_url", toc_url)
   end
 
@@ -131,7 +131,7 @@ class Downloader
   #
   def self.get_data_by_database(target)
     target = Narou.alias_to_id(target)
-    toc_url = get_toc_url(target)
+    toc_url = get_toc_url(target) or return nil
     @@database.get_data("toc_url", toc_url)
   end
 

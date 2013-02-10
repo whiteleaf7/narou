@@ -3,6 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "../narou"
 require_relative "../helper"
 
 module Command
@@ -44,11 +45,16 @@ module Command
         if i > 0
           puts "―" * 30
         end
-        unless Downloader.novel_exists?(target)
+        data = Downloader.get_data_by_database(target)
+        unless data
           puts "#{target} は存在しません"
           next
         end
-        title = Downloader.get_data_by_database(target)["title"]
+        title = data["title"]
+        if Narou.novel_frozen?(target)
+          puts "#{title} は凍結中です\n削除を中止しました"
+          next
+        end
         unless @options["yes"]
           next unless Helper.confirm("#{title} を#{(@options["with-file"] ? "“完全に”" : "")}削除しますか")
         end

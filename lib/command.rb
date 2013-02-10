@@ -26,15 +26,18 @@ module Command
     #"interactive" => Interactive.new,
     "remove" => Remove.new,
     "alias" => Alias.new,
-    "folder" => Folder.new,
     "setting" => Setting.new,
+    "folder" => Folder.new,
     "browser" => Browser.new,
+    "freeze" => Freeze.new,
     "help" => Help.new,
     "version" => Version.new,
     "init" => Init.new   # 特殊コマンドなので一覧には表示されない
   }
 
-  Shortcuts = Hash[*get_list.keys.map { |s|
+  # ショートカット定義
+  # COMMAND_LIST の上から順に優先度が高い
+  Shortcuts = Hash[*get_list.keys.reverse.map { |s|
     [s[0], s, s[0..1], s]
   }.flatten]
 end

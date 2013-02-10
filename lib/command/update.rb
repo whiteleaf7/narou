@@ -48,13 +48,18 @@ module Command
           puts "#{target} は存在しません"
           next
         end
+        title = data["title"]
+        if Narou.novel_frozen?(target)
+          puts "#{title} は凍結中です\nアップデートを中止しました"
+          next
+        end
         is_updated = Downloader.start(target)
         if is_updated
           unless @options["no-convert"]
             Convert.execute_and_rescue_exit([target])
           end
         else
-          puts "#{data["title"]} に更新はありません"
+          puts "#{title} に更新はありません"
         end
       end
     end

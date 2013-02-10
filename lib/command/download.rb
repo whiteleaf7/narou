@@ -3,6 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "../narou"
 require_relative "../downloader"
 
 module Command
@@ -44,8 +45,12 @@ module Command
         if i > 1
           puts "―" * 30
         end
-        if !@options["force"] && Downloader.novel_exists?(target)
-          data = Downloader.get_data_by_database(target)
+        data = Downloader.get_data_by_database(target)
+        if Narou.novel_frozen?(target)
+          puts "#{data["title"]} は凍結中です\nダウンロードを中止しました"
+          next
+        end
+        if !@options["force"] && data
           puts "#{target} はダウンロード済みです。"
           puts "ID: #{data["id"]}"
           puts "title: #{data["title"]}"
