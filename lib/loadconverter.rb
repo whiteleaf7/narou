@@ -4,6 +4,7 @@
 #
 
 require_relative "converterbase"
+require_relative "helper"
 
 class Converter < ConverterBase; end
 
@@ -49,7 +50,7 @@ class Converter < ConverterBase; end
 def load_converter(path)
   converter_path = File.join(path, "converter.rb")
   if File.exists?(converter_path)
-    if RUBY_PLATFORM =~ /mswin(?!ce)|mingw|cygwin|bccwin/i
+    if Helper.os_windows?
       load converter_path.encode(Encoding::Windows_31J)
     else
       load converter_path
