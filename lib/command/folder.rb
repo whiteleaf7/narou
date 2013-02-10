@@ -11,11 +11,11 @@ module Command
       super("<target> [<target2> ...]")
       @opt.separator <<-EOS
 
-  ・指定した小説の保存フォルダを開きます
+  ・指定した小説の保存フォルダを開きます。
 
   Example:
-    narou open n9669bk
-    narou open musyoku
+    narou folder n9669bk
+    narou folder musyoku
       EOS
     end
 
