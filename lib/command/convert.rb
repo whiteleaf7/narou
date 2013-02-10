@@ -6,6 +6,7 @@
 require_relative "../database"
 require_relative "../downloader"
 require_relative "../novelconverter"
+require_relative "../localsetting"
 
 module Command
   class Convert < CommandBase
@@ -49,9 +50,25 @@ module Command
       @opt.on("--no-open", "出力時に保存フォルダを開かない") {
         @options["no-open"] = true
       }
+      @opt.separator <<-EOS
+
+  Configuration:
+    --no-epub, --no-mobi, --no-open は narou setting コマンドで恒常的な設定にすることが可能です。
+    詳しくは narou setting --help を参照して下さい。
+      EOS
+    end
+
+    def load_local_settings
+      local_settings = LocalSetting.get["local_setting"]
+      local_settings.each do |name, value|
+        if name =~ /^convert\.(.+)$/
+          @options[$1] = value
+        end
+      end
     end
 
     def execute(argv)
+      load_local_settings    # @opt.on 実行前に設定ロードしたいので super 前で実行する
       super
       if argv.empty?
         puts @opt.help

@@ -56,6 +56,10 @@ module Command
           puts "別名にはアルファベット・数字・アンダースコアしか使えません"
           next
         end
+        if target.nil?
+          puts "書式が間違っています。#{alias_name}=別名 のように書いて下さい"
+          next
+        end
         if target == ""
           aliases.delete(alias_name)
           puts "#{alias_name} を解除しました"

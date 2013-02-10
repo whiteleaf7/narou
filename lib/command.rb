@@ -27,6 +27,7 @@ module Command
     "remove" => Remove.new,
     "alias" => Alias.new,
     "folder" => Folder.new,
+    "setting" => Setting.new,
     "browser" => Browser.new,
     "help" => Help.new,
     "version" => Version.new,
