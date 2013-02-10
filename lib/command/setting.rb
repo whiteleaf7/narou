@@ -15,19 +15,20 @@ module Command
       # 変数名  => [受け付ける型, 説明]
       "convert.no-epub" => [:boolean, "EPUB変換を有効にするかどうか"],
       "convert.no-mobi" => [:boolean, "MOBI変換を有効にするかどうか"],
-      "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開くかどうか"]
+      "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開くかどうか"],
+      "convert.copy_to" => [:dir, "変換したらこのフォルダにコピーする"]
     }
 
     class InvalidVariableType < StandardError
       def initialize(type)
-        super("値の型が #{Setting.variable_type_to_description(type)} ではありません")
+        super("値が #{Setting.variable_type_to_description(type).rstrip} ではありません")
       end
     end
 
     class InvalidVariableName < StandardError; end
 
     def initialize
-      super("[<name>=<value> ...] [options...]")
+      super("[<name>=<value> ...] [options]")
       @opt.separator <<-EOS
 
   ・各コマンドの設定の変更が出来ます。
@@ -38,7 +39,7 @@ module Command
       @opt.separator("        <name>           <value>              説明")
       SETTING_VARIABLES.each do |name, info|
         type_description = self.class.variable_type_to_description(info[0])
-        @opt.separator("    #{name.ljust(18)} #{type_description.ljust(10)} #{info[1]}")
+        @opt.separator("    #{name.ljust(18)} #{type_description} #{info[1]}")
       end
 
       @opt.separator <<-EOS
@@ -59,11 +60,13 @@ module Command
     def self.variable_type_to_description(type)
       case type
       when :boolean
-        "true/false"
+        "true/false  "
       when :integer
-        "数値"
+        "数値        "
       when :string
-        "文字列"
+        "文字列      "
+      when :dir
+        "フォルダパス"
       else
         ""
       end
@@ -98,11 +101,16 @@ module Command
           raise InvalidVariableType, :boolean
         end
       when :integer
-        case value
-        when /^[+-]?\d+$/
+        if value =~ /^[+-]?\d+$/
           result = value.to_i
         else
           raise InvalidVariableType, :integer
+        end
+      when :dir
+        if File.directory?(value)
+          result = File.expand_path(value)
+        else
+          raise InvalidVariableType, :dir
         end
       when :string
         result = value

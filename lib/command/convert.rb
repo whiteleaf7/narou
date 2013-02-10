@@ -3,6 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require "fileutils"
 require_relative "../database"
 require_relative "../downloader"
 require_relative "../novelconverter"
@@ -11,6 +12,10 @@ require_relative "../localsetting"
 module Command
   class Convert < CommandBase
     @@database = Database.instance
+
+    def oneline_help
+      "小説を変換します。管理小説以外にテキストファイルも変換可能"
+    end
 
     def initialize
       super("<target> [<target2> ...] [option]")
@@ -54,6 +59,7 @@ module Command
 
   Configuration:
     --no-epub, --no-mobi, --no-open は narou setting コマンドで恒常的な設定にすることが可能です。
+    convert.copy_to を設定すれば変換した最終出力ファイルを指定のフォルダに自動でコピー出来ます。
     詳しくは narou setting --help を参照して下さい。
       EOS
     end
@@ -109,19 +115,24 @@ module Command
           next unless converted_txt_path
         end
         converted_txt_dir = File.dirname(converted_txt_path)
-        unless @options["no-epub"]
+        if @options["no-epub"]
+          copied_file_path = copy_to_converted_file(converted_txt_path)
+        else
           # epub
           res = NovelConverter.txt_to_epub(converted_txt_path)
           next if res != :success
+          
+          if argument_target_type == :file
+            data = get_title_and_author_by_textfile(converted_txt_path)
+          else
+            data = Downloader.get_data_by_database(target)
+          end
+          epub_path = File.join(converted_txt_dir, %![#{data["author"]}] #{data["title"]}.epub!)
 
-          unless @options["no-mobi"]
+          if @options["no-mobi"]
+            copied_file_path = copy_to_converted_file(epub_path)
+          else
             # mobi
-            if argument_target_type == :file
-              data = get_title_and_author_by_textfile(converted_txt_path)
-            else
-              data = Downloader.get_data_by_database(target)
-            end
-            epub_path = File.join(converted_txt_dir, %![#{data["author"]}] #{data["title"]}.epub!)
             res = NovelConverter.epub_to_mobi(epub_path)
             next if res != :success
             # strip
@@ -130,8 +141,13 @@ module Command
             kindlestrip_path = File.join(Narou.get_script_dir, "kindlestrip.py")
             command = %!python "#{kindlestrip_path}" "#{mobi_path}" "#{mobi_path}"!
             `#{command}`
+            copied_file_path = copy_to_converted_file(mobi_path)
 
             puts "MOBIファイルを出力しました"
+          end
+
+          if copied_file_path
+            puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
           end
         end
 
@@ -153,8 +169,11 @@ module Command
       { "title" => title, "author" => author }
     end
 
-    def oneline_help
-      "小説を変換します。管理小説以外にテキストファイルも変換可能"
+    def copy_to_converted_file(src_path)
+      copy_to_dir = @options["copy_to"]
+      return nil unless copy_to_dir
+      FileUtils.copy(src_path, copy_to_dir)
+      File.join(copy_to_dir, File.basename(src_path))
     end
   end
 end
