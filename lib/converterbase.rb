@@ -186,7 +186,8 @@ class ConverterBase
   #
   def delete_narou_mobile_tag(data)
     data.gsub!("【改ページ】", "")
-    data.gsub!("<KBR>", "")
+    data.gsub!(/<KBR>/i, "")
+    data.gsub!(/<PBR>/i, "\n")
   end
 
   ROME_NUM_ALPHABET = %w(II III IV VI VII VIII IX ii iii iv vi vii viii ix)
