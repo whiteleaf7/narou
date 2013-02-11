@@ -71,9 +71,7 @@ class Database
   end
 
   def save_database
-    open(@@database_path, "w") do |fp|
-      fp.write(YAML.dump(@database))
-    end
+    File.write(@@database_path, YAML.dump(@database))
   end
 
   def get_object

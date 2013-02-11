@@ -515,7 +515,7 @@ class ConverterBase
         joined_str = joined_str.split("\n").map { |s|
           s.sub(/^　/, "")
         }.join
-        error = @inspector.check_auto_join_brackets(match, joined_str, bracket)
+        error = @inspector.validate_singular_auto_join_brackets(match, joined_str, bracket)
         if error
           # 連結した文章を検査した結果、異常を検知したため連結を中止する
           match

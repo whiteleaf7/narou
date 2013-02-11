@@ -88,7 +88,7 @@ class Inspector
   #
   # 連結具合の異常を検出
   #
-  def check_auto_join_brackets(raw_strings, joined_strings, bracket)
+  def validate_singular_auto_join_brackets(raw_strings, joined_strings, bracket)
     error_result = false
     # カギ括弧の開き・閉じの数が合わない
     if joined_strings.count(bracket[0]) != joined_strings.count(bracket[1])
@@ -116,7 +116,7 @@ class Inspector
   #
   # 行末読点の状況を調べる
   #
-  def check_end_touten_conditions(data)
+  def inspect_end_touten_conditions(data)
     return if @setting.enable_auto_join_line
     num = 0
     data.scan(/、\n　/) do
@@ -135,7 +135,7 @@ class Inspector
   #
   # カギ括弧内の改行状況を調べる
   #
-  def check_return_count_in_brackets(data)
+  def countup_return_in_brackets(data)
     return if @setting.enable_auto_join_in_brackets
     max = 0
     brackets_num = 0

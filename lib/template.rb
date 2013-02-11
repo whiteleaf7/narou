@@ -21,9 +21,7 @@ class Template
     if File.directory?(dest_filepath)
       dest_filepath = File.join(dest_filepath, src_filename)
     end
-    open(dest_filepath, "w") do |fp|
-      fp.write(result)
-    end
+    File.write(dest_filepath, result)
   end
 
   #

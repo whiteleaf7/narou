@@ -36,9 +36,8 @@ class LocalSetting
 
   def save_settings
     @local_settings.each do |name, setting|
-      open(File.join(Narou.get_local_setting_dir, name + ".yaml"), "w") do |fp|
-        fp.write(YAML.dump(setting))
-      end
+      path = File.join(Narou.get_local_setting_dir, name + ".yaml")
+      File.write(path, YAML.dump(setting))
     end
   end
 

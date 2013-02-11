@@ -471,9 +471,7 @@ class Downloader
     unless File.exists?(dir_path)
       FileUtils.mkdir(dir_path)
     end
-    open(path, "w") do |fp|
-      fp.write(YAML.dump(object))
-    end
+    File.write(path, YAML.dump(object))
   end
 
   #

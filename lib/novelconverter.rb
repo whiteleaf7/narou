@@ -202,7 +202,7 @@ class NovelConverter
       result = create_novel_text_by_template(@toc, sections)
     end
 
-    make_midashi_and_save(result)
+    midashi_save(result)
     inspect_novel(result)
 
     if @output_filename
@@ -213,24 +213,21 @@ class NovelConverter
         save_path += CONVERTED_FILE_EXT
       end
     end
-    open(save_path, "w") do |fp|
-      fp.write(result)
-    end
+    File.write(save_path, result)
     puts "#{File.basename(save_path)} を出力しました"
     save_path
   end
 
-  def make_midashi_and_save(text)
+  def midashi_save(text)
     midashi_list = listup_midashi(text)
-    open(File.join(@setting.archive_path, "見出しリスト.txt"), "w") do |fp|
-      fp.write(midashi_list)
-    end
+    path = File.join(@setting.archive_path, "見出しリスト.txt")
+    File.write(path, midashi_list)
   end
 
   def inspect_novel(text)
     # 行末読点の現在状況を調査する
-    @inspector.check_end_touten_conditions(text)
-    @inspector.check_return_count_in_brackets(text)
+    @inspector.inspect_end_touten_conditions(text)
+    @inspector.countup_return_in_brackets(text)
 
     # 小説の監視・検査状況を出力・保存する
     if @inspector.error? || @inspector.warning?
