@@ -53,11 +53,11 @@ module Command
         end
         alias_name, target = arg.split("=", 2)
         unless alias_name =~ /^\w+$/
-          puts "別名にはアルファベット・数字・アンダースコアしか使えません"
+          warn "別名にはアルファベット・数字・アンダースコアしか使えません"
           next
         end
         if target.nil?
-          puts "書式が間違っています。#{alias_name}=別名 のように書いて下さい"
+          warn "書式が間違っています。#{alias_name}=別名 のように書いて下さい"
           next
         end
         if target == ""
@@ -66,7 +66,7 @@ module Command
           next
         end
         unless Downloader.novel_exists?(target)
-          puts "#{target} は存在しません"
+          warn "#{target} は存在しません"
           next
         end
         data = Downloader.get_data_by_database(target)

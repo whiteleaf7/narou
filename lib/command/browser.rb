@@ -28,7 +28,7 @@ module Command
       argv.each do |target|
         toc_url = Downloader.get_toc_url(target)
         unless toc_url
-          puts "#{target} は存在しません"
+          warn "#{target} は存在しません"
           next
         end
         Helper.open_url_by_browser(toc_url)

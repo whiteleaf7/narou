@@ -149,9 +149,9 @@ module Command
         name, value = arg.split("=", 2).map(&:strip)
         if value.nil?
           if valid_variable_name?(name)
-            puts "書式が間違っています。#{name}=値 のように書いて下さい"
+            warn "書式が間違っています。#{name}=値 のように書いて下さい"
           else
-            puts "書式が間違っています。"
+            warn "書式が間違っています。"
           end
           next
         end
@@ -163,7 +163,7 @@ module Command
         begin
           casted_value = validate_variable(name, value)
         rescue InvalidVariableName, InvalidVariableType => e
-          puts e.message
+          warn e.message
           next
         end
         local_settings[name] = casted_value

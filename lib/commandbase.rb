@@ -16,10 +16,10 @@ module Command
     def execute(argv)
       @opt.parse!(argv)
     rescue OptionParser::InvalidOption => e
-      puts "不正なオプションです(#{e})"
+      warn "不正なオプションです(#{e})"
       exit 1
     rescue OptionParser::MissingArgument => e
-      puts "オプションの引数が不正です(#{e})"
+      warn "オプションの引数が不正です(#{e})"
       exit 1
     end
 

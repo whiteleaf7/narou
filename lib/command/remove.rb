@@ -47,7 +47,7 @@ module Command
         end
         data = Downloader.get_data_by_database(target)
         unless data
-          puts "#{target} は存在しません"
+          warn "#{target} は存在しません"
           next
         end
         title = data["title"]

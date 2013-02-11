@@ -33,14 +33,14 @@ class Downloader
       toc_url = get_toc_url(target)
       setting = @@settings.find { |s| s.multi_match(toc_url, "url") }
       unless setting
-        puts "対応外のURLです(#{target})"
-        exit 1
+        warn "対応外のURLです(#{target})"
+        return false
       end
     when :id
       data = @@database[target.to_i]
       unless data
-        puts "指定のID(#{target})は存在しません"
-        exit 1
+        warn "指定のID(#{target})は存在しません"
+        return false
       end
       setting = get_setting(data["sitename"])
       setting.multi_match(data["toc_url"], "url")
@@ -51,8 +51,8 @@ class Downloader
         setting = get_setting(data["sitename"])
         setting.multi_match(data["toc_url"], "url")
       else
-        puts "指定の小説(#{target})は存在しません"
-        exit 1
+        warn "指定の小説(#{target})は存在しません"
+        return false
       end
     end
     downloader = Downloader.new(setting)
@@ -111,8 +111,8 @@ class Downloader
     else
       @@database.delete(id)
       save_database
-      puts "#{path} が見つかりません。"
-      puts "保存ディレクトリが消去されていたため、管理リストから削除しました。"
+      warn "#{path} が見つかりません。"
+      warn "保存ディレクトリが消去されていたため、管理リストから削除しました。"
       return nil
     end
   end
@@ -190,7 +190,7 @@ class Downloader
   def self.get_setting(sitename)
     setting = @@settings.find { |s| s["name"] == sitename }
     return setting if setting
-    puts "#{data["sitename"]} の設定ファイルが見つかりません"
+    warn "#{data["sitename"]} の設定ファイルが見つかりません"
     exit 1
   end
 
@@ -207,11 +207,11 @@ class Downloader
       settings << setting
     end
     if settings.empty?
-      puts "小説サイトの定義ファイルがひとつもありません"
+      warn "小説サイトの定義ファイルがひとつもありません"
       exit 1
     end
     unless @@narou
-      puts "小説家になろうの定義ファイルが見つかりませんでした"
+      warn "小説家になろうの定義ファイルが見つかりませんでした"
       exit 1
     end
     settings
@@ -239,7 +239,7 @@ class Downloader
   def start_download(force = false)
     latest_toc = get_latest_table_of_contents
     unless latest_toc
-      puts "目次データが取得出来ませんでした"
+      warn "目次データが取得出来ませんでした"
       exit 1
     end
     old_toc = load_novel_data(TOC_FILE_NAME)
@@ -290,8 +290,8 @@ class Downloader
       end
     rescue OpenURI::HTTPError => e
       if e.message =~ /^404/
-        puts "指定された小説は存在しません"
-        exit 1
+        warn "指定されたURLは存在しません"
+        return false
       else
         raise
       end
@@ -359,7 +359,7 @@ class Downloader
   def sections_download_and_save(subtitles)
     max = subtitles.count
     return if max == 0
-    puts @title
+    puts @title + " のDL開始"
     subtitles.each_with_index do |subtitle_info, i|
       if @setting == @@narou
         # 小説家になろうは連続DL規制があるため、ウェイトを入れる必要がある
@@ -396,12 +396,12 @@ class Downloader
     rescue OpenURI::HTTPError => e
       if e.message =~ /^503/
         if retry_count == 0
-          puts "上限までリトライしましたがファイルがダウンロード出来ませんでした"
+          warn "上限までリトライしましたがファイルがダウンロード出来ませんでした"
           exit 1
         end
         retry_count -= 1
-        puts "server message: #{e.message}"
-        puts "リトライ待機中……"
+        warn "server message: #{e.message}"
+        warn "リトライ待機中……"
         sleep(WAITING_TIME_FOR_503)
         retry
       else

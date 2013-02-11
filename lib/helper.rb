@@ -32,7 +32,7 @@ module Helper
 
   def self.confirm(message)
     confirm_msg = "#{message} (y/n)?: "
-    print confirm_msg
+    STDOUT.print confirm_msg   # Logger でロギングされないように直接標準出力に表示
     while input = STDIN.gets
       case input[0].downcase
       when "y"
@@ -40,7 +40,7 @@ module Helper
       when "n"
         return false
       else
-        print confirm_msg
+        STDOUT.print confirm_msg
       end
     end
   end

@@ -98,9 +98,10 @@ module Command
             next unless converted_txt_path
           rescue ArgumentError => e
             if e.message =~ /invalid byte sequence in UTF-8/
-              puts "テキストファイルの文字コードがUTF-8ではありません。--enc オプションでテキストのエンコーディングを指定して下さい"
-              puts "(#{e.message})"
-              exit 1
+              warn "#{target}"
+              warn "テキストファイルの文字コードがUTF-8ではありません。--enc オプションでテキストのエンコーディングを指定して下さい"
+              warn "(#{e.message})"
+              next
             else
               raise
             end
@@ -108,7 +109,7 @@ module Command
         else
           argument_target_type = :novel
           unless Downloader.novel_exists?(target)
-            puts "#{target} は存在しません"
+            warn "#{target} は存在しません"
             next
           end
           converted_txt_path = NovelConverter.convert(target, output_filename)

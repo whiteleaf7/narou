@@ -74,7 +74,7 @@ class NovelConverter
     aozoraepub3_basename = File.basename(aozoraepub3_path)
     aozoraepub3_dir = File.dirname(aozoraepub3_path)
     unless File.exists?(aozoraepub3_path)
-      puts "AozoraEpub3が見つからなかったので、EPUBが出力出来ませんでした"
+      warn "AozoraEpub3が見つからなかったので、EPUBが出力出来ませんでした"
       return nil
     end
     Dir.chdir(aozoraepub3_dir)
@@ -90,9 +90,9 @@ class NovelConverter
     stdout_capture = res[0].force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
     Dir.chdir(pwd)
     if stdout_capture =~ /^\[ERROR\]/
-      puts
-      puts "AozoraEpub3実行中にエラーが発生したため、EPUBが出力出来ませんでした"
-      puts stdout_capture.rstrip
+      warn ""
+      warn "AozoraEpub3実行中にエラーが発生したため、EPUBが出力出来ませんでした"
+      warn stdout_capture.rstrip
       return :error
     end
     warn_list = stdout_capture.scan(/^\[WARN\].+$/)
@@ -126,16 +126,16 @@ class NovelConverter
     stdout_capture.force_encoding(Encoding::UTF_8)
     if proccess_status.exited?
       if proccess_status.exitstatus == 2
-        puts
-        puts "kindlegen実行中にエラーが発生したため、MOBIが出力出来ませんでした"
+        warn ""
+        warn "kindlegen実行中にエラーが発生したため、MOBIが出力出来ませんでした"
         if stdout_capture.scan(/(エラー\(.+?\):\w+?:.+)$/)
-          puts $1
+          warn $1
         end
         return :error
       end
     else
-      puts
-      puts "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
+      warn ""
+      warn "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
       return :abort
     end
     puts "変換しました"
@@ -231,14 +231,14 @@ class NovelConverter
 
     # 小説の監視・検査状況を出力・保存する
     if @inspector.error? || @inspector.warning?
-      puts "―― 小説にエラーもしくは警告が存在します ――"
+      warn "―― 小説にエラーもしくは警告が存在します ――"
       @inspector.display(Inspector::ERROR | Inspector::WARNING)
-      puts
+      warn ""
     end
     if @inspector.info?
-      puts "―― 小説の検査状況を表示します ――"
+      warn "―― 小説の検査状況を表示します ――"
       @inspector.display(Inspector::INFO)
-      puts
+      warn ""
     end
     @inspector.save
   end

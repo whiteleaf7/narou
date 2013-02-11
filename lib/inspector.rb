@@ -42,7 +42,7 @@ class Inspector
     @info
   end
 
-  def display(klass = ALL, target = $>)
+  def display(klass = ALL, target = $stderr)
     target.puts @messages.map { |msg|
       if msg =~ /^\[(.+)\]/
         key = KLASS_TAG.key($1)
@@ -92,7 +92,7 @@ class Inspector
     error_result = false
     # カギ括弧の開き・閉じの数が合わない
     if joined_strings.count(bracket[0]) != joined_strings.count(bracket[1])
-      error("auto_join_in_brackets: カギ括弧(#{bracket[0]}、#{bracket[1]})の開き・閉じの数が合わないので" + \
+      warning("auto_join_in_brackets: カギ括弧(#{bracket[0]}、#{bracket[1]})の開き・閉じの数が合わないので" + \
             "連結を中止しました。カギ括弧が閉じていない、もしくは同じ種類のカギ括弧が二重に使われている" + \
             "可能性があります。\n" + \
             omit_message(raw_strings))
