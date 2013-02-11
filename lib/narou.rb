@@ -33,7 +33,12 @@ module Narou
   end
 
   def self.get_local_setting_dir
-    File.join(get_root_dir, LOCAL_SETTING_DIR)
+    root_dir = get_root_dir
+    if root_dir
+      File.join(root_dir, LOCAL_SETTING_DIR)
+    else
+      nil
+    end
   end
 
   def self.get_script_dir

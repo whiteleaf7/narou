@@ -52,9 +52,12 @@ class LocalSetting
   #
   def load_settings
     settings = {}
-    Dir.glob(File.join(Narou.get_local_setting_dir, "*.yaml")) do |path|
-      name = File.basename(path, ".yaml")
-      settings[name] = YAML.load_file(path)
+    local_setting_dir = Narou.get_local_setting_dir
+    if local_setting_dir
+      Dir.glob(File.join(local_setting_dir, "*.yaml")) do |path|
+        name = File.basename(path, ".yaml")
+        settings[name] = YAML.load_file(path)
+      end
     end
     settings
   end
