@@ -19,6 +19,12 @@ class Inspector
 
   KLASS_TAG = { ERROR => "エラー", WARNING =>  "警告", INFO => "INFO" }
 
+  attr_writer :messages
+
+  def self.read_messages(setting)
+    File.read(File.join(setting.archive_path, ERROR_LOG_NAME))
+  end
+
   def initialize(setting)
     @setting = setting
     @messages = []
@@ -58,7 +64,7 @@ class Inspector
   def save(path = nil)
     path = File.join(@setting.archive_path, ERROR_LOG_NAME) if path.nil?
     open(path, "w") do |fp|
-      fp.puts "--- エラーログ出力 #{Time.now} ---"
+      fp.puts "--- ログ出力 #{Time.now} ---"
       display(ALL, fp)
     end
   end

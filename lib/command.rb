@@ -21,17 +21,18 @@ module Command
     "download" => Download.new,
     "update" => Update.new,
     "list" => List.new,
-    #"new" => New.new,
     "convert" => Convert.new,
-    #"interactive" => Interactive.new,
-    "remove" => Remove.new,
     "alias" => Alias.new,
+    "error"=> Error.new,
+    "remove" => Remove.new,
     "setting" => Setting.new,
     "folder" => Folder.new,
     "browser" => Browser.new,
     "freeze" => Freeze.new,
     "help" => Help.new,
     "version" => Version.new,
+    #"new" => New.new,
+    #"interactive" => Interactive.new,
     "init" => Init.new   # 特殊コマンドなので一覧には表示されない
   }
 

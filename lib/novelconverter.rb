@@ -12,6 +12,7 @@ require_relative "downloader"
 require_relative "template"
 require_relative "progressbar"
 require_relative "helper"
+require_relative "localsetting"
 
 class NovelConverter
   NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
@@ -169,7 +170,6 @@ class NovelConverter
     (io = conv.after_convert(io, text_type)).rewind    # 特殊事後変換処理
     return io.read
   end
-  
 
   #
   # 変換処理メイン
@@ -216,6 +216,9 @@ class NovelConverter
     end
     File.write(save_path, result)
     puts "#{File.basename(save_path)} を出力しました"
+
+    update_latest_convert_novel
+
     save_path
   end
 
@@ -263,6 +266,15 @@ class NovelConverter
       end
     end
     list
+  end
+
+  #
+  # 最近変換した小説IDを記録更新
+  #
+  def update_latest_convert_novel
+    id = Downloader.get_id_by_database(@novel_name)
+    LocalSetting.get["latest_convert"]["id"] = id
+    LocalSetting.get.save_settings
   end
 
   #

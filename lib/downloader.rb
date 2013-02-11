@@ -20,6 +20,8 @@ class Downloader
   WAITING_TIME_FOR_503 = 20   # 503 のときに待機する秒数
   RETRY_MAX_FOR_503 = 5   # 503 のときに何回再試行するか
 
+  attr_reader :id
+
   #
   # ターゲット(ID、URL、Nコード、小説名)を指定して小説データのダウンロードを開始する
   #
