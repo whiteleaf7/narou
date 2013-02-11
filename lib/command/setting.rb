@@ -13,15 +13,22 @@ module Command
 
     SETTING_VARIABLES = {
       # 変数名  => [受け付ける型, 説明]
-      "convert.no-epub" => [:boolean, "EPUB変換を有効にするかどうか"],
-      "convert.no-mobi" => [:boolean, "MOBI変換を有効にするかどうか"],
-      "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開くかどうか"],
-      "convert.copy_to" => [:dir, "変換したらこのフォルダにコピーする"]
+      "convert.no-epub" => [:boolean, "EPUB変換を無効にするかどうか"],
+      "convert.no-mobi" => [:boolean, "MOBI変換を無効にするかどうか"],
+      "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開かない"],
+      "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
+                                    "    ※存在しないフォルダだとエラーになるので注意"]
     }
 
     class InvalidVariableType < StandardError
       def initialize(type)
         super("値が #{Setting.variable_type_to_description(type).rstrip} ではありません")
+      end
+    end
+
+    class UnknownVariableType < StandardError
+      def initialize(type)
+        super("unknwon variable type (:#{type})")
       end
     end
 
@@ -48,6 +55,8 @@ module Command
     narou setting --list
     narou setting convert.no-open=true
     narou setting convert.no-epub=   # 右辺に何も書かないとその設定を削除できる
+    narou setting convert.copy_to=C:/dropbox/mobi
+    narou s convert.copy_to="C:\\Documents and Setting\\user\\epub"
 
   Optioins:
       EOS
@@ -65,10 +74,12 @@ module Command
         "数値        "
       when :string
         "文字列      "
-      when :dir
+      when :directory
         "フォルダパス"
+      when :file
+        "ファイルパス"
       else
-        ""
+        raise UnknownVariableType, type
       end
     end
 
@@ -98,29 +109,31 @@ module Command
         when /false/i
           result = false
         else
-          raise InvalidVariableType, :boolean
+          raise InvalidVariableType, type
         end
       when :integer
         if value =~ /^[+-]?\d+$/
           result = value.to_i
         else
-          raise InvalidVariableType, :integer
+          raise InvalidVariableType, type
         end
-      when :dir
-        if File.directory?(value)
+      when :directory, :file
+        if File.method("#{type}?").call(value)
           result = File.expand_path(value)
         else
-          raise InvalidVariableType, :dir
+          raise InvalidVariableType, type
         end
       when :string
         result = value
+      else
+        raise UnknownVariableType, type
       end
       result
     end
 
     def output_setting_list
       LocalSetting.get["local_setting"].each do |name, value|
-        puts "#{name} = #{value}"
+        puts "#{name}=#{value}"
       end
     end
 
@@ -132,7 +145,7 @@ module Command
       end
       local_settings = LocalSetting.get["local_setting"]
       argv.each do |arg|
-        name, value = arg.split("=", 2)
+        name, value = arg.split("=", 2).map(&:strip)
         if value.nil?
           if valid_variable_name?(name)
             puts "書式が間違っています。#{name}=値 のように書いて下さい"
