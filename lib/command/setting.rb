@@ -17,7 +17,8 @@ module Command
       "convert.no-mobi" => [:boolean, "MOBI変換を無効にするかどうか"],
       "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開かない"],
       "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
-                                    "    ※存在しないフォルダだとエラーになるので注意"]
+                                    "    ※存在しないフォルダだとエラーになるので注意"],
+      "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを変更"]
     }
 
     class InvalidVariableType < StandardError
@@ -56,7 +57,7 @@ module Command
     narou setting convert.no-open=true
     narou setting convert.no-epub=   # 右辺に何も書かないとその設定を削除できる
     narou setting convert.copy_to=C:/dropbox/mobi
-    narou s convert.copy_to="C:\\Documents and Setting\\user\\epub"
+    narou s convert.copy_to="C:\\Documents and Settings\\user\\epub"
 
   Optioins:
       EOS

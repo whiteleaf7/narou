@@ -4,7 +4,6 @@
 #
 
 require "open3"
-require_relative "narou"
 
 #
 # 雑多なお助けメソッド群
@@ -12,8 +11,6 @@ require_relative "narou"
 # MacOSX 関連は確認してないので動作するか不明
 #
 module Helper
-  AOZORAEPUB3_PATH = "./AozoraEpub3/AozoraEpub3.jar"
-
   def self.os_windows?
     @@os_is_windows ||= RUBY_PLATFORM =~ /mswin(?!ce)|mingw|cygwin|bccwin/i
   end
@@ -31,10 +28,6 @@ module Helper
     else
       :other
     end
-  end
-
-  def self.get_aozoraepub3_path
-    File.expand_path(File.join(Narou.get_root_dir, AOZORAEPUB3_PATH))
   end
 
   def self.confirm(message)

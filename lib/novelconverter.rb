@@ -70,7 +70,7 @@ class NovelConverter
       dst_option = %!-dst "#{File.expand_path(dst_dir)}"!
     end
     pwd = Dir.pwd
-    aozoraepub3_path = Helper.get_aozoraepub3_path
+    aozoraepub3_path = Narou.get_aozoraepub3_path
     aozoraepub3_basename = File.basename(aozoraepub3_path)
     aozoraepub3_dir = File.dirname(aozoraepub3_path)
     unless File.exists?(aozoraepub3_path)
@@ -86,7 +86,7 @@ class NovelConverter
     res = Helper::AsyncCommand.exec(command) do
       print "."
     end
-    # TODO: Windows環境以外での出力される文字コードはSJISなのか？
+    # MEMO: Windows環境以外での出力される文字コードはSJISなのか？
     stdout_capture = res[0].force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
     Dir.chdir(pwd)
     if stdout_capture =~ /^\[ERROR\]/
@@ -111,7 +111,7 @@ class NovelConverter
   # 返り値：正常終了 :success、エラー終了 :error、中断終了 :abort、kindlegenがなかった nil
   #
   def self.epub_to_mobi(epub_path)
-    kindlegen_path = File.join(File.dirname(Helper.get_aozoraepub3_path), "kindlegen")
+    kindlegen_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "kindlegen")
     return nil if Dir.glob(kindlegen_path + "*").empty?
 
     if Helper.os_windows?

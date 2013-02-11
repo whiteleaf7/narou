@@ -9,6 +9,8 @@ require_relative "localsetting"
 
 module Narou
   LOCAL_SETTING_DIR = ".narou"
+  AOZORAEPUB3_EXE_NAME = "AozoraEpub3.jar"
+  AOZORAEPUB3_DIR = "./AozoraEpub3"
 
   @@root_dir = nil
 
@@ -61,5 +63,32 @@ module Narou
   def self.novel_frozen?(target)
     id = Downloader.get_id_by_database(target) or return false
     LocalSetting.get["freeze"].include?(id)
+  end
+
+  #
+  # AozoraEpub3 の実行ファイル(.jar)のフルパス取得
+  # 検索順序
+  # 1. ローカルセッティング (local_setting aozoraepub3path)
+  # 2. 小説保存ディレクトリ(Narou.get_root_dir) 直下の AozoraEpub3
+  # 3. スクリプト保存ディレクトリ(Narou.get_script_dir) 直下の AozoraEpub3
+  #
+  def self.get_aozoraepub3_path
+    return @aozora_path if @aozora_path
+    localsetting_aozorapath = LocalSetting.get["local_setting"]["aozoraepub3path"]
+    if localsetting_aozorapath
+      aozora_path = File.join(localsetting_aozorapath, AOZORAEPUB3_EXE_NAME)
+      if File.exists?(aozora_path)
+        @aozora_path = aozora_path
+        return aozora_path
+      end
+    end
+    [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
+      aozora_path = File.expand_path(File.join(dir, AOZORAEPUB3_DIR, AOZORAEPUB3_EXE_NAME))
+      if File.exists?(aozora_path)
+        @aozora_path = aozora_path
+        return aozora_path
+      end
+    end
+    nil
   end
 end
