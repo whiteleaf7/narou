@@ -58,18 +58,17 @@ module Command
 
     def execute(argv)
       super
-      database = Database.instance.get_object.values
+      database_values = Database.instance.get_object.values
       if !argv.empty? && argv.first =~ /^\d+$/
         num = argv.first.to_i
       else
-        num = database.count
+        num = database_values.count
       end
       if @options["latest"]
-        database.sort_by! { |v| v["last_update"] }
-        database.reverse!   # 更新順に表示する場合は新しい順に表示する
+        database_values = Database.instance.sort_by_last_update
       end
-      database.reverse! if @options["reverse"]
-      novels = database[0, num]
+      database_values.reverse! if @options["reverse"]
+      novels = database_values[0, num]
       output_list(novels)
     end
 

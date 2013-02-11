@@ -103,4 +103,12 @@ class Database
     id = max_id ? max_id + 1 : 0
     id
   end
+
+  #
+  # last_update で更新順にソート
+  #
+  def sort_by_last_update
+    values = @database.values.sort_by { |v| v["last_update"] }.reverse
+    values
+  end
 end
