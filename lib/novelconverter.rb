@@ -145,7 +145,7 @@ class NovelConverter
 
   def initialize(setting, output_filename = nil, display_inspector = false)
     @setting = setting
-    @novel_name = setting.name
+    @novel_title = setting.title
     @output_filename = output_filename
     @inspector = Inspector.new(@setting)
     @illustration = Illustration.new(@setting, @inspector)
@@ -175,7 +175,7 @@ class NovelConverter
   # 変換処理メイン
   #
   def convert_main(text = nil)
-    puts "#{@novel_name} の変換を開始"
+    puts "#{@novel_title} の変換を開始"
     sections = []
 
     converter = load_converter(@setting.archive_path)
@@ -209,7 +209,7 @@ class NovelConverter
     if @output_filename
       save_path = File.join(@setting.archive_path, File.basename(@output_filename))
     else
-      save_path = File.join(@setting.archive_path, CONVERTED_FILENAME_PREFIX + @novel_name)
+      save_path = File.join(@setting.archive_path, CONVERTED_FILENAME_PREFIX + @novel_title)
       if save_path !~ /\.\w+$/
         save_path += CONVERTED_FILE_EXT
       end
@@ -272,7 +272,7 @@ class NovelConverter
   # 最近変換した小説IDを記録更新
   #
   def update_latest_convert_novel
-    id = Downloader.get_id_by_database(@novel_name)
+    id = Downloader.get_id_by_database(@novel_title)
     LocalSetting.get["latest_convert"]["id"] = id
     LocalSetting.get.save_settings
   end

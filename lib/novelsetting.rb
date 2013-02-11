@@ -9,7 +9,7 @@ require "inifile"   # gem install inifile
 class NovelSetting
   INI_NAME = "setting.ini"
 
-  attr_accessor :name, :archive_path
+  attr_accessor :title, :archive_path
 
   def self.create(target)
     archive_path = Downloader.get_novel_data_dir_by_target(target)
@@ -18,7 +18,7 @@ class NovelSetting
 
   def initialize(archive_path)
     @archive_path = archive_path
-    @name = archive_path.split("/").last
+    @title = archive_path.split("/").last
     load_setting
     set_attribute
   end
