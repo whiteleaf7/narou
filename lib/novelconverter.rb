@@ -23,10 +23,10 @@ class NovelConverter
   #
   # 返り値は保存したファイルのパス
   #
-  def self.convert(target, output_filename = nil)
+  def self.convert(target, output_filename = nil, display_inspector = false)
     setting = NovelSetting.create(target)
     if setting
-      novel_converter = new(setting, output_filename)
+      novel_converter = new(setting, output_filename, display_inspector)
       return novel_converter.convert_main
     end
     nil
@@ -37,7 +37,7 @@ class NovelConverter
   #
   # 返り値は保存したファイルのパス
   #
-  def self.convert_file(filename, encoding, output_filename = nil)
+  def self.convert_file(filename, encoding, output_filename = nil, display_inspector = false)
     if output_filename
       archive_path = File.dirname(output_filename) + "/"
     else
@@ -45,7 +45,7 @@ class NovelConverter
     end
     setting = NovelSetting.new(archive_path)
     setting.name = File.basename(filename)
-    novel_converter = new(setting, output_filename)
+    novel_converter = new(setting, output_filename, display_inspector)
     text = File.read(filename)
     if encoding
       text.force_encoding(encoding).encode!(Encoding::UTF_8)
@@ -142,12 +142,13 @@ class NovelConverter
     :success
   end
 
-  def initialize(setting, output_filename = nil)
+  def initialize(setting, output_filename = nil, display_inspector = false)
     @setting = setting
     @novel_name = setting.name
     @output_filename = output_filename
     @inspector = Inspector.new(@setting)
     @illustration = Illustration.new(@setting, @inspector)
+    @display_inspector = display_inspector
   end
 
   def load_novel_section(subtitle_info)
@@ -229,17 +230,24 @@ class NovelConverter
     @inspector.inspect_end_touten_conditions(text)
     @inspector.countup_return_in_brackets(text)
 
-    # 小説の監視・検査状況を出力・保存する
-    if @inspector.error? || @inspector.warning?
-      warn "―― 小説にエラーもしくは警告が存在します ――"
-      @inspector.display(Inspector::ERROR | Inspector::WARNING)
-      warn ""
+    if !@display_inspector
+      unless @inspector.empty?
+        puts "小説状態の調査結果を #{Inspector::ERROR_LOG_NAME} に出力しました"
+      end
+    else
+      # 小説の監視・検査状況を表示する
+      if @inspector.error? || @inspector.warning?
+        warn "―― 小説にエラーもしくは警告が存在します ――"
+        @inspector.display(Inspector::ERROR | Inspector::WARNING)
+        warn ""
+      end
+      if @inspector.info?
+        warn "―― 小説の検査状況を表示します ――"
+        @inspector.display(Inspector::INFO)
+        warn ""
+      end
     end
-    if @inspector.info?
-      warn "―― 小説の検査状況を表示します ――"
-      @inspector.display(Inspector::INFO)
-      warn ""
-    end
+
     @inspector.save
   end
 

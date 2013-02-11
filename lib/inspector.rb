@@ -7,6 +7,7 @@
 # 小説の状態を監視・検査する
 #
 class Inspector
+  ERROR_LOG_NAME = "エラーログ.txt"
   LINE_LENGTH_THRESHOLD = 400
   BRACKETS_RETURN_COUNT_THRESHOLD = 7
   END_TOUTEN_COUNT_THRESHOLD = 50
@@ -55,7 +56,7 @@ class Inspector
   end
 
   def save(path = nil)
-    path = File.join(@setting.archive_path, "エラーログ.txt") if path.nil?
+    path = File.join(@setting.archive_path, ERROR_LOG_NAME) if path.nil?
     open(path, "w") do |fp|
       fp.puts "--- エラーログ出力 #{Time.now} ---"
       display(ALL, fp)

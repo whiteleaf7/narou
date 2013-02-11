@@ -55,10 +55,13 @@ module Command
       @opt.on("--no-open", "出力時に保存フォルダを開かない") {
         @options["no-open"] = true
       }
+      @opt.on("-i", "--inspect", "小説状態の調査結果を表示する") {
+        @options["inspect"] = true
+      }
       @opt.separator <<-EOS
 
   Configuration:
-    --no-epub, --no-mobi, --no-open は narou setting コマンドで恒常的な設定にすることが可能です。
+    --no-epub, --no-mobi, --no-open , --inspect は narou setting コマンドで恒常的な設定にすることが可能です。
     convert.copy_to を設定すれば変換した最終出力ファイルを指定のフォルダに自動でコピー出来ます。
     詳しくは narou setting --help を参照して下さい。
       EOS
@@ -94,7 +97,7 @@ module Command
         if File.file?(target.to_s)
           argument_target_type = :file
           begin
-            converted_txt_path = NovelConverter.convert_file(target, enc, output_filename)
+            converted_txt_path = NovelConverter.convert_file(target, enc, output_filename, @options["inspect"])
             next unless converted_txt_path
           rescue ArgumentError => e
             if e.message =~ /invalid byte sequence in UTF-8/
@@ -112,7 +115,7 @@ module Command
             warn "#{target} は存在しません"
             next
           end
-          converted_txt_path = NovelConverter.convert(target, output_filename)
+          converted_txt_path = NovelConverter.convert(target, output_filename, @options["inspect"])
           next unless converted_txt_path
         end
         converted_txt_dir = File.dirname(converted_txt_path)

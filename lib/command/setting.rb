@@ -18,6 +18,7 @@ module Command
       "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開かない"],
       "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                     "    ※存在しないフォルダだとエラーになるので注意"],
+      "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
       "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを変更"]
     }
 
