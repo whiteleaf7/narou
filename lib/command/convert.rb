@@ -176,8 +176,13 @@ module Command
     def copy_to_converted_file(src_path)
       copy_to_dir = @options["copy_to"]
       return nil unless copy_to_dir
-      FileUtils.copy(src_path, copy_to_dir)
-      File.join(copy_to_dir, File.basename(src_path))
+      if File.directory?(copy_to_dir)
+        FileUtils.copy(src_path, copy_to_dir)
+        return File.join(copy_to_dir, File.basename(src_path))
+      else
+        warn "#{copy_to_dir} はフォルダではないかすでに削除されています。コピー出来ませんでした"
+        return nil
+      end
     end
   end
 end
