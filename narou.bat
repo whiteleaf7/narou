@@ -14,6 +14,7 @@ ruby -x "%~f0" %*
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "lib/logger"         # 標準出力と標準エラーのロギング開始
 require_relative "lib/commandline"
 
 $debug = false
@@ -28,7 +29,7 @@ if $debug
     backtrace = e.backtrace
     puts backtrace.shift + ": #{e.message} (#{e.class})"
     backtrace.each do |b|
-      puts "  from #{b}"
+      warn "  from #{b}"
     end
     exit 1
   end
