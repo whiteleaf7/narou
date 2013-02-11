@@ -34,8 +34,13 @@ class LocalSetting
     @local_settings[name] = setting
   end
 
-  def save_settings
-    @local_settings.each do |name, setting|
+  def save_settings(name = nil)
+    if name
+      save_list = { name => @local_settings[name] }
+    else
+      save_list = @local_settings
+    end
+    save_list.each do |name, setting|
       path = File.join(Narou.get_local_setting_dir, name + ".yaml")
       File.write(path, YAML.dump(setting))
     end

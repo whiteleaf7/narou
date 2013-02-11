@@ -112,7 +112,7 @@ class Downloader
       return path
     else
       @@database.delete(id)
-      save_database
+      @@database.save_database
       warn "#{path} が見つかりません。"
       warn "保存ディレクトリが消去されていたため、管理リストから削除しました。"
       return nil

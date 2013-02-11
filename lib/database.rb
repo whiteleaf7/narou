@@ -7,16 +7,16 @@ require "fileutils"
 require "singleton"
 require "yaml"
 require_relative "narou"
+require_relative "localsetting"
 
 class Database
   include Singleton
 
   ARCHIVE_ROOT_DIR_PATH = "小説データ/"
-  DATABASE_FILE_PATH = ARCHIVE_ROOT_DIR_PATH + "database.yaml"
+  DATABASE_NAME = "database"
 
   if Narou.already_init?
     @@archive_root_path = File.expand_path(File.join(Narou.get_root_dir, ARCHIVE_ROOT_DIR_PATH))
-    @@database_path = File.expand_path(File.join(Narou.get_root_dir, DATABASE_FILE_PATH))
   end
 
   def [](key)
@@ -40,9 +40,7 @@ class Database
   end
 
   def initialize
-    if Narou.already_init?
-      @database = self.class.load_database
-    end
+    @database = LocalSetting.get[DATABASE_NAME]
   end
 
   #
@@ -62,16 +60,8 @@ class Database
     @@archive_root_path
   end
 
-  def self.load_database
-    database = YAML.load_file(@@database_path)
-  rescue Errno::ENOENT
-    database = {}
-  ensure
-    database
-  end
-
   def save_database
-    File.write(@@database_path, YAML.dump(@database))
+    LocalSetting.get.save_settings(DATABASE_NAME)
   end
 
   def get_object
