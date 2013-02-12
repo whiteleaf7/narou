@@ -27,8 +27,8 @@ module Command
       end
       argv.each do |target|
         dir = Downloader.get_novel_data_dir_by_target(target)
-        puts dir
         Helper.open_directory_by_os_filer(dir)
+        puts dir
       end
     end
 
