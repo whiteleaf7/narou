@@ -4,7 +4,7 @@
 #
 
 require "fileutils"
-require "inifile"   # gem install inifile
+require_relative "ini"
 
 class NovelSetting
   INI_NAME = "setting.ini"
@@ -24,19 +24,19 @@ class NovelSetting
   end
 
   def load_setting
-    ini_path = @archive_path + INI_NAME
-    ini = IniFile.load(ini_path) || { global: {} }
+    ini_path = File.join(@archive_path, INI_NAME)
+    ini = Ini.load_file(ini_path)
     @setting = {}
     DEFAULT_SETTINGS.each do |element|
       name, value = element[:name], element[:value]
-      if ini[:global][name]
-        @setting[name] = cast_type(ini[:global][name])
+      if ini["global"][name]
+        @setting[name] = ini["global"][name]
       else
         @setting[name] = value
       end
     end
     # デフォルト設定以外を読み込む
-    ini[:global].each do |s|
+    ini["global"].each do |s|
       unless @setting.include?(s[0])
         @setting[s[0]] = cast_type(s[1])
       end
@@ -54,21 +54,6 @@ class NovelSetting
           @setting["#{key}"] = value
         end
       EOS
-    end
-  end
-
-  def cast_type(value)
-    case value.downcase
-    when /^[+-]?[0-9]+$/
-      value.to_i
-    when /^[+-]?[0-9]+¥.[0-9]+$/
-      value.to_f
-    when "true"
-      true
-    when "false"
-      false
-    else
-      value
     end
   end
 
