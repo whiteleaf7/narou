@@ -77,6 +77,23 @@ describe Ini, "#cast" do
   end
 end
 
+describe Ini, "を初期化した場合：" do
+  describe 'new("") した時' do
+    before do
+      @ini = Ini.new
+    end
+
+    it "は global セクションだけがあること" do
+      @ini.object.count.should == 1
+      @ini.object.include?("global").should be_true
+    end
+
+    it "の global セクションは空のハッシュだけであること" do
+      @ini.object["global"].empty?.should be_true
+    end
+  end
+end
+
 describe "test.ini" do
   before do
     @ini_data = Ini.load_file(data_test_ini_path)
