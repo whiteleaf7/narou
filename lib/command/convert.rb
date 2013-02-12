@@ -44,7 +44,7 @@ module Command
         @options["output"] = filename
       }
       @opt.on("-e ENCODING", "--enc ENCODING",
-              "テキストファイル指定時のエンコーディングを指定する。デフォルトはUTF8") { |encoding|
+              "テキストファイル指定時のエンコーディングを指定する。デフォルトはUTF-8") { |encoding|
         @options["encoding"] = encoding
       }
       @opt.on("--no-epub", "AozoraEpub3でEPUB化しない") {
