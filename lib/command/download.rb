@@ -57,7 +57,6 @@ module Command
           next
         end
         unless Downloader.start(target, @options["force"])
-          puts "ダウンロードに失敗しました(#{target})"
           next
         end
         unless @options["no-convert"]

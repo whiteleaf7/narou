@@ -30,12 +30,11 @@ class Downloader
   def self.start(target, force = false)
     setting = nil
     target = Narou.alias_to_id(target)
-    case get_target_type(target)
+    case type = get_target_type(target)
     when :url, :ncode
-      toc_url = get_toc_url(target)
-      setting = @@settings.find { |s| s.multi_match(toc_url, "url") }
+      setting = get_sitesetting_by_target(target)
       unless setting
-        warn "対応外のURLです(#{target})"
+        warn "対応外の#{type}です(#{target})"
         return false
       end
     when :id
@@ -44,13 +43,13 @@ class Downloader
         warn "指定のID(#{target})は存在しません"
         return false
       end
-      setting = get_setting(data["sitename"])
+      setting = get_sitesetting_by_sitename(data["sitename"])
       setting.multi_match(data["toc_url"], "url")
     when :other
       detected = false
       data = @@database.get_data("title", target)
       if data
-        setting = get_setting(data["sitename"])
+        setting = get_sitesetting_by_sitename(data["sitename"])
         setting.multi_match(data["toc_url"], "url")
       else
         warn "指定の小説(#{target})は存在しません"
@@ -61,6 +60,18 @@ class Downloader
     result = downloader.start_download(force)
     setting.clear
     result
+  end
+
+  #
+  # 小説サイト設定を取得する
+  #
+  def self.get_sitesetting_by_target(target)
+    toc_url = get_toc_url(target)
+    setting = nil
+    if toc_url
+      setting = @@settings.find { |s| s.multi_match(toc_url, "url") }
+    end
+    setting
   end
 
   #
@@ -147,7 +158,7 @@ class Downloader
   #
   # 指定の小説の目次ページのURLを取得する
   #
-  # 書式にのっとって生成しているだけで、存在しないURLが返ってくる可能性もある
+  # targetがURLかNコードの場合、実際には小説が存在しないURLが返ってくることがあるのを留意する
   #
   def self.get_toc_url(target)
     target = Narou.alias_to_id(target)
@@ -189,7 +200,7 @@ class Downloader
     data["title"]
   end
 
-  def self.get_setting(sitename)
+  def self.get_sitesetting_by_sitename(sitename)
     setting = @@settings.find { |s| s["name"] == sitename }
     return setting if setting
     warn "#{data["sitename"]} の設定ファイルが見つかりません"
