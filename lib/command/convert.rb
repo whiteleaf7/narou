@@ -43,7 +43,8 @@ module Command
       @opt.on("-o FILE", "--output FILE", "出力ファイル名を指定する。フォルダパス部分は無視される") { |filename|
         @options["output"] = filename
       }
-      @opt.on("-e ENCODING", "--enc ENCODING", "テキストファイル指定時のエンコーディングを指定する") { |encoding|
+      @opt.on("-e ENCODING", "--enc ENCODING",
+              "テキストファイル指定時のエンコーディングを指定する。デフォルトはUTF8") { |encoding|
         @options["encoding"] = encoding
       }
       @opt.on("--no-epub", "AozoraEpub3でEPUB化しない") {
