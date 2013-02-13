@@ -8,7 +8,7 @@ require_relative "../localsetting"
 module Command
   class Browser < CommandBase
     def initialize
-      super("[options...]")
+      super("<target> [<target2> ...]")
       @opt.separator <<-EOS
 
   ・指定した小説の掲載ページをブラウザで開きます。
