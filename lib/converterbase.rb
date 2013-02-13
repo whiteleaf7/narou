@@ -555,19 +555,16 @@ class ConverterBase
   #
   def narou_ruby(data)
     # 《》なルビの対処
-    data.tr!("≪≫", "《》")
-    data.gsub!(/(.+?)《(.+?)》/) do |match|
+    data.gsub!(/(.+?)≪(.+?)≫/) do |match|
       m1, m2 = $1, $2
       case
       when m2 =~ /^・+$/
         # ルビが・だけの場合、傍点と判断
         bouten(m1, m2)
-      when m1.include?("｜")
-        match
-      when object_of_ruby?(m1[-1])
-        match
+      when m1.include?("｜"), object_of_ruby?(m1[-1])
+        "#{m1}《#{m2}》"
       else
-        "#{m1}≪#{m2}≫"
+        match
       end
     end
     # （）なルビの対処
