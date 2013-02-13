@@ -19,12 +19,13 @@
 <%= section["chapter"] %>
 
 <% end -%>
-［＃１字下げ］［＃ここから中見出し］<%= section["subtitle"].sub(/\n\z/,"") %>［＃ここで中見出し終わり］
+［＃３字下げ］［＃ここから中見出し］<%= section["subtitle"].rstrip %>［＃ここで中見出し終わり］
 <% if section["element"]["introduction"] != "" -%>
 ［＃ここから前書き］
 <%= section["element"]["introduction"] %>
 ［＃ここで前書き終わり］
 <% end -%>
+
 
 <%= section["element"]["body"] %>
 <% if section["element"]["postscript"] != "" -%>
