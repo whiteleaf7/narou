@@ -87,19 +87,23 @@ class NovelConverter
     res = Helper::AsyncCommand.exec(command) do
       print "."
     end
-    # MEMO: Windows環境以外での出力される文字コードはSJISなのか？
+    # MEMO: Windows環境以外で出力される文字コードはSJISなのか？
     stdout_capture = res[0].force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
     Dir.chdir(pwd)
-    if stdout_capture =~ /^\[ERROR\]/
-      warn ""
-      warn "AozoraEpub3実行中にエラーが発生したため、EPUBが出力出来ませんでした"
-      warn stdout_capture.rstrip
-      return :error
-    end
+    error_list = stdout_capture.scan(/^\[ERROR\].+$/)
     warn_list = stdout_capture.scan(/^\[WARN\].+$/)
-    unless warn_list.empty?
+    if !error_list.empty? || !warn_list.empty?
       puts
+      puts error_list
       puts warn_list
+      unless error_list.empty?
+        # AozoraEpub3 のエラーにはEPUBが出力されないエラーとEPUBが出力されるエラーの2種類ある。
+        # EPUBが出力される場合は「変換完了」という文字があるのでそれを検出する
+        if stdout_capture !~ /^変換完了/
+          warn "AozoraEpub3実行中にエラーが発生したため、EPUBが出力出来ませんでした"
+          return :error
+        end
+      end
     end
     puts "変換しました"
     :success
