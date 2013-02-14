@@ -16,8 +16,6 @@ require_relative "localsetting"
 
 class NovelConverter
   NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
-  CONVERTED_FILENAME_PREFIX = "[変換]"
-  CONVERTED_FILE_EXT = ".txt"
 
   #
   # 指定の小説を整形・変換する
@@ -45,7 +43,8 @@ class NovelConverter
       archive_path = File.dirname(filename) + "/"
     end
     setting = NovelSetting.new(archive_path)
-    setting.name = File.basename(filename)
+    setting.author = ""
+    setting.title = File.basename(filename)
     novel_converter = new(setting, output_filename, display_inspector)
     text = File.read(filename)
     if encoding
@@ -66,6 +65,14 @@ class NovelConverter
   #
   def self.txt_to_epub(filename, dst_dir = nil)
     abs_srcpath = File.expand_path(filename)
+    cover_path = File.join(File.dirname(filename), "cover.jpg")
+    cover_option = ""
+    # MEMO: 外部実行からだと -c FILENAME, -c 1 オプションはぬるぽが出て動かない
+    if File.exists?(cover_path)
+      #cover_option = %!--cover "#{cover_path}"!
+      cover_option = "-c 0"   # 先頭の挿絵を表紙として利用
+    end
+
     dst_option = ""
     if dst_dir
       dst_option = %!-dst "#{File.expand_path(dst_dir)}"!
@@ -79,7 +86,7 @@ class NovelConverter
       return nil
     end
     Dir.chdir(aozoraepub3_dir)
-    command = %!java -cp "#{aozoraepub3_basename}" AozoraEpub3 -enc UTF-8 #{dst_option} "#{abs_srcpath}"!
+    command = %!java -cp "#{aozoraepub3_basename}" AozoraEpub3 -enc UTF-8 #{cover_option} #{dst_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
@@ -89,6 +96,7 @@ class NovelConverter
     end
     # MEMO: Windows環境以外で出力される文字コードはSJISなのか？
     stdout_capture = res[0].force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
+
     Dir.chdir(pwd)
     error_list = stdout_capture.scan(/^\[ERROR\].+$/)
     warn_list = stdout_capture.scan(/^\[WARN\].+$/)
@@ -149,6 +157,7 @@ class NovelConverter
 
   def initialize(setting, output_filename = nil, display_inspector = false)
     @setting = setting
+    @novel_author = setting.author
     @novel_title = setting.title
     @output_filename = output_filename
     @inspector = Inspector.new(@setting)
@@ -161,7 +170,9 @@ class NovelConverter
     YAML.load_file(path)
   end
 
-  def create_novel_text_by_template(toc, sections)
+  def create_novel_text_by_template(sections)
+    toc = @toc
+    cover_chuki = @cover_chuki
     Template.get(NOVEL_TEXT_TEMPLATE_NAME, binding)
   end
 
@@ -173,6 +184,18 @@ class NovelConverter
     (io = conv.convert(io, text_type)).rewind          # 共通変換処理
     (io = conv.after_convert(io, text_type)).rewind    # 特殊事後変換処理
     return io.read
+  end
+
+  #
+  # 表紙用挿絵注記作成
+  #
+  def create_cover_chuki
+    cover_path = File.join(@setting.archive_path, "cover.jpg")
+    if File.exists?(cover_path)
+      "［＃挿絵（cover.jpg）入る］"
+    else
+      ""
+    end
   end
 
   #
@@ -204,7 +227,8 @@ class NovelConverter
         sections << section
       end
       progressbar.clear
-      result = create_novel_text_by_template(@toc, sections)
+      @cover_chuki = create_cover_chuki
+      result = create_novel_text_by_template(sections)
     end
 
     midashi_save(result)
@@ -213,9 +237,13 @@ class NovelConverter
     if @output_filename
       save_path = File.join(@setting.archive_path, File.basename(@output_filename))
     else
-      save_path = File.join(@setting.archive_path, CONVERTED_FILENAME_PREFIX + @novel_title)
+      save_filename = @novel_title
+      if @novel_author.length > 0
+        save_filename = "[#{@novel_author}] #{save_filename}"
+      end
+      save_path = File.join(@setting.archive_path, save_filename)
       if save_path !~ /\.\w+$/
-        save_path += CONVERTED_FILE_EXT
+        save_path += ".txt"
       end
     end
     File.write(save_path, result)

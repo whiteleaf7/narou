@@ -9,16 +9,23 @@ require_relative "ini"
 class NovelSetting
   INI_NAME = "setting.ini"
 
-  attr_accessor :title, :archive_path
+  attr_accessor :author, :title, :archive_path
 
   def self.create(target)
     archive_path = Downloader.get_novel_data_dir_by_target(target)
-    archive_path ? new(archive_path) : nil
+    if archive_path
+      setting = new(archive_path)
+      data = Downloader.get_data_by_target(target)
+      setting.author = data["author"]
+      setting.title = data["title"]
+      setting
+    else
+      nil
+    end
   end
 
   def initialize(archive_path)
     @archive_path = archive_path
-    @title = archive_path.split("/").last
     load_setting
     set_attribute
   end
