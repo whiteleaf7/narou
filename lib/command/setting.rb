@@ -15,9 +15,11 @@ module Command
       # 変数名  => [受け付ける型, 説明]
       "convert.no-epub" => [:boolean, "EPUB変換を無効にするかどうか"],
       "convert.no-mobi" => [:boolean, "MOBI変換を無効にするかどうか"],
+      "convert.no-strip" => [:boolean, "MOBIのstripを無効にするかどうか\n" +
+                                       " " * 6 + "※注意：KDP用のMOBIはstripしてはいけない"],
       "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開かない"],
       "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
-                                    "    ※存在しないフォルダだとエラーになるので注意"],
+                                        " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
       "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
       "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを変更"]
     }

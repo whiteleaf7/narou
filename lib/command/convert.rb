@@ -53,6 +53,9 @@ module Command
       @opt.on("--no-mobi", "kindlegenでMOBI化しない") {
         @options["no-mobi"] = true
       }
+      @opt.on("--no-strip", "MOBIをstripしない") {
+        @options["no-strip"] = true
+      }
       @opt.on("--no-open", "出力時に保存フォルダを開かない") {
         @options["no-open"] = true
       }
@@ -141,12 +144,14 @@ module Command
             # mobi
             res = NovelConverter.epub_to_mobi(epub_path)
             next if res != :success
-            # strip
             mobi_path = epub_path.sub(/\.epub$/, "") + ".mobi"
-            puts "kindlestrip実行中"
-            kindlestrip_path = File.join(Narou.get_script_dir, "kindlestrip.py")
-            command = %!python "#{kindlestrip_path}" "#{mobi_path}" "#{mobi_path}"!
-            `#{command}`
+            # strip
+            unless @options["no-strip"]
+              puts "kindlestrip実行中"
+              kindlestrip_path = File.join(Narou.get_script_dir, "lib/kindlestrip.rb")
+              command = %!ruby "#{kindlestrip_path}" "#{mobi_path}" "#{mobi_path}"!
+              `#{command}`
+            end
             copied_file_path = copy_to_converted_file(mobi_path)
 
             puts "MOBIファイルを出力しました"
