@@ -54,7 +54,7 @@ module Command
       end
       frozen_list = LocalSetting.get["freeze"]
       argv.each do |target|
-        data = Downloader.get_data_by_database(target)
+        data = Downloader.get_data_by_target(target)
         unless data
           puts "#{target} は存在しません"
           next

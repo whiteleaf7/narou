@@ -34,7 +34,7 @@ module Command
       if argv.empty?
         latest_id = LocalSetting.get["latest_convert"]["id"]
         if latest_id
-          data = Downloader.get_data_by_database(latest_id)
+          data = Downloader.get_data_by_target(latest_id)
           display_log(data["title"])
         end
         return
@@ -44,7 +44,7 @@ module Command
           puts "―" * 30
         end
         display_log(target)
-        data = Downloader.get_data_by_database(target)
+        data = Downloader.get_data_by_target(target)
         unless data
           warn "#{target} は存在しません"
           next

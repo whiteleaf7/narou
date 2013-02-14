@@ -130,7 +130,7 @@ module Command
           if argument_target_type == :file
             data = get_title_and_author_by_textfile(converted_txt_path)
           else
-            data = Downloader.get_data_by_database(target)
+            data = Downloader.get_data_by_target(target)
           end
           epub_path = File.join(converted_txt_dir, %![#{data["author"]}] #{data["title"]}.epub!)
 

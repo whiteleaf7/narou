@@ -142,7 +142,7 @@ class Downloader
   #
   # target からデータベースのデータを取得
   #
-  def self.get_data_by_database(target)
+  def self.get_data_by_target(target)
     target = Narou.alias_to_id(target)
     toc_url = get_toc_url(target) or return nil
     @@database.get_data("toc_url", toc_url)
@@ -186,7 +186,7 @@ class Downloader
 
   def self.remove_novel(target, with_file = false)
     target = Narou.alias_to_id(target)
-    data = get_data_by_database(target) or return nil
+    data = get_data_by_target(target) or return nil
     data_dir = get_novel_data_dir_by_target(target)
     if with_file
       FileUtils.remove_entry_secure(data_dir)

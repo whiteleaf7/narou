@@ -45,7 +45,7 @@ module Command
         if i > 0
           puts "―" * 30
         end
-        data = Downloader.get_data_by_database(target)
+        data = Downloader.get_data_by_target(target)
         unless data
           warn "#{target} は存在しません"
           next

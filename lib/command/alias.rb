@@ -68,7 +68,7 @@ module Command
           warn "#{target} は存在しません"
           next
         end
-        data = Downloader.get_data_by_database(target)
+        data = Downloader.get_data_by_target(target)
         id = data["id"]
         title = data["title"]
         aliases[alias_name] = id

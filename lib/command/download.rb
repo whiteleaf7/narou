@@ -45,7 +45,7 @@ module Command
         if i > 1
           puts "―" * 30
         end
-        data = Downloader.get_data_by_database(target)
+        data = Downloader.get_data_by_target(target)
         if Narou.novel_frozen?(target)
           puts "#{data["title"]} は凍結中です\nダウンロードを中止しました"
           next
