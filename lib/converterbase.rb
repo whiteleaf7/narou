@@ -655,7 +655,7 @@ class ConverterBase
   def enchant_midashi(data)
     def midashi(str)
       midashi_title = str.gsub("［＃半字下げ］", "")
-      "［＃１字下げ］［＃ここから中見出し］#{midashi_title}［＃ここで中見出し終わり］"
+      "［＃３字下げ］［＃ここから中見出し］#{midashi_title}［＃ここで中見出し終わり］"
     end
 
     data.gsub!(/［＃改ページ］\n(.+?)\n/) do |match|
@@ -665,7 +665,7 @@ class ConverterBase
         match
       else
         # 見出しの次の行が空行ではない場合空行を追加する
-        add_tail = rest =~ /\A$/ ? "" : "\n"
+        add_tail = rest =~ /\A$/ ? "" : "\n\n"
         "［＃改ページ］\n#{midashi(m1)}\n#{add_tail}"
       end
     end
