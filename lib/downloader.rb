@@ -299,6 +299,14 @@ class Downloader
     toc_source = ""
     begin
       open(toc_url) do |toc_fp|
+        if toc_fp.base_uri.to_s != toc_url
+          # リダイレクトされた場合。
+          # ノクターン・ムーンライトのNコードを ncode.syosetu.com に渡すと、novel18.syosetu.com に飛ばされる
+          # 目次の定義が微妙に ncode.syosetu.com と違うので、設定を取得し直す
+          @setting.clear
+          @setting = Downloader.get_sitesetting_by_target(toc_fp.base_uri.to_s)
+          toc_url = @setting["toc_url"]
+        end
         toc_source = pretreatment_source(toc_fp.read)
       end
     rescue OpenURI::HTTPError => e
