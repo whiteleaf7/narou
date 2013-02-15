@@ -510,7 +510,7 @@ class ConverterBase
   #
   def auto_join_in_brackets(data)
     BRACKETS.each do |bracket|
-      data.gsub!(/#{bracket[0]}(.+?)#{bracket[1]}/m) do |match|
+      data.gsub!(/#{bracket[0]}+(.+?)#{bracket[1]}+/m) do |match|
         joined_str = match.dup
         joined_str.gsub!(/([…―])\n/, "\\1。\n")
         joined_str = joined_str.split("\n").map { |s|
