@@ -271,9 +271,9 @@ class Downloader
       update_subtitles = update_check(old_toc["subtitles"], latest_toc["subtitles"])
     end
     if update_subtitles.count > 0
+      sections_download_and_save(update_subtitles)
       update_database
       save_novel_data(TOC_FILE_NAME, latest_toc)
-      sections_download_and_save(update_subtitles)
       return true
     else
       return false
@@ -385,9 +385,9 @@ class Downloader
   def sections_download_and_save(subtitles)
     max = subtitles.count
     return if max == 0
-    interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"]
-    interval_sleep_time = 0 if interval_sleep_time < 0
     puts @title + " のDL開始"
+    interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"] || 0
+    interval_sleep_time = 0 if interval_sleep_time < 0
     subtitles.each_with_index do |subtitle_info, i|
       if interval_sleep_time > 0
         sleep(interval_sleep_time) if i > 0
@@ -399,8 +399,9 @@ class Downloader
       index, subtitle = subtitle_info["index"], subtitle_info["subtitle"]
       puts "第#{index}部分　#{subtitle} (#{i+1}/#{max})"
       section_element = a_section_download(subtitle_info)
-      subtitle_info["element"] = section_element
-      save_novel_data(File.join(SECTION_SAVE_DIR_NAME, "#{index} #{subtitle}.yaml"), subtitle_info)
+      info = subtitle_info.dup
+      info["element"] = section_element
+      save_novel_data(File.join(SECTION_SAVE_DIR_NAME, "#{index} #{subtitle}.yaml"), info)
     end
   end
 
