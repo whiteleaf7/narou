@@ -211,6 +211,14 @@ class SectionStripper
   def get_header
     @stripped_data_header
   end
+
+  def self.strip(infile, outfile = nil)
+    outfile = infile unless outfile
+    data_file = File.binread(infile)
+    stripped_file = new(data_file)
+    File.binwrite(outfile, stripped_file.get_result)
+    stripped_file
+  end
 end
 
 if __FILE__ == $0
@@ -226,18 +234,15 @@ if __FILE__ == $0
   else
     infile = ARGV[0]
     outfile = ARGV[1]
-    data_file = File.binread(infile)
     begin
-      stripped_file = SectionStripper.new(data_file)
-      File.binwrite(outfile, stripped_file.get_result)
+      stripped_file = SectionStripper.strip(infile, outfile)
       #print "Header Bytes: " + binascii.b2a_hex(strippedFile.getHeader())
       if ARGV.length == 3
         File.binwrite(ARGV[2], stripped_file.get_stripped_data)
       end
     rescue StripException => e
-      puts "Error: #{e.message}"
+      warn "Error: #{e.message}"
       exit 1
     end
-    exit 0
   end
 end

@@ -8,6 +8,7 @@ require_relative "../database"
 require_relative "../downloader"
 require_relative "../novelconverter"
 require_relative "../localsetting"
+require_relative "../kindlestrip"
 
 module Command
   class Convert < CommandBase
@@ -148,9 +149,13 @@ module Command
             # strip
             unless @options["no-strip"]
               puts "kindlestrip実行中"
-              kindlestrip_path = File.join(Narou.get_script_dir, "lib/kindlestrip.rb")
-              command = %!ruby "#{kindlestrip_path}" "#{mobi_path}" "#{mobi_path}"!
-              `#{command}`
+              $stdout.silent = true
+              begin
+                SectionStripper.strip(mobi_path)
+              rescue StripException => e
+                warn "Error: #{e.message}"
+              end
+              $stdout.silent = false
             end
             copied_file_path = copy_to_converted_file(mobi_path)
 
