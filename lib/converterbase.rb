@@ -724,7 +724,7 @@ class ConverterBase
     insert_separate_space(data)
     convert_special_characters(data)
     convert_fraction_and_date(data)
-    if text_type == "body"
+    if text_type == "body" || text_type == "textfile"
       hanji_sage(data)
       auto_indent(data)
     end

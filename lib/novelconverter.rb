@@ -238,8 +238,9 @@ class NovelConverter
       save_path = File.join(@setting.archive_path, File.basename(@output_filename))
     else
       save_filename = @novel_title
-      if @novel_author.length > 0
-        save_filename = "[#{@novel_author}] #{save_filename}"
+      if text
+        info = get_title_and_author_by_text(result)
+        save_filename = "[#{info["author"]}] #{info["title"]}"
       end
       save_path = File.join(@setting.archive_path, save_filename)
       if save_path !~ /\.\w+$/
@@ -252,6 +253,14 @@ class NovelConverter
     update_latest_convert_novel
 
     save_path
+  end
+
+  #
+  # テキストデータ先頭二行からタイトルと作者名を取得
+  #
+  def get_title_and_author_by_text(text)
+    title, author = text.split("\n", 3)
+    { "title" => title, "author" => author }
   end
 
   def midashi_save(text)

@@ -31,9 +31,9 @@ class NovelSetting
   end
 
   def load_setting
-    ini_path = File.join(@archive_path, INI_NAME)
-    ini = Ini.load_file(ini_path)
     @setting = {}
+    ini_path = File.join(@archive_path, INI_NAME)
+    ini = Ini.load_file(ini_path) rescue Ini.load("")
     DEFAULT_SETTINGS.each do |element|
       name, value = element[:name], element[:value]
       if ini["global"][name]

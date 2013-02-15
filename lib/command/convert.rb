@@ -130,15 +130,8 @@ module Command
           # epub
           res = NovelConverter.txt_to_epub(converted_txt_path)
           next if res != :success
-          
-          if argument_target_type == :file
-            data = get_title_and_author_by_textfile(converted_txt_path)
-            epub_path = File.join(converted_txt_dir, %![#{data["author"]}] #{data["title"]}.epub!)
-          else
-            #data = Downloader.get_data_by_target(target)
-            epub_path = converted_txt_path.sub(/.txt$/, ".epub")
-          end
 
+          epub_path = converted_txt_path.sub(/.txt$/, ".epub")
           if @options["no-mobi"]
             copied_file_path = copy_to_converted_file(epub_path)
           else
@@ -171,18 +164,6 @@ module Command
           Helper.open_directory_by_os_filer(converted_txt_dir, "小説の保存フォルダを開きますか")
         end
       end
-    end
-
-    #
-    # テキストファイル先頭二行からタイトルと作者名を取得
-    #
-    def get_title_and_author_by_textfile(textfile_path)
-      title = author = ""
-      open(textfile_path) do |fp|
-        title = fp.gets.rstrip
-        author = fp.gets.rstrip
-      end
-      { "title" => title, "author" => author }
     end
 
     def copy_to_converted_file(src_path)
