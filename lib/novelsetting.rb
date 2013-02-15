@@ -88,7 +88,12 @@ class NovelSetting
     {
       name: "enable_hanji_sage",
       value: true,
-      help: "半字下げを有効に"
+      help: "鍵カッコ等の半字下げを有効に(kindle paperwhite向け設定)"
+    },
+    {
+      name: "enable_auto_indent",
+      value: true,
+      help: "自動行頭字下げ機能。行頭字下げがされてないようならば適切に行頭字下げをする"
     },
     {
       name: "enable_auto_join_in_brackets",

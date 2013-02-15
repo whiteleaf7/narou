@@ -19,6 +19,9 @@ class Inspector
 
   KLASS_TAG = { ERROR => "エラー", WARNING =>  "警告", INFO => "INFO" }
 
+  IGNORE_INDENT_CHAR = "　(（［「『〈《≪【〔―・※"
+  AUTO_INDENT_THRESHOLD_RATIO = 0.6   # 全行のうちこの割合以上字下げされてなければ強制字下げする
+
   attr_writer :messages
 
   def self.read_messages(setting)
@@ -164,8 +167,18 @@ class Inspector
     end
     if brackets_num_over_1 > 0
       info("カギ括弧内の改行状況:\n" + \
-           "検出したカギ括弧数: #{brackets_num}、そのうち1個以上改行を含む数: #{brackets_num_over_1} \n" + \
+           "検出したカギ括弧数: #{brackets_num}、そのうち1個以上改行を含む数: #{brackets_num_over_1}\n" + \
            "1つのカギ括弧内で最大の改行数: #{max}、全カギ括弧内での改行合計: #{total}")
     end
+  end
+
+  #
+  # 行頭字下げをするべきか調べる
+  #
+  def inspect_indent(data)
+    dont_indent_line_count = data.scan(/^[^#{IGNORE_INDENT_CHAR}]/).count
+    line_count = data.lines.count
+    ratio = dont_indent_line_count / line_count.to_f
+    return ratio > AUTO_INDENT_THRESHOLD_RATIO
   end
 end

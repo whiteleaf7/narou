@@ -184,7 +184,7 @@ class ConverterBase
   #
   # 小説家になろうの携帯用タグの削除
   #
-  def delete_narou_mobile_tag(data)
+  def replace_narou_tag(data)
     data.gsub!("【改ページ】", "")
     data.gsub!(/<KBR>/i, "")
     data.gsub!(/<PBR>/i, "\n")
@@ -255,7 +255,7 @@ class ConverterBase
   #
   # 濁点つきフォントに部分的に切り替える
   #
-  def replace_dakuten_font(data)
+  def convert_dakuten_char_to_font(data)
     data.gsub!(/(.)[゛ﾞ]/) do
       "［＃濁点］#{$1}［＃濁点終わり］"
     end
@@ -341,17 +341,32 @@ class ConverterBase
   def zenkaku_num_to_hankaku_num(num)
     num.tr("０-９#{KANJI_NUM}", "0-90-9")
   end
+  
+  HALF_INDENT_TARGET = /^[ 　\t]*([「『(（【〈《≪])/
+  FULL_INDENT_TARGET = /^[ 　\t]*(――)/
+  #
+  # 半字下げ
+  #
+  # 「や（などの前にカスタム注記（［＃半字下げ］）を追加し、半文字分字下げする
+  # kindle paperwhite で鍵括弧のインデントがおかしいことへの対応
+  #
+  def hanji_sage(data)
+    data.gsub!(HALF_INDENT_TARGET, "［＃半字下げ］\\1") if @setting.enable_hanji_sage
+  end
 
   #
   # 行頭字下げ
   #
-  # 「や（などの前に空白を追加し、若干字下げさせる
+  # 必ず下げなければいけないところは強制的に字下げ
+  # 他の部分は全体的に判断して字下げ
   #
-  def force_indent_special_character(data)
-    half_indent_target = /^[ 　\t]*([「『(（【〈《≪])/
-    full_indent_target = /^[ 　\t]*(――)/
-    data.gsub!(half_indent_target, "［＃半字下げ］\\1") if @setting.enable_hanji_sage
-    data.gsub!(full_indent_target, "　\\1")
+  def auto_indent(data)
+    data.gsub!(FULL_INDENT_TARGET, "　\\1")
+    if @setting.enable_auto_indent && @inspector.inspect_indent(data)
+      data.gsub!(/^([^#{Inspector::IGNORE_INDENT_CHAR}])/) do
+        $1 == " " ? "　" : "　#{$1}"
+      end
+    end
   end
 
   #
@@ -692,13 +707,13 @@ class ConverterBase
   #
   # 小説データ全体に対して施す変換
   #
-  def convert_for_all_data(data)
+  def convert_for_all_data(data, text_type)
     auto_join_in_brackets(data) if @setting.enable_auto_join_in_brackets
     auto_join_line(data) if @setting.enable_auto_join_line
     erase_comments_block(data)
     replace_illust_tag(data)
     replace_url(data)
-    delete_narou_mobile_tag(data)
+    replace_narou_tag(data)
     convert_rome_numeric(data)
     alphabet_to_zenkaku(data, @setting.enable_alphabet_force_zenkaku)
     num_to_kanji(data)
@@ -709,14 +724,17 @@ class ConverterBase
     insert_separate_space(data)
     convert_special_characters(data)
     convert_fraction_and_date(data)
-    force_indent_special_character(data)
-    replace_dakuten_font(data)
+    if text_type == "body"
+      hanji_sage(data)
+      auto_indent(data)
+    end
+    convert_dakuten_char_to_font(data)
   end
 
   #
   # 変換処理本体
   #
-  # text_type: 渡されるテキストの種類。subtitle, introduction, body, postscript のどれか
+  # text_type: 渡されるテキストの種類。subtitle, introduction, body, postscript, textfile のどれか
   #
   def convert(io, text_type)
     @write_fp = StringIO.new
@@ -727,7 +745,7 @@ class ConverterBase
       return @write_fp if @setting.enable_erase_postscript
     end
     data = io.read
-    convert_for_all_data(data)
+    convert_for_all_data(data, text_type)
     if text_type == "textfile"
       progressbar = ProgressBar.new(data.count("\n") + 1)
       progressbar.output(0)
@@ -776,7 +794,7 @@ class ConverterBase
     # rebuild_english_sentences で再構築された英文にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_narou_ruby
-    data.sub!(/\n\z/, "")
+    data.rstrip!
     progressbar.clear if text_type == "textfile"
     @write_fp
   end
