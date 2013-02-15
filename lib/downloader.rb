@@ -385,13 +385,16 @@ class Downloader
   def sections_download_and_save(subtitles)
     max = subtitles.count
     return if max == 0
+    interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"]
+    interval_sleep_time = 0 if interval_sleep_time < 0
     puts @title + " のDL開始"
     subtitles.each_with_index do |subtitle_info, i|
-      if @setting["domain"] =~ /syosetu.com/
+      if interval_sleep_time > 0
+        sleep(interval_sleep_time) if i > 0
+      elsif @setting["domain"] =~ /syosetu.com/
         # 小説家になろうは連続DL規制があるため、ウェイトを入れる必要がある
-        if i % 10 == 0 && i >= 10
-          sleep(6)
-        end
+        # 10話ごとに規制が入るため、10話ごとにウェイトを挟む
+        sleep(6) if i % 10 == 0 && i >= 10
       end
       index, subtitle = subtitle_info["index"], subtitle_info["subtitle"]
       puts "第#{index}部分　#{subtitle} (#{i+1}/#{max})"

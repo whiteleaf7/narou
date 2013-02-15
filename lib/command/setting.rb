@@ -13,15 +13,16 @@ module Command
 
     SETTING_VARIABLES = {
       # 変数名  => [受け付ける型, 説明]
+      "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを変更"],
       "convert.no-epub" => [:boolean, "EPUB変換を無効にするかどうか"],
       "convert.no-mobi" => [:boolean, "MOBI変換を無効にするかどうか"],
       "convert.no-strip" => [:boolean, "MOBIのstripを無効にするかどうか\n" +
-                                       " " * 6 + "※注意：KDP用のMOBIはstripしてはいけない"],
+                                       " " * 6 + "※注意：KDP用のMOBIはstripしないでください"],
       "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開かない"],
       "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                         " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
       "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
-      "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを変更"]
+      "download.interval" => [:integer, "各話DL時に指定した秒数待機する。デフォルト0"]
     }
 
     class InvalidVariableType < StandardError
@@ -75,7 +76,7 @@ module Command
       when :boolean
         "true/false  "
       when :integer
-        "数値        "
+        "整数        "
       when :string
         "文字列      "
       when :directory
