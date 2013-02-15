@@ -65,13 +65,13 @@ class NovelConverter
   #
   def self.txt_to_epub(filename, dst_dir = nil)
     abs_srcpath = File.expand_path(filename)
-    cover_path = File.join(File.dirname(filename), "cover.jpg")
+    #cover_path = File.join(File.dirname(filename), "cover.jpg")
     cover_option = ""
     # MEMO: 外部実行からだと -c FILENAME, -c 1 オプションはぬるぽが出て動かない
-    if File.exists?(cover_path)
+    #if File.exists?(cover_path)
       #cover_option = %!--cover "#{cover_path}"!
       cover_option = "-c 0"   # 先頭の挿絵を表紙として利用
-    end
+    #end
 
     dst_option = ""
     if dst_dir
@@ -190,12 +190,16 @@ class NovelConverter
   # 表紙用挿絵注記作成
   #
   def create_cover_chuki
-    cover_path = File.join(@setting.archive_path, "cover.jpg")
-    if File.exists?(cover_path)
-      "［＃挿絵（cover.jpg）入る］"
-    else
-      ""
+    result = ""
+    [".jpg", ".png", ".jpeg"].each do |ext|
+      filename = "cover#{ext}"
+      cover_path = File.join(@setting.archive_path, filename)
+      if File.exists?(cover_path)
+        result = "［＃挿絵（#{filename}）入る］"
+        break
+      end
     end
+    result
   end
 
   #
@@ -204,6 +208,7 @@ class NovelConverter
   def convert_main(text = nil)
     puts "#{@novel_title} の変換を開始"
     sections = []
+    @cover_chuki = create_cover_chuki
 
     converter = load_converter(@setting.archive_path)
     if text
@@ -212,6 +217,8 @@ class NovelConverter
         @inspector.info "テキストファイルの処理を実行しましたが、改行直後の見出し付与は有効になっていません。" +
                         "setting.ini の enable_enchant_midashi を true にすることをお薦めします。"
       end
+      splited = result.split("\n", 3)
+      result = [splited[0], splited[1], @cover_chuki, splited[2]].join("\n")   # 表紙の挿絵注記を3行目に挟み込む
     else
       @section_save_dir = Downloader.get_novel_section_save_dir(@setting.archive_path)
       @toc = Downloader.get_toc_data(@setting.archive_path)
@@ -227,7 +234,6 @@ class NovelConverter
         sections << section
       end
       progressbar.clear
-      @cover_chuki = create_cover_chuki
       result = create_novel_text_by_template(sections)
     end
 
