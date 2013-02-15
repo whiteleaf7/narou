@@ -161,10 +161,10 @@ module Command
 
             puts "MOBIファイルを出力しました"
           end
+        end
 
-          if copied_file_path
-            puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
-          end
+        if copied_file_path
+          puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
         end
 
         unless @options["no-open"]
