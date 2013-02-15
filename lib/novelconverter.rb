@@ -237,10 +237,11 @@ class NovelConverter
     if @output_filename
       save_path = File.join(@setting.archive_path, File.basename(@output_filename))
     else
-      save_filename = @novel_title
       if text
         info = get_title_and_author_by_text(result)
         save_filename = "[#{info["author"]}] #{info["title"]}"
+      else
+        save_filename = "[#{@novel_author}] #{@novel_title}"
       end
       save_path = File.join(@setting.archive_path, save_filename)
       if save_path !~ /\.\w+$/
