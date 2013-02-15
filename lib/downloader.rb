@@ -374,7 +374,7 @@ class Downloader
     return if max == 0
     puts @title + " のDL開始"
     subtitles.each_with_index do |subtitle_info, i|
-      if @setting == @@narou
+      if @setting["domain"] =~ /syosetu.com/
         # 小説家になろうは連続DL規制があるため、ウェイトを入れる必要がある
         if i % 10 == 0 && i >= 10
           sleep(6)

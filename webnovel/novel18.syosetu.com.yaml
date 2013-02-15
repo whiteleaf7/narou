@@ -1,0 +1,32 @@
+# ------------------------------------------------------------
+# 小説サイト定義
+name: 小説家になろう１８禁
+domain: http://novel18.syosetu.com
+url: \\k<domain>/(?<ncode>n\d+[a-z]+)
+encoding: UTF-8
+
+# ------------------------------------------------------------
+# 書籍情報取得設定
+title: <title>(?<title>.+?)</title>
+author: 作者：(?:<a href="http://xmypage.syosetu.com/.+?/">)?(?<author>.+?)(?:</a>)?$
+story: <div class="novel_ex">(?<story>.+?)</div>
+
+# ------------------------------------------------------------
+# 目次取得設定
+toc_url: \\k<domain>/\\k<ncode>/
+subtitles: |-
+  (?:<tr><td class="chapter" colspan="4">(?<chapter>.+?)</td></tr>
+   <tr> 
+  )?<td class="(?:long_subtitle|period_subtitle)"><a href="(?<href>/.+?/(?<index>\d+?)/)">(?<subtitle>.+?)</a></td>
+  <td class="long_update">
+  (?<subdate>.+?)(?:
+  <span title="(?<subupdate>.+?) 改稿">
+  （<u>改</u>）</span>)?
+  </td>
+  </tr>
+
+tcode: <li><a href="\\k<domain>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
+txtdownload_url: \\k<domain>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
+
+# ------------------------------------------------------------
+# 各話ページ設定
