@@ -167,6 +167,11 @@ class Downloader
       setting = @@settings.find { |s| s.multi_match(target, "url") }
       return setting["toc_url"] if setting
     when :ncode
+      @@database.each do |_, data|
+        if data["toc_url"] =~ %r!#{target}/$!
+          return data["toc_url"]
+        end
+      end
       return "#{@@narou["domain"]}/#{target}/"
     when :id
       data = @@database[target.to_i]
