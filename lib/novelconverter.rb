@@ -36,7 +36,7 @@ class NovelConverter
   #
   # 返り値は保存したファイルのパス
   #
-  def self.convert_file(filename, encoding, output_filename = nil, display_inspector = false)
+  def self.convert_file(filename, encoding = nil, output_filename = nil, display_inspector = false)
     if output_filename
       archive_path = File.dirname(output_filename) + "/"
     else

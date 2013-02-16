@@ -182,7 +182,7 @@ class ConverterBase
   end
 
   #
-  # 小説家になろうの携帯用タグの削除
+  # 小説家になろう専用タグを置換
   #
   def replace_narou_tag(data)
     data.gsub!("【改ページ】", "")

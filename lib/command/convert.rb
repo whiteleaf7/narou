@@ -45,7 +45,8 @@ module Command
         @options["output"] = filename
       }
       @opt.on("-e ENCODING", "--enc ENCODING",
-              "テキストファイル指定時のエンコーディングを指定する。デフォルトはUTF-8") { |encoding|
+              "テキストファイル指定時の文字コードを指定する。デフォルトはUTF-8") { |encoding|
+        encoding = "utf-8" if encoding =~ /UTF8/i
         @options["encoding"] = encoding
       }
       @opt.on("--no-epub", "AozoraEpub3でEPUB化しない") {
@@ -93,7 +94,13 @@ module Command
         ext = File.extname(output_filename)
         basename = File.basename(output_filename, ext)
       end
-      enc = Encoding.find(@options["encoding"]) rescue nil
+      if @options["encoding"]
+        enc = Encoding.find(@options["encoding"]) rescue nil
+        unless enc
+          warn "--enc で指定された文字コードは存在しません。sjis, eucjp, utf-8, UTF-16BE 等を指定して下さい"
+          return
+        end
+      end
       argv.each.with_index(1) do |target, i|
         if i > 1
           puts "―" * 30
@@ -107,12 +114,18 @@ module Command
           rescue ArgumentError => e
             if e.message =~ /invalid byte sequence in UTF-8/
               warn "#{target}"
-              warn "テキストファイルの文字コードがUTF-8ではありません。--enc オプションでテキストのエンコーディングを指定して下さい"
+              warn "テキストファイルの文字コードがUTF-8ではありません。" +
+                   "--enc オプションでテキストの文字コードを指定して下さい"
               warn "(#{e.message})"
               next
             else
               raise
             end
+          rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
+            warn "#{target}"
+            warn "テキストファイルの文字コードは#{@options["encoding"]}ではありませんでした。" +
+                 "正しい文字コードを指定して下さい"
+            next
           end
         else
           argument_target_type = :novel
