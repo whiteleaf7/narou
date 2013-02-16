@@ -102,9 +102,7 @@ module Command
         end
       end
       argv.each.with_index(1) do |target, i|
-        if i > 1
-          puts "―" * 30
-        end
+        Helper.print_horizontal_rule if i > 1
         output_filename = "#{basename} (#{i})#{ext}" if basename
         if File.file?(target.to_s)
           argument_target_type = :file

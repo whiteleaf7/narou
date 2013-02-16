@@ -69,6 +69,10 @@ module Helper
     end
   end
 
+  def self.print_horizontal_rule
+    puts "―" * 35
+  end
+
   #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #

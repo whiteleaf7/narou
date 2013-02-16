@@ -47,9 +47,7 @@ module Command
       end
       aliases = LocalSetting.get["alias"]
       argv.each_with_index do |arg, i|
-        if i > 0
-          puts "―" * 30
-        end
+        Helper.print_horizontal_rule if i > 0
         alias_name, target = arg.split("=", 2)
         unless alias_name =~ /^\w+$/
           warn "別名にはアルファベット・数字・アンダースコアしか使えません"

@@ -42,9 +42,7 @@ module Command
         return
       end
       argv.each_with_index do |target, i|
-        if i > 0
-          puts "―" * 30
-        end
+        Helper.print_horizontal_rule if i > 0
         data = Downloader.get_data_by_target(target)
         unless data
           warn "#{target} は存在しません"
