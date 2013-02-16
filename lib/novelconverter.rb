@@ -57,7 +57,7 @@ class NovelConverter
   # AozoraEpub3でEPUBファイル作成
   #
   # AozoraEpub3は.jarがあるところがカレントディレクトリじゃないとうまく動かない
-  # TODO:
+  # MEMO:
   # 逆にカレントディレクトリにAozoraEpub3の必須ファイルを置いて手を加えることで、
   # テンプレート等の差し替えが容易になる
   #
@@ -78,6 +78,7 @@ class NovelConverter
       dst_option = %!-dst "#{File.expand_path(dst_dir)}"!
     end
     pwd = Dir.pwd
+
     aozoraepub3_path = Narou.get_aozoraepub3_path
     aozoraepub3_basename = File.basename(aozoraepub3_path)
     aozoraepub3_dir = File.dirname(aozoraepub3_path)
@@ -85,8 +86,16 @@ class NovelConverter
       warn "AozoraEpub3が見つからなかったので、EPUBが出力出来ませんでした"
       return nil
     end
+
+    ini_option = ""
+    preset_aozoraepub3_ini_path = File.join(Narou.get_script_dir, "preset/AozoraEpub3.ini")
+    if File.exists?(preset_aozoraepub3_ini_path)
+      ini_option = %!-i "#{preset_aozoraepub3_ini_path}"!
+    end
+
     Dir.chdir(aozoraepub3_dir)
-    command = %!java -cp "#{aozoraepub3_basename}" AozoraEpub3 -enc UTF-8 #{cover_option} #{dst_option} "#{abs_srcpath}"!
+    command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 ! +
+              %!#{cover_option} #{dst_option} #{ini_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
