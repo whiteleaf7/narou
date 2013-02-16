@@ -518,8 +518,7 @@ class Downloader
   #
   def init_novel_dir
     dir_path = get_novel_data_dir
-    return if File.exists?(dir_path)
-    FileUtils.mkdir_p(dir_path)
+    FileUtils.mkdir_p(dir_path) unless File.exists?(dir_path)
     default_settings = NovelSetting::DEFAULT_SETTINGS
     Template.write(NovelSetting::INI_NAME, dir_path, binding)
     Template.write("converter.rb", dir_path, binding)

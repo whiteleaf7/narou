@@ -1,6 +1,6 @@
 # ------------------------------------------------------------
 # 小説サイト定義
-name: 小説家になろう１８禁
+name: ノクターン・ムーンライト
 domain: http://novel18.syosetu.com
 url: \\k<domain>/(?<ncode>n\d+[a-z]+)
 encoding: UTF-8

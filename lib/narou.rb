@@ -23,7 +23,8 @@ module Narou
       drive_letter = $&
     end
     while path != ""
-      unless Dir.glob("#{path}/#{LOCAL_SETTING_DIR}").empty?
+      #unless Dir.glob("#{path}/#{LOCAL_SETTING_DIR}").empty?
+      if File.directory?("#{path}/#{LOCAL_SETTING_DIR}")
         @@root_dir = drive_letter + path
         break
       end
