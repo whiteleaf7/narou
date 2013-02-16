@@ -744,12 +744,15 @@ class ConverterBase
     when "postscript"
       return @write_fp if @setting.enable_erase_postscript
     end
-    data = io.read
-    convert_for_all_data(data, text_type)
     if text_type == "textfile"
+      @write_fp.puts(io.gets + io.gets)   # タイトル・著者名スキップ
+      data = io.read
       progressbar = ProgressBar.new(data.count("\n") + 1)
       progressbar.output(0)
+    else
+      data = io.read
     end
+    convert_for_all_data(data, text_type)
     @read_fp = StringIO.new(data)
     initialize_member_values
     @read_fp.each_with_index do |line, i|

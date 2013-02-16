@@ -1,0 +1,117 @@
+@charset "utf-8";
+@namespace "http://www.w3.org/1999/xhtml";
+
+body {
+	font-family: "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
+	line-height: 1.6em !important;
+}
+
+.gtc, .b {
+	font-family: '@ＭＳ ゴシック','@MS Gothic',sans-serif !important;
+}
+
+.b { font-weight: bold; }
+.i { font-style: italic; }
+
+/* カスタム注記用 */
+
+/* 濁点フォント */
+@font-face {
+	font-family: "DakutenAokinMincho";
+	src: url(../fonts/DMincho.ttf) format("truetype");
+}
+
+.dakuten {
+	font-family: "DakutenAokinMincho" !important;
+}
+
+/* 半字下げ */
+.custom_hanji { text-indent: 0.5em; }
+
+/* パラメーター（折り返しなし） */
+.custom_parameter_block {
+	font-size: 90%;
+	line-height: 1.2em !important;
+	border: 2px solid #000;
+	border-radius: 6px;
+	margin: 1em 0.5em 0em 0.5em;
+	padding: 1em 0.2em 1em 0.2em;
+	display: inline-block;
+	font-family: sans-serif !important;
+	font-weight: bold;
+	white-space: nowrap;
+  -webkit-box-shadow: 3px 3px 3px #bbb;
+}
+.jzm .custom_parameter_block {
+	display: block;
+}
+.jzm .p .custom_parameter_block {
+	display: inline-block;
+}
+/* パラメーター２（折り返しあり） */
+.custom_parameter_block2 {
+	font-size: 90%;
+	line-height: 1.2em !important;
+	border: 2px solid #000;
+	border-radius: 4px;
+	margin: 1em 0.5em 1em 0.5em;
+	padding: 1em 0.2em 1em 0.2em;
+	display: inline-block;
+	font-family: sans-serif !important;
+	font-weight: bold;
+  -webkit-box-shadow: 3px 3px 3px #bbb;
+}
+.jzm .custom_parameter_block2 {
+	display: block;
+}
+.jzm .p .custom_parameter_block2 {
+	display: inline-block;
+}
+
+/* 前書き */
+.introduction {
+	float: right;
+	font-size: 83%;
+	line-height: 1.5em !important;
+	border-top: 3px solid #aaa;
+	color: #555;
+	margin: 0.25em;
+	margin-right: 1em;
+	padding: 1em 0.5em 1em 0.5em;
+	display: inline-block;
+	font-family: sans-serif !important;
+	text-align: left !important;
+	height: 70%;
+}
+.jzm .introduction {
+	display: block;
+}
+.jzm .p .introduction {
+	display: inline-block;
+}
+
+/* 後書き */
+.postscript {
+	float: right;
+	font-size: 83%;
+	line-height: 1.5em !important;
+	border-top: 3px solid #888;
+	color: #222;
+	margin: 0.25em;
+	margin-right: 2em;
+	padding: 1em 0.5em 1em 0.5em;
+	display: inline-block;
+	font-family: sans-serif !important;
+	text-align: left !important;
+	height: 70%;
+}
+.jzm .postscript {
+	display: block;
+}
+.jzm .p .postscript {
+	display: inline-block;
+}
+
+div.clear {
+	clear: both;
+}

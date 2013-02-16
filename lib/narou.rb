@@ -10,14 +10,16 @@ require_relative "globalsetting"
 
 module Narou
   LOCAL_SETTING_DIR = ".narou"
-  GLOBAL_SETTING_DIR = ".narou"
+  GLOBAL_SETTING_DIR = ".narou_g"
   AOZORAEPUB3_JAR_NAME = "AozoraEpub3.jar"
   AOZORAEPUB3_DIR = "./AozoraEpub3"
+  PRESET_DIR = "./preset"
 
   @@root_dir = nil
   @@local_setting_dir = nil
   @@global_setting_dir = nil
   @@aozora_path = nil
+  @@preset_dir = nil
 
   def self.get_root_dir
     return @@root_dir if @@root_dir
@@ -89,6 +91,13 @@ module Narou
 
   def self.aozoraepub3_directory?(path)
     File.exists?(create_aozoraepub3_jar_path(path))
+  end
+
+  def self.get_preset_dir
+    return "C:/Users/sasa/Documents/GitHub/narou/preset"
+    return @@preset_dir if @@preset_dir
+    @@preset_dir = File.expand_path(File.join(get_script_dir, PRESET_DIR))
+    @@preset_dir
   end
 
   #
