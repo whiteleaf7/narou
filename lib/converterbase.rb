@@ -557,7 +557,7 @@ class ConverterBase
     char =~ /[一-龠Ａ-Ｚａ-ｚA-Za-z]/
   end
 
-  def bouten(str, ten)
+  def sesame(str, ten)
     if str.include?("｜")
       str.sub("｜", "［＃傍点］") + "［＃傍点終わり］"
     else
@@ -575,7 +575,7 @@ class ConverterBase
       case
       when m2 =~ /^・+$/
         # ルビが・だけの場合、傍点と判断
-        bouten(m1, m2)
+        sesame(m1, m2)
       when m1.include?("｜"), object_of_ruby?(m1[-1])
         "#{m1}《#{m2}》"
       else
@@ -592,7 +592,7 @@ class ConverterBase
         "#{m1[0...-1]}（#{m2}）"
       when m2 =~ /^・+$/
         # ルビが・だけの場合、傍点と判断
-        bouten(m1, m2)
+        sesame(m1, m2)
       when object_of_ruby?(last_char)
         "#{m1}《#{m2}》"
       else
