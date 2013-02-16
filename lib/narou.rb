@@ -11,7 +11,7 @@ require_relative "globalsetting"
 module Narou
   LOCAL_SETTING_DIR = ".narou"
   GLOBAL_SETTING_DIR = ".narou"
-  AOZORAEPUB3_EXE_NAME = "AozoraEpub3.jar"
+  AOZORAEPUB3_JAR_NAME = "AozoraEpub3.jar"
   AOZORAEPUB3_DIR = "./AozoraEpub3"
 
   @@root_dir = nil
@@ -68,7 +68,6 @@ module Narou
     FileUtils.mkdir(LOCAL_SETTING_DIR)
     puts LOCAL_SETTING_DIR + "/ を作成しました"
     Database.init
-    puts "初期化が完了しました"
   end
 
   def self.alias_to_id(target)
@@ -84,6 +83,14 @@ module Narou
     LocalSetting.get["freeze"].include?(id)
   end
 
+  def self.create_aozoraepub3_jar_path(*paths)
+    File.expand_path(File.join(*paths, AOZORAEPUB3_JAR_NAME))
+  end
+
+  def self.aozoraepub3_directory?(path)
+    File.exists?(create_aozoraepub3_jar_path(path))
+  end
+
   #
   # AozoraEpub3 の実行ファイル(.jar)のフルパス取得
   # 検索順序
@@ -93,17 +100,16 @@ module Narou
   #
   def self.get_aozoraepub3_path
     return @@aozora_path if @@aozora_path
-    globalsetting_aozorapath = GlobalSetting.get["global_setting"]["aozoraepub3path"]
-    if globalsetting_aozorapath
-      aozora_path = File.join(globalsetting_aozorapath, AOZORAEPUB3_EXE_NAME)
+    global_setting_aozora_path = GlobalSetting.get["global_setting"]["aozoraepub3path"]
+    if global_setting_aozora_path
+      aozora_path = create_aozoraepub3_jar_path(global_setting_aozora_path)
       if File.exists?(aozora_path)
         @@aozora_path = aozora_path
-        puts @@aozora_path
         return aozora_path
       end
     end
     [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
-      aozora_path = File.expand_path(File.join(dir, AOZORAEPUB3_DIR, AOZORAEPUB3_EXE_NAME))
+      aozora_path = create_aozoraepub3_jar_path(dir, AOZORAEPUB3_DIR)
       if File.exists?(aozora_path)
         @@aozora_path = aozora_path
         return aozora_path

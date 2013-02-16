@@ -67,7 +67,7 @@ module Command
       @opt.separator <<-EOS
 
   Configuration:
-    --no-epub, --no-mobi, --no-open , --inspect は narou setting コマンドで恒常的な設定にすることが可能です。
+    --no-epub, --no-mobi, --no-strip, --no-open , --inspect は narou setting コマンドで恒常的な設定にすることが可能です。
     convert.copy_to を設定すれば変換した最終出力ファイルを指定のフォルダに自動でコピー出来ます。
     詳しくは narou setting --help を参照して下さい。
       EOS
