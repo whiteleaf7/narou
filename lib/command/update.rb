@@ -40,15 +40,22 @@ module Command
         end
       end
       update_target_list.each_with_index do |target, i|
-        Helper.print_horizontal_rule if i > 0
+        display_message = nil
+        through_flag = false
         data = Downloader.get_data_by_target(target)
-        unless data
-          warn "#{target} は存在しません"
-          next
-        end
         title = data["title"]
-        if Narou.novel_frozen?(target)
-          puts "#{title} は凍結中です\nアップデートを中止しました"
+        if !data
+          display_message = "#{target} は存在しません"
+        elsif Narou.novel_frozen?(target)
+          if argv.length > 0
+            display_message = "#{title} は凍結中です"
+          else
+            next
+          end
+        end
+        Helper.print_horizontal_rule if i > 0
+        if display_message
+          puts display_message
           next
         end
         is_updated = Downloader.start(target)
