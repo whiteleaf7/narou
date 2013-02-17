@@ -225,6 +225,13 @@ class ConverterBase
   end
 
   #
+  # 縦中横注記取得
+  #
+  def tcy(str)
+    "［＃縦中横］#{str}［＃縦中横終わり］"
+  end
+
+  #
   # 縦中横にすべき表現を変換
   #
   def convert_tatechuyoko(data)
@@ -234,18 +241,22 @@ class ConverterBase
     # 事前に !? は全角にしておく
     data.gsub!(/！+/) do |match|
       len = match.length
-      if len >= 4
+      if len == 3
+        tcy("!!!")
+      elsif len >= 4
         # 4個以上なら偶数になるように調整（奇数だった場合増やす方向（+1））して2個ずつ縦中横
         len += 1 if len.odd?
-        "［＃縦中横］!!［＃縦中横終わり］" * (len / 2)
+        tcy("!!") * (len / 2)
       else
         match
       end
     end
-    %w(！！？ ！？！ ？？？ ？！？ ？？ ？！？ ？？！ ！！！ ！！ ！？ ？！).each do |target|
-      dest = "［＃縦中横］" + target.tr("！？", "!?") + "［＃縦中横終わり］"
-      data.gsub!(target) do
-        dest
+    data.gsub!(/[！？]+/) do |match|
+      len = match.length
+      if len == 2
+        tcy(match.tr("！？", "!?"))
+      else
+        match
       end
     end
   end
