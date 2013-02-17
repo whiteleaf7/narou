@@ -34,21 +34,12 @@ module Command
       }
     end
 
-    # String#rjust の全角考慮版
-    def rjust_zenkaku(value, max)
-      value_length = value.dup.force_encoding(Encoding::ASCII_8BIT).length
-      return value + " " * (max - value_length)
-    end
-
-    # String#length の全角文字は2文字と数える版
-    def length_zenkaku(value)
-    end
-
     def output_list(novels)
-      puts " ID |  更新日  |     タイトル"
+      puts "  ID |  更新日  |     タイトル"
       novels.each do |novel|
+        id = novel["id"]
         puts [
-          novel["id"].to_s.rjust(3),
+          ((Narou.novel_frozen?(id) ? "*" : "") + id.to_s).rjust(4),
           novel["last_update"].strftime("%y/%m/%d"),
           novel["title"],
           @options["url"] ? novel["toc_url"] : nil
