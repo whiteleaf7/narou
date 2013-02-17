@@ -22,6 +22,7 @@ module Command
     "update" => Update.new,
     "list" => List.new,
     "convert" => Convert.new,
+    "diff" => Diff.new,
     "alias" => Alias.new,
     "error"=> Error.new,
     "remove" => Remove.new,
@@ -33,7 +34,7 @@ module Command
     "version" => Version.new,
     #"new" => New.new,
     #"interactive" => Interactive.new,
-    "init" => Init.new   # 特殊コマンドなので一覧には表示されない
+    "init" => Init.new
   }
 
   # ショートカット定義

@@ -15,7 +15,8 @@ require_relative "localsetting"
 #
 class Downloader
   NOVEL_SITE_SETTING_DIR = "webnovel/"
-  SECTION_SAVE_DIR_NAME = "本文"    # 本文を保存するディレクトリの名前(否パス)
+  SECTION_SAVE_DIR_NAME = "本文"    # 本文を保存するディレクトリの名前
+  CACHE_SAVE_DIR_NAME = "cache"   # 差分用キャッシュ保存用ディレクトリの名前
   TOC_FILE_NAME = "toc.yaml"
   WAITING_TIME_FOR_503 = 20   # 503 のときに待機する秒数
   RETRY_MAX_FOR_503 = 5   # 503 のときに何回再試行するか
@@ -133,7 +134,7 @@ class Downloader
   #
   # target のIDを取得
   #
-  def self.get_id_by_database(target)
+  def self.get_id_by_target(target)
     target = Narou.alias_to_id(target)
     toc_url = get_toc_url(target) or return nil
     @@database.get_id("toc_url", toc_url)
@@ -185,7 +186,7 @@ class Downloader
 
   def self.novel_exists?(target)
     target = Narou.alias_to_id(target)
-    id = get_id_by_database(target) or return nil
+    id = get_id_by_target(target) or return nil
     @@database.novel_exists?(id)
   end
 
@@ -235,6 +236,15 @@ class Downloader
     settings
   end
 
+  #
+  # 差分用キャッシュのディレクトリ一覧取得
+  #
+  def self.get_cache_list(target)
+    novel_data_dir = get_novel_data_dir_by_target(target)
+    save_dir = File.join(novel_data_dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME)
+    Dir.glob("#{save_dir}/*")
+  end
+
   if Narou.already_init?
     @@settings = load_settings
     @@database = Database.instance
@@ -271,6 +281,7 @@ class Downloader
       update_subtitles = update_check(old_toc["subtitles"], latest_toc["subtitles"])
     end
     if update_subtitles.count > 0
+      @cache_dir = create_cache_dir if old_toc.length > 0
       sections_download_and_save(update_subtitles)
       update_database
       save_novel_data(TOC_FILE_NAME, latest_toc)
@@ -278,6 +289,17 @@ class Downloader
     else
       return false
     end
+  end
+
+  #
+  # 差分用キャッシュ保存ディレクトリ作成
+  #
+  def create_cache_dir
+    now = Time.now
+    name = now.strftime("%Y%m%d%H%M%S#{now.usec.to_s[0, 3]}")
+    cache_dir = File.join(get_novel_data_dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME, name)
+    FileUtils.mkdir_p(cache_dir)
+    cache_dir
   end
 
   #
@@ -401,7 +423,20 @@ class Downloader
       section_element = a_section_download(subtitle_info)
       info = subtitle_info.dup
       info["element"] = section_element
-      save_novel_data(File.join(SECTION_SAVE_DIR_NAME, "#{index} #{subtitle}.yaml"), info)
+      section_file_name = "#{index} #{subtitle}.yaml"
+      section_file_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
+      move_to_cache_dir(section_file_path)
+      save_novel_data(section_file_path, info)
+    end
+  end
+
+  #
+  # 差分用のキャッシュとして保存
+  #
+  def move_to_cache_dir(relative_path)
+    path = File.join(get_novel_data_dir, relative_path)
+    if File.exists?(path)
+      FileUtils.mv(path, @cache_dir)
     end
   end
 
@@ -499,7 +534,7 @@ class Downloader
     path = File.join(get_novel_data_dir, filename)
     dir_path = File.dirname(path)
     unless File.exists?(dir_path)
-      FileUtils.mkdir(dir_path)
+      FileUtils.mkdir_p(dir_path)
     end
     File.write(path, YAML.dump(object))
   end

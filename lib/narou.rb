@@ -81,7 +81,7 @@ module Narou
   end
 
   def self.novel_frozen?(target)
-    id = Downloader.get_id_by_database(target) or return false
+    id = Downloader.get_id_by_target(target) or return false
     LocalSetting.get["freeze"].include?(id)
   end
 

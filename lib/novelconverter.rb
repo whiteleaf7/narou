@@ -345,7 +345,7 @@ class NovelConverter
   # 最近変換した小説IDを記録更新
   #
   def update_latest_convert_novel
-    id = Downloader.get_id_by_database(@novel_title)
+    id = Downloader.get_id_by_target(@novel_title)
     LocalSetting.get["latest_convert"]["id"] = id
     LocalSetting.get.save_settings
   end

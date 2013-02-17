@@ -147,6 +147,9 @@ module Command
       settings.each do |scope, scoped_settings|
         puts "[#{scope.capitalize} Variables]"
         scoped_settings.each do |name, value|
+          if value =~ / /
+            value = "'#{value}'"
+          end
           puts "#{name}=#{value}"
         end
       end
@@ -199,6 +202,8 @@ module Command
       global: {
         # 変数名  => [受け付ける型, 説明(, 不可視化フラグ)]
         "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを変更", true],
+        "difftool" => [:file, "Diffで使うツールを指定する"],
+        "difftool.arg" => [:string, "difftoolで使う引数を設定(オプション)"],
       },
       local: {
         "convert.no-epub" => [:boolean, "EPUB変換を無効にするかどうか"],

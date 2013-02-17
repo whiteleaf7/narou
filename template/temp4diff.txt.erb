@@ -1,0 +1,24 @@
+<%# -*- coding: UTF-8 -*- -%>
+(この差分データに含まれる話数一覧)
+<% sections.each_with_index do |section, i| -%>
+・<%= section["subtitle"].rstrip %> <% if section["subupdate"] == "" %>
+<%= section["update"] -%>
+<% else -%>
+<%= section["subupdate"] %>
+<% end -%>
+<% end -%>
+―――――――――――――――――――――――――――――
+
+<% sections.each do |section| -%>
+<% if section["element"]["introduction"] != "" -%>
+<%= section["element"]["introduction"] %>
+―――――――――――――――――――――――――――――
+<% end -%>
+　　　<%= section["subtitle"].rstrip %>
+
+<%= section["element"]["body"] %>
+<% if section["element"]["postscript"] != "" -%>
+―――――――――――――――――――――――――――――
+<%= section["element"]["postscript"] %>
+<% end -%>
+<% end -%>
