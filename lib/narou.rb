@@ -18,7 +18,7 @@ module Narou
   @@root_dir = nil
   @@local_setting_dir = nil
   @@global_setting_dir = nil
-  @@aozora_path = nil
+  @@aozora_jar_path = nil
   @@preset_dir = nil
 
   def self.get_root_dir
@@ -108,20 +108,20 @@ module Narou
   # 3. スクリプト保存ディレクトリ(Narou.get_script_dir) 直下の AozoraEpub3
   #
   def self.get_aozoraepub3_path
-    return @@aozora_path if @@aozora_path
+    return @@aozora_jar_path if @@aozora_jar_path
     global_setting_aozora_path = GlobalSetting.get["global_setting"]["aozoraepub3path"]
     if global_setting_aozora_path
-      aozora_path = create_aozoraepub3_jar_path(global_setting_aozora_path)
-      if File.exists?(aozora_path)
-        @@aozora_path = aozora_path
-        return aozora_path
+      aozora_jar_path = create_aozoraepub3_jar_path(global_setting_aozora_path)
+      if File.exists?(aozora_jar_path)
+        @@aozora_jar_path = aozora_jar_path
+        return aozora_jar_path
       end
     end
     [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
-      aozora_path = create_aozoraepub3_jar_path(dir, AOZORAEPUB3_DIR)
-      if File.exists?(aozora_path)
-        @@aozora_path = aozora_path
-        return aozora_path
+      aozora_jar_path = create_aozoraepub3_jar_path(dir, AOZORAEPUB3_DIR)
+      if File.exists?(aozora_jar_path)
+        @@aozora_jar_path = aozora_jar_path
+        return aozora_jar_path
       end
     end
     nil

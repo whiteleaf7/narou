@@ -71,6 +71,7 @@ module Command
         puts "設定をスキップしました。あとで narou init で再度設定出来ます"
         return
       end
+      puts
       rewrite_aozoraepub3_files(aozora_path)
       global_setting["aozoraepub3path"] = aozora_path
       GlobalSetting.get.save_settings("global_setting")
@@ -86,20 +87,25 @@ module Command
       open(chuki_tag_path, "r:BOM|UTF-8") do |fp|
         chuki_tag = fp.read
       end
-      if chuki_tag !~ /### Narou\.rb embedded custom chuki ###/
+      embedded_mark = "### Narou.rb embedded custom chuki ###"
+      if chuki_tag =~ /#{embedded_mark}/
+        chuki_tag.gsub!(/#{embedded_mark}.+#{embedded_mark}/m, custom_chuki_tag)
+      else
         chuki_tag << "\n" + custom_chuki_tag
-        File.write(chuki_tag_path, chuki_tag)
-        puts chuki_tag_path + " を書き換えました"
       end
+      File.write(chuki_tag_path, chuki_tag)
+      puts "(次のファイルを書き換えました)"
+      puts chuki_tag_path
+      puts
       # ファイルコピー
-      src = []; dst = []
-      src << File.join(Narou.get_preset_dir, "vertical_font.css")
-      dst << File.join(aozora_path, "template/OPS/css_custom/vertical_font.css")
-      src << File.join(Narou.get_preset_dir, "DMincho.ttf")
-      dst << File.join(aozora_path, "template/OPS/fonts/DMincho.ttf")
+      src = ["AozoraEpub3.ini", "vertical_font.css", "DMincho.ttf"]
+      dst = ["AozoraEpub3.ini", "template/OPS/css_custom/vertical_font.css", "template/OPS/fonts/DMincho.ttf"]
+      puts "(次のファイルをコピーor上書きしました)"
       src.count.times do |i|
-        FileUtils.cp(src[i], dst[i])
-        puts dst[i] + " を追加しました"
+        src_full_path = File.join(Narou.get_preset_dir, src[i])
+        dst_full_path = File.join(aozora_path, dst[i])
+        FileUtils.cp(src_full_path, dst_full_path)
+        puts dst_full_path
       end
     end
 
@@ -121,9 +127,4 @@ module Command
       nil
     end
   end
-end
-
-if __FILE__ == $0
-  Encoding.default_external = Encoding::UTF_8
-  Command::Init.new.init_aozoraepub3(true)
 end

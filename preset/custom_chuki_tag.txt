@@ -1,4 +1,5 @@
-################################################################
+### Narou.rb embedded custom chuki ###
+
 ####カスタム注記
 半字下げ	<div class="custom_hanji">	</div>	1
 一字下げ	<div class="pt1">	</div>	1
@@ -6,10 +7,6 @@
 三字下げ	<div class="pt3">	</div>	1
 ここからパラメーター	<div class="custom_parameter_block">		1
 ここでパラメーター終わり	</div>		1
-ここからパラメーター２	<div class="custom_parameter_block2">		1
-ここでパラメーター２終わり	</div>		1
-ここから作者コメント	<div class="custom_author_comment">		1
-ここで作者コメント終わり	</div><div class="clear"></div>		1
 ここから前書き	<div class="introduction">		1
 ここで前書き終わり	</div><div class="clear"></div>		1
 ここから後書き	<div class="postscript">		1

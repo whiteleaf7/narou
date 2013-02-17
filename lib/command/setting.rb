@@ -198,7 +198,7 @@ module Command
     SETTING_VARIABLES = {
       global: {
         # 変数名  => [受け付ける型, 説明(, 不可視化フラグ)]
-        "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを変更"],
+        "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを変更", true],
       },
       local: {
         "convert.no-epub" => [:boolean, "EPUB変換を無効にするかどうか"],

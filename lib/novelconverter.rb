@@ -60,17 +60,14 @@ class NovelConverter
 
   def self.stash_aozora_fonts_directory
     fonts_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "template/OPS/fonts")
-    puts fonts_path
     return unless File.exists?(fonts_path)
     FileUtils.mv(fonts_path, fonts_path + "_hide")
-    p Dir.glob(File.dirname(fonts_path) + "/*").map { |f| File.basename(f) }
   end
 
   def self.visible_aozora_fonts_directory
     fonts_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "template/OPS/fonts")
     return unless File.exists?(fonts_path + "_hide")
     FileUtils.mv(fonts_path + "_hide", fonts_path)
-    p Dir.glob(File.dirname(fonts_path) + "/*").map { |f| File.basename(f) }
   end
 
   #
@@ -93,10 +90,6 @@ class NovelConverter
       cover_option = "-c 0"   # 先頭の挿絵を表紙として利用
     #end
 
-    puts "---"
-    p use_dakuten_font
-    puts "---"
-
     dst_option = ""
     if dst_dir
       dst_option = %!-dst "#{File.expand_path(dst_dir)}"!
@@ -111,15 +104,9 @@ class NovelConverter
       return nil
     end
 
-    ini_option = ""
-    preset_aozoraepub3_ini_path = File.join(Narou.get_script_dir, "preset/AozoraEpub3.ini")
-    if File.exists?(preset_aozoraepub3_ini_path)
-      ini_option = %!-i "#{preset_aozoraepub3_ini_path}"!
-    end
-
     Dir.chdir(aozoraepub3_dir)
     command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 ! +
-              %!#{cover_option} #{dst_option} #{ini_option} "#{abs_srcpath}"!
+              %!#{cover_option} #{dst_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
