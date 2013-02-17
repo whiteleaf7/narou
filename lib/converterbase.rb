@@ -529,7 +529,7 @@ class ConverterBase
         joined_str = match.dup
         joined_str.gsub!(/([…―])\n/, "\\1。\n")
         joined_str = joined_str.split("\n").map { |s|
-          s.sub(/^　/, "")
+          s.sub(/^　+/, "")
         }.join
         error = @inspector.validate_singular_auto_join_brackets(match, joined_str, bracket)
         if error
