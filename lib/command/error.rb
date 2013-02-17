@@ -41,7 +41,6 @@ module Command
       end
       argv.each_with_index do |target, i|
         Helper.print_horizontal_rule if i > 0
-        display_log(target)
         data = Downloader.get_data_by_target(target)
         unless data
           warn "#{target} は存在しません"
