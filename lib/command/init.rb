@@ -68,7 +68,7 @@ module Command
       puts "AozoraEpub3の構成ファイルを書き換えます。narouコマンド用に別途新規インストールしておくことをオススメします"
       aozora_path = ask_aozoraepub3_path
       unless aozora_path
-        puts "AozoraEpub3の設定をスキップしました。あとで narou init で再度設定出来ます"
+        puts "設定をスキップしました。あとで narou init で再度設定出来ます"
         return
       end
       rewrite_aozoraepub3_files(aozora_path)
