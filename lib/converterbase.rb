@@ -11,6 +11,8 @@ require_relative "progressbar"
 class ConverterBase
   KANJI_NUM = "〇一二三四五六七八九"
 
+  attr_reader :use_dakuten_font
+
   def before_convert(io, text_type)
     data = io.read
     data.gsub!("\n\n", "\n")
@@ -27,6 +29,7 @@ class ConverterBase
     @inspector = inspector
     @illustration = illustration
     @english_sentences = []
+    @use_dakuten_font = false
     initialize_member_values
   end
 
@@ -268,6 +271,7 @@ class ConverterBase
   #
   def convert_dakuten_char_to_font(data)
     data.gsub!(/(.)[゛ﾞ]/) do
+      @use_dakuten_font = true
       "［＃濁点］#{$1}［＃濁点終わり］"
     end
     #data.gsub!(/(.)[゛ﾞ]/, "\\1ﾞ［＃「\\1ﾞ」は縦中横］")

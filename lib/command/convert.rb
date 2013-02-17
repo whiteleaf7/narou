@@ -107,7 +107,9 @@ module Command
         if File.file?(target.to_s)
           argument_target_type = :file
           begin
-            converted_txt_path = NovelConverter.convert_file(target, enc, output_filename, @options["inspect"])
+            res = NovelConverter.convert_file(target, enc, output_filename, @options["inspect"])
+            converted_txt_path = res[:converted_txt_path]
+            use_dakuten_font = res[:use_dakuten_font]
             next unless converted_txt_path
           rescue ArgumentError => e
             if e.message =~ /invalid byte sequence in UTF-8/
@@ -131,7 +133,9 @@ module Command
             warn "#{target} は存在しません"
             next
           end
-          converted_txt_path = NovelConverter.convert(target, output_filename, @options["inspect"])
+          res = NovelConverter.convert(target, output_filename, @options["inspect"])
+          converted_txt_path = res[:converted_txt_path]
+          use_dakuten_font = res[:use_dakuten_font]
           next unless converted_txt_path
         end
         converted_txt_dir = File.dirname(converted_txt_path)
@@ -139,7 +143,7 @@ module Command
           copied_file_path = copy_to_converted_file(converted_txt_path)
         else
           # epub
-          res = NovelConverter.txt_to_epub(converted_txt_path)
+          res = NovelConverter.txt_to_epub(converted_txt_path, use_dakuten_font)
           next if res != :success
 
           epub_path = converted_txt_path.sub(/.txt$/, ".epub")

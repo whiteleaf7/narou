@@ -3,6 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require "fileutils"
 require "stringio"
 require_relative "novelsetting"
 require_relative "inspector"
@@ -17,24 +18,25 @@ require_relative "localsetting"
 class NovelConverter
   NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
 
+  attr_reader :use_dakuten_font
+
   #
   # 指定の小説を整形・変換する
-  #
-  # 返り値は保存したファイルのパス
   #
   def self.convert(target, output_filename = nil, display_inspector = false)
     setting = NovelSetting.create(target)
     if setting
       novel_converter = new(setting, output_filename, display_inspector)
-      return novel_converter.convert_main
+      return {
+        converted_txt_path: novel_converter.convert_main,
+        use_dakuten_font: novel_converter.use_dakuten_font
+      }
     end
     nil
   end
 
   #
   # テキストファイルを整形・変換する
-  #
-  # 返り値は保存したファイルのパス
   #
   def self.convert_file(filename, encoding = nil, output_filename = nil, display_inspector = false)
     if output_filename
@@ -50,7 +52,25 @@ class NovelConverter
     if encoding
       text.force_encoding(encoding).encode!(Encoding::UTF_8)
     end
-    return novel_converter.convert_main(text)
+    {
+      converted_txt_path: novel_converter.convert_main(text),
+      use_dakuten_font: novel_converter.use_dakuten_font
+    }
+  end
+
+  def self.stash_aozora_fonts_directory
+    fonts_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "template/OPS/fonts")
+    puts fonts_path
+    return unless File.exists?(fonts_path)
+    FileUtils.mv(fonts_path, fonts_path + "_hide")
+    p Dir.glob(File.dirname(fonts_path) + "/*").map { |f| File.basename(f) }
+  end
+
+  def self.visible_aozora_fonts_directory
+    fonts_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "template/OPS/fonts")
+    return unless File.exists?(fonts_path + "_hide")
+    FileUtils.mv(fonts_path + "_hide", fonts_path)
+    p Dir.glob(File.dirname(fonts_path) + "/*").map { |f| File.basename(f) }
   end
 
   #
@@ -63,7 +83,7 @@ class NovelConverter
   #
   # 返り値：正常終了 :success、エラー終了 :error、AozoraEpub3が見つからなかった nil
   #
-  def self.txt_to_epub(filename, dst_dir = nil)
+  def self.txt_to_epub(filename, use_dakuten_font = false, dst_dir = nil)
     abs_srcpath = File.expand_path(filename)
     #cover_path = File.join(File.dirname(filename), "cover.jpg")
     cover_option = ""
@@ -72,6 +92,10 @@ class NovelConverter
       #cover_option = %!--cover "#{cover_path}"!
       cover_option = "-c 0"   # 先頭の挿絵を表紙として利用
     #end
+
+    puts "---"
+    p use_dakuten_font
+    puts "---"
 
     dst_option = ""
     if dst_dir
@@ -99,6 +123,7 @@ class NovelConverter
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
+    stash_aozora_fonts_directory unless use_dakuten_font
     print "AozoraEpub3でEPUBに変換しています"
     res = Helper::AsyncCommand.exec(command) do
       print "."
@@ -124,6 +149,8 @@ class NovelConverter
     end
     puts "変換しました"
     :success
+  ensure
+    visible_aozora_fonts_directory unless use_dakuten_font
   end
 
   #
@@ -172,6 +199,7 @@ class NovelConverter
     @inspector = Inspector.new(@setting)
     @illustration = Illustration.new(@setting, @inspector)
     @display_inspector = display_inspector
+    @use_dakuten_font = false
   end
 
   def load_novel_section(subtitle_info)
@@ -192,6 +220,7 @@ class NovelConverter
     (io = conv.before_convert(io, text_type)).rewind   # 特殊事前変換処理
     (io = conv.convert(io, text_type)).rewind          # 共通変換処理
     (io = conv.after_convert(io, text_type)).rewind    # 特殊事後変換処理
+    @use_dakuten_font = true if conv.use_dakuten_font
     return io.read
   end
 
