@@ -51,6 +51,7 @@ def load_converter(path)
   converter_path = File.join(path, "converter.rb")
   if File.exists?(converter_path)
     if Helper.os_windows?
+      # TODO: RubyのバグでUTF-8なパスをrequireが見えてない。修正されたら消す
       load converter_path.encode(Encoding::Windows_31J)
     else
       load converter_path

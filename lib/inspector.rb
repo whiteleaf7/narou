@@ -7,7 +7,7 @@
 # 小説の状態を監視・検査する
 #
 class Inspector
-  ERROR_LOG_NAME = "エラーログ.txt"
+  INSPECT_LOG_NAME = "調査ログ.txt"
   LINE_LENGTH_THRESHOLD = 400
   BRACKETS_RETURN_COUNT_THRESHOLD = 7
   END_TOUTEN_COUNT_THRESHOLD = 50
@@ -22,10 +22,15 @@ class Inspector
   IGNORE_INDENT_CHAR = "　(（［「『〈《≪【〔―・※"
   AUTO_INDENT_THRESHOLD_RATIO = 0.6   # 全行のうちこの割合以上字下げされてなければ強制字下げする
 
-  attr_writer :messages
+  attr_writer :messages, :subtitle
 
   def self.read_messages(setting)
-    File.read(File.join(setting.archive_path, ERROR_LOG_NAME))
+    inspect_log = File.join(setting.archive_path, INSPECT_LOG_NAME)
+    if File.exists?(inspect_log)
+      File.read(inspect_log)
+    else
+      nil
+    end
   end
 
   def initialize(setting)
@@ -34,6 +39,7 @@ class Inspector
     @error = false
     @warning = false
     @info = false
+    @subtitle = ""
   end
 
   def empty?
@@ -61,11 +67,11 @@ class Inspector
         end
       end
       nil
-    }.compact.join("\n" * 2)
+    }.compact.join("\n\n")
   end
 
   def save(path = nil)
-    path = File.join(@setting.archive_path, ERROR_LOG_NAME) if path.nil?
+    path = File.join(@setting.archive_path, INSPECT_LOG_NAME) if path.nil?
     open(path, "w") do |fp|
       fp.puts "--- ログ出力 #{Time.now} ---"
       display(ALL, fp)
@@ -92,35 +98,46 @@ class Inspector
   end
 
   def omit_message(strings)
-    "該当箇所: " + strings[0...70].gsub("\n", "\\n") + " ..."
+    "≫≫≫ 該当箇所(#{@subtitle})\n..." + strings[0...35].gsub("\n", "\\n") + " ..."
   end
 
   #
-  # 連結具合の異常を検出
+  # 連結した鍵カッコが正常かどうか
   #
-  def validate_singular_auto_join_brackets(raw_strings, joined_strings, bracket)
+  def validate_joined_inner_brackets(raw_strings, joined_strings, brackets)
     error_result = false
-    # カギ括弧の開き・閉じの数が合わない
-    if joined_strings.count(bracket[0]) != joined_strings.count(bracket[1])
-      warning("auto_join_in_brackets: カギ括弧(#{bracket[0]}、#{bracket[1]})の開き・閉じの数が合わないので" + \
-            "連結を中止しました。カギ括弧が閉じていない、もしくは同じ種類のカギ括弧が二重に使われている" + \
-            "可能性があります。\n" + \
-            omit_message(raw_strings))
-      error_result = true
     # 連結前の文章の改行具合を調べて、改行が閾値を超えた場合意図的な改行とみなす
-    elsif raw_strings.count("\n") >= BRACKETS_RETURN_COUNT_THRESHOLD
-      warning("auto_join_in_brackets: 改行が規定の回数を超えて検出されました。" + \
-              "作者による意図的な改行とみなし、連結を中止しました。\n" + \
+    if raw_strings.count("\n") >= BRACKETS_RETURN_COUNT_THRESHOLD
+      warning("改行が規定の回数を超えて検出されました。" +
+              "作者による意図的な改行とみなし、連結を中止しました。\n" +
               omit_message(raw_strings))
       error_result = true
-    # 連結した文章があまりにも長い場合、連結ミスをしている可能性が高い
+    # 連結した文章があまりにも長い場合、特殊な用途で使われている可能性がある
     elsif joined_strings.length >= LINE_LENGTH_THRESHOLD
-      warning("auto_join_in_brackets: 連結結果が長過ぎます。連結を中止しました。" + \
-              "特殊な用途（手紙形式）等でカギ括弧が使われている可能性があります。\n" + \
+      warning("連結結果が長過ぎます。連結を中止しました。" +
+              "特殊な用途（手紙形式）等で鍵カッコが使われている可能性があります。\n" +
             omit_message(raw_strings))
       error_result = true
     end
     error_result
+  end
+
+  #
+  # 鍵カッコのとじ開きの異常部分を調査
+  #
+  def inspect_invalid_openclose_brackets(data, brackets, stack)
+    brackets.each do |bracket|
+      buffer = data.dup
+      while buffer =~ /#{bracket}/
+        match_before = $`.dup
+        match_after = $'.dup
+        before = ConverterBase.rebuild_brackets(match_before, stack)
+        after = ConverterBase.rebuild_brackets(match_after, stack)
+        error("鍵カッコ(#{bracket})が正しく閉じていません。\n" +
+              omit_message((before[-15..-1] || before) + bracket + after))
+        buffer = match_before
+      end
+    end
   end
 
   #

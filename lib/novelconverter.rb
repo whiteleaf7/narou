@@ -251,9 +251,10 @@ class NovelConverter
       @toc["subtitles"].each_with_index do |subinfo, i|
         progressbar.output(i)
         section = load_novel_section(subinfo)
+        @inspector.subtitle = section["subtitle"]
         element = section["element"]
         element.each do |text_type, elm_text|
-          element[text_type] = convert_text_by_load_converter(elm_text, text_type,  converter)
+          element[text_type] = convert_text_by_load_converter(elm_text, text_type, converter)
         end
         section["subtitle"] = convert_text_by_load_converter(section["subtitle"], "subtitle",  converter)
         sections << section
@@ -308,17 +309,19 @@ class NovelConverter
 
     if !@display_inspector
       unless @inspector.empty?
-        puts "小説状態の調査結果を #{Inspector::ERROR_LOG_NAME} に出力しました"
+        puts "小説状態の調査結果を #{Inspector::INSPECT_LOG_NAME} に出力しました"
       end
     else
       # 小説の監視・検査状況を表示する
       if @inspector.error? || @inspector.warning?
-        warn "―― 小説にエラーもしくは警告が存在します ――"
+        warn "―――― 小説にエラーもしくは警告が存在します ――――"
+        warn ""
         @inspector.display(Inspector::ERROR | Inspector::WARNING)
         warn ""
       end
       if @inspector.info?
-        warn "―― 小説の検査状況を表示します ――"
+        warn "―――― 小説の検査状況を表示します ――――"
+        warn ""
         @inspector.display(Inspector::INFO)
         warn ""
       end

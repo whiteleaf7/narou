@@ -536,25 +536,55 @@ class ConverterBase
   # ==================================================
 
   BRACKETS = [%w(「 」), %w(『 』)]
+
+  # ネストに対応した鍵カッコの正規表現
+  OPENCLOSE_REGEXPS = BRACKETS.map { |bracket|
+    bo, bc = bracket
+    /(?<oc>#{bo}[^#{bo+bc}]*(?:\g<oc>[^#{bo+bc}]*)*#{bc})/m
+  }
+
   #
-  # カギ括弧内自動連結
+  # 改行を連結した文章を作る
+  #
+  # 改行がひとつもなかった場合は nil を返す
+  #
+  def join_inner_bracket(str)
+    joined_str = str.dup
+    return nil if str.count("\n") == 0
+    joined_str.gsub!(/([…―])\n/, "\\1。\n")
+    joined_str = joined_str.split("\n").map { |s|
+      s.sub(/^　+/, "")
+    }.join
+    joined_str
+  end
+
+  #
+  # 鍵カッコ内自動連結
   #
   def auto_join_in_brackets(data)
-    BRACKETS.each do |bracket|
-      data.gsub!(/#{bracket[0]}+(.+?)#{bracket[1]}+/m) do |match|
-        joined_str = match.dup
-        joined_str.gsub!(/([…―])\n/, "\\1。\n")
-        joined_str = joined_str.split("\n").map { |s|
-          s.sub(/^　+/, "")
-        }.join
-        error = @inspector.validate_singular_auto_join_brackets(match, joined_str, bracket)
-        if error
-          # 連結した文章を検査した結果、異常を検知したため連結を中止する
-          match
-        else
-          joined_str
+    OPENCLOSE_REGEXPS.each_with_index do |openclose, i|
+      stack = {}
+      data.gsub!(openclose).with_index do |match, j|
+        joined_str = join_inner_bracket(match)
+        if joined_str
+          error = @inspector.validate_joined_inner_brackets(match, joined_str, BRACKETS[i])
         end
+        if joined_str
+          stack[j] = error ? match : joined_str
+        else
+          stack[j] = match
+        end
+        "<@>#{j}<@>"
       end
+      # 正しく閉じてない鍵カッコだけが data に残ってる
+      @inspector.inspect_invalid_openclose_brackets(data, BRACKETS[i], stack)
+      data.replace(ConverterBase.rebuild_brackets(data, stack))
+    end
+  end
+
+  def self.rebuild_brackets(data, stack)
+    data.gsub(/<@>(\d+)<@>/) do
+      stack[$1.to_i]
     end
   end
 
@@ -671,6 +701,7 @@ class ConverterBase
   def enchant_midashi(data)
     def midashi(str)
       midashi_title = str.gsub("［＃半字下げ］", "")
+      @inspector.subtitle = midashi_title
       "［＃３字下げ］［＃ここから中見出し］#{midashi_title}［＃ここで中見出し終わり］"
     end
 

@@ -10,7 +10,7 @@ require_relative "../novelsetting"
 require_relative "../localsetting"
 
 module Command
-  class Error < CommandBase
+  class Inspect < CommandBase
     def oneline_help
       "小説状態の調査状況ログを表示します"
     end
@@ -24,8 +24,8 @@ module Command
   ・narou setting convert.inspect=true とすれば変換時に常に表示されるようになります。
 
   Example:
-    narou error     # 直前の変換時のログを表示
-    narou error 6   # ログを表示したい小説を指定する
+    narou inspect     # 直前の変換時のログを表示
+    narou inspect 6   # ログを表示したい小説を指定する
       EOS
     end
 
@@ -53,7 +53,7 @@ module Command
     def display_log(title)
       puts "(#{title} の小説状態調査状況ログ)"
       novel_setting = NovelSetting.create(title)
-      puts Inspector.read_messages(novel_setting)
+      puts Inspector.read_messages(novel_setting) || "調査ログがまだ無いようです"
     end
   end
 end
