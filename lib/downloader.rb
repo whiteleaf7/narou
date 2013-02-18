@@ -411,12 +411,14 @@ class Downloader
     interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"] || 0
     interval_sleep_time = 0 if interval_sleep_time < 0
     subtitles.each_with_index do |subtitle_info, i|
-      if interval_sleep_time > 0
+      if @setting["domain"] =~ /syosetu.com/ && (i % 10 == 0 && i >= 10)
+        # MEMO:
+        # 小説家になろうは連続DL規制があるため、ウェイトを入れる必要がある。
+        # 10話ごとに規制が入るため、10話ごとにウェイトを挟む。
+        # 1話ごとに1秒待機を10回繰り返そうと、11回目に規制が入るため、ウェイトは必ず必要。
+        sleep(5)
+      else
         sleep(interval_sleep_time) if i > 0
-      elsif @setting["domain"] =~ /syosetu.com/
-        # 小説家になろうは連続DL規制があるため、ウェイトを入れる必要がある
-        # 10話ごとに規制が入るため、10話ごとにウェイトを挟む
-        sleep(6) if i % 10 == 0 && i >= 10
       end
       index, subtitle = subtitle_info["index"], subtitle_info["subtitle"]
       puts "第#{index}部分　#{subtitle} (#{i+1}/#{max})"
@@ -435,7 +437,7 @@ class Downloader
   #
   def move_to_cache_dir(relative_path)
     path = File.join(get_novel_data_dir, relative_path)
-    if File.exists?(path)
+    if File.exists?(path) && @cache_dir
       FileUtils.mv(path, @cache_dir)
     end
   end

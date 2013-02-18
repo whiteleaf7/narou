@@ -74,6 +74,8 @@ module Command
         "true/false  "
       when :integer
         "整数        "
+      when :float
+        "小数点数    "
       when :string
         "文字列      "
       when :directory
@@ -122,6 +124,12 @@ module Command
       when :integer
         if value =~ /^[+-]?\d+$/
           result = value.to_i
+        else
+          raise InvalidVariableType, type
+        end
+      when :float
+        if value =~ /^[+-]?\d+\.?\d*$/
+          result = value.to_f
         else
           raise InvalidVariableType, type
         end
@@ -214,7 +222,7 @@ module Command
         "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
-        "download.interval" => [:integer, "各話DL時に指定した秒数待機する。デフォルト0"]
+        "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"]
       }
     }
   end
