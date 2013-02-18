@@ -11,12 +11,12 @@
 <% sections.each_with_index do |section, i| -%>
 ［＃改ページ］
 <% if i == 0 -%>
-［＃ここから大見出し］<%= toc["title"] %>［＃ここで大見出し終わり］
+［＃６段階大きな文字］<%= toc["title"] %>［＃大きな文字終わり］
 ［＃地付き］<%= toc["author"] %>
 
 <% end -%>
 <% if section["chapter"] != "" -%>
-<%= section["chapter"] %>
+［＃ここから大見出し］<%= section["chapter"] %>［＃ここで大見出し終わり］
 
 <% end -%>
 ［＃３字下げ］［＃ここから中見出し］<%= section["subtitle"].rstrip %>［＃ここで中見出し終わり］
