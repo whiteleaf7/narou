@@ -285,7 +285,7 @@ class ConverterBase
     # 括弧の閉じの直前の句点を消す
     data.gsub!(/。([」』）])/, "\\1")
     # 原則偶数個を１セットで使うべき文字を偶数個に補正
-    # （―も偶数個セットにするべきだが、記号的な意味で使われる場合もあるので無視）
+    # MEMO:（―も偶数個セットにするべきだが、記号的な意味で使われる場合もあるので無視）
     %w(…).each do |target|
       data.gsub!(/#{target}{3,}/) do |match|
         len = match.length
@@ -296,6 +296,7 @@ class ConverterBase
     # たまに見かける誤字対策
     data.gsub!(/。+/, "。")
     data.gsub!(/、+/, "、")
+    data.gsub!(/。　/, "。")
   end
 
   #
