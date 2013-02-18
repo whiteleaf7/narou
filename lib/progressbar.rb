@@ -19,12 +19,12 @@ class ProgressBar
     ratio = calc_ratio(num)
     now = (@width * ratio).round
     rest = @width - now
-    print "[" + @char * now + ' ' * rest + "] #{(ratio * 100).round}%\r"
+    STDOUT.print "[" + @char * now + ' ' * rest + "] #{(ratio * 100).round}%\r"
   end
 
   def clear
     return if $debug
-    print " " * 79 + "\r"
+    STDOUT.print " " * 79 + "\r"
   end
 
   def calc_ratio(num)

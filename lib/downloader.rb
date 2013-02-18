@@ -282,7 +282,13 @@ class Downloader
     end
     if update_subtitles.count > 0
       @cache_dir = create_cache_dir if old_toc.length > 0
-      sections_download_and_save(update_subtitles)
+      begin
+        sections_download_and_save(update_subtitles)
+      rescue Interrupt
+        FileUtils.remove_entry_secure(@cache_dir) if @cache_dir
+        puts "ダウンロードを中断しました"
+        exit 1
+      end
       update_database
       save_novel_data(TOC_FILE_NAME, latest_toc)
       return true

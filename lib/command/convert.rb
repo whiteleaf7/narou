@@ -179,6 +179,10 @@ module Command
           Helper.open_directory_by_os_filer(converted_txt_dir, "小説の保存フォルダを開きますか")
         end
       end
+    rescue Interrupt
+      puts
+      puts "変換を中断しました"
+      exit 1
     end
 
     def copy_to_converted_file(src_path)

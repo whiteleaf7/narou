@@ -67,6 +67,9 @@ module Command
           puts "#{title} に更新はありません"
         end
       end
+    rescue Interrupt
+      puts "アップデートを中断しました"
+      exit 1
     end
 
     def oneline_help
