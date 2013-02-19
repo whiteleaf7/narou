@@ -10,15 +10,19 @@
 ―――――――――――――――――――――――――――――
 
 <% sections.each do |section| -%>
-<% if section["element"]["introduction"] != "" -%>
-<%= section["element"]["introduction"] %>
-―――――――――――――――――――――――――――――
-<% end -%>
 　　　<%= section["subtitle"].rstrip %>
+<% if section["element"]["introduction"] != "" -%>
+(前書き)
+<%= section["element"]["introduction"] %>
+**********************************************************
+<% end -%>
 
 <%= section["element"]["body"] %>
 <% if section["element"]["postscript"] != "" -%>
-―――――――――――――――――――――――――――――
+**********************************************************
+(後書き)
 <%= section["element"]["postscript"] %>
 <% end -%>
+―――――――――――――――――――――――――――――
+
 <% end -%>
