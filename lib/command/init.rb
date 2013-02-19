@@ -104,7 +104,7 @@ module Command
       src.count.times do |i|
         src_full_path = File.join(Narou.get_preset_dir, src[i])
         dst_full_path = File.join(aozora_path, dst[i])
-        FileUtils.cp(src_full_path, dst_full_path)
+        FileUtils.install(src_full_path, dst_full_path)
         puts dst_full_path
       end
     end
