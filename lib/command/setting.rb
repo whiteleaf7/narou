@@ -5,6 +5,7 @@
 
 require_relative "../localsetting"
 require_relative "../globalsetting"
+require_relative "../novelsetting"
 
 module Command
   class Setting < CommandBase
@@ -36,20 +37,10 @@ module Command
   Local Variable List:
         <name>           <value>              説明
       EOS
-      SETTING_VARIABLES[:local].each do |name, info|
-        unless info[2]
-          type_description = self.class.variable_type_to_description(info[0])
-          @opt.separator("    #{name.ljust(18)} #{type_description} #{info[1]}")
-        end
-      end
+      @opt.separator(get_variable_list_strings(:local))
 
       @opt.separator("\n  Global Variable List:")
-      SETTING_VARIABLES[:global].each do |name, info|
-        unless info[2]
-          type_description = self.class.variable_type_to_description(info[0])
-          @opt.separator("    #{name.ljust(18)} #{type_description} #{info[1]}")
-        end
-      end
+      @opt.separator(get_variable_list_strings(:global))
 
       @opt.separator <<-EOS
 
@@ -64,6 +55,11 @@ module Command
       EOS
       @opt.on("-l", "--list", "現在の設定値を確認する") {
         output_setting_list
+        exit 0
+      }
+      @opt.on("-a", "--all", "設定できる全ての変数名を表示する") {
+        @options["all"] = true
+        display_variable_list
         exit 0
       }
     end
@@ -206,14 +202,35 @@ module Command
       GlobalSetting.get.save_settings("global_setting")
     end
 
+    def get_variable_list_strings(scope)
+      result = ""
+      SETTING_VARIABLES[scope].each do |name, info|
+        if @options["all"] || info[2] != INVISIBLE
+          type_description = self.class.variable_type_to_description(info[0])
+          result << "    #{name.ljust(18)} #{type_description} #{info[1]}\n"
+        end
+      end
+      result
+    end
+
+    def display_variable_list
+      puts "Local Variable List:"
+      puts get_variable_list_strings(:local).gsub(/^ {4}/, "")
+      puts
+      puts "Global Variable List:"
+      puts get_variable_list_strings(:global).gsub(/^ {4}/, "")
+    end
+
+    TYPE_OF_VALUE = {
+      TrueClass => :boolean, FalseClass => :boolean, Fixnum => :integer,
+      Float => :float, String => :string
+    }
+
+    INVISIBLE = true
+
     SETTING_VARIABLES = {
-      global: {
-        # 変数名  => [受け付ける型, 説明(, 不可視化フラグ)]
-        "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを変更", true],
-        "difftool" => [:file, "Diffで使うツールを指定する"],
-        "difftool.arg" => [:string, "difftoolで使う引数を設定(オプション)"],
-      },
       local: {
+        # 変数名 => [受け付ける型, 説明(, 不可視化フラグ)]
         "convert.no-epub" => [:boolean, "EPUB変換を無効にするかどうか"],
         "convert.no-mobi" => [:boolean, "MOBI変換を無効にするかどうか"],
         "convert.no-strip" => [:boolean, "MOBIのstripを無効にするかどうか\n" +
@@ -223,7 +240,18 @@ module Command
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"]
+      },
+      global: {
+        "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを指定", INVISIBLE],
+        "difftool" => [:file, "Diffで使うツールを指定する"],
+        "difftool.arg" => [:string, "difftoolで使う引数を設定(オプション)"],
       }
     }
+
+    NovelSetting::DEFAULT_SETTINGS.each do |default|
+      SETTING_VARIABLES[:local]["force." + default[:name]] = [
+        TYPE_OF_VALUE[default[:value].class], "\n      " + default[:help], INVISIBLE
+      ]
+    end
   end
 end

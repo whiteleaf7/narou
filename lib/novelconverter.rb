@@ -24,7 +24,7 @@ class NovelConverter
   # 指定の小説を整形・変換する
   #
   def self.convert(target, output_filename = nil, display_inspector = false)
-    setting = NovelSetting.create(target)
+    setting = NovelSetting.load(target)
     if setting
       novel_converter = new(setting, output_filename, display_inspector)
       return {

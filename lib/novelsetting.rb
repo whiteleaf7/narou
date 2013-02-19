@@ -11,7 +11,7 @@ class NovelSetting
 
   attr_accessor :author, :title, :archive_path
 
-  def self.create(target)
+  def self.load(target)
     archive_path = Downloader.get_novel_data_dir_by_target(target)
     if archive_path
       setting = new(archive_path)
@@ -26,17 +26,34 @@ class NovelSetting
 
   def initialize(archive_path)
     @archive_path = archive_path
-    load_setting
+    load_settings
     set_attribute
   end
 
-  def load_setting
+  #
+  # 小説変換時の設定値読込
+  #
+  # 設定値の優先順位は
+  # 1. narou setting コマンドで設定した force.*
+  # 2. setting.ini
+  # 3. DEFAULT_SETTINGS
+  #
+  def load_settings
     @setting = {}
     ini_path = File.join(@archive_path, INI_NAME)
     ini = Ini.load_file(ini_path) rescue Ini.load("")
+    force_settings = {}
+    # 設定値を強制的に上書きするデータの読込
+    LocalSetting.get["local_setting"].each { |name, value|
+      if name =~ /^force\.(.+)$/
+        force_settings[$1] = value
+      end
+    }
     DEFAULT_SETTINGS.each do |element|
       name, value = element[:name], element[:value]
-      if ini["global"][name]
+      if force_settings.include?(name)
+        @setting[name] = force_settings[name]
+      elsif ini["global"].include?(name)
         @setting[name] = ini["global"][name]
       else
         @setting[name] = value
@@ -141,7 +158,7 @@ class NovelSetting
     {
       name: "enable_narou_illust",
       value: true,
-      help: "なろうの挿絵タグを有効にする（false なら削除）"
+      help: "小説家になろうの挿絵タグを有効にする（false なら削除）"
     },
     {
       name: "enable_transform_fraction",
