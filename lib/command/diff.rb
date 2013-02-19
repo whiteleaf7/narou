@@ -32,9 +32,9 @@ module Command
     narou setting difftool="C:\\Program Files\\WinMerge\\WinMergeU.exe"
 
     # difftoolに渡す引数(指定しなければ単純に新旧ファイルを引数に呼び出すだけ)
-    # 特殊な変数 $NEW : DLした最新データの差分用ファイルパス
-    #            $OLD : 古い方の差分用ファイルパス
-    narou setting difftool.arg='-e -x -ub -dl "NEW" -dr "OLD" $NEW $OLD'
+    # 特殊な変数 #NEW : DLした最新データの差分用ファイルパス
+    #            #OLD : 古い方の差分用ファイルパス
+    narou setting difftool.arg='-e -x -ub -dl "NEW" -dr "OLD" #NEW #OLD'
 
       EOS
 
@@ -91,8 +91,8 @@ module Command
       diff_arg = GlobalSetting.get["global_setting"]["difftool.arg"]
       diff_cmd = %!"#{@difftool}" !
       if diff_arg
-        diff_arg.gsub!("$NEW", left)
-        diff_arg.gsub!("$OLD", right)
+        diff_arg.gsub!("#NEW", left)
+        diff_arg.gsub!("#OLD", right)
         diff_cmd += diff_arg
       else
         diff_cmd += %!#{left} #{right}!
