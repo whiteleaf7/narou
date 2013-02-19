@@ -250,7 +250,8 @@ module Command
 
     NovelSetting::DEFAULT_SETTINGS.each do |default|
       SETTING_VARIABLES[:local]["force." + default[:name]] = [
-        TYPE_OF_VALUE[default[:value].class], "\n      " + default[:help], INVISIBLE
+        #TYPE_OF_VALUE[default[:value].class], "\n      " + default[:help], INVISIBLE
+        TYPE_OF_VALUE[default[:value].class], "", INVISIBLE
       ]
     end
   end
