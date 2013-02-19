@@ -98,7 +98,8 @@ class Inspector
   end
 
   def omit_message(strings)
-    "≫≫≫ 該当箇所(#{@subtitle})\n..." + strings[0...35].gsub("\n", "\\n") + " ..."
+    navigation = "in #{@subtitle}" if @subtitle.to_s.length > 0
+    "≫≫≫ 該当箇所 #{navigation}\n..." + strings[0...36].gsub("\n", "\\n") + "..."
   end
 
   #
@@ -106,16 +107,17 @@ class Inspector
   #
   def validate_joined_inner_brackets(raw_strings, joined_strings, brackets)
     error_result = false
+    case
     # 連結前の文章の改行具合を調べて、改行が閾値を超えた場合意図的な改行とみなす
-    if raw_strings.count("\n") >= BRACKETS_RETURN_COUNT_THRESHOLD
+    when raw_strings.count("\n") >= BRACKETS_RETURN_COUNT_THRESHOLD
       warning("改行が規定の回数を超えて検出されました。" +
               "作者による意図的な改行とみなし、連結を中止しました。\n" +
               omit_message(raw_strings))
       error_result = true
     # 連結した文章があまりにも長い場合、特殊な用途で使われている可能性がある
-    elsif joined_strings.length >= LINE_LENGTH_THRESHOLD
+    when joined_strings.length >= LINE_LENGTH_THRESHOLD
       warning("連結結果が長過ぎます。連結を中止しました。" +
-              "特殊な用途（手紙形式）等で鍵カッコが使われている可能性があります。\n" +
+              "特殊な用途(手紙形式)等で鍵カッコが使われている可能性があります。\n" +
             omit_message(raw_strings))
       error_result = true
     end

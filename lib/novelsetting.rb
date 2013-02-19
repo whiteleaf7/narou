@@ -65,6 +65,9 @@ class NovelSetting
   end
 
   DEFAULT_SETTINGS = [
+    # name: 変数名
+    # value: 初期値
+    # help: 説明(setting.ini に書き出される)
     {
       name: "enable_convert_num_to_kanji",
       value: true,
@@ -93,17 +96,27 @@ class NovelSetting
     {
       name: "enable_auto_indent",
       value: true,
-      help: "自動行頭字下げ機能。行頭字下げがされてないようならば適切に行頭字下げをする"
+      help: "自動行頭字下げ機能。行頭字下げが行われているかを判断し、適切に行頭字下げをする"
     },
     {
       name: "enable_auto_join_in_brackets",
       value: true,
-      help: "括弧内自動連結を有効に\n例)\n「～～～！\n　＊＊＊？」  → 「～～～！　＊＊＊？」"
+      help: "鍵カッコ内自動連結を有効に\n例)\n「～～～！\n　＊＊＊？」  → 「～～～！　＊＊＊？」"
+    },
+    {
+      name: "enable_inspect_invalid_openclose_brackets",
+      value: true,
+      help: "鍵カッコ内のとじ開きが正しくされているかどうか調査する"
     },
     {
       name: "enable_auto_join_line",
       value: true,
       help: "行末が読点で終わっている部分を出来るだけ連結する"
+    },
+    {
+      name: "enable_enchant_midashi",
+      value: true,
+      help: "［＃改ページ］直後の行に中見出しを付与する（テキストファイルを直接変換する場合のみの設定）"
     },
     {
       name: "enable_author_comments",
@@ -121,14 +134,9 @@ class NovelSetting
       help: "後書きを削除するか"
     },
     {
-      name: "enable_narou_ruby",
+      name: "enable_ruby",
       value: true,
       help: "ルビ処理対策を有効に"
-    },
-    {
-      name: "enable_enchant_midashi",
-      value: true,
-      help: "［＃改ページ］直後の行に見出しを付与する（テキストファイルを直接変換する場合のみの設定）"
     },
     {
       name: "enable_narou_illust",
@@ -143,7 +151,7 @@ class NovelSetting
     {
       name: "enable_transform_date",
       value: true,
-      help: "日付表記(20yy/mm/dd)を任意の形式に変換する"
+      help: "日付表記(20yy/mm/dd)を任意の形式(date_formatで指定)に変換する"
     },
     {
       name: "date_format",

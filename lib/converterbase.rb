@@ -562,6 +562,9 @@ class ConverterBase
   # 鍵カッコ内自動連結
   #
   def auto_join_in_brackets(data)
+    if !@setting.enable_auto_join_in_brackets && !@setting.enable_inspect_invalid_openclose_brackets
+      return
+    end
     OPENCLOSE_REGEXPS.each_with_index do |openclose, i|
       stack = {}
       data.gsub!(openclose).with_index do |match, j|
@@ -569,21 +572,23 @@ class ConverterBase
         if joined_str
           error = @inspector.validate_joined_inner_brackets(match, joined_str, BRACKETS[i])
         end
-        if joined_str
+        if @setting.enable_auto_join_in_brackets && joined_str
           stack[j] = error ? match : joined_str
         else
           stack[j] = match
         end
-        "<@>#{j}<@>"
+        "［＃正規表現＝#{j}］"
       end
-      # 正しく閉じてない鍵カッコだけが data に残ってる
-      @inspector.inspect_invalid_openclose_brackets(data, BRACKETS[i], stack)
+      if @setting.enable_inspect_invalid_openclose_brackets
+        # 正しく閉じてない鍵カッコだけが data に残ってる
+        @inspector.inspect_invalid_openclose_brackets(data, BRACKETS[i], stack)
+      end
       data.replace(ConverterBase.rebuild_brackets(data, stack))
     end
   end
 
   def self.rebuild_brackets(data, stack)
-    data.gsub(/<@>(\d+)<@>/) do
+    data.gsub(/［＃正規表現＝(\d+)］/) do
       stack[$1.to_i]
     end
   end
@@ -755,7 +760,7 @@ class ConverterBase
   # 小説データ全体に対して施す変換
   #
   def convert_for_all_data(data, text_type)
-    auto_join_in_brackets(data) if @setting.enable_auto_join_in_brackets
+    auto_join_in_brackets(data)
     auto_join_line(data) if @setting.enable_auto_join_line
     erase_comments_block(data)
     replace_illust_tag(data)
@@ -843,7 +848,7 @@ class ConverterBase
     rebuild_english_sentences(data)
     # rebuild_english_sentences で再構築された英文にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
-    narou_ruby(data) if @setting.enable_narou_ruby
+    narou_ruby(data) if @setting.enable_ruby
     data.rstrip!
     progressbar.clear if text_type == "textfile"
     @write_fp
