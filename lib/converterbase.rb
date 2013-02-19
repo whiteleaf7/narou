@@ -121,7 +121,7 @@ class ConverterBase
   #
   def exception_reconvert_kanji_to_num(data)
     return unless @setting.enable_convert_num_to_kanji
-    data.gsub!(/([Ａ-Ｚａ-ｚ])([#{KANJI_NUM}]+)/) do
+    data.gsub!(/([Ａ-Ｚａ-ｚ])([#{KANJI_NUM}・]+)/) do   # ｖｅｒ１・０１ のようなパターンも許容する
       $1 + $2.tr(KANJI_NUM, "０-９")
     end
     data.gsub!(/([#{KANJI_NUM}]+)([Ａ-Ｚａ-ｚ])/) do
