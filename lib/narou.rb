@@ -86,7 +86,6 @@ module Narou
   end
 
   def self.get_preset_dir
-    return "C:/Users/sasa/Documents/GitHub/narou/preset"
     return @@preset_dir if @@preset_dir
     @@preset_dir = File.expand_path(File.join(get_script_dir, PRESET_DIR))
     @@preset_dir
