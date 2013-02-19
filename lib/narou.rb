@@ -85,19 +85,19 @@ module Narou
     LocalSetting.get["freeze"].include?(id)
   end
 
+  def self.get_preset_dir
+    return "C:/Users/sasa/Documents/GitHub/narou/preset"
+    return @@preset_dir if @@preset_dir
+    @@preset_dir = File.expand_path(File.join(get_script_dir, PRESET_DIR))
+    @@preset_dir
+  end
+
   def self.create_aozoraepub3_jar_path(*paths)
     File.expand_path(File.join(*paths, AOZORAEPUB3_JAR_NAME))
   end
 
   def self.aozoraepub3_directory?(path)
     File.exists?(create_aozoraepub3_jar_path(path))
-  end
-
-  def self.get_preset_dir
-    return "C:/Users/sasa/Documents/GitHub/narou/preset"
-    return @@preset_dir if @@preset_dir
-    @@preset_dir = File.expand_path(File.join(get_script_dir, PRESET_DIR))
-    @@preset_dir
   end
 
   #
@@ -125,5 +125,16 @@ module Narou
       end
     end
     nil
+  end
+
+  def self.create_novel_filename(novel_data, ext = "")
+    "[#{novel_data["author"]}] #{novel_data["title"]}#{ext}"
+  end
+
+  def self.get_mobi_path(target)
+    data = Downloader.get_data_by_target(target)
+    return nil unless data
+    dir = Downloader.get_novel_data_dir_by_target(target)
+    File.join(dir, create_novel_filename(data, ".mobi"))
   end
 end
