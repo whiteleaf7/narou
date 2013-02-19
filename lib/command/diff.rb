@@ -5,6 +5,7 @@
 
 require "yaml"
 require "tempfile"
+require "open3"
 require_relative "../downloader"
 require_relative "../database"
 require_relative "../template"
@@ -21,7 +22,7 @@ module Command
       super("[<target> ...]")
       @opt.separator <<-EOS
 
-  ・指定した小説のアップデート前、後の変更部分を setting コマンドで指定した difftool で表示します。
+  ・指定した小説のアップデート前後の変更部分を setting コマンドで指定した difftool で表示します。
   ・引数を指定しなかった場合は直近のアップデートの変更点を表示します。
 
   Example:
@@ -31,15 +32,15 @@ module Command
     # 差分表示用プログラムの指定
     narou setting difftool="C:\\Program Files\\WinMerge\\WinMergeU.exe"
 
-    # difftoolに渡す引数(指定しなければ単純に新旧ファイルを引数に呼び出すだけ)
-    # 特殊な変数 #NEW : DLした最新データの差分用ファイルパス
-    #            #OLD : 古い方の差分用ファイルパス
-    narou setting difftool.arg='-e -x -ub -dl "NEW" -dr "OLD" #NEW #OLD'
+    # difftoolに渡す引数(指定しなければ単純に新旧ファイルを引数に呼び出す)
+    # 特殊な変数 %NEW : DLした最新データの差分用ファイルパス
+    #            %OLD : 古い方の差分用ファイルパス
+    narou setting difftool.arg='-e -x -ub -dl "NEW" -dr "OLD" %NEW %OLD'
 
       EOS
 
       @options["number"] = 1
-      @opt.on("-n NUM", "比較する差分を遡って指定する。最新のアップデートと直前のデータを比較するなら-n 1、2個前のアップデートなら-n 2。(デフォルトは-n 1)", Integer) do |number|
+      @opt.on("-n NUM", "--number", "比較する差分を遡って指定する。最新のアップデートと直前のデータを比較するなら-n 1、2個前のアップデートなら-n 2。(デフォルトは-n 1)", Integer) do |number|
         if number > 1
           @options["number"] = number
         end
@@ -84,18 +85,20 @@ module Command
         end
         %!"#{path}"!
       })
-      `#{diff_cmd}`
+      res = Open3.capture3(diff_cmd)
+      puts res[0] unless res[0].empty?
+      warn res[1] unless res[1].empty?
     end
 
     def create_difftool_command_string(left, right)
       diff_arg = GlobalSetting.get["global_setting"]["difftool.arg"]
       diff_cmd = %!"#{@difftool}" !
       if diff_arg
-        diff_arg.gsub!("#NEW", left)
-        diff_arg.gsub!("#OLD", right)
+        diff_arg.gsub!("%NEW", left)
+        diff_arg.gsub!("%OLD", right)
         diff_cmd += diff_arg
       else
-        diff_cmd += %!#{left} #{right}!
+        diff_cmd += [left, right].join(" ")
       end
       diff_cmd
     end
