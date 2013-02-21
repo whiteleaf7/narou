@@ -5,21 +5,27 @@
 
 module Command
   class Help < CommandBase
+    HEADER = "Narou.rb ― 小説家になろうダウンローダ＆縦書用整形スクリプト"
+
+    def oneline_help
+      "このヘルプを表示します"
+    end
+
     def execute(argv)
-      puts "Narou.rb ― 小説家になろうダウンローダ＆縦書用整形スクリプト"
-      puts
       if Narou.already_init?
-        puts " Usage: #{@opt.program_name} <command> [arguments...] [options...]"
+        display_help
       else
-        puts " Usage: #{@opt.program_name} <command>"
+        display_help_first_time
       end
+    end
+
+    def display_help
+      puts HEADER
+      puts
+      puts " Usage: #{@opt.program_name} <command> [arguments...] [options...]"
       puts
       puts " コマンドの簡単な説明:"
-      if Narou.already_init?
-        cmd_list = Command.get_list
-      else
-        cmd_list = Command.get_list.select { |k, _| k == "init" }
-      end
+      cmd_list = Command.get_list
       cmd_list.each do |key, command|
         oneline = command.oneline_help.split("\n")
         puts "   #{key.ljust(12)} #{oneline.shift}"
@@ -33,8 +39,13 @@ module Command
       puts "  (e.g. `#{@opt.program_name} d n4259s', `#{@opt.program_name} fr musyoku')"
     end
 
-    def oneline_help
-      "このヘルプを表示します"
+    def display_help_first_time
+      puts HEADER
+      puts
+      puts " Usage: #{@opt.program_name} init"
+      puts
+      puts "   まだこのフォルダは初期化されていません。"
+      puts "   narou init コマンドを実行して初期化を行いましょう。"
     end
   end
 end
