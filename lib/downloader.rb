@@ -237,12 +237,25 @@ class Downloader
   end
 
   #
+  # 差分用キャッシュの保存ディレクトリ取得
+  #
+  def self.get_cache_root_dir(target)
+    dir = get_novel_data_dir_by_target(target)
+    if dir
+      return File.join(dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME)
+    end
+    nil
+  end
+
+  #
   # 差分用キャッシュのディレクトリ一覧取得
   #
   def self.get_cache_list(target)
-    novel_data_dir = get_novel_data_dir_by_target(target)
-    save_dir = File.join(novel_data_dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME)
-    Dir.glob("#{save_dir}/*")
+    dir = get_cache_root_dir(target)
+    if dir
+      return Dir.glob("#{dir}/*")
+    end
+    nil
   end
 
   if Narou.already_init?
@@ -302,7 +315,7 @@ class Downloader
   #
   def create_cache_dir
     now = Time.now
-    name = now.strftime("%Y%m%d%H%M%S#{now.usec.to_s[0, 3]}")
+    name = now.strftime("%Y.%m.%d@%H;%M;%S")
     cache_dir = File.join(get_novel_data_dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME, name)
     FileUtils.mkdir_p(cache_dir)
     cache_dir

@@ -19,15 +19,18 @@ module Command
     end
 
     def initialize
-      super("[<target> ...]")
+      super("[<target>] [options ...]")
       @opt.separator <<-EOS
 
   ・指定した小説のアップデート前後の変更部分を setting コマンドで指定した difftool で表示します。
-  ・引数を指定しなかった場合は直近のアップデートの変更点を表示します。
+  ・引数を指定しなかった場合は直前に更新した小説の変更点を表示します。
 
   Example:
-    narou diff     # 直近のアップデートの変更点を表示
+    narou diff          # 直前に更新した小説の変更点を表示
     narou diff 6
+    narou diff 6 -n 2   # 最新から2番目の差分との比較
+    narou diff 6 -2     # -n 2 の省略した記述方法
+    narou diff 6 2013.02.21@01;39;46   # 差分を直接指定
 
     # 差分表示用プログラムの指定
     narou setting difftool="C:\\Program Files\\WinMerge\\WinMergeU.exe"
@@ -41,13 +44,26 @@ module Command
 
       @options["number"] = 1
       @opt.on("-n NUM", "--number", "比較する差分を遡って指定する。最新のアップデートと直前のデータを比較するなら-n 1、2個前のアップデートなら-n 2。(デフォルトは-n 1)", Integer) do |number|
-        if number > 1
-          @options["number"] = number
-        end
+        @options["number"] = number if number > 1
       end
+      @opt.on("--clean", "指定した小説の差分データを全て削除する") {
+        @options["clean"] = true
+      }
+    end
+
+    # 引数の中の -数字 オプション(-n 数字の省略形)を -n 数字 に変換する
+    def short_number_option_parse(argv)
+      argv.map! { |arg|
+        if arg =~ /^-(\d+)$/
+          ["-n", $1.to_s]
+        else
+          arg
+        end
+      }.flatten!
     end
 
     def execute(argv)
+      short_number_option_parse(argv)
       super
       @difftool = GlobalSetting.get["global_setting"]["difftool"]
       if @difftool
@@ -66,14 +82,25 @@ module Command
         end
         return
       end
-      argv.each do |target|
-        id = Downloader.get_id_by_target(target)
-        unless id
-          warn "#{target} は存在しません"
-          next
+      target = argv.shift
+      view_diff_version = argv.shift
+      if view_diff_version
+        if invalid_diff_version_string?(view_diff_version)
+          warn "差分指定の書式が違います(正しい例:2013.02.21@01;39;46)"
+          return
         end
-        exec_difftool(id)
+        @options["view_diff_version"] = view_diff_version
       end
+      id = Downloader.get_id_by_target(target)
+      unless id
+        warn "#{target} は存在しません"
+        return
+      end
+      exec_difftool(id)
+    end
+
+    def invalid_diff_version_string?(str)
+      !str =~ /^\d{4}\.\d{2}\.\d{2}@\d{2};\d{2};\d{2}$/
     end
 
     def exec_difftool(id)
@@ -104,15 +131,23 @@ module Command
     end
 
     def create_temp_files(id)
-      nth = @options["number"]
-      cache_dir = Downloader.get_cache_list(id).sort_by { |v| File.basename(v) }.reverse[nth - 1]
+      if @options["view_diff_version"]
+        cache_root_dir = Downloader.get_cache_root_dir(id)
+        if cache_root_dir
+          cache_dir = File.join(cache_root_dir, @options["view_diff_version"])
+          cache_dir = nil unless File.exists?(cache_dir)
+        end
+      else
+        nth = @options["number"]
+        cache_dir = Downloader.get_cache_list(id).sort_by { |v| File.basename(v) }.reverse[nth - 1]
+      end
       unless cache_dir
         puts "差分データがありません"
         return nil
       end
       cache_list = Dir.glob("#{cache_dir}/*.yaml")
       if cache_list.length == 0
-        puts "差分データがありません"
+        puts "最新話のみでした"
         return nil
       end
       novel_dir = Downloader.get_novel_section_save_dir(Downloader.get_novel_data_dir_by_target(id))
