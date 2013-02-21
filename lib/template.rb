@@ -31,9 +31,26 @@ class Template
   #
   # テンプレートを元にデータを作成
   #
-  def self.get(src_filename, _binding)
+  def self.get(src_filename, _binding, binary_version = 1.0)
+    @@binary_version = binary_version
+    @@src_filename = src_filename
     src = File.read(File.join(Narou.get_script_dir, TEMPLATE_DIR, src_filename + ".erb"))
     result = ERB.new(src, nil, "-").result(_binding)
     result
+  end
+
+  def self.invalid_templace_version?
+    @@src_version < @@binary_version
+  end
+
+  #
+  # 書かれているテンプレートがどのバージョンのテンプレートを設定
+  #
+  def self.target_binary_version(version)
+    @@src_version = version
+    if invalid_templace_version?
+      warn "テンプレートのバージョンが古いので意図しない動作をする可能性があります\n" +
+           "(#{@@src_filename}.erb ver #{version.to_f} < #{@@binary_version.to_f})"
+    end
   end
 end

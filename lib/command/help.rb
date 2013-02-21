@@ -30,7 +30,7 @@ module Command
       puts
       puts "  各コマンドの詳細は narou <command> -h/--help を参照してください。"
       puts "  各コマンドは先頭の一文字か二文字でも指定できます。"
-      puts "  (e.g. '#{@opt.program_name} d n4259s', '#{@opt.program_name} fr musyoku')"
+      puts "  (e.g. `#{@opt.program_name} d n4259s', `#{@opt.program_name} fr musyoku')"
     end
 
     def oneline_help
