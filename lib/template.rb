@@ -24,19 +24,31 @@ class Template
     unless overwrite
       return if File.exists?(dest_filepath)
     end
-    result = get(src_filename, _binding)
+    result = get(src_filename, _binding) or return nil
     File.write(dest_filepath, result)
   end
 
   #
   # テンプレートを元にデータを作成
   #
+  # テンプレートファイルの検索順位
+  # 1. root_dir/template
+  # 2. script_dir/template
+  #
   def self.get(src_filename, _binding, binary_version = 1.0)
     @@binary_version = binary_version
     @@src_filename = src_filename
-    src = File.read(File.join(Narou.get_script_dir, TEMPLATE_DIR, src_filename + ".erb"))
-    result = ERB.new(src, nil, "-").result(_binding)
-    result
+    [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
+      path = File.join(dir, TEMPLATE_DIR, src_filename + ".erb")
+      next unless File.exists?(path)
+      src = ""
+      open(path, "r:BOM|UTF-8") do |fp|
+        src = fp.read
+      end
+      result = ERB.new(src, nil, "-").result(_binding)
+      return result
+    end
+    nil
   end
 
   def self.invalid_templace_version?
