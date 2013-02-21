@@ -7,19 +7,49 @@ require_relative "../lib/device"
 
 if Helper.os_windows?
   describe "Windowsの場合" do
-    it "Kindleと接続時connecting?はtrueになるべき" do
-      Device::Kindle.connecting?.should be_true
-    end
-
-    it "Kindleのドキュメントディレクトリの名前は F:/documents" do
-      Device::Kindle.get_documents_path.should == "F:/documents"
-    end
-
-    it "Windows7_OSなボリュームネームのドライブは C:/" do
-      module Dummy
-        extend Device::Library::Windows
+    describe Device::Library::Windows do
+      it "Windows7_OSなボリュームネームのドライブは C:/" do
+        module Dummy
+          extend Device::Library::Windows
+        end
+        Dummy.get_device_root_dir("Windows7_OS").should == "C:/"
       end
-      Dummy.get_device_root_dir("Windows7_OS").should == "C:/"
+    end
+
+    describe "Kindle" do
+      before do
+        @device = Device.new("kindle")
+      end
+
+      it "は存在するべき" do
+        Device.exists?("kindle").should be_true
+      end
+
+      it "と接続時connecting?はtrueになるべき" do
+        @device.connecting?.should be_true
+      end
+
+      it "のドキュメントディレクトリの名前は F:/documents" do
+        @device.get_documents_path.should == "F:/documents"
+      end
+    end
+
+    describe "Kobo" do
+      before do
+        @device = Device.new("kobo")
+      end
+
+      it "は存在するべき" do
+        Device.exists?("kobo").should be_true
+      end
+
+      it "と接続時connecting?はtrueになるべき" do
+        @device.connecting?.should be_true
+      end
+
+      it "のドキュメントディレクトリの名前は ?:/" do
+        @device.get_documents_path.should == "?:/"
+      end
     end
   end
 end

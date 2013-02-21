@@ -6,37 +6,70 @@
 require "fileutils"
 require_relative "helper"
 
-module Device
+class Device
   if Helper.os_windows?
     require_relative "device/library/windows"
     extend Device::Library::Windows
   end
 
-  module Kindle
-    VOLUME_NAME = "Kindle"
-    DOCUMENTS_PATH = "documents"
+  require_relative "device/kindle"
+  require_relative "device/kobo"
 
-    def self.connecting?
-      !!get_documents_path
+  attr_reader :name, :ebook_file_ext
+
+  DEVICES = { "kindle" => Kindle, "kobo" => Kobo }
+
+  class SendFailure < StandardError; end
+
+  def self.exists?(device)
+    DEVICES.include?(device.downcase)
+  end
+
+  def initialize(device_name)
+    unless Device.exists?(device_name)
+      warn "#{device_name} は存在しません"
+      exit 1
     end
+    @device = DEVICES[device_name.downcase]
+    @name = device_name.capitalize
+    @ebook_file_ext = @device::EBOOK_FILE_EXT
+  end
 
-    def self.get_documents_path
-      if Helper.os_windows?
-        dir = Device.get_device_root_dir(VOLUME_NAME)
-        return File.join(dir, DOCUMENTS_PATH) if dir
-      end
-      nil
+  def connecting?
+    !!get_documents_path
+  end
+
+  def get_documents_path
+    if Helper.os_windows?
+      dir = Device.get_device_root_dir(@device::VOLUME_NAME)
+      return File.join(dir, @device::DOCUMENTS_PATH) if dir
     end
+    nil
+  end
 
-    def self.copy_to_documents(src_file)
-      documents_path = get_documents_path
-      if documents_path
-        dst_path = File.join(documents_path, File.basename(src_file))
-        FileUtils.cp(src_file, dst_path)
-        dst_path
+  def copy_to_documents(src_file)
+    documents_path = get_documents_path
+    if documents_path
+      dst_path = File.join(documents_path, File.basename(src_file))
+      case Helper.determine_os
+      when :windows
+        cmd = "copy /B " + %!"#{src_file}" "#{dst_path}"!.gsub("/", "\\").encode(Encoding::Windows_31J)
+        capture = `#{cmd}`
+        if $?.exitstatus > 0
+          warn capture.force_encoding(Encoding::Windows_31J)
+          exit 1
+        end
       else
-        nil
+        begin
+          FileUtils.cp(src_file, dst_path)
+        rescue => e
+          warn e.message
+          exit 1
+        end
       end
+      dst_path
+    else
+      nil
     end
   end
 end

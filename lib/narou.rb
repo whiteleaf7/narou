@@ -70,6 +70,8 @@ module Narou
     FileUtils.mkdir(LOCAL_SETTING_DIR)
     puts LOCAL_SETTING_DIR + "/ を作成しました"
     Database.init
+    #LocalSetting.get["local_setting"]["device"] = "kindle"
+    #LocalSetting.get.save_settings
   end
 
   def self.alias_to_id(target)
@@ -131,9 +133,13 @@ module Narou
   end
 
   def self.get_mobi_path(target)
+    get_ebook_file_path(target, ".mobi")
+  end
+
+  def self.get_ebook_file_path(target, ext)
     data = Downloader.get_data_by_target(target)
     return nil unless data
     dir = Downloader.get_novel_data_dir_by_target(target)
-    File.join(dir, create_novel_filename(data, ".mobi"))
+    File.join(dir, create_novel_filename(data, ext))
   end
 end

@@ -239,7 +239,8 @@ module Command
         "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
-        "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"]
+        "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
+        "device" => [:string, "変換、送信対象の端末。デフォルト kindle"],
       },
       global: {
         "aozoraepub3dir" => [:directory, "AozoraEpub3のあるフォルダを指定", INVISIBLE],
