@@ -19,6 +19,11 @@ module CommandLine
     arg = Command::Shortcuts[arg] || arg
     arg = "help" if arg == "-h" || arg == "--help"
     arg = "version" if arg == "-v" || arg == "--version"
+    unless Narou.already_init?
+      unless ["help", "version", "init"].include?(arg)
+        arg = "help"
+      end
+    end
     unless Command.get_list.include?(arg)
       puts "不明なコマンドです"
       puts
