@@ -159,7 +159,7 @@ module Command
       end
       sections = latest_novel_sections
       temp_new = Tempfile.open("new")
-      temp_new.write(Template.get("diff.txt", binding, 2.0))
+      temp_new.write(Template.get("diff.txt", binding))
 
       sections = cache_sections
       temp_old = Tempfile.open("old")
