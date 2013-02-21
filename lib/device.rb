@@ -56,13 +56,15 @@ class Device
         cmd = "copy /B " + %!"#{src_file}" "#{dst_path}"!.gsub("/", "\\").encode(Encoding::Windows_31J)
         capture = `#{cmd}`
         if $?.exitstatus > 0
-          warn capture.force_encoding(Encoding::Windows_31J)
+          puts
+          warn capture.force_encoding(Encoding::Windows_31J).rstrip
           exit 1
         end
       else
         begin
           FileUtils.cp(src_file, dst_path)
         rescue => e
+          puts
           warn e.message
           exit 1
         end
