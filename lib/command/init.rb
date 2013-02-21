@@ -60,7 +60,7 @@ module Command
 
     def init_aozoraepub3(force = false)
       global_setting = GlobalSetting.get["global_setting"]
-      if !force && global_setting["aozoraepub3path"]
+      if !force && global_setting["aozoraepub3dir"]
         return
       end
       puts "AozoraEpub3の設定を行います"
@@ -73,7 +73,7 @@ module Command
       end
       puts
       rewrite_aozoraepub3_files(aozora_path)
-      global_setting["aozoraepub3path"] = aozora_path
+      global_setting["aozoraepub3dir"] = aozora_path
       GlobalSetting.get.save_settings("global_setting")
       puts "AozoraEpub3の設定を終了しました"
     end

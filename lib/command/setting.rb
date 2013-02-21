@@ -242,7 +242,7 @@ module Command
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"]
       },
       global: {
-        "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを指定", INVISIBLE],
+        "aozoraepub3dir" => [:directory, "AozoraEpub3のあるフォルダを指定", INVISIBLE],
         "difftool" => [:string, "Diffで使うツールのパスを指定する"],
         "difftool.arg" => [:string, "difftoolで使う引数を設定(オプション)"],
       }

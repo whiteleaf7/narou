@@ -102,13 +102,13 @@ module Narou
   #
   # AozoraEpub3 の実行ファイル(.jar)のフルパス取得
   # 検索順序
-  # 1. グローバルセッティング (global_setting aozoraepub3path)
+  # 1. グローバルセッティング (global_setting aozoraepub3dir)
   # 2. 小説保存ディレクトリ(Narou.get_root_dir) 直下の AozoraEpub3
   # 3. スクリプト保存ディレクトリ(Narou.get_script_dir) 直下の AozoraEpub3
   #
   def self.get_aozoraepub3_path
     return @@aozora_jar_path if @@aozora_jar_path
-    global_setting_aozora_path = GlobalSetting.get["global_setting"]["aozoraepub3path"]
+    global_setting_aozora_path = GlobalSetting.get["global_setting"]["aozoraepub3dir"]
     if global_setting_aozora_path
       aozora_jar_path = create_aozoraepub3_jar_path(global_setting_aozora_path)
       if File.exists?(aozora_jar_path)
