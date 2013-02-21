@@ -66,12 +66,7 @@ module Command
       short_number_option_parse(argv)
       super
       @difftool = GlobalSetting.get["global_setting"]["difftool"]
-      if @difftool
-        unless File.exists?(@difftool)
-          warn "#{@difftool} が存在しません。narou setting で difftool を再設定して下さい"
-          return
-        end
-      else
+      unless @difftool
         warn "difftool が設定されていません。narou setting で difftool を設定して下さい"
         return
       end
@@ -112,7 +107,12 @@ module Command
         end
         %!"#{path}"!
       })
-      res = Open3.capture3(diff_cmd)
+      begin
+        res = Open3.capture3(diff_cmd)
+      rescue Errno::ENOENT => e
+        warn e.message
+        exit 1
+      end
       puts res[0] unless res[0].empty?
       warn res[1] unless res[1].empty?
     end

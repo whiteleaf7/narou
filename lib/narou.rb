@@ -10,7 +10,7 @@ require_relative "globalsetting"
 
 module Narou
   LOCAL_SETTING_DIR = ".narou"
-  GLOBAL_SETTING_DIR = ".narou_g"
+  GLOBAL_SETTING_DIR = ".narousetting"
   AOZORAEPUB3_JAR_NAME = "AozoraEpub3.jar"
   AOZORAEPUB3_DIR = "./AozoraEpub3"
   PRESET_DIR = "./preset"

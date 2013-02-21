@@ -243,7 +243,7 @@ module Command
       },
       global: {
         "aozoraepub3path" => [:directory, "AozoraEpub3のあるフォルダを指定", INVISIBLE],
-        "difftool" => [:file, "Diffで使うツールを指定する"],
+        "difftool" => [:string, "Diffで使うツールのパスを指定する"],
         "difftool.arg" => [:string, "difftoolで使う引数を設定(オプション)"],
       }
     }
