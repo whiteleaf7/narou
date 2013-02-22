@@ -85,11 +85,14 @@ class Downloader
   #
   # target の種別を判別する
   #
+  # ncodeの場合は破壊的に小文字に変更する
+  #
   def self.get_target_type(target)
     case target
     when URI.regexp
       :url
-    when /^n\d+[a-z]+$/
+    when /^n\d+[a-z]+$/i
+      target.downcase!
       :ncode
     when /^\d+$/, Fixnum
       :id
