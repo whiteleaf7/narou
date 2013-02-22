@@ -80,7 +80,7 @@ class NovelConverter
   #
   # 返り値：正常終了 :success、エラー終了 :error、AozoraEpub3が見つからなかった nil
   #
-  def self.txt_to_epub(filename, use_dakuten_font = false, dst_dir = nil)
+  def self.txt_to_epub(filename, use_dakuten_font = false, dst_dir = nil, device = nil)
     abs_srcpath = File.expand_path(filename)
     #cover_path = File.join(File.dirname(filename), "cover.jpg")
     cover_option = ""
@@ -94,6 +94,12 @@ class NovelConverter
     if dst_dir
       dst_option = %!-dst "#{File.expand_path(dst_dir)}"!
     end
+
+    ext_option = ""
+    if device && device.kobo?
+      ext_option = "-ext " + device.ebook_file_ext
+    end
+
     pwd = Dir.pwd
 
     aozoraepub3_path = Narou.get_aozoraepub3_path
@@ -106,7 +112,7 @@ class NovelConverter
 
     Dir.chdir(aozoraepub3_dir)
     command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 ! +
-              %!#{cover_option} #{dst_option} "#{abs_srcpath}"!
+              %!#{cover_option} #{dst_option} #{ext_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
@@ -150,7 +156,10 @@ class NovelConverter
   #
   def self.epub_to_mobi(epub_path)
     kindlegen_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "kindlegen")
-    return nil if Dir.glob(kindlegen_path + "*").empty?
+    if Dir.glob(kindlegen_path + "*").empty?
+      warn "kindlegenが見つかりませんでした。AozoraEpub3と同じディレクトリにインストールして下さい"
+      return :error
+    end
 
     if Helper.os_windows?
       epub_path.encode!(Encoding::Windows_31J)
@@ -164,7 +173,7 @@ class NovelConverter
     stdout_capture.force_encoding(Encoding::UTF_8)
     if proccess_status.exited?
       if proccess_status.exitstatus == 2
-        warn ""
+        puts ""
         warn "kindlegen実行中にエラーが発生したため、MOBIが出力出来ませんでした"
         if stdout_capture.scan(/(エラー\(.+?\):\w+?:.+)$/)
           warn $1
@@ -172,7 +181,7 @@ class NovelConverter
         return :error
       end
     else
-      warn ""
+      puts ""
       warn "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
       return :abort
     end

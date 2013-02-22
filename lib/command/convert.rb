@@ -26,11 +26,12 @@ module Command
   ・変換したい小説のNコード、URL、タイトルもしくはIDを指定して下さい。
     IDは #{@opt.program_name} list を参照して下さい。
   ・一度に複数の小説を指定する場合は空白で区切って下さい。
-  ※-oオプションがない場合、[変換]小説名.txtが小説の保存フォルダに出力されます。
-  ※複数指定した場合に-oオプションがあった場合、ファイル名に連番がつきます。
+  ※-oオプションがない場合、[変換]小説名.txtが小説の保存フォルダに出力されます
   ・管理小説以外にもテキストファイルを変換出来ます。
     テキストファイルのファイルパスを指定します。
-  ・デフォルトでは変換終了後にAozoraEpub3を使ってEPUB化を実行します。
+  ※複数指定した場合に-oオプションがあった場合、ファイル名に連番がつきます。
+  ・MOBI化する場合は narou setting device=kindle をして下さい。
+  ・device=kobo の場合、.kepub.epub を出力します。
 
   Example:
     narou convert n9669bk
@@ -68,7 +69,7 @@ module Command
 
   Configuration:
     --no-epub, --no-mobi, --no-strip, --no-open , --inspect は narou setting コマンドで恒常的な設定にすることが可能です。
-    convert.copy_to を設定すれば変換した最終出力ファイルを指定のフォルダに自動でコピー出来ます。
+    convert.copy_to を設定すれば変換したEPUB/MOBIを指定のフォルダに自動でコピー出来ます。
     device で設定した端末が接続されていた場合、対応するデータを自動送信します。
     詳しくは narou setting --help を参照して下さい。
       EOS
@@ -86,8 +87,9 @@ module Command
     def get_device
       device_name = LocalSetting.get["local_setting"]["device"]
       if device_name && Device.exists?(device_name)
-        @device = Device.new(device_name)
+        return Device.new(device_name)
       end
+      nil
     end
 
     def execute(argv)
@@ -97,95 +99,51 @@ module Command
         puts @opt.help
         return
       end
-      output_filename = @options["output"]
-      if output_filename && argv.length > 1
-        ext = File.extname(output_filename)
-        basename = File.basename(output_filename, ext)
+      @output_filename = @options["output"]
+      if @output_filename && argv.length > 1
+        @ext = File.extname(@output_filename)
+        @basename = File.basename(@output_filename, @ext)
       end
       if @options["encoding"]
-        enc = Encoding.find(@options["encoding"]) rescue nil
-        unless enc
+        @enc = Encoding.find(@options["encoding"]) rescue nil
+        unless @enc
           warn "--enc で指定された文字コードは存在しません。sjis, eucjp, utf-8 等を指定して下さい"
           return
         end
       end
-      get_device
+      @device = get_device
+      convert_novels(argv)
+    end
+
+    def convert_novels(argv)
       argv.each.with_index(1) do |target, i|
         Helper.print_horizontal_rule if i > 1
-        output_filename = "#{basename} (#{i})#{ext}" if basename
+        @output_filename = "#{@basename} (#{i})#{@ext}" if @basename
         if File.file?(target.to_s)
-          argument_target_type = :file
-          begin
-            res = NovelConverter.convert_file(target, enc, output_filename, @options["inspect"])
-            converted_txt_path = res[:converted_txt_path]
-            use_dakuten_font = res[:use_dakuten_font]
-            next unless converted_txt_path
-          rescue ArgumentError => e
-            if e.message =~ /invalid byte sequence in UTF-8/
-              warn "#{target}"
-              warn "テキストファイルの文字コードがUTF-8ではありません。" +
-                   "--enc オプションでテキストの文字コードを指定して下さい"
-              warn "(#{e.message})"
-              next
-            else
-              raise
-            end
-          rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
-            warn "#{target}"
-            warn "テキストファイルの文字コードは#{@options["encoding"]}ではありませんでした。" +
-                 "正しい文字コードを指定して下さい"
-            next
-          end
+          @argument_target_type = :file
+          res = convert_txt(target)
         else
-          argument_target_type = :novel
+          @argument_target_type = :novel
           unless Downloader.novel_exists?(target)
             warn "#{target} は存在しません"
             next
           end
-          res = NovelConverter.convert(target, output_filename, @options["inspect"])
-          converted_txt_path = res[:converted_txt_path]
-          use_dakuten_font = res[:use_dakuten_font]
-          next unless converted_txt_path
+          res = NovelConverter.convert(target, @output_filename, @options["inspect"])
         end
-        converted_txt_dir = File.dirname(converted_txt_path)
-        if @options["no-epub"]
-          copied_file_path = copy_to_converted_file(converted_txt_path)
-        else
-          # epub
-          res = NovelConverter.txt_to_epub(converted_txt_path, use_dakuten_font)
-          next if res != :success
+        @converted_txt_path = res[:converted_txt_path]
+        @use_dakuten_font = res[:use_dakuten_font]
+        next unless @converted_txt_path
 
-          epub_path = converted_txt_path.sub(/.txt$/, ".epub")
-          if @options["no-mobi"]
-            copied_file_path = copy_to_converted_file(epub_path)
-          else
-            # mobi
-            res = NovelConverter.epub_to_mobi(epub_path)
-            next if res != :success
-            mobi_path = epub_path.sub(/\.epub$/, "") + ".mobi"
-            # strip
-            unless @options["no-strip"]
-              puts "kindlestrip実行中"
-              $stdout.silent = true
-              begin
-                SectionStripper.strip(mobi_path)
-              rescue StripException => e
-                warn "Error: #{e.message}"
-              end
-              $stdout.silent = false
-            end
-            copied_file_path = copy_to_converted_file(mobi_path)
-
-            puts "MOBIファイルを出力しました"
-
-            if @device && @device.connecting?
-              Send.execute_and_rescue_exit([@device.name, target])
-            end
+        ebook_file = convert_txt_to_ebook_file
+        next if ebook_file.nil?
+        if ebook_file
+          copied_file_path = copy_to_converted_file(ebook_file)
+          if copied_file_path
+            puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
           end
-        end
-
-        if copied_file_path
-          puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
+          if @device && @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
+            Send.execute_and_rescue_exit([@device.name, target])
+          end
         end
 
         unless @options["no-open"]
@@ -196,6 +154,61 @@ module Command
       puts
       puts "変換を中断しました"
       exit 1
+    end
+
+    def convert_txt(target)
+      return NovelConverter.convert_file(target, @enc, @output_filename, @options["inspect"])
+    rescue ArgumentError => e
+      if e.message =~ /invalid byte sequence in UTF-8/
+        warn "#{target}"
+        warn "テキストファイルの文字コードがUTF-8ではありません。" +
+        "--enc オプションでテキストの文字コードを指定して下さい"
+        warn "(#{e.message})"
+        return nil
+      else
+        raise
+      end
+    rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
+      warn "#{target}"
+      warn "テキストファイルの文字コードは#{@options["encoding"]}ではありませんでした。" +
+      "正しい文字コードを指定して下さい"
+      return nil
+    end
+
+    def convert_txt_to_ebook_file
+      converted_txt_dir = File.dirname(@converted_txt_path)
+      return false if @options["no-epub"]
+      # epub
+      status = NovelConverter.txt_to_epub(@converted_txt_path, @use_dakuten_font, nil, @device)
+      return nil if status != :success
+      if @device && @device.kobo?
+        epub_ext = @device.ebook_file_ext
+      else
+        epub_ext = ".epub"
+      end
+      epub_path = @converted_txt_path.sub(/.txt$/, epub_ext)
+
+      if !@device || !@device.kindle? || @options["no-mobi"]
+        return epub_path
+      end
+
+      # mobi
+      status = NovelConverter.epub_to_mobi(epub_path)
+      return nil if status != :success
+      mobi_path = epub_path.sub(/\.epub$/, @device.ebook_file_ext)
+
+      # strip
+      unless @options["no-strip"]
+        puts "kindlestrip実行中"
+        begin
+          SectionStripper.strip(mobi_path, nil, false)
+        rescue StripException => e
+          warn "Error: #{e.message}"
+        end
+      end
+      puts "MOBIファイルを出力しました"
+
+      return mobi_path
     end
 
     def copy_to_converted_file(src_path)

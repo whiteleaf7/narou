@@ -116,7 +116,8 @@ class SectionStripper
     mobiheader
   end
 
-  def initialize(datain)
+  def initialize(datain, verbose = true)
+    @verbose = verbose
     if datain[0x3C...0x3C+8] != "BOOKMOBI"
       raise StripException, "invalid file format"
     end
@@ -131,7 +132,7 @@ class SectionStripper
       raise StripException, "File doesn't contain the sources section."
     end
 
-    puts "Found SRCS section number %d, and count %d" % [srcs_secnum, srcs_cnt]
+    puts "Found SRCS section number %d, and count %d" % [srcs_secnum, srcs_cnt] if @verbose
     # find its offset and length
     _next = srcs_secnum + srcs_cnt
     srcs_offset, flgval = datain.unpack("@#{78+srcs_secnum*8}NN")
@@ -140,7 +141,7 @@ class SectionStripper
     if datain[srcs_offset ... srcs_offset+4] != "SRCS"
       raise StripException, "SRCS section num does not point to SRCS."
     end
-    puts "   beginning at offset %0x and ending at offset %0x" % [srcs_offset, srcs_length]
+    puts "   beginning at offset %0x and ending at offset %0x" % [srcs_offset, srcs_length] if @verbose
 
     # it appears bytes 68-71 always contain (2*num_sections) + 1
     # this is not documented anyplace at all but it appears to be some sort of next 
@@ -197,7 +198,7 @@ class SectionStripper
     # if K8 mobi, handle metadata 121 in old mobiheader
     mobiheader = updateEXTH121(srcs_secnum, srcs_cnt, mobiheader)
     @data_file = @data_file[0, offset0] + mobiheader + @data_file[offset1 .. -1]
-    puts "done"
+    puts "done" if @verbose
   end
 
   def get_result
@@ -212,10 +213,10 @@ class SectionStripper
     @stripped_data_header
   end
 
-  def self.strip(infile, outfile = nil)
+  def self.strip(infile, outfile = nil, verbose = true)
     outfile = infile unless outfile
     data_file = File.binread(infile)
-    stripped_file = new(data_file)
+    stripped_file = new(data_file, verbose)
     File.binwrite(outfile, stripped_file.get_result)
     stripped_file
   end

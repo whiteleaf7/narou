@@ -19,7 +19,7 @@ class Device
 
   DEVICES = { "kindle" => Kindle, "kobo" => Kobo }
 
-  class SendFailure < StandardError; end
+  class UnknownDevice < StandardError; end
 
   def self.exists?(device)
     DEVICES.include?(device.downcase)
@@ -27,12 +27,12 @@ class Device
 
   def initialize(device_name)
     unless Device.exists?(device_name)
-      warn "#{device_name} は存在しません"
-      exit 1
+      raise UnknownDevice, "#{device_name} は存在しません"
     end
     @device = DEVICES[device_name.downcase]
     @name = device_name.capitalize
     @ebook_file_ext = @device::EBOOK_FILE_EXT
+    create_device_check_methods
   end
 
   def connecting?
@@ -72,6 +72,18 @@ class Device
       dst_path
     else
       nil
+    end
+  end
+
+  private
+
+  def create_device_check_methods
+    DEVICES.keys.each do |name|
+      instance_eval <<-EOS
+        def #{name}?
+          #{@name.downcase == name}
+        end
+      EOS
     end
   end
 end
