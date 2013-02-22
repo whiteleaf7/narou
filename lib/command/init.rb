@@ -59,8 +59,8 @@ module Command
     end
 
     def init_aozoraepub3(force = false)
-      global_setting = GlobalSetting.get["global_setting"]
-      if !force && global_setting["aozoraepub3dir"]
+      @global_setting = GlobalSetting.get["global_setting"]
+      if !force && @global_setting["aozoraepub3dir"]
         return
       end
       puts "AozoraEpub3の設定を行います"
@@ -73,7 +73,7 @@ module Command
       end
       puts
       rewrite_aozoraepub3_files(aozora_path)
-      global_setting["aozoraepub3dir"] = aozora_path
+      @global_setting["aozoraepub3dir"] = aozora_path
       GlobalSetting.get.save_settings("global_setting")
       puts "AozoraEpub3の設定を終了しました"
     end
@@ -111,12 +111,16 @@ module Command
 
     def ask_aozoraepub3_path
       puts
-      print "AozoraEpub3のあるフォルダを入力して下さい\n(未入力でスキップ、:keep で現在と同じ設定):\n>"
+      print "AozoraEpub3のあるフォルダを入力して下さい\n(未入力でスキップ"
+      if @global_setting["aozoraepub3dir"]
+        print "、:keep で前回と同じ設定"
+      end
+      print "):\n>"
       while input = $stdin.gets.rstrip
         path = File.expand_path(input)
         case
         when input == ":keep"
-          aozora_dir = GlobalSetting.get["global_setting"]["aozoraepub3dir"]
+          aozora_dir = @global_setting["aozoraepub3dir"]
           if aozora_dir && Narou.aozoraepub3_directory?(aozora_dir)
             return aozora_dir
           end
