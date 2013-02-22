@@ -618,7 +618,7 @@ class ConverterBase
   end
 
   def replace_tatesen(str)
-    str.gsub("｜", "［＃縦線］")
+    str.gsub("｜", "※［＃縦線］")
   end
 
   #
