@@ -160,7 +160,9 @@ class ConverterBase
           rescue ArgumentError
             match
           else
-            num_to_kanji(date.strftime(@setting.date_format))
+            buf = date.strftime(@setting.date_format)
+            num_to_kanji(buf)
+            buf
           end
         end
       else
@@ -328,7 +330,9 @@ class ConverterBase
   #
   def rebuild_english_sentences(data)
     @english_sentences.each_with_index do |sentence, id|
-      data.sub!("［＃英文＝#{num_to_kanji(id.to_s)}］", sentence)
+      buf = id.to_s
+      num_to_kanji(buf)
+      data.sub!("［＃英文＝#{buf}］", sentence)
     end
   end
 
@@ -695,7 +699,9 @@ class ConverterBase
 
   def rebuild_url(data)
     @_url_list.each_with_index do |url, id|
-      data.sub!("［＃ＵＲＬ＝#{num_to_kanji(id.to_s)}］", url)
+      buf = id.to_s
+      num_to_kanji(buf)
+      data.sub!("［＃ＵＲＬ＝#{buf}］", url)
     end
   end
 
@@ -719,7 +725,9 @@ class ConverterBase
 
   def rebuild_illust(data)
     @_illust_chuki_list.each_with_index do |chuki, id|
-      data.sub!("［＃挿絵＝#{num_to_kanji(id.to_s)}］", chuki)
+      buf = id.to_s
+      num_to_kanji(buf)
+      data.sub!("［＃挿絵＝#{buf}］", chuki)
     end
   end
 

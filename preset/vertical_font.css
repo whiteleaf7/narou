@@ -30,7 +30,7 @@ body {
 
 /* パラメーター（折り返しあり） */
 .custom_parameter_block {
-	font-size: 90%;
+	font-size: 100%;
 	line-height: 1.2em !important;
 	border: 2px solid #000;
 	border-radius: 4px;
