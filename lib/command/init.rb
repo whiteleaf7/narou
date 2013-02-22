@@ -10,7 +10,7 @@ module Command
   class Init < CommandBase
     def oneline_help
       if Narou.already_init?
-        "AozoraEpub3 の再設定を行います。"
+        "AozoraEpub3 の再設定を行います"
       else
         "現在のフォルダを小説用に初期化します"
       end
