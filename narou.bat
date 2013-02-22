@@ -14,13 +14,12 @@ ruby -x "%~f0" %*
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require_relative "lib/logger"         # 標準出力と標準エラーのロギング開始
-require_relative "lib/commandline"
-
 $debug = false
-
 Encoding.default_external = Encoding::UTF_8
-Version = "0.1.0"
+
+require_relative "lib/logger"         # 標準出力と標準エラーのロギング開始
+require_relative "lib/version"
+require_relative "lib/commandline"
 
 if $debug
   begin
