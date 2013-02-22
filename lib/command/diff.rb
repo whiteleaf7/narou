@@ -157,6 +157,9 @@ module Command
         latest_novel_sections << YAML.load_file(File.join(novel_dir, File.basename(path)))
         cache_sections << YAML.load_file(path)
       end
+
+      novel_info = Database.instance[id]
+
       sections = latest_novel_sections
       temp_new = Tempfile.open("new")
       temp_new.write(Template.get("diff.txt", binding))
