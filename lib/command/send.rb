@@ -18,7 +18,7 @@ module Command
       @opt.separator <<-EOS
 
   ・指定した小説の電子書籍データ(#{Device::DEVICES.map{|_,d| d::EBOOK_FILE_EXT}.join(", ")})を<device>で指定した端末に送信します。
-    <device>には現在 kindle, kobo が指定出来ます。
+    <device>には現在 #{Device::DEVICES.keys.join(", ")} が指定出来ます。
   ・narou setting device=<device>としておけば、<device>の入力を省略できます。
     また、convertコマンドで変換時に(端末がPCに接続されていれば)自動でデータを送信するようになります。
   ！Windows専用コマンドです！

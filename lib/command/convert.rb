@@ -69,6 +69,7 @@ module Command
   Configuration:
     --no-epub, --no-mobi, --no-strip, --no-open , --inspect は narou setting コマンドで恒常的な設定にすることが可能です。
     convert.copy_to を設定すれば変換した最終出力ファイルを指定のフォルダに自動でコピー出来ます。
+    device で設定した端末が接続されていた場合、対応するデータを自動送信します。
     詳しくは narou setting --help を参照して下さい。
       EOS
     end
