@@ -60,9 +60,9 @@ class NovelSetting
       end
     end
     # デフォルト設定以外を読み込む
-    ini["global"].each do |s|
-      unless @setting.include?(s[0])
-        @setting[s[0]] = cast_type(s[1])
+    ini["global"].each do |key, value|
+      unless @setting.include?(key)
+        @setting[key] = value
       end
     end
   end

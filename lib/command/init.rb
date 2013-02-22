@@ -111,7 +111,7 @@ module Command
 
     def ask_aozoraepub3_path
       puts
-      print "AozoraEpub3のあるフォルダを入力して下さい\n(未入力でスキップ、:keep で現在と同じフォルダ):\n>"
+      print "AozoraEpub3のあるフォルダを入力して下さい\n(未入力でスキップ、:keep で現在と同じ設定):\n>"
       while input = $stdin.gets.rstrip
         path = File.expand_path(input)
         case
