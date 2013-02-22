@@ -82,6 +82,13 @@ module Command
       end
     end
 
+    def get_device
+      device_name = LocalSetting.get["local_setting"]["device"]
+      if device_name && Device.exists?(device_name)
+        @device = Device.new(device_name)
+      end
+    end
+
     def execute(argv)
       load_local_settings    # @opt.on 実行前に設定ロードしたいので super 前で実行する
       super
@@ -97,10 +104,11 @@ module Command
       if @options["encoding"]
         enc = Encoding.find(@options["encoding"]) rescue nil
         unless enc
-          warn "--enc で指定された文字コードは存在しません。sjis, eucjp, utf-8, UTF-16BE 等を指定して下さい"
+          warn "--enc で指定された文字コードは存在しません。sjis, eucjp, utf-8 等を指定して下さい"
           return
         end
       end
+      get_device
       argv.each.with_index(1) do |target, i|
         Helper.print_horizontal_rule if i > 1
         output_filename = "#{basename} (#{i})#{ext}" if basename
@@ -168,6 +176,10 @@ module Command
             copied_file_path = copy_to_converted_file(mobi_path)
 
             puts "MOBIファイルを出力しました"
+
+            if @device && @device.connecting?
+              Send.execute_and_rescue_exit([@device.name, target])
+            end
           end
         end
 
