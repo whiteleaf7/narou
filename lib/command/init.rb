@@ -111,18 +111,21 @@ module Command
 
     def ask_aozoraepub3_path
       puts
-      print "AozoraEpub3のあるフォルダを入力して下さい(未入力でスキップ):\n>"
-      while input = STDIN.gets.rstrip
+      print "AozoraEpub3のあるフォルダを入力して下さい\n(未入力でスキップ、:keep で現在と同じフォルダ):\n>"
+      while input = $stdin.gets.rstrip
         path = File.expand_path(input)
         case
+        when input == ":keep"
+          aozora_dir = GlobalSetting.get["global_setting"]["aozoraepub3dir"]
+          if aozora_dir && Narou.aozoraepub3_directory?(aozora_dir)
+            return aozora_dir
+          end
         when Narou.aozoraepub3_directory?(path)
           return path
-          break
         when input == ""
           break
-        else
-          print "\n入力されたフォルダにAozoraEpub3がありません。もう一度入力して下さい:\n>"
         end
+        print "\n入力されたフォルダにAozoraEpub3がありません。もう一度入力して下さい:\n>"
       end
       nil
     end
