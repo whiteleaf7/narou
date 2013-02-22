@@ -121,10 +121,12 @@ class NovelConverter
     Dir.chdir(pwd)
     error_list = stdout_capture.scan(/^\[ERROR\].+$/)
     warn_list = stdout_capture.scan(/^\[WARN\].+$/)
-    if !error_list.empty? || !warn_list.empty?
+    info_list = stdout_capture.scan(/^\[INFO\].+$/)
+    if !error_list.empty? || !warn_list.empty? || !info_list.empty?
       puts
       puts error_list
       puts warn_list
+      puts info_list
       unless error_list.empty?
         # AozoraEpub3 のエラーにはEPUBが出力されないエラーとEPUBが出力されるエラーの2種類ある。
         # EPUBが出力される場合は「変換完了」という文字があるのでそれを検出する
