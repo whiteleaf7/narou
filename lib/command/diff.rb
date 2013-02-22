@@ -112,6 +112,8 @@ module Command
       rescue Errno::ENOENT => e
         warn e.message
         exit 1
+      ensure
+        temp_paths.each { |tmp| tmp.close(true) }
       end
       puts res[0] unless res[0].empty?
       warn res[1] unless res[1].empty?
