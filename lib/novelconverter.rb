@@ -48,7 +48,7 @@ class NovelConverter
     setting.author = ""
     setting.title = File.basename(filename)
     novel_converter = new(setting, output_filename, display_inspector)
-    text = File.read(filename)
+    text = open(filename, "r:BOM|UTF-8") { |fp| fp.read }
     if encoding
       text.force_encoding(encoding).encode!(Encoding::UTF_8)
     end
