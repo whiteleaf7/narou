@@ -897,7 +897,7 @@ class ConverterBase
     # rebuild_english_sentences で再構築された英文にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
-    data.rstrip!
+    data.strip!
     progressbar.clear if text_type == "textfile"
     @write_fp
   end
