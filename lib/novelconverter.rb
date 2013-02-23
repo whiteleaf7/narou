@@ -275,10 +275,10 @@ class NovelConverter
     else
       if text
         info = get_title_and_author_by_text(result)
-        save_filename = "[#{info["author"]}] #{info["title"]}"
       else
-        save_filename = "[#{@novel_author}] #{@novel_title}"
+        info = { "author" => @novel_author, "title" => @novel_title }
       end
+      save_filename = Narou.create_novel_filename(info)
       save_path = File.join(@setting.archive_path, save_filename)
       if save_path !~ /\.\w+$/
         save_path += ".txt"

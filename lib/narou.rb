@@ -129,7 +129,8 @@ module Narou
   end
 
   def self.create_novel_filename(novel_data, ext = "")
-    "[#{novel_data["author"]}] #{novel_data["title"]}#{ext}"
+    info = Hash[novel_data.map { |k, v| [k, v.sub(/^[ 　]*(.+?)[ 　]*$/, "\\1")] }]
+    "[#{info["author"]}] #{info["title"]}#{ext}"
   end
 
   def self.get_mobi_path(target)
