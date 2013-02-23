@@ -46,7 +46,7 @@ module Command
       @opt.on("-n NUM", "--number", "比較する差分を遡って指定する。最新のアップデートと直前のデータを比較するなら-n 1、2個前のアップデートなら-n 2。(デフォルトは-n 1)", Integer) do |number|
         @options["number"] = number if number > 1
       end
-      @opt.on("--clean", "指定した小説の差分データを全て削除する") {
+      @opt.on("-c", "--clean", "指定した小説の差分データを全て削除する") {
         @options["clean"] = true
       }
     end
@@ -65,11 +65,6 @@ module Command
     def execute(argv)
       short_number_option_parse(argv)
       super
-      @difftool = GlobalSetting.get["global_setting"]["difftool"]
-      unless @difftool
-        warn "difftool が設定されていません。narou setting で difftool を設定して下さい"
-        return
-      end
       if argv.empty?
         latest = Database.instance.sort_by_last_update.first
         if latest
@@ -78,6 +73,11 @@ module Command
         return
       end
       target = argv.shift
+      id = Downloader.get_id_by_target(target)
+      unless id
+        warn "#{target} は存在しません"
+        return
+      end
       view_diff_version = argv.shift
       if view_diff_version
         if invalid_diff_version_string?(view_diff_version)
@@ -86,9 +86,13 @@ module Command
         end
         @options["view_diff_version"] = view_diff_version
       end
-      id = Downloader.get_id_by_target(target)
-      unless id
-        warn "#{target} は存在しません"
+      if @options["clean"]
+        clean_diff(id)
+        return
+      end
+      @difftool = GlobalSetting.get["global_setting"]["difftool"]
+      unless @difftool
+        warn "difftool が設定されていません。narou setting で difftool を設定して下さい"
         return
       end
       exec_difftool(id)
@@ -96,6 +100,17 @@ module Command
 
     def invalid_diff_version_string?(str)
       !str =~ /^\d{4}\.\d{2}\.\d{2}@\d{2};\d{2};\d{2}$/
+    end
+
+    def clean_diff(id)
+      cache_root_dir = Downloader.get_cache_root_dir(id)
+      print Database.instance.get_data("id", id)["title"] + " の"
+      unless File.exists?(cache_root_dir)
+        puts "差分はひとつもありません"
+        return
+      end
+      FileUtils.remove_entry_secure(cache_root_dir)
+      puts "差分を削除しました"
     end
 
     def exec_difftool(id)
@@ -149,14 +164,15 @@ module Command
       end
       cache_list = Dir.glob("#{cache_dir}/*.yaml")
       if cache_list.length == 0
-        puts "最新話のみでした"
+        puts "最新話のみのアップデートのようです"
         return nil
       end
       novel_dir = Downloader.get_novel_section_save_dir(Downloader.get_novel_data_dir_by_target(id))
       latest_novel_sections = []
       cache_sections = []
       cache_list.each do |path|
-        latest_novel_sections << YAML.load_file(File.join(novel_dir, File.basename(path)))
+        match_latest_path = File.join(novel_dir, File.basename(path))
+        latest_novel_sections << YAML.load_file(match_latest_path) if File.exists?(match_latest_path)
         cache_sections << YAML.load_file(path)
       end
 
