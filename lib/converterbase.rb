@@ -655,7 +655,7 @@ class ConverterBase
       "［＃ルビ＝#{i}］"
     end
     # （）なルビの対処
-    data.gsub!(/(.+?)（([ぁ-んァ-ヴーゞ・Ａ-Ｚａ-ｚA-Za-z]{,10})）/).with_index(last_i + 1) do |match, i|
+    data.gsub!(/(.+?)（([ぁ-んァ-ヴーゞ・Ａ-Ｚａ-ｚA-Za-z]{,20})）/).with_index(last_i + 1) do |match, i|
       m1, m2 = $1, $2
       last_char = m1[-1]
       ruby_str = case
@@ -665,8 +665,8 @@ class ConverterBase
       when m2 =~ /^・+$/
         # ルビが・だけの場合、傍点と判断
         sesame(m1, m2)
-      when object_of_ruby?(last_char)
-        "#{replace_tatesen(m1)}《#{m2}》"
+      when m1.include?("｜"), object_of_ruby?(last_char)
+        "#{m1}《#{m2}》"
       else
         replace_tatesen(match)
       end
