@@ -580,6 +580,7 @@ class Downloader
     default_settings = NovelSetting::DEFAULT_SETTINGS
     Template.write(NovelSetting::INI_NAME, dir_path, binding)
     Template.write("converter.rb", dir_path, binding)
+    Template.write(NovelSetting::REPLACE_NAME, dir_path, binding)
   end
 
   #

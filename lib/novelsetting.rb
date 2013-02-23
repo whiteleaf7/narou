@@ -8,8 +8,9 @@ require_relative "ini"
 
 class NovelSetting
   INI_NAME = "setting.ini"
+  REPLACE_NAME = "replace.txt"
 
-  attr_accessor :id, :author, :title, :archive_path
+  attr_accessor :id, :author, :title, :archive_path, :replace_pattern
 
   def self.load(target)
     archive_path = Downloader.get_novel_data_dir_by_target(target)
@@ -29,6 +30,7 @@ class NovelSetting
     @archive_path = archive_path
     load_settings
     set_attribute
+    load_replace_pattern
   end
 
   #
@@ -68,6 +70,9 @@ class NovelSetting
     end
   end
 
+  #
+  # 設定データ用アクセサ定義
+  #
   def set_attribute
     @setting.each_key do |key|
       instance_eval <<-EOS
@@ -79,6 +84,26 @@ class NovelSetting
           @setting["#{key}"] = value
         end
       EOS
+    end
+  end
+
+  #
+  # replace.txt による置換定義を読み込む
+  #
+  def load_replace_pattern
+    @replace_pattern = []
+    replace_txt_path = File.join(@archive_path, REPLACE_NAME)
+    if File.exists?(replace_txt_path)
+      open(replace_txt_path, "r:BOM|UTF-8") do |fp|
+        fp.each do |line|
+          line.strip!
+          next if line[0] == ";"    # コメント記号
+          pattern = line.split("\t", 2)
+          if pattern.length == 2 && pattern[0]
+            @replace_pattern << pattern
+          end
+        end
+      end
     end
   end
 

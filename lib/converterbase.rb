@@ -901,4 +901,14 @@ class ConverterBase
     progressbar.clear if text_type == "textfile"
     @write_fp
   end
+
+  #
+  # replace.txt により単純置換
+  #
+  def replace_by_replace_txt(text)
+    @setting.replace_pattern.each do |pattern|
+      src, dst = pattern
+      text.gsub!(src, dst)
+    end
+  end
 end
