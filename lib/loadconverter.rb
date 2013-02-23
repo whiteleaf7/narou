@@ -6,17 +6,27 @@
 require_relative "converterbase"
 require_relative "helper"
 
-class Converter < ConverterBase; end
+class Converter < ConverterBase; end   # deprecated
+
+$converter_container = {}
+
+def converter(title, &block)
+  $converter_container[title] = Class.new(ConverterBase, &block)
+end
 
 #
 # 小説固有コンバーターのロード
 #
-# ファイル名は converter.rb 固定で、ConverterBase を継承した Converter クラスを定義すると、
-# before_convert メソッド及び after_convert メソッドが呼ばれるようになる。
+# ファイル名は converter.rb 固定で、変換処理のフックを定義できる。
+# 基本の変換処理の実行前にはbeforeメソッド、変換処理後にafterメソッドが呼ばれる。
 # このファイルを必ず用意する必要はない。
-# デフォルトの動作は ConverterBase#before_convert 及び #after_convert に定義されている。
+# converter は ConverterBase を継承したクラスを生成するものである。
+# converter "タイトル" {} は class CONVERTER < ConverterBase; end にほぼ等しい。
 #
-# 引数の io はファイル先頭に seek(rewind) してあることが保証される。
+# デフォルトの動作は ConverterBase#before 及び ConverterBase#aftert に定義されている。
+# super を呼ばなければ基本動作を抑制出来る。
+#
+# 引数の io は StringIO のオブジェクトであり、ファイル先頭に seek(rewind) してあることが保証される。
 # また、返却する IO オブジェクトはファイル先頭に seek しておく必要はない。
 # text_type は渡されるテキストがタイトルなのか、前書きなのか等の種別を判断する文字列が渡される。
 # 渡される文字列と意味：
@@ -28,17 +38,16 @@ class Converter < ConverterBase; end
 #
 # @setting で setting.ini で設定した値が読み込める(ex. @setting.enable_num_to_kanji)
 #
-# ex.)
-# class Converter < ConverterBase
+# e.g.)
+# converter "書籍のタイトル" do
 #   # 共通変換処理の前に呼ばれる
-#   def before_convert(io, text_type)
-#     data = io.read
-#     data.gsub!("\n\n", "\n")   # WEB小説に多い無駄な空改行を削除する
-#     StringIO.new(data)         # 返り値はIOライクなオブジェクトを。StringIO推奨
+#   def before(io, text_type)
+#     io.string.gsub!("\n\n", "\n")   # WEB小説に多い無駄な空改行を削除する
+#     io                              # 返り値もStringIOで
 #   end
 #
 #   # 共通変換処理の後に呼ばれる
-#   def after_convert(io, text_type)
+#   def after(io, text_type)
 #     buffer = StringIO.new
 #     io.each do |line|
 #       ～何らかの処理～（共通変換処理で漢数字化されたものを特定部分だけアラビア数字に戻したり）
@@ -47,15 +56,35 @@ class Converter < ConverterBase; end
 #     buffer
 #   end
 # end
-def load_converter(path)
-  converter_path = File.join(path, "converter.rb")
+def load_converter(archive_path)
+  title = File.basename(archive_path)
+  converter_path = File.join(archive_path, "converter.rb")
   if File.exists?(converter_path)
     if Helper.os_windows?
       # TODO: RubyのバグでUTF-8なパスをrequireが見えてない。修正されたら消す
-      load converter_path.encode(Encoding::Windows_31J)
+      require converter_path.encode(Encoding::Windows_31J)
     else
-      load converter_path
+      require converter_path
     end
+  else
+    return Class.new(ConverterBase) {}
   end
-  Converter
+  conv = $converter_container[title]
+  if conv
+    return conv
+  else
+    # deprecated
+    warn "[DEPRECATED] converter.rb の書式が古いで新しい書式に書き換えました"
+    renewal_deprecated_converter(title, converter_path)
+    return Class.new(Converter) {}
+  end
+end
+
+# 書式の古い converter.rb を書き換える
+def renewal_deprecated_converter(title, converter_path)
+  src = open(converter_path, "r:BOM|UTF-8") { |fp| fp.read }
+  src.gsub!("class Converter < ConverterBase", %!converter "#{title}" do!)
+  src.gsub!("def before_convert", "def before")
+  src.gsub!("def after_convert", "def after")
+  File.write(converter_path, src)
 end

@@ -7,12 +7,12 @@
 # 作者: <%= @setting["author"] %>
 # URL: <%= @setting["toc_url"] %>
 #
-class Converter < ConverterBase
-  def before_convert(io, text_type)
+converter "<%= @setting["title"] %>" do
+  def before(io, text_type)
     super
   end
 
-  def after_convert(io, text_type)
+  def after(io, text_type)
     super
   end
 end

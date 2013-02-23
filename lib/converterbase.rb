@@ -13,14 +13,14 @@ class ConverterBase
 
   attr_reader :use_dakuten_font
 
-  def before_convert(io, text_type)
-    data = io.read
+  def before(io, text_type)
+    data = io.string
     data.gsub!("\n\n", "\n")
     data.gsub!("\n\n\n", "\n\n")
-    StringIO.new(data)
+    io
   end
 
-  def after_convert(io, text_type)
+  def after(io, text_type)
     io
   end
 
@@ -28,7 +28,6 @@ class ConverterBase
     @setting = setting
     @inspector = inspector
     @illustration = illustration
-    @english_sentences = []
     @use_dakuten_font = false
     initialize_member_values
   end
@@ -39,6 +38,9 @@ class ConverterBase
     @before_line = ""
     @delay_outputs_buffer = ""
     @in_comment_block = false
+    @english_sentences = []
+    @_url_list = []
+    @_illust_chuki_list = []
   end
 
   def outputs(data = "", force = false)
@@ -57,7 +59,7 @@ class ConverterBase
   # すべての行の行末空白を削除
   #
   def rstrip_all_lines(data)
-    data.gsub!(/^[ 　\t]+$/m, "")
+    data.gsub(/^[ 　\t]+$/m, "")
   end
 
   #
@@ -690,7 +692,6 @@ class ConverterBase
   # URL っぽい文字列を一旦別のIDに置き換えてあとで復元することで、変換処理の影響を受けさせない
   #
   def replace_url(data)
-    @_url_list ||= []
     data.gsub!(URI.regexp) do |match|
       @_url_list << match
       "［＃ＵＲＬ＝#{@_url_list.count - 1}］"
@@ -710,7 +711,6 @@ class ConverterBase
   # 挿絵画像が存在しなければダウンロードして保存する
   #
   def replace_illust_tag(data)
-    @_illust_chuki_list ||= []
     data.gsub!(/^(<i[0-9]+\|[0-9]+>)\n?/m) do
       next "" unless @setting.enable_narou_illust
       chuki = @illustration.get($1)
@@ -814,12 +814,29 @@ class ConverterBase
     convert_dakuten_char_to_font(data)
   end
 
+  def before_convert(io, text_type)
+    before(io, text_type)
+  end
+
+  def after_convert(io, text_type)
+    after(io, text_type)
+  end
+
+  def convert(text, text_type)
+    return "" if text == ""
+    io = StringIO.new(rstrip_all_lines(text))
+    (io = before_convert(io, text_type)).rewind
+    (io = convert_main(io, text_type)).rewind
+    (io = after_convert(io, text_type)).rewind
+    return io.read
+  end
+
   #
   # 変換処理本体
   #
   # text_type: 渡されるテキストの種類。subtitle, introduction, body, postscript, textfile のどれか
   #
-  def convert(io, text_type)
+  def convert_main(io, text_type)
     @write_fp = StringIO.new
     case text_type
     when "introduction"
@@ -835,9 +852,9 @@ class ConverterBase
     else
       data = io.read
     end
+    initialize_member_values
     convert_for_all_data(data, text_type)
     @read_fp = StringIO.new(data)
-    initialize_member_values
     @read_fp.each_with_index do |line, i|
       progressbar.output(i) if text_type == "textfile"
       @request_skip_output_line = false

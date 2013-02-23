@@ -212,17 +212,6 @@ class NovelConverter
     Template.get(NOVEL_TEXT_TEMPLATE_NAME, binding)
   end
 
-  def convert_text_by_load_converter(text, text_type, converter)
-    return "" if text == ""
-    conv = converter.new(@setting, @inspector, @illustration)
-    io = StringIO.new(rstrip_all_lines(text))
-    (io = conv.before_convert(io, text_type)).rewind   # 特殊事前変換処理
-    (io = conv.convert(io, text_type)).rewind          # 共通変換処理
-    (io = conv.after_convert(io, text_type)).rewind    # 特殊事後変換処理
-    @use_dakuten_font = true if conv.use_dakuten_font
-    return io.read
-  end
-
   #
   # 表紙用挿絵注記作成
   #
@@ -247,9 +236,9 @@ class NovelConverter
     sections = []
     @cover_chuki = create_cover_chuki
 
-    converter = load_converter(@setting.archive_path)
+    conv = load_converter(@setting.archive_path).new(@setting, @inspector, @illustration)
     if text
-      result = convert_text_by_load_converter(text, "textfile",  converter)
+      result = conv.convert(text, "textfile")
       unless @setting.enable_enchant_midashi
         @inspector.info "テキストファイルの処理を実行しましたが、改行直後の見出し付与は有効になっていません。" +
                         "setting.ini の enable_enchant_midashi を true にすることをお薦めします。"
@@ -266,14 +255,16 @@ class NovelConverter
         @inspector.subtitle = section["subtitle"]
         element = section["element"]
         element.each do |text_type, elm_text|
-          element[text_type] = convert_text_by_load_converter(elm_text, text_type, converter)
+          element[text_type] = conv.convert(elm_text, text_type)
         end
-        section["subtitle"] = convert_text_by_load_converter(section["subtitle"], "subtitle",  converter)
+        section["subtitle"] = conv.convert(section["subtitle"], "subtitle")
         sections << section
       end
       progressbar.clear
       result = create_novel_text_by_template(sections)
     end
+
+    @use_dakuten_font = conv.use_dakuten_font
 
     midashi_save(result)
     inspect_novel(result)
@@ -363,12 +354,5 @@ class NovelConverter
     id = Downloader.get_id_by_target(@novel_title)
     LocalSetting.get["latest_convert"]["id"] = id
     LocalSetting.get.save_settings
-  end
-
-  #
-  # すべての行の行末空白を削除
-  #
-  def rstrip_all_lines(data)
-    data.gsub(/^[ 　\t]+$/, "")
   end
 end
