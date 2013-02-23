@@ -4,7 +4,7 @@
 #
 
 class ProgressBar
-  def initialize(max, interval = 1, width = 40, char = "*")
+  def initialize(max, interval = 1, width = 50, char = "*")
     @max = max == 0 ? 1.0 : max.to_f
     @interval = interval
     @width = width

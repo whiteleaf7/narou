@@ -576,15 +576,13 @@ class ConverterBase
       stack = {}
       data.gsub!(openclose).with_index do |match, j|
         joined_str = join_inner_bracket(match)
-        if joined_str
-          error = @inspector.validate_joined_inner_brackets(match, joined_str, BRACKETS[i])
-        end
         if @setting.enable_auto_join_in_brackets && joined_str
+          error = @inspector.validate_joined_inner_brackets(match, joined_str, BRACKETS[i])
           stack[j] = error ? match : joined_str
         else
           stack[j] = match
         end
-        "［＃正規表現＝#{j}］"
+        "［＃鍵カッコ＝#{j}］"
       end
       if @setting.enable_inspect_invalid_openclose_brackets
         # 正しく閉じてない鍵カッコだけが data に残ってる
@@ -595,7 +593,7 @@ class ConverterBase
   end
 
   def self.rebuild_brackets(data, stack)
-    data.gsub(/［＃正規表現＝(\d+)］/) do
+    data.gsub(/［＃鍵カッコ＝(\d+)］/) do
       stack[$1.to_i]
     end
   end
@@ -702,7 +700,8 @@ class ConverterBase
     @url_list.each_with_index do |url, id|
       buf = id.to_s
       num_to_kanji(buf)
-      data.sub!("［＃ＵＲＬ＝#{buf}］", url)
+      data.sub!("［＃ＵＲＬ＝#{buf}］", "［＃リンク開始］#{url}［＃リンクアドレスここまで］#{url}［＃リンク終了］")
+      
     end
   end
 

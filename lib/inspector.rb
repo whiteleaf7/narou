@@ -168,27 +168,23 @@ class Inspector
     return if @setting.enable_auto_join_in_brackets
     max = 0
     brackets_num = 0
-    brackets_num_over_1 = 0
+    brackets_num_over_threshould = 0
     total = 0
-    max_sentence = ""
-    ConverterBase::BRACKETS.each do |bracket|
-      data.scan(/#{bracket[0]}(.+?)#{bracket[1]}/m) do |match|
+    ConverterBase::OPENCLOSE_REGEXPS.each do |openclose|
+      data.scan(openclose) do |match|
         cnt = match[0].count("\n")
         brackets_num += 1
-        next if cnt == 0
-        brackets_num_over_1 += 1
         total += cnt
+        next if cnt < BRACKETS_RETURN_COUNT_THRESHOLD
+        brackets_num_over_threshould += 1
         if cnt > max
           max = cnt
-          max_sentence = bracket[0] + match[0] + bracket[1]
         end
       end
     end
-    if brackets_num_over_1 > 0
-      info("カギ括弧内の改行状況:\n" + \
-           "検出したカギ括弧数: #{brackets_num}、そのうち1個以上改行を含む数: #{brackets_num_over_1}\n" + \
-           "1つのカギ括弧内で最大の改行数: #{max}、全カギ括弧内での改行合計: #{total}")
-    end
+    info("カギ括弧内の改行状況:\n" +
+         "検出したカギ括弧数: #{brackets_num}、そのうち#{BRACKETS_RETURN_COUNT_THRESHOLD}個以上改行を含む数: #{brackets_num_over_threshould}\n" + 
+         "1つのカギ括弧内で最大の改行数: #{max}、全カギ括弧内での改行合計: #{total}")
   end
 
   #
