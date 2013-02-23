@@ -74,7 +74,7 @@ def load_converter(archive_path)
     return conv
   else
     # deprecated
-    warn "[DEPRECATED] converter.rb の書式が古いで新しい書式に書き換えました"
+    warn "[DEPRECATED] converter.rb の書式が古いので新しい書式に書き換えました"
     renewal_deprecated_converter(title, converter_path)
     return Class.new(Converter) {}
   end
