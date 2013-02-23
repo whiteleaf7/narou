@@ -25,9 +25,7 @@ class Ini
     text = ""
     case
     when file.kind_of?(String)
-      open(file, "r:BOM|UTF-8") do |fp|
-        text = fp.read
-      end
+      text = open(file, "r:BOM|UTF-8") { |fp| fp.read }
       ini = new(text)
       ini.filename = file
       return ini.object

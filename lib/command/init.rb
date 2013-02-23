@@ -83,10 +83,7 @@ module Command
       custom_chuki_tag_path = File.join(Narou.get_preset_dir, "custom_chuki_tag.txt")
       chuki_tag_path = File.join(aozora_path, "chuki_tag.txt")
       custom_chuki_tag = open(custom_chuki_tag_path, "r:BOM|UTF-8") { |fp| fp.read }
-      chuki_tag = ""
-      open(chuki_tag_path, "r:BOM|UTF-8") do |fp|
-        chuki_tag = fp.read
-      end
+      chuki_tag = open(chuki_tag_path, "r:BOM|UTF-8") { |fp| fp.read }
       embedded_mark = "### Narou.rb embedded custom chuki ###"
       if chuki_tag =~ /#{embedded_mark}/
         chuki_tag.gsub!(/#{embedded_mark}.+#{embedded_mark}/m, custom_chuki_tag)
