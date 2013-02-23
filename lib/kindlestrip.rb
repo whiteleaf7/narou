@@ -135,8 +135,8 @@ class SectionStripper
     puts "Found SRCS section number %d, and count %d" % [srcs_secnum, srcs_cnt] if @verbose
     # find its offset and length
     _next = srcs_secnum + srcs_cnt
-    srcs_offset, flgval = datain.unpack("@#{78+srcs_secnum*8}NN")
-    next_offset, flgval = datain.unpack("@#{78+_next*8}NN")
+    srcs_offset, = datain.unpack("@#{78+srcs_secnum*8}NN")
+    next_offset, = datain.unpack("@#{78+_next*8}NN")
     srcs_length = next_offset - srcs_offset
     if datain[srcs_offset ... srcs_offset+4] != "SRCS"
       raise StripException, "SRCS section num does not point to SRCS."
@@ -165,7 +165,7 @@ class SectionStripper
     # earlier by 8*srcs_cnt + the length of the srcs sections themselves)
     delta = delta - srcs_length
     (srcs_secnum + srcs_cnt ... @num_sections).each do |i|
-      offset, flgval = datain.unpack("@#{78+i*8}NN")
+      offset, = datain.unpack("@#{78+i*8}NN")
       offset += delta
       flgval = 2 * (i - srcs_cnt)
       @data_file += [offset].pack("N") + [flgval].pack("N")
@@ -173,7 +173,7 @@ class SectionStripper
 
     # now pad it out to begin right at the first offset
     # typically this is 2 bytes of nulls
-    first_offset, flgval = @data_file.unpack("@78NN")
+    first_offset, = @data_file.unpack("@78NN")
     @data_file += "\0" * (first_offset - @data_file.length)
 
     # now finally add on every thing up to the original src_offset
@@ -190,8 +190,8 @@ class SectionStripper
     @num_section = @num_sections - srcs_cnt
 
     # update the srcs_secnum and srcs_cnt in the mobiheader
-    offset0, flgval0 = @data_file.unpack("@78NN")
-    offset1, flgval1 = @data_file.unpack("@86NN")
+    offset0, = @data_file.unpack("@78NN")
+    offset1, = @data_file.unpack("@86NN")
     mobiheader = @data_file[offset0 ... offset1]
     mobiheader = mobiheader[0, 0xe0] + [-1].pack("N") + [0].pack("N") + mobiheader[0xe8 .. -1]
 

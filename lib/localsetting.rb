@@ -5,7 +5,6 @@
 
 require "yaml"
 require "singleton"
-require_relative "narou"
 
 #
 # 管理小説のみに適用される設定
@@ -40,8 +39,8 @@ class LocalSetting
     else
       save_list = @local_settings
     end
-    save_list.each do |name, setting|
-      path = File.join(Narou.get_local_setting_dir, name + ".yaml")
+    save_list.each do |sname, setting|
+      path = File.join(Narou.get_local_setting_dir, sname + ".yaml")
       File.write(path, YAML.dump(setting))
     end
   end

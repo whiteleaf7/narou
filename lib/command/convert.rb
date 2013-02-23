@@ -103,6 +103,8 @@ module Command
       if @output_filename && argv.length > 1
         @ext = File.extname(@output_filename)
         @basename = File.basename(@output_filename, @ext)
+      else
+        @basename = nil
       end
       if @options["encoding"]
         @enc = Encoding.find(@options["encoding"]) rescue nil
@@ -118,7 +120,7 @@ module Command
     def convert_novels(argv)
       argv.each.with_index(1) do |target, i|
         Helper.print_horizontal_rule if i > 1
-        @output_filename = "#{@basename} (#{i})#{@ext}" if @basename
+        @output_filename = @basename ? "#{@basename} (#{i})#{@ext}" : nil
         if File.file?(target.to_s)
           @argument_target_type = :file
           res = convert_txt(target)
@@ -176,7 +178,6 @@ module Command
     end
 
     def convert_txt_to_ebook_file
-      converted_txt_dir = File.dirname(@converted_txt_path)
       return false if @options["no-epub"]
       # epub
       status = NovelConverter.txt_to_epub(@converted_txt_path, @use_dakuten_font, nil, @device)

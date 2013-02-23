@@ -47,7 +47,6 @@ class Downloader
       setting = get_sitesetting_by_sitename(data["sitename"])
       setting.multi_match(data["toc_url"], "url")
     when :other
-      detected = false
       data = @@database.get_data("title", target)
       if data
         setting = get_sitesetting_by_sitename(data["sitename"])

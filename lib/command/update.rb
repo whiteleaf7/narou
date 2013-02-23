@@ -41,7 +41,6 @@ module Command
       end
       update_target_list.each_with_index do |target, i|
         display_message = nil
-        through_flag = false
         data = Downloader.get_data_by_target(target)
         title = data["title"]
         if !data

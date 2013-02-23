@@ -63,7 +63,7 @@ module Helper
     case determine_os
     when :windows
       escaped_url = url.gsub("%", "%^").gsub("&", "^&")
-      `start #{url}`
+      `start #{escaped_url}`
     when :mac
       `open "#{url}"`
     end
