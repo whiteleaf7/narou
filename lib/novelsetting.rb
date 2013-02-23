@@ -143,7 +143,7 @@ class NovelSetting
     },
     {
       name: "enable_erase_introduction",
-      value: true,
+      value: false,
       help: "前書きを削除するか"
     },
     {
