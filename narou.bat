@@ -14,7 +14,7 @@ ruby -x "%~f0" %*
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-$debug = false
+$debug = File.exists?("debug")
 Encoding.default_external = Encoding::UTF_8
 
 require_relative "lib/logger"         # 標準出力と標準エラーのロギング開始
@@ -25,9 +25,8 @@ if $debug
   begin
     CommandLine.run(ARGV)
   rescue Exception => e
-    backtrace = e.backtrace
-    puts backtrace.shift + ": #{e.message} (#{e.class})"
-    backtrace.each do |b|
+    puts $@.shift + ": #{e.message} (#{e.class})"
+    $@.each do |b|
       warn "  from #{b}"
     end
     exit 1

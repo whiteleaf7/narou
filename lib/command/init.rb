@@ -82,7 +82,7 @@ module Command
       # chuki_tag.txt の書き換え
       custom_chuki_tag_path = File.join(Narou.get_preset_dir, "custom_chuki_tag.txt")
       chuki_tag_path = File.join(aozora_path, "chuki_tag.txt")
-      custom_chuki_tag = File.read(custom_chuki_tag_path)
+      custom_chuki_tag = open(custom_chuki_tag_path, "r:BOM|UTF-8") { |fp| fp.read }
       chuki_tag = ""
       open(chuki_tag_path, "r:BOM|UTF-8") do |fp|
         chuki_tag = fp.read
