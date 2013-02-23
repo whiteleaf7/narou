@@ -191,6 +191,7 @@ class NovelConverter
 
   def initialize(setting, output_filename = nil, display_inspector = false)
     @setting = setting
+    @novel_id = setting.id
     @novel_author = setting.author
     @novel_title = setting.title
     @output_filename = output_filename
@@ -242,7 +243,7 @@ class NovelConverter
   # 変換処理メイン
   #
   def convert_main(text = nil)
-    puts "#{@novel_title} の変換を開始"
+    puts "ID:#{@novel_id} #{@novel_title} の変換を開始"
     sections = []
     @cover_chuki = create_cover_chuki
 

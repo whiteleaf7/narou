@@ -429,7 +429,7 @@ class Downloader
   def sections_download_and_save(subtitles)
     max = subtitles.count
     return if max == 0
-    puts @title + " のDL開始"
+    puts "ID:#{@id}　#{@title} のDL開始"
     interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"] || 0
     interval_sleep_time = 0 if interval_sleep_time < 0
     subtitles.each_with_index do |subtitle_info, i|

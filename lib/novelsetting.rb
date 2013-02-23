@@ -9,13 +9,14 @@ require_relative "ini"
 class NovelSetting
   INI_NAME = "setting.ini"
 
-  attr_accessor :author, :title, :archive_path
+  attr_accessor :id, :author, :title, :archive_path
 
   def self.load(target)
     archive_path = Downloader.get_novel_data_dir_by_target(target)
     if archive_path
       setting = new(archive_path)
       data = Downloader.get_data_by_target(target)
+      setting.id = data["id"]
       setting.author = data["author"]
       setting.title = data["title"]
       setting
