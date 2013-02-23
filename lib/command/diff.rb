@@ -46,6 +46,9 @@ module Command
       @opt.on("-n NUM", "--number", "比較する差分を遡って指定する。最新のアップデートと直前のデータを比較するなら-n 1、2個前のアップデートなら-n 2。(デフォルトは-n 1)", Integer) do |number|
         @options["number"] = number if number > 1
       end
+      @opt.on("-l", "--list", "指定した小説の差分一覧を表示する") {
+        @options["list"] = true
+      }
       @opt.on("-c", "--clean", "指定した小説の差分データを全て削除する") {
         @options["clean"] = true
       }
@@ -67,13 +70,12 @@ module Command
       super
       if argv.empty?
         latest = Database.instance.sort_by_last_update.first
-        if latest
-          exec_difftool(latest["id"])
-        end
-        return
+        return unless latest
+        id = latest["id"]
+      else
+        target = argv.shift
+        id = Downloader.get_id_by_target(target)
       end
-      target = argv.shift
-      id = Downloader.get_id_by_target(target)
       unless id
         warn "#{target} は存在しません"
         return
@@ -85,6 +87,10 @@ module Command
           return
         end
         @options["view_diff_version"] = view_diff_version
+      end
+      if @options["list"]
+        display_diff_list(id)
+        return
       end
       if @options["clean"]
         clean_diff(id)
@@ -147,6 +153,11 @@ module Command
       diff_cmd
     end
 
+    def get_sorted_cache_list(id)
+      list = Downloader.get_cache_list(id) or return nil
+      list.sort_by { |v| File.basename(v) }.reverse
+    end
+
     def create_temp_files(id)
       if @options["view_diff_version"]
         cache_root_dir = Downloader.get_cache_root_dir(id)
@@ -156,21 +167,24 @@ module Command
         end
       else
         nth = @options["number"]
-        cache_dir = Downloader.get_cache_list(id).sort_by { |v| File.basename(v) }.reverse[nth - 1]
+        list = get_sorted_cache_list(id)
+        cache_dir = list[nth - 1] if list
       end
       unless cache_dir
         puts "差分データがありません"
         return nil
       end
-      cache_list = Dir.glob("#{cache_dir}/*.yaml")
-      if cache_list.length == 0
+      cache_section_list = Dir.glob("#{cache_dir}/*.yaml").sort_by { |path|
+        File.basename(path, ".yaml").split(" ", 2)[0].to_i
+      }
+      if cache_section_list.length == 0
         puts "最新話のみのアップデートのようです"
         return nil
       end
       novel_dir = Downloader.get_novel_section_save_dir(Downloader.get_novel_data_dir_by_target(id))
       latest_novel_sections = []
       cache_sections = []
-      cache_list.each do |path|
+      cache_section_list.each do |path|
         match_latest_path = File.join(novel_dir, File.basename(path))
         latest_novel_sections << YAML.load_file(match_latest_path) if File.exists?(match_latest_path)
         cache_sections << YAML.load_file(path)
@@ -187,6 +201,29 @@ module Command
       temp_old.write(Template.get("diff.txt", binding))
 
       [temp_new, temp_old]
+    end
+
+    def display_diff_list(id)
+      cache_list = get_sorted_cache_list(id)
+      print Database.instance.get_data("id", id)["title"] + " の"
+      unless cache_list
+        puts "差分はひとつもありません"
+        return
+      end
+      puts "差分一覧"
+      cache_list.each.with_index(1) do |cache_path, i|
+        puts File.basename(cache_path) + "   -#{i}"
+        cache_section_list = Dir.glob(File.join(cache_path, "*.yaml"))
+        if cache_section_list.length > 0
+          cache_section_list.map { |section_path|
+            File.basename(section_path, ".yaml").split(" ", 2)
+          }.sort_by { |v| v[0].to_i }.each { |index, subtitle|
+            puts "   第#{index}部分　#{subtitle}"
+          }
+        else
+          puts "   (最新話のみのアップデート)"
+        end
+      end
     end
   end
 end
