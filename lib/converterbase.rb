@@ -39,8 +39,8 @@ class ConverterBase
     @delay_outputs_buffer = ""
     @in_comment_block = false
     @english_sentences = []
-    @_url_list = []
-    @_illust_chuki_list = []
+    @url_list = []
+    @illust_chuki_list = []
   end
 
   def outputs(data = "", force = false)
@@ -693,13 +693,13 @@ class ConverterBase
   #
   def replace_url(data)
     data.gsub!(URI.regexp) do |match|
-      @_url_list << match
-      "［＃ＵＲＬ＝#{@_url_list.count - 1}］"
+      @url_list << match
+      "［＃ＵＲＬ＝#{@url_list.count - 1}］"
     end
   end
 
   def rebuild_url(data)
-    @_url_list.each_with_index do |url, id|
+    @url_list.each_with_index do |url, id|
       buf = id.to_s
       num_to_kanji(buf)
       data.sub!("［＃ＵＲＬ＝#{buf}］", url)
@@ -715,8 +715,8 @@ class ConverterBase
       next "" unless @setting.enable_narou_illust
       chuki = @illustration.get($1)
       if chuki
-        @_illust_chuki_list << chuki
-        "［＃挿絵＝#{@_illust_chuki_list.count - 1}］\n"
+        @illust_chuki_list << chuki
+        "［＃挿絵＝#{@illust_chuki_list.count - 1}］\n"
       else
         ""
       end
@@ -724,7 +724,7 @@ class ConverterBase
   end
 
   def rebuild_illust(data)
-    @_illust_chuki_list.each_with_index do |chuki, id|
+    @illust_chuki_list.each_with_index do |chuki, id|
       buf = id.to_s
       num_to_kanji(buf)
       data.sub!("［＃挿絵＝#{buf}］", chuki)
