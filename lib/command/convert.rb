@@ -123,7 +123,7 @@ module Command
         @output_filename = @basename ? "#{@basename} (#{i})#{@ext}" : nil
         if File.file?(target.to_s)
           @argument_target_type = :file
-          res = convert_txt(target)
+          res = convert_txt(target) or next
         else
           @argument_target_type = :novel
           unless Downloader.novel_exists?(target)
