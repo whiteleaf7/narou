@@ -442,7 +442,7 @@ class ConverterBase
   # 改ページある？
   #
   def kai_page?(line)
-    line =~ /［＃(?:改ページ|改丁|改頁|改段)］/
+    line =~ /［＃改ページ］/
   end
 
   #
