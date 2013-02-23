@@ -3,5 +3,5 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-Version = "0.2.1"
-VersionCommit = "6662062"
+Version = "0.3.0"
+VersionCommit = "691ed10"
