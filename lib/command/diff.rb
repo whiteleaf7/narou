@@ -206,7 +206,7 @@ module Command
     def display_diff_list(id)
       cache_list = get_sorted_cache_list(id)
       print Database.instance.get_data("id", id)["title"] + " の"
-      unless cache_list
+      if cache_list.empty?
         puts "差分はひとつもありません"
         return
       end
