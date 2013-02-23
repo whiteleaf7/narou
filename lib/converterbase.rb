@@ -412,7 +412,7 @@ class ConverterBase
   # 行頭空白を考慮した字下げ
   #
   def jisage(line, num)
-    line.sub!(/^[ 　\t]+/, "　" * num)
+    line.sub!(/^[ 　\t]*/, "　" * num)
   end
 
   def border_symbol?(line)
@@ -433,7 +433,7 @@ class ConverterBase
         result << "\n"
       end
       @request_insert_blank_next_line = true
-      jisage(line, 3)
+      jisage(line, 4)
     end
     line.sub!(/\A/, result)
   end
