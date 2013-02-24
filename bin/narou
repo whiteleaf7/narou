@@ -1,0 +1,10 @@
+#! ruby
+# -*- mode: ruby -*-
+# -*- coding: UTF-8 -*-
+#
+# Narou.rb ― 小説家になろうダウンロード＆整形スクリプト
+#
+# Copyright 2013 whiteleaf. All rights reserved.
+#
+
+require_relative "../narou.rb"

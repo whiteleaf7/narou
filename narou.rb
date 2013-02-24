@@ -1,11 +1,3 @@
-@echo off
-REM -*- mode: ruby -*-
-@if not "%~d0" == "~d0" goto WinNT
-ruby -x narou.bat %1 %2 %3 %4 %5 %6 %7 %8 %9
-@goto endofruby
-:WinNT
-ruby -x "%~f0" %*
-@goto endofruby
 #! ruby
 # -*- coding: UTF-8 -*-
 #
@@ -14,7 +6,7 @@ ruby -x "%~f0" %*
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-$debug = File.exists?("debug")
+$debug = File.exists?(File.join(File.expand_path(__FILE__), "debug"))
 Encoding.default_external = Encoding::UTF_8
 
 require_relative "lib/logger"         # 標準出力と標準エラーのロギング開始
@@ -34,6 +26,3 @@ if $debug
 else
   CommandLine.run(ARGV)
 end
-
-__END__
-:endofruby
