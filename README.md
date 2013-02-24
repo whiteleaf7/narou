@@ -11,36 +11,67 @@ Narou.rb ― 小説家になろうダウンローダ＆縦書用整形スクリ�
 
 必須ツール
 ------------
-* Ruby 1.9.3以上
-* AozoraEpub3 1.1.0系
+* Ruby 1.9.3以上 (Windows: http://www.artonx.org/data/asr/, その他OS: 適当に)
+* AozoraEpub3 1.1.0系 (http://www18.atwiki.jp/hmdev/pages/21.html)
 * Java 6以降（AozoraEpub3で必須）
-* kindlegen（できるだけ最新版）
+* kindlegen 2.7 (http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211)
 
-使い方
+機能っぽい一覧
 ------------
 ```
  Usage: narou <command> [arguments...] [options...]
 
  コマンドの簡単な説明:
    download     指定した小説をダウンロードします
-   update       指定した小説を更新します
-                指定がない場合、すべての小説が対象になります
+   update       小説を更新します
    list         現在管理している小説の一覧を表示します
    convert      小説を変換します。管理小説以外にテキストファイルも変換可能
-   remove       小説を削除します
-   alias        小説のIDに紐付けた別名を作成します
+   diff         アップデートされた小説の変更点を表示します
    setting      各コマンドの設定を変更します
+   alias        小説のIDに紐付けた別名を作成します
+   inspect      小説状態の調査状況ログを表示します
+   send         変換したEPUB/MOBIを電子書籍端末に送信します
    folder       小説の保存フォルダを開きます
    browser      小説の掲載ページをブラウザで開きます
+   remove       小説を削除します
    freeze       小説の凍結設定を行います
    help         このヘルプを表示します
    version      バージョンを表示します
+   init         AozoraEpub3 の再設定を行います
 
   各コマンドの詳細は narou <command> -h/--help を参照してください。
   各コマンドは先頭の一文字か二文字でも指定できます。
-  (e.g. 'narou d n4259s', 'narou fr musyoku')
+  (e.g. `narou d n4259s', `narou fr musyoku')
 ```
 
 インストール
 ------------
-必須のカスタム注記とCSSをアップしてないのでまだ不可能 :(
+* 事前に AozoraEpub3 をインストールしておきます。
+  → http://www18.atwiki.jp/hmdev/pages/21.html
+
+* kindlegen を AozoraEpub3 をインストールしたフォルダにコピーします。
+  → http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211
+
+* Narou.rb をインストールします。
+  コンソールで
+```
+gem install narou
+```
+
+* 小説の管理用として任意のフォルダで、
+```
+narou init
+```
+  あとは画面の説明に従って下さい。
+
+使い方 - How To Use
+-------------------
+基本的な使い方
+
+narou init したフォルダで、narou <command> を適宜実行します。
+```
+narou downlaod Nコード
+narou update Nコード
+narou convert Nコード
+```
+等と使います。
