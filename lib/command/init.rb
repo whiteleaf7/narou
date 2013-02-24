@@ -54,7 +54,9 @@ module Command
         Narou.init
         puts "-" * 30
         init_aozoraepub3
-        puts "初期化が完了しました"
+        puts "初期化が完了しました！"
+        puts "現在のフォルダ下で各種コマンドが使用出来るようになりました。"
+        puts "まずは narou --help で簡単な説明を御覧ください。"
       end
     end
 
