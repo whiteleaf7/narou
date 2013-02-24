@@ -58,7 +58,7 @@ module Narou
   end
 
   def self.get_script_dir
-    File.expand_path(File.join(File.dirname(__FILE__), ".."))
+    @@script_dir ||= File.expand_path(File.join(File.dirname(__FILE__), ".."))
   end
 
   def self.already_init?
