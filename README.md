@@ -1,5 +1,5 @@
 Narou.rb ― 小説家になろうダウンローダ＆縦書用整形スクリプト
-============
+============================================================
 
 説明 - Description
 ------------------
@@ -9,9 +9,9 @@ Narou.rb ― 小説家になろうダウンローダ＆縦書用整形スクリ�
 
 作った人 - Author
 -----------------
-whiteleaf
-Twitter: https://twitter.com/sasalove7
-Blog: http://whiteleaf.hatenablog.com/
+* whiteleaf
+* Twitter: https://twitter.com/sasalove7
+* Blog: http://whiteleaf.hatenablog.com/
 
 必須ツール - Require tools
 --------------------------
@@ -85,4 +85,19 @@ narou convert Nコード
 サポート - Support
 ------------------
 https://twitter.com/sasalove7 , http://whiteleaf.hatenablog.com/
+
 上記のツイッター及びブログで今後要望等を取り扱いたいと思います。
+
+添付のDMincho.ttfについて - About DMincho font
+----------------------------------------------
+WEB小説でよく見かける「あ゛」のような表現を、縦書でも再現するための濁点つきフォントです。
+
+青キン明朝フォントをカスタマイズして使用しています。
+
+オリジナルはIPA明朝フォントであり、ライセンスは IPAフォントライセンスv1.0 の元に「派生プログラム」として
+再配布されています。
+
+ライセンスに基づく一般公開は以下のURLになります。また、
+オリジナルなIPA明朝フォントに戻す場合、下記からDL出来るアーカイブに同梱の ipam.otf で上書きして下さい。
+
+http://ux.getuploader.com/whiteleaf/download/23/ipam.rar
