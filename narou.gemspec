@@ -32,7 +32,6 @@ narou コマンドのインストールが完了しました。
 
   EOS
 
-  gem.has_rdoc      = true   # rdoc を生成しない
   gem.required_ruby_version = ">=1.9.3"
 
   gem.files         = `git ls-files`.split("\n") << Narou.create_git_commit_version
