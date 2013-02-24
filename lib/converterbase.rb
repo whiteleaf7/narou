@@ -416,7 +416,10 @@ class ConverterBase
   end
 
   def border_symbol?(line)
-    line =~ /^[ 　\t]*[■□◆◇○◎●★☆\*＊※♡♥❤　 ]+$/
+    @@symbols ||= open(File.join(Narou.get_preset_dir, "bordersymbols.txt"), "r:BOM|UTF-8") { |fp|
+      fp.read.strip
+    }
+    line =~ /^[ 　\t]*[#{@@symbols}]+$/
   end
 
   def blank_line?(line)

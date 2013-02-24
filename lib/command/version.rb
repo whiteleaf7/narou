@@ -6,7 +6,7 @@
 module Command
   class Version < CommandBase
     def execute(argv)
-      puts ::Version + " " + ::VersionCommit
+      puts ::Version + " build " + ::CommitVersion
     end
 
     def oneline_help
