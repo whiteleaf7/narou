@@ -192,7 +192,9 @@ class Inspector
   #
   def inspect_indent(data)
     dont_indent_line_count = data.scan(/^[^#{IGNORE_INDENT_CHAR}]/).count
-    line_count = data.lines.count
+    lines = data.lines
+    # MEMO: Enumerable#size (via http://jp.rubyist.net/magazine/?0041-200Special-note#l11)
+    line_count = (lines.respond_to?(:size) ? lines.size : lines.count)
     ratio = dont_indent_line_count / line_count.to_f
     return ratio > AUTO_INDENT_THRESHOLD_RATIO
   end
