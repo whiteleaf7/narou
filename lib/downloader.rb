@@ -112,15 +112,13 @@ class Downloader
     when :url, :ncode
       toc_url = get_toc_url(target)
       data = @@database.get_data("toc_url", toc_url)
-      id = data["id"]
     when :other
       data = @@database.get_data("title", target)
-      id = data["id"]
     when :id
-      id = target.to_i
       data = @@database[id]
     end
     return nil unless data
+    id = data["id"]
     path = File.join(Database.archive_root_path, data["sitename"], data["title"])
     if File.exists?(path)
       return path
@@ -128,7 +126,7 @@ class Downloader
       @@database.delete(id)
       @@database.save_database
       warn "#{path} が見つかりません。"
-      warn "保存ディレクトリが消去されていたため、管理リストから削除しました。"
+      warn "保存フォルダが消去されていたため、データベースのインデックスを削除しました。"
       return nil
     end
   end
