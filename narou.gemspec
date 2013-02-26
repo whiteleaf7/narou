@@ -2,12 +2,21 @@
 # -*- coding: UTF-8 -*-
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
 require "version"
+
+require "fileutils"
 
 module Narou
   def self.create_git_commit_version
     File.write("commitversion", `git describe --always`.strip)
     "commitversion"
+  end
+end
+
+at_exit do
+  if File.exists?("commitversion")
+    FileUtils.rm("commitversion")
   end
 end
 
