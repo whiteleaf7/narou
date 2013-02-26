@@ -103,12 +103,12 @@ class NovelConverter
     pwd = Dir.pwd
 
     aozoraepub3_path = Narou.get_aozoraepub3_path
-    aozoraepub3_basename = File.basename(aozoraepub3_path)
-    aozoraepub3_dir = File.dirname(aozoraepub3_path)
-    unless File.exists?(aozoraepub3_path)
+    unless aozoraepub3_path
       warn "AozoraEpub3が見つからなかったので、EPUBが出力出来ませんでした"
       return nil
     end
+    aozoraepub3_basename = File.basename(aozoraepub3_path)
+    aozoraepub3_dir = File.dirname(aozoraepub3_path)
 
     Dir.chdir(aozoraepub3_dir)
     command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 ! +
@@ -121,6 +121,7 @@ class NovelConverter
     res = Helper::AsyncCommand.exec(command) do
       print "."
     end
+    visible_aozora_fonts_directory unless use_dakuten_font
     # MEMO: Windows環境以外で出力される文字コードはSJISなのか？
     stdout_capture = res[0].force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
 
@@ -144,8 +145,6 @@ class NovelConverter
     end
     puts "変換しました"
     :success
-  ensure
-    visible_aozora_fonts_directory unless use_dakuten_font
   end
 
   #
