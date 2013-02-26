@@ -25,6 +25,14 @@ class Device
     DEVICES.include?(device.downcase)
   end
 
+  def self.create(device_name)
+    @@device_cache ||= {}
+    name = device_name.downcase
+    return @@device_cache[name] ||= new(name)
+  end
+
+  private_class_method :new
+
   def initialize(device_name)
     unless Device.exists?(device_name)
       raise UnknownDevice, "#{device_name} は存在しません"

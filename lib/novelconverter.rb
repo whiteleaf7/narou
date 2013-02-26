@@ -209,6 +209,7 @@ class NovelConverter
   def create_novel_text_by_template(sections)
     toc = @toc
     cover_chuki = @cover_chuki
+    device = Narou.get_device
     Template.get(NOVEL_TEXT_TEMPLATE_NAME, binding)
   end
 

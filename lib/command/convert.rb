@@ -84,14 +84,6 @@ module Command
       end
     end
 
-    def get_device
-      device_name = LocalSetting.get["local_setting"]["device"]
-      if device_name && Device.exists?(device_name)
-        return Device.new(device_name)
-      end
-      nil
-    end
-
     def execute(argv)
       load_local_settings    # @opt.on 実行前に設定ロードしたいので super 前で実行する
       super
@@ -113,7 +105,7 @@ module Command
           return
         end
       end
-      @device = get_device
+      @device = Narou.get_device
       convert_novels(argv)
     end
 

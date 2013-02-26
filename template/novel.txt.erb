@@ -13,13 +13,17 @@
 ［＃改ページ］
 <% if section["chapter"] != "" -%>
 ［＃ページの左右中央］
+<% if device && device.name == "Kindle" -%>
 ［＃ここからキンドル左右中央］
+<% end -%>
 <%= toc["title"] %>
 
 ［＃ここから大見出し］<%= section["chapter"] %>［＃ここで大見出し終わり］
 　
 　
+<% if device && device.name == "Kindle" -%>
 ［＃ここでキンドル左右中央終わり］
+<% end -%>
 ［＃改ページ］
 <% end -%>
 ［＃３字下げ］［＃ここから中見出し］<%= section["subtitle"].rstrip %>［＃ここで中見出し終わり］

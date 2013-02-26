@@ -7,6 +7,7 @@ require "fileutils"
 require_relative "helper"
 require_relative "localsetting"
 require_relative "globalsetting"
+require_relative "device"
 
 module Narou
   LOCAL_SETTING_DIR = ".narou"
@@ -142,5 +143,13 @@ module Narou
     return nil unless data
     dir = Downloader.get_novel_data_dir_by_target(target)
     File.join(dir, create_novel_filename(data, ext))
+  end
+
+  def self.get_device
+    device_name = LocalSetting.get["local_setting"]["device"]
+    if device_name && Device.exists?(device_name)
+      return Device.create(device_name)
+    end
+    nil
   end
 end
