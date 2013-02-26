@@ -124,9 +124,9 @@ module Command
           end
           res = NovelConverter.convert(target, @output_filename, @options["inspect"])
         end
+        next unless res
         @converted_txt_path = res[:converted_txt_path]
         @use_dakuten_font = res[:use_dakuten_font]
-        next unless @converted_txt_path
 
         ebook_file = convert_txt_to_ebook_file
         next if ebook_file.nil?
