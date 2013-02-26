@@ -115,7 +115,7 @@ class Downloader
     when :other
       data = @@database.get_data("title", target)
     when :id
-      data = @@database[id]
+      data = @@database[target.id]
     end
     return nil unless data
     id = data["id"]
