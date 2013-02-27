@@ -126,6 +126,7 @@ class NovelConverter
     stdout_capture = res[0].force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
 
     Dir.chdir(pwd)
+
     error_list = stdout_capture.scan(/^\[ERROR\].+$/)
     warn_list = stdout_capture.scan(/^\[WARN\].+$/)
     info_list = stdout_capture.scan(/^\[INFO\].+$/)
@@ -201,7 +202,8 @@ class NovelConverter
   end
 
   def load_novel_section(subtitle_info)
-    path = File.join(@section_save_dir, "#{subtitle_info["index"]} #{subtitle_info["file_subtitle"]}.yaml")
+    file_subtitle = subtitle_info["file_suubtitle"] || subtitle_info["subtitle"]   # 互換性維持のため
+    path = File.join(@section_save_dir, "#{subtitle_info["index"]} #{file_subtitle}.yaml")
     YAML.load_file(path)
   end
 

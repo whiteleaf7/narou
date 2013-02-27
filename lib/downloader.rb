@@ -119,7 +119,8 @@ class Downloader
     end
     return nil unless data
     id = data["id"]
-    path = File.join(Database.archive_root_path, data["sitename"], data["file_title"])
+    file_title = data["file_title"] || data["title"]   # 互換性維持のための処理
+    path = File.join(Database.archive_root_path, data["sitename"], file_title)
     if File.exists?(path)
       return path
     else
