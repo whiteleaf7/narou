@@ -42,23 +42,31 @@ module Command
         return
       end
       argv.each.with_index(1) do |target, i|
+        download_target ||= target
         Helper.print_horizontal_rule if i > 1
-        data = Downloader.get_data_by_target(target)
-        if Narou.novel_frozen?(target)
+        data = Downloader.get_data_by_target(download_target)
+        if Narou.novel_frozen?(download_target)
           puts "#{data["title"]} は凍結中です\nダウンロードを中止しました"
           next
         end
         if !@options["force"] && data
-          puts "#{target} はダウンロード済みです。"
-          puts "ID: #{data["id"]}"
-          puts "title: #{data["title"]}"
+          if Downloader.get_novel_data_dir_by_target(download_target)
+            puts "#{download_target} はダウンロード済みです。"
+            puts "ID: #{data["id"]}"
+            puts "title: #{data["title"]}"
+          else
+            if Helper.confirm("再ダウンロードしますか")
+              download_target = data["toc_url"]
+              redo
+            end
+          end
           next
         end
-        unless Downloader.start(target, @options["force"])
+        unless Downloader.start(download_target, @options["force"])
           next
         end
         unless @options["no-convert"]
-          Convert.execute_and_rescue_exit([target])
+          Convert.execute_and_rescue_exit([download_target])
         end
       end
     end
