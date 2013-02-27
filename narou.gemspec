@@ -36,9 +36,16 @@ Gem::Specification.new do |gem|
 }.split("\n").join
 
   gem.post_install_message = <<-EOS
-narou コマンドのインストールが完了しました。
-小説を管理するための任意のフォルダで narou init コマンドを実行して下さい。
+#{"*" * 79}
 
+narou コマンドのインストール or アップデートが完了しました。
+詳しい説明は `narou help' コマンドをご覧下さい。
+
+  NOTICE
+  初めてこのアプリケーションを使う場合、小説管理用のフォルダを初期化する必要があります。
+  任意のフォルダで `narou init' を実行して下さい。
+
+#{"*" * 79}
   EOS
 
   gem.required_ruby_version = ">=1.9.3"
