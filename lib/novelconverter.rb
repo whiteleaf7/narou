@@ -201,7 +201,7 @@ class NovelConverter
   end
 
   def load_novel_section(subtitle_info)
-    path = File.join(@section_save_dir, "#{subtitle_info["index"]} #{subtitle_info["subtitle"]}.yaml")
+    path = File.join(@section_save_dir, "#{subtitle_info["index"]} #{subtitle_info["file_subtitle"]}.yaml")
     YAML.load_file(path)
   end
 
@@ -236,7 +236,7 @@ class NovelConverter
     sections = []
     @cover_chuki = create_cover_chuki
 
-    conv = load_converter(@setting.archive_path).new(@setting, @inspector, @illustration)
+    conv = load_converter(@novel_title, @setting.archive_path).new(@setting, @inspector, @illustration)
     if text
       result = conv.convert(text, "textfile")
       unless @setting.enable_enchant_midashi

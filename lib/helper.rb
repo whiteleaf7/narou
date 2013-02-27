@@ -73,6 +73,10 @@ module Helper
     puts "―" * 35
   end
 
+  def self.replace_filename_special_chars(str)
+    str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥")
+  end
+
   #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #

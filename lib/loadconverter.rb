@@ -56,8 +56,7 @@ end
 #     buffer
 #   end
 # end
-def load_converter(archive_path)
-  title = File.basename(archive_path)
+def load_converter(title, archive_path)
   converter_path = File.join(archive_path, "converter.rb")
   if File.exists?(converter_path)
     if Helper.os_windows?

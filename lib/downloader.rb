@@ -84,7 +84,7 @@ class Downloader
   #
   # target の種別を判別する
   #
-  # ncodeの場合は破壊的に小文字に変更する
+  # ncodeの場合、targetを破壊的に変更する
   #
   def self.get_target_type(target)
     case target
@@ -119,7 +119,7 @@ class Downloader
     end
     return nil unless data
     id = data["id"]
-    path = File.join(Database.archive_root_path, data["sitename"], data["title"])
+    path = File.join(Database.archive_root_path, data["sitename"], data["file_title"])
     if File.exists?(path)
       return path
     else
@@ -329,6 +329,7 @@ class Downloader
       "id" => @id,
       "author" => @setting["author"],
       "title" => @setting["title"],
+      "file_title" => @file_title,
       "toc_url" => @setting["toc_url"],
       "sitename" => @setting["name"],
       "last_update" => Time.now
@@ -365,6 +366,7 @@ class Downloader
     end
     @setting.multi_match(toc_source, "title", "author", "story", "tcode")
     @title = @setting["title"]
+    @file_title = Helper.replace_filename_special_chars(@title)
     toc_objects = {
       "title" => @title,
       "author" => @setting["author"],
@@ -411,6 +413,7 @@ class Downloader
         "href" => @setting["href"],
         "chapter" => @setting["chapter"],
         "subtitle" => @setting["subtitle"],
+        "file_subtitle" => Helper.replace_filename_special_chars(@setting["subtitle"]),
         "subdate" => @setting["subdate"],
         "subupdate" => @setting["subupdate"]
       }
@@ -439,12 +442,12 @@ class Downloader
       else
         sleep(interval_sleep_time) if i > 0
       end
-      index, subtitle = subtitle_info["index"], subtitle_info["subtitle"]
+      index, subtitle, file_subtitle  = %w(index subtitle file_subtitle).map {|k| subtitle_info[k] }
       puts "第#{index}部分　#{subtitle} (#{i+1}/#{max})"
       section_element = a_section_download(subtitle_info)
       info = subtitle_info.dup
       info["element"] = section_element
-      section_file_name = "#{index} #{subtitle}.yaml"
+      section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
       move_to_cache_dir(section_file_path)
       save_novel_data(section_file_path, info)
@@ -544,8 +547,8 @@ class Downloader
   #
   # 小説データの格納ディレクトリパス
   def get_novel_data_dir
-    raise "小説名がまだ設定されていません" unless @title
-    File.join(Database.archive_root_path, @setting["name"], @title)
+    raise "小説名がまだ設定されていません" unless @file_title
+    File.join(Database.archive_root_path, @setting["name"], @file_title)
   end
 
   #
