@@ -131,8 +131,7 @@ module Narou
 
   def self.create_novel_filename(novel_data, ext = "")
     author, title = %w(author title).map { |k|
-      # AozoraEpub3 の命名規則に沿った変換
-      novel_data[k].sub(/^[ 　]*(.+?)[ 　]*$/, "\\1").gsub(%r![/\\:*?\"<>|]!, "")
+      Helper.replace_filename_special_chars(novel_data[k])
     }
     "[#{author}] #{title}#{ext}"
   end

@@ -111,7 +111,7 @@ class NovelConverter
     aozoraepub3_dir = File.dirname(aozoraepub3_path)
 
     Dir.chdir(aozoraepub3_dir)
-    command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 ! +
+    command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 -of DUMMY ! +
               %!#{cover_option} #{dst_option} #{ext_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
