@@ -9,7 +9,6 @@
 $debug = File.exists?(File.join(File.expand_path(File.dirname($0)), "debug"))
 Encoding.default_external = Encoding::UTF_8
 
-require "optparse"
 require_relative "lib/logger"
 require_relative "lib/version"
 require_relative "lib/commandline"
@@ -17,9 +16,8 @@ require_relative "lib/commandline"
 rescue_level = $debug ? Exception : StandardError
 
 begin
-  display_backtrace = $debug
-  ARGV.options.on("--backtrace") { display_backtrace = true }
-  ARGV.parse!
+  display_backtrace = ARGV.delete("--backtrace")
+  display_backtrace ||= $debug
   CommandLine.run(ARGV)
 rescue rescue_level => e
   warn $@.shift + ": #{e.message} (#{e.class})"
