@@ -6,23 +6,30 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-$debug = File.exists?(File.join(File.expand_path(__FILE__), "debug"))
+$debug = File.exists?(File.join(File.expand_path(File.dirname($0)), "debug"))
 Encoding.default_external = Encoding::UTF_8
 
-require_relative "lib/logger"         # 標準出力と標準エラーのロギング開始
+require "optparse"
+require_relative "lib/logger"
 require_relative "lib/version"
 require_relative "lib/commandline"
 
-if $debug
-  begin
-    CommandLine.run(ARGV)
-  rescue Exception => e
-    puts $@.shift + ": #{e.message} (#{e.class})"
+rescue_level = $debug ? Exception : StandardError
+
+begin
+  display_backtrace = $debug
+  ARGV.options.on("--backtrace") { display_backtrace = true }
+  ARGV.parse!
+  CommandLine.run(ARGV)
+rescue rescue_level => e
+  warn $@.shift + ": #{e.message} (#{e.class})"
+  if display_backtrace
     $@.each do |b|
       warn "  from #{b}"
     end
-    exit 1
+  else
+    puts "  エラーが発生したため終了しました。"
+    puts "  詳細なエラーは --backtrace オプションを付けて再度実行して下さい。"
   end
-else
-  CommandLine.run(ARGV)
+  exit 1
 end
