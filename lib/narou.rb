@@ -130,8 +130,8 @@ module Narou
   end
 
   def self.create_novel_filename(novel_data, ext = "")
-    info = Hash[novel_data.map { |k, v| [k, v.sub(/^[ 　]*(.+?)[ 　]*$/, "\\1")] }]
-    "[#{info["author"]}] #{info["title"]}#{ext}"
+    author, title = [novel_data["author"], novel_data["title"]].map { |v| v.sub(/^[ 　]*(.+?)[ 　]*$/, "\\1") }
+    "[#{author}] #{title}#{ext}"
   end
 
   def self.get_mobi_path(target)
@@ -145,8 +145,8 @@ module Narou
     File.join(dir, create_novel_filename(data, ext))
   end
 
-  def self.get_device
-    device_name = LocalSetting.get["local_setting"]["device"]
+  def self.get_device(device_name = nil)
+    device_name = LocalSetting.get["local_setting"]["device"] unless device_name
     if device_name && Device.exists?(device_name)
       return Device.create(device_name)
     end

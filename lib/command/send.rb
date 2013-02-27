@@ -33,13 +33,9 @@ module Command
 
     def get_device(argv)
       if Device.exists?(argv.first)
-        return Device.new(argv.shift)
+        return Narou.get_device(argv.shift)
       end
-      local_setting_device = LocalSetting.get["local_setting"]["device"]
-      if local_setting_device
-        return Device.new(local_setting_device)
-      end
-      nil
+      Narou.get_device
     end
 
     def execute(argv)
