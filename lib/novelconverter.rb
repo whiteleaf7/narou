@@ -202,7 +202,7 @@ class NovelConverter
   end
 
   def load_novel_section(subtitle_info)
-    file_subtitle = subtitle_info["file_suubtitle"] || subtitle_info["subtitle"]   # 互換性維持のため
+    file_subtitle = subtitle_info["file_subtitle"] || subtitle_info["subtitle"]   # 互換性維持のため
     path = File.join(@section_save_dir, "#{subtitle_info["index"]} #{file_subtitle}.yaml")
     YAML.load_file(path)
   end
