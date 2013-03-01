@@ -127,7 +127,7 @@ class NovelConverter
 
     Dir.chdir(pwd)
 
-    error_list = stdout_capture.scan(/^\[ERROR\].+$/)
+    error_list = stdout_capture.scan(/^(?:\[ERROR\]|エラーが発生しました :).+$/)
     warn_list = stdout_capture.scan(/^\[WARN\].+$/)
     info_list = stdout_capture.scan(/^\[INFO\].+$/)
     if !error_list.empty? || !warn_list.empty? || !info_list.empty?
