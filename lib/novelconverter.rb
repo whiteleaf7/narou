@@ -80,7 +80,7 @@ class NovelConverter
   #
   # 返り値：正常終了 :success、エラー終了 :error、AozoraEpub3が見つからなかった nil
   #
-  def self.txt_to_epub(filename, use_dakuten_font = false, dst_dir = nil, device = nil)
+  def self.txt_to_epub(filename, use_dakuten_font = false, dst_dir = nil, device = nil, verbose = false)
     abs_srcpath = File.expand_path(filename)
     #cover_path = File.join(File.dirname(filename), "cover.jpg")
     cover_option = ""
@@ -127,14 +127,19 @@ class NovelConverter
 
     Dir.chdir(pwd)
 
+    if verbose
+      puts
+      puts "==== AozoraEpub3 stdout capture " + "=" * 47
+      puts stdout_capture.strip
+      puts "=" * 79
+    end
+
     error_list = stdout_capture.scan(/^(?:\[ERROR\]|エラーが発生しました :).+$/)
     warn_list = stdout_capture.scan(/^\[WARN\].+$/)
     info_list = stdout_capture.scan(/^\[INFO\].+$/)
     if !error_list.empty? || !warn_list.empty? || !info_list.empty?
       puts
-      puts error_list
-      puts warn_list
-      puts info_list
+      puts error_list, warn_list, info_list
       unless error_list.empty?
         # AozoraEpub3 のエラーにはEPUBが出力されないエラーとEPUBが出力されるエラーの2種類ある。
         # EPUBが出力される場合は「変換完了」という文字があるのでそれを検出する
@@ -154,7 +159,7 @@ class NovelConverter
   #
   # 返り値：正常終了 :success、エラー終了 :error、中断終了 :abort、kindlegenがなかった nil
   #
-  def self.epub_to_mobi(epub_path)
+  def self.epub_to_mobi(epub_path, verbose = false)
     kindlegen_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "kindlegen")
     if Dir.glob(kindlegen_path + "*").empty?
       warn "kindlegenが見つかりませんでした。AozoraEpub3と同じディレクトリにインストールして下さい"
@@ -171,6 +176,14 @@ class NovelConverter
     end
     stdout_capture, _, proccess_status = res
     stdout_capture.force_encoding(Encoding::UTF_8)
+
+    if verbose
+      puts
+      puts "==== kindlegen stdout capture " + "=" * 49
+      puts stdout_capture.gsub("\n\n", "\n").strip
+      puts "=" * 79
+    end
+
     if proccess_status.exited?
       if proccess_status.exitstatus == 2
         puts ""

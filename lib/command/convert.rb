@@ -65,6 +65,9 @@ module Command
       @opt.on("-i", "--inspect", "小説状態の調査結果を表示する") {
         @options["inspect"] = true
       }
+      @opt.on("-v", "--verbose", "AozoraEpub3, kindlegen の標準出力を全て表示します") {
+        @options["verbose"] = true
+      }
       @opt.separator <<-EOS
 
   Configuration:
@@ -172,7 +175,7 @@ module Command
     def convert_txt_to_ebook_file
       return false if @options["no-epub"]
       # epub
-      status = NovelConverter.txt_to_epub(@converted_txt_path, @use_dakuten_font, nil, @device)
+      status = NovelConverter.txt_to_epub(@converted_txt_path, @use_dakuten_font, nil, @device, @options["verbose"])
       return nil if status != :success
       if @device && @device.kobo?
         epub_ext = @device.ebook_file_ext
@@ -186,7 +189,7 @@ module Command
       end
 
       # mobi
-      status = NovelConverter.epub_to_mobi(epub_path)
+      status = NovelConverter.epub_to_mobi(epub_path, @options["verbose"])
       return nil if status != :success
       mobi_path = epub_path.sub(/\.epub$/, @device.ebook_file_ext)
 
