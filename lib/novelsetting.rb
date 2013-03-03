@@ -124,7 +124,7 @@ class NovelSetting
     {
       name: "kanji_num_with_units_lower_digit_zero",
       value: 2,
-      help: "〇(ゼロ)が最低この数字以上付いてないと千・万をつける対象にしない"
+      help: "〇(ゼロ)が最低この数字以上付いてないと千・万などをつける対象にしない"
     },
     {
       name: "enable_alphabet_force_zenkaku",
@@ -132,9 +132,9 @@ class NovelSetting
       help: "アルファベットを強制的に全角にする。falseの場合英文は半角、それ以外は全角になる"
     },
     {
-      name: "enable_hanji_sage",
+      name: "enable_half_indent_bracket",
       value: true,
-      help: "鍵カッコ等の半字下げを有効に(kindle paperwhite向け設定)"
+      help: "行頭鍵カッコに二分アキを挿入する"
     },
     {
       name: "enable_auto_indent",

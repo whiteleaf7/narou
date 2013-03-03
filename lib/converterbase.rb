@@ -63,13 +63,25 @@ class ConverterBase
   end
 
   #
+  # 数字の変換
+  #
+  def convert_numbers(data)
+    # 小数点を・に
+    data.gsub!(/([\d０-９#{KANJI_NUM}]+?)[\.．]([\d０-９#{KANJI_NUM}]+?)/, "\\1・\\2")
+    if @setting.enable_convert_num_to_kanji
+      num_to_kanji(data)
+    else
+      hankaku_num_to_zenkaku_num(data)
+    end
+    data
+  end
+
+  #
   # アラビア数字を漢数字に
   #
   # カンマ区切りの数字はアラビア数字のままにしておく
   #
   def num_to_kanji(data)
-    data.gsub!(/([\d０-９#{KANJI_NUM}]+?)[\.．]([\d０-９#{KANJI_NUM}]+?)/, "\\1・\\2")
-    return unless @setting.enable_convert_num_to_kanji
     data.gsub!(/[\d０-９,，]+/) do |match|
       if match =~ /[,，]/
         match
@@ -77,6 +89,7 @@ class ConverterBase
         zenkaku_num_to_kanji(match.tr("0-9", KANJI_NUM))
       end
     end
+    data
   end
 
   #
@@ -172,9 +185,7 @@ class ConverterBase
           rescue ArgumentError
             match
           else
-            buf = date.strftime(@setting.date_format)
-            num_to_kanji(buf)
-            buf
+            convert_numbers(date.strftime(@setting.date_format))
           end
         end
       else
@@ -184,7 +195,7 @@ class ConverterBase
   end
 
   #
-  # 特定の記号の直後は全角スペースを挿入する
+  # 特定の記号の直後は全角アキを挿入する
   #
   def insert_separate_space(data)
     data.gsub!(/([!?！？]+)([^!?！？])/) do
@@ -342,9 +353,7 @@ class ConverterBase
   #
   def rebuild_english_sentences(data)
     @english_sentences.each_with_index do |sentence, id|
-      buf = id.to_s
-      num_to_kanji(buf)
-      data.sub!("［＃英文＝#{buf}］", sentence)
+      data.sub!("［＃英文＝#{convert_numbers(id.to_s)}］", sentence)
     end
   end
 
@@ -374,17 +383,27 @@ class ConverterBase
   def zenkaku_num_to_hankaku_num(num)
     num.tr("０-９#{KANJI_NUM}", "0-90-9")
   end
+
+  #
+  # ３桁以上の半角数字を全角アラビア数字に
+  #
+  def hankaku_num_to_zenkaku_num(data)
+    data.gsub!(/\d{3,}/) do |num|
+      num.tr("0-9", "０-９")
+    end
+    data
+  end
   
   HALF_INDENT_TARGET = /^[ 　\t]*([「『(（【〈《≪])/
   FULL_INDENT_TARGET = /^[ 　\t]*(――)/
   #
-  # 半字下げ
+  # 行頭鍵カッコ(等)に二分アキを追加する
   #
-  # 「や（などの前にカスタム注記（［＃半字下げ］）を追加し、半文字分字下げする
+  # 「や（などの前にカスタム注記（［＃二分アキ］）を追加し、半文字分字下げする(二分アキ)。
   # kindle paperwhite で鍵括弧のインデントがおかしいことへの対応
   #
-  def hanji_sage(data)
-    data.gsub!(HALF_INDENT_TARGET, "［＃半字下げ］\\1") if @setting.enable_hanji_sage
+  def half_indent_bracket(data)
+    data.gsub!(HALF_INDENT_TARGET, "［＃二分アキ］\\1") if @setting.enable_half_indent_bracket
   end
 
   #
@@ -711,10 +730,8 @@ class ConverterBase
 
   def rebuild_url(data)
     @url_list.each_with_index do |url, id|
-      buf = id.to_s
-      num_to_kanji(buf)
-      data.sub!("［＃ＵＲＬ＝#{buf}］", "［＃リンク開始］#{url}［＃リンクアドレスここまで］#{url}［＃リンク終了］")
-      
+      data.sub!("［＃ＵＲＬ＝#{convert_numbers(id.to_s)}］",
+                "［＃リンク開始］#{url}［＃リンクアドレスここまで］#{url}［＃リンク終了］")
     end
   end
 
@@ -737,9 +754,7 @@ class ConverterBase
 
   def rebuild_illust(data)
     @illust_chuki_list.each_with_index do |chuki, id|
-      buf = id.to_s
-      num_to_kanji(buf)
-      data.sub!("［＃挿絵＝#{buf}］", chuki)
+      data.sub!("［＃挿絵＝#{convert_numbers(id.to_s)}］", chuki)
     end
   end
 
@@ -811,7 +826,7 @@ class ConverterBase
     replace_narou_tag(data)
     convert_rome_numeric(data)
     alphabet_to_zenkaku(data, @setting.enable_alphabet_force_zenkaku)
-    num_to_kanji(data)
+    convert_numbers(data)
     exception_reconvert_kanji_to_num(data)
     if @setting.enable_kanji_num_with_units
       convert_kanji_num_with_unit(data, @setting.kanji_num_with_units_lower_digit_zero)
@@ -820,7 +835,7 @@ class ConverterBase
     convert_special_characters(data)
     convert_fraction_and_date(data)
     if text_type == "body" || text_type == "textfile"
-      hanji_sage(data)
+      half_indent_bracket(data)
       auto_indent(data)
     end
     convert_dakuten_char_to_font(data)

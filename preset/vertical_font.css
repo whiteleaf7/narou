@@ -25,8 +25,8 @@ body {
 	font-family: "DakutenAokinMincho" !important;
 }
 
-/* 半字下げ */
-.custom_hanji { text-indent: 0.5em; }
+/* 二分アキ */
+.half_em_space { text-indent: 0.5em; }
 
 /* パラメーター（折り返しあり） */
 .custom_parameter_block {

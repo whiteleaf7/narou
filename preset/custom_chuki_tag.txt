@@ -1,7 +1,7 @@
 ### Narou.rb embedded custom chuki ###
 
 ####カスタム注記
-半字下げ	<div class="custom_hanji">	</div>	1
+二分アキ	<div class="half_em_space">	</div>	1
 一字下げ	<div class="pt1">	</div>	1
 二字下げ	<div class="pt2">	</div>	1
 三字下げ	<div class="pt3">	</div>	1
