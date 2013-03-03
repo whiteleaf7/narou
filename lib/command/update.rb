@@ -17,6 +17,7 @@ module Command
     IDは #{@opt.program_name} list を参照して下さい。
   ・対象を指定しなかった場合、すべての小説の更新をチェックします。
   ・一度に複数の小説を指定する場合は空白で区切って下さい。
+  ・全て更新する場合、convert.no-openが設定されていなくても保存フォルダは開きません。
 
   Example:
     narou update               # 全て更新
@@ -34,10 +35,12 @@ module Command
     def execute(argv)
       super
       update_target_list = argv.dup
+      no_open = false
       if update_target_list.empty?
         Database.instance.each do |id, _|
           update_target_list << id
         end
+        no_open = true
       end
       update_target_list.each_with_index do |target, i|
         display_message = nil
@@ -59,7 +62,7 @@ module Command
         is_updated = Downloader.start(target)
         if is_updated
           unless @options["no-convert"]
-            Convert.execute_and_rescue_exit([target])
+            Convert.execute_and_rescue_exit([target, (no_open ? "--no-open" : "")])
           end
         else
           puts "#{data["title"]} に更新はありません"
