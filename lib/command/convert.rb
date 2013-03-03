@@ -95,7 +95,7 @@ module Command
         return
       end
       @output_filename = @options["output"]
-      if @output_filename && argv.length > 1
+      if @output_filename
         @ext = File.extname(@output_filename)
         @basename = File.basename(@output_filename, @ext)
       else
@@ -115,10 +115,14 @@ module Command
     def convert_novels(argv)
       argv.each.with_index(1) do |target, i|
         Helper.print_horizontal_rule if i > 1
-        @output_filename = @basename ? "#{@basename} (#{i})#{@ext}" : nil
+        if @basename
+          @basename << " (#{i})" if argv.length > 1
+          @output_filename = @basename + @ext
+        end
+
         if File.file?(target.to_s)
           @argument_target_type = :file
-          res = convert_txt(target) or next
+          res = convert_txt(target)
         else
           @argument_target_type = :novel
           unless Downloader.novel_exists?(target)
