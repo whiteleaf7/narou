@@ -86,16 +86,26 @@ class ConverterBase
     str.tr("０-９", KANJI_NUM)
   end
 
-  KANJI_NUM_UNITS = %w(万 億 兆 京 垓).unshift("")
+  KANJI_NUM_UNITS = %w(万 億 兆 京).unshift("")
   KANJI_KURAI = %w(十 百 千).unshift("")
+  KANJI_NUM_UNITS_DIGIT = {
+    "十" => 1, "百" => 2, "千" => 3, "万" => 4, "億" => 8, "兆" => 12, "京" => 16
+  }
   #
   # 漢数字を単位を使った表現に変換
   #
+  # ８００万１０００ といったような表現は、内部一度で 8001000 に変換する。
+  # lower_digit_zero はこの最後の 000 に適用される
+  #
   def convert_kanji_num_with_unit(data, lower_digit_zero = 0)
-    data.gsub!(/([#{KANJI_NUM}]+)([十百千万億兆京垓]?)/) do |match|
-      next match unless $2.empty?
-      m1 = $1
-      if m1 =~ /^[一二三四五六七八九]+〇{#{lower_digit_zero},}$/
+    #data.gsub!(/([#{KANJI_NUM}]+)([十百千万億兆京]?)/) do |match|
+    data.gsub!(/([#{KANJI_NUM}十百千万億兆京]+)/) do |match|
+      total = 0
+      $1.scan(/([#{KANJI_NUM}]+)([十百千万億兆京]*)/) do |num, units|
+        total += (num.tr(KANJI_NUM, "0-9") + units.each_char.map { |c| "0" * KANJI_NUM_UNITS_DIGIT[c] }.join).to_i
+      end
+      m1 = total.to_s.tr("0-9", KANJI_NUM)
+      if m1 =~ /〇{#{lower_digit_zero},}$/
         digits = m1.reverse.scan(/.{1,4}/).map(&:reverse).reverse   # 下の桁から4桁ずつ区切った配列を作成
         keta = digits.count - 1
         digits.map.with_index { |nums, keta_i|
