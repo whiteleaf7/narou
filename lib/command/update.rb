@@ -42,12 +42,11 @@ module Command
       update_target_list.each_with_index do |target, i|
         display_message = nil
         data = Downloader.get_data_by_target(target)
-        title = data["title"]
         if !data
-          display_message = "#{target} は存在しません"
+          display_message = "#{target} は管理小説の中に存在しません"
         elsif Narou.novel_frozen?(target)
           if argv.length > 0
-            display_message = "#{title} は凍結中です"
+            display_message = "#{data["title"]} は凍結中です"
           else
             next
           end
@@ -63,7 +62,7 @@ module Command
             Convert.execute_and_rescue_exit([target])
           end
         else
-          puts "#{title} に更新はありません"
+          puts "#{data["title"]} に更新はありません"
         end
       end
     rescue Interrupt
