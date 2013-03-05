@@ -6,7 +6,7 @@
 require_relative "converterbase"
 require_relative "helper"
 
-class Converter < ConverterBase; end   # deprecated
+BlankConverter = Class.new(ConverterBase) {}
 
 $converter_container = {}
 
@@ -66,24 +66,14 @@ def load_converter(title, archive_path)
       require converter_path
     end
   else
-    return Class.new(ConverterBase) {}
+    return BlankConverter
   end
   conv = $converter_container[title]
   if conv
     return conv
   else
-    # deprecated
-    warn "[DEPRECATED] converter.rb の書式が古いので新しい書式に書き換えました"
-    renewal_deprecated_converter(title, converter_path)
-    return Class.new(Converter) {}
+    warn "converter.rbは見つかりましたが、`converter'で登録されていないようです。" +
+         "変換処理は converter \"#{title}\" として登録する必要があります"
+    return BlankConverter
   end
-end
-
-# 書式の古い converter.rb を書き換える
-def renewal_deprecated_converter(title, converter_path)
-  src = open(converter_path, "r:BOM|UTF-8") { |fp| fp.read }
-  src.gsub!("class Converter < ConverterBase", %!converter "#{title}" do!)
-  src.gsub!("def before_convert", "def before")
-  src.gsub!("def after_convert", "def after")
-  File.write(converter_path, src)
 end
