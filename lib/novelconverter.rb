@@ -247,7 +247,8 @@ class NovelConverter
   # 変換処理メイン
   #
   def convert_main(text = nil)
-    puts "ID:#{@novel_id}　#{@novel_title} の変換を開始"
+    print "ID:#{@novel_id}　" if @novel_id
+    puts "#{@novel_title} の変換を開始"
     sections = []
     @cover_chuki = create_cover_chuki
 
