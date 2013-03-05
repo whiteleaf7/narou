@@ -528,7 +528,6 @@ class ConverterBase
     pos = @read_fp.pos
     result = false
     @read_fp.each do |line|
-      p line
       break if page_break?(line)
       if line =~ AUTHOR_INTRODUCTION_SPLITTER
         result = true
@@ -536,7 +535,6 @@ class ConverterBase
       end
     end
     @read_fp.pos = pos
-    p result
     result
   end
 
