@@ -41,6 +41,7 @@ class ConverterBase
     @english_sentences = []
     @url_list = []
     @illust_chuki_list = []
+    @in_author_comment_block = nil
   end
 
   def outputs(data = "", force = false)
@@ -59,7 +60,7 @@ class ConverterBase
   # すべての行の行末空白を削除
   #
   def rstrip_all_lines(data)
-    data.gsub(/^[ 　\t]+$/m, "")
+    data.gsub(/[ 　\t]+$/m, "")
   end
 
   #
@@ -473,7 +474,7 @@ class ConverterBase
   #
   # 改ページある？
   #
-  def kai_page?(line)
+  def page_break?(line)
     line =~ /［＃改ページ］/
   end
 
@@ -481,8 +482,8 @@ class ConverterBase
   # 前書き・後書きの検出及び処理 ==============================
   #
 
-  AUTHOR_INTRODUCTION_SPLITTER = /^[\*＊]{44}$/
-  AUTHOR_POSTSCRIPT_SPLITTER = /^[\*＊]{48}$/
+  AUTHOR_INTRODUCTION_SPLITTER = /^　*[\*＊]{44}$/
+  AUTHOR_POSTSCRIPT_SPLITTER = /^　*[\*＊]{48}$/
   AUTHOR_COMMENT_CHUKI = {
     introduction: {
       open: "［＃ここから前書き］", close: "［＃ここで前書き終わり］"
@@ -494,17 +495,7 @@ class ConverterBase
 
   def process_author_comment(line)
     if @setting.enable_author_comments
-      unless @in_author_comment_block
-        if inclusion_author_comment_block?(line)
-          # outputs を使うと改ページより前に注記が入ってしまうため、
-          # delay_outputs を使って出力を line 出力の後に遅らせる
-          delay_outputs(AUTHOR_COMMENT_CHUKI[@in_author_comment_block][:open]) 
-          if @in_author_comment_block == :postscript
-            @request_skip_output_line = true
-            line.clear
-          end
-        end
-      else
+      if @in_author_comment_block
         if leave_author_comment_block?(line)
           outputs(AUTHOR_COMMENT_CHUKI[@in_author_comment_block][:close])
           if @in_author_comment_block == :introduction
@@ -518,6 +509,16 @@ class ConverterBase
             process_author_comment(line)
           end
         end
+      else
+        if inclusion_author_comment_block?(line)
+          # outputs を使うと改ページより前に注記が入ってしまうため、
+          # delay_outputs を使って出力を line 出力の後に遅らせる
+          delay_outputs(AUTHOR_COMMENT_CHUKI[@in_author_comment_block][:open]) 
+          if @in_author_comment_block == :postscript
+            @request_skip_output_line = true
+            line.clear
+          end
+        end
       end
     end
   end
@@ -527,19 +528,21 @@ class ConverterBase
     pos = @read_fp.pos
     result = false
     @read_fp.each do |line|
-      break if kai_page?(line)
+      p line
+      break if page_break?(line)
       if line =~ AUTHOR_INTRODUCTION_SPLITTER
         result = true
         break
       end
     end
     @read_fp.pos = pos
+    p result
     result
   end
 
   def inclusion_author_comment_block?(line)
     result = false
-    if kai_page?(line)
+    if page_break?(line)
       if find_introduction?
         @in_author_comment_block = :introduction
         result = true
@@ -559,7 +562,7 @@ class ConverterBase
         result = true
       end
     when :postscript
-      if kai_page?(line)
+      if page_break?(line)
         result = true
       end
     end
@@ -715,7 +718,7 @@ class ConverterBase
   # 全角版 String#rstrip!
   #
   def zenkaku_rstrip(line)
-    line.gsub!(/[　\s]*$/, "")
+    line.gsub!(/[　\s]+\z/, "")
   end
 
   #
@@ -763,7 +766,7 @@ class ConverterBase
   #
   def enchant_midashi(data)
     def midashi(str)
-      midashi_title = str.gsub("［＃半字下げ］", "")
+      midashi_title = str.gsub("［＃半字下げ］", "").gsub(/^[　\s]+/, "").gsub(/[　\s]+$/, "")
       @inspector.subtitle = midashi_title
       "［＃３字下げ］［＃ここから中見出し］#{midashi_title}［＃ここで中見出し終わり］"
     end
@@ -886,23 +889,21 @@ class ConverterBase
       progressbar.output(i) if text_type == "textfile"
       @request_skip_output_line = false
       zenkaku_rstrip(line)
-      if !comments_block?(line)
-        if @request_insert_blank_next_line
-          outputs unless blank_line?(line)
-          @request_insert_blank_next_line = false
-        end
-        process_author_comment(line) if text_type == "textfile"
-        insert_blank_line_to_border_symbol(line)
-        force_indent_special_chapter(line)
+      if @request_insert_blank_next_line
+        outputs unless blank_line?(line)
+        @request_insert_blank_next_line = false
+      end
+      process_author_comment(line) if text_type == "textfile"
+      insert_blank_line_to_border_symbol(line)
+      force_indent_special_chapter(line)
 
-        outputs(line)
-        unless @delay_outputs_buffer.empty?
-          @write_fp.write(@delay_outputs_buffer)
-          @before_line = @delay_outputs_buffer
-          @delay_outputs_buffer = ""
-        else
-          @before_line = line
-        end
+      outputs(line)
+      unless @delay_outputs_buffer.empty?
+        @write_fp.write(@delay_outputs_buffer)
+        @before_line = @delay_outputs_buffer
+        @delay_outputs_buffer = ""
+      else
+        @before_line = line
       end
     end
     author_comment_force_close if text_type == "textfile"
