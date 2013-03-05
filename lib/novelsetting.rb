@@ -27,7 +27,7 @@ class NovelSetting
   end
 
   def initialize(archive_path)
-    @archive_path = archive_path
+    @archive_path = File.expand_path(archive_path)
     load_settings
     set_attribute
     load_replace_pattern
