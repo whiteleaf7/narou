@@ -4,6 +4,7 @@ name: ノクターン・ムーンライト
 domain: http://novel18.syosetu.com
 url: \\k<domain>/(?<ncode>n\d+[a-z]+)
 encoding: UTF-8
+confirm_over18: yes
 
 # ------------------------------------------------------------
 # 書籍情報取得設定

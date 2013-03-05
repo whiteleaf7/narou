@@ -273,6 +273,23 @@ class Downloader
   end
 
   #
+  # 18歳以上か確認する
+  #
+  def confirm_over18?
+    global_setting = GlobalSetting.get["global_setting"]
+    if global_setting.include?("over18")
+      return global_setting["over18"]
+    end
+    if Helper.confirm("年齢認証：あなたは18歳以上ですか")
+      global_setting["over18"] = true
+      GlobalSetting.get.save_settings
+      return true
+    else
+      return false
+    end
+  end
+
+  #
   # ダウンロード処理本体
   #
   # force が true なら全話強制ダウンロード
@@ -283,6 +300,12 @@ class Downloader
     unless latest_toc
       warn "目次データが取得出来ませんでした"
       exit 1
+    end
+    if @setting["confirm_over18"]
+      unless confirm_over18?
+        puts "18歳以上のみ閲覧出来る小説です。ダウンロードを中止しました"
+        return false
+      end
     end
     old_toc = load_novel_data(TOC_FILE_NAME)
     unless old_toc
