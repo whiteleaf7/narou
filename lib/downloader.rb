@@ -56,8 +56,8 @@ class Downloader
         return false
       end
     end
-    downloader = Downloader.new(setting)
-    result = downloader.start_download(force)
+    downloader = Downloader.new(setting, force)
+    result = downloader.start_download
     setting.clear
     result
   end
@@ -267,8 +267,10 @@ class Downloader
   #
   # コンストラクタ
   #
-  def initialize(site_setting)
+  def initialize(site_setting, force = false)
     @setting = site_setting
+    @force = force
+    @cache_dir = nil
     @id = @@database.get_id("toc_url", @setting["toc_url"]) || @@database.get_new_id
   end
 
@@ -292,10 +294,9 @@ class Downloader
   #
   # ダウンロード処理本体
   #
-  # force が true なら全話強制ダウンロード
   # 返り値：ダウンロードしたものが１話でもあったかどうか(Boolean)
   #
-  def start_download(force = false)
+  def start_download
     latest_toc = get_latest_table_of_contents
     unless latest_toc
       warn "目次データが取得出来ませんでした"
@@ -312,7 +313,7 @@ class Downloader
       init_novel_dir
       old_toc = {}
     end
-    if force
+    if @force
       update_subtitles = latest_toc["subtitles"]
     else
       update_subtitles = update_check(old_toc["subtitles"], latest_toc["subtitles"])
@@ -322,7 +323,7 @@ class Downloader
       begin
         sections_download_and_save(update_subtitles)
       rescue Interrupt
-        FileUtils.remove_entry_secure(@cache_dir) if @cache_dir
+        remove_cache_dir
         puts "ダウンロードを中断しました"
         exit 1
       end
@@ -343,6 +344,13 @@ class Downloader
     cache_dir = File.join(get_novel_data_dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME, name)
     FileUtils.mkdir_p(cache_dir)
     cache_dir
+  end
+
+  #
+  # 差分用キャッシュ保存ディレクトリを削除
+  #
+  def remove_cache_dir
+    FileUtils.remove_entry_secure(@cache_dir) if @cache_dir
   end
 
   #
@@ -456,6 +464,7 @@ class Downloader
     puts "ID:#{@id}　#{@title} のDL開始"
     interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"] || 0
     interval_sleep_time = 0 if interval_sleep_time < 0
+    save_least_one = false
     subtitles.each_with_index do |subtitle_info, i|
       if @setting["domain"] =~ /syosetu.com/ && (i % 10 == 0 && i >= 10)
         # MEMO:
@@ -467,14 +476,32 @@ class Downloader
         sleep(interval_sleep_time) if i > 0
       end
       index, subtitle, file_subtitle  = %w(index subtitle file_subtitle).map {|k| subtitle_info[k] }
-      puts "第#{index}部分　#{subtitle} (#{i+1}/#{max})"
+      print "第#{index}部分　#{subtitle} (#{i+1}/#{max})"
       section_element = a_section_download(subtitle_info)
       info = subtitle_info.dup
       info["element"] = section_element
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
-      move_to_cache_dir(section_file_path)
-      save_novel_data(section_file_path, info)
+      if different_section?(section_file_path, info)
+        print " (更新あり)" if @force
+        move_to_cache_dir(section_file_path)
+        save_novel_data(section_file_path, info)
+        save_least_one = true
+      end
+      puts
+    end
+    remove_cache_dir unless save_least_one
+  end
+
+  #
+  # すでに保存されている内容とDLした内容が違うかどうか
+  #
+  def different_section?(relative_path, subtitle_info)
+    path = File.join(get_novel_data_dir, relative_path)
+    if File.exists?(path)
+      return YAML.load_file(path) != subtitle_info
+    else
+      return true
     end
   end
 
