@@ -13,10 +13,5 @@
 ここで後書き終わり	</div><div class="clear"></div>		1
 濁点	<span class="dakuten">
 濁点終わり	</span>
-リンク開始	<a href="
-リンクアドレスここまで	">
-リンク終了	</a>
-ここからキンドル左右中央	<div class="kindle_outer"><div class="kindle_inner">		1
-ここでキンドル左右中央終わり	</div></div>		1
 
 ### Narou.rb embedded custom chuki ###

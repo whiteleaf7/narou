@@ -6,24 +6,18 @@
 ［＃区切り線］
 <%= toc["story"] %>
 
-掲載ページ: ［＃リンク開始］<%= toc["toc_url"] %>［＃リンクアドレスここまで］<%= toc["toc_url"] %>［＃リンク終了］
+掲載ページ: <a href="<%= toc["toc_url"] %>"><%= toc["toc_url"] %></a>
 ［＃区切り線］
 
 <% sections.each_with_index do |section, i| -%>
 ［＃改ページ］
 <% if section["chapter"] != "" -%>
 ［＃ページの左右中央］
-<% if device && device.name == "Kindle" -%>
-［＃ここからキンドル左右中央］
-<% end -%>
 <%= toc["title"] %>
 
 ［＃ここから大見出し］<%= section["chapter"] %>［＃ここで大見出し終わり］
 　
 　
-<% if device && device.name == "Kindle" -%>
-［＃ここでキンドル左右中央終わり］
-<% end -%>
 ［＃改ページ］
 <% end -%>
 ［＃３字下げ］［＃ここから中見出し］<%= section["subtitle"].rstrip %>［＃ここで中見出し終わり］
