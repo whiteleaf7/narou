@@ -642,6 +642,36 @@ class ConverterBase
     #data.gsub!(/[^。…―－\-」』)）>＞］\]〉》】〕｝\}0-9０-９]/
   end
 
+  #
+  # 小説家になろうのルビ対策
+  #
+  # TODO:
+  # 既知の問題―同一行にルビ開始文字でない｜と、ルビ開始用｜が同時に存在するとき、
+  # ルビ開始文字でない｜が［＃縦線］に置換されない
+  # →存在するかも疑わしいパターンなため、仕様とする
+  #
+  def narou_ruby(data)
+    # 《》なルビの対処
+    last_i = 0
+    ruby_stack = {}
+    data.gsub!(/(.+?)≪(.+?)≫/).with_index do |match, i|
+      ruby_str = to_ruby(match, $1, $2, ["≪", "≫"])
+      last_i = i
+      ruby_stack[i] = ruby_str
+      "［＃ルビ＝#{i}］"
+    end
+    # （）なルビの対処
+    data.gsub!(/(.+?)（([ぁ-んァ-ヴーゞ・Ａ-Ｚａ-ｚA-Za-z]{,20})）/).with_index(last_i + 1) do |match, i|
+      ruby_str = to_ruby(match, $1, $2, ["（", "）"])
+      ruby_stack[i] = ruby_str
+      "［＃ルビ＝#{i}］"
+    end
+    data.replace(replace_tatesen(data))
+    data.gsub!(/［＃ルビ＝(\d+)］/) do
+      ruby_stack[$1.to_i]
+    end
+  end
+
   def object_of_ruby?(char)
     char =~ /[一-龠Ａ-Ｚａ-ｚA-Za-z]/
   end
@@ -658,57 +688,19 @@ class ConverterBase
     str.gsub("｜", "※［＃縦線］")
   end
 
-  #
-  # 小説家になろうのルビ対策
-  #
-  # TODO:
-  # 既知の問題―同一行にルビ開始文字でない｜と、ルビ開始用｜が同時に存在するとき、
-  # ルビ開始文字でない｜が［＃縦線］に置換されない
-  # →存在するかも疑わしいパターンなため、仕様とする
-  #
-  def narou_ruby(data)
-    # 《》なルビの対処
-    last_i = 0
-    ruby_stack = {}
-    data.gsub!(/(.+?)≪(.+?)≫/).with_index do |match, i|
-      m1, m2 = $1, $2
-      ruby_str = case
-      when m2 =~ /^・+$/
-        # ルビが・だけの場合、傍点と判断
-        sesame(m1, m2)
-      when m1.include?("｜"), object_of_ruby?(m1[-1])
-        "#{m1}《#{m2}》"
-      else
-        replace_tatesen(match)
-      end
-      last_i = i
-      ruby_stack[i] = ruby_str
-      "［＃ルビ＝#{i}］"
-    end
-    # （）なルビの対処
-    data.gsub!(/(.+?)（([ぁ-んァ-ヴーゞ・Ａ-Ｚａ-ｚA-Za-z]{,20})）/).with_index(last_i + 1) do |match, i|
-      m1, m2 = $1, $2
-      last_char = m1[-1]
-      ruby_str = case
-      when last_char == "｜"
-        # （の直前に｜がある場合ルビ化は抑制される
-        "#{m1[0...-1]}（#{m2}）"
-      when m2 =~ /^・+$/
-        # ルビが・だけの場合、傍点と判断
-        sesame(m1, m2)
-      when m1.include?("｜"), object_of_ruby?(last_char)
-        "#{m1}《#{m2}》"
-      else
-        replace_tatesen(match)
-      end
-      ruby_stack[i] = ruby_str
-      "［＃ルビ＝#{i}］"
-    end
-    data.replace(replace_tatesen(data))
-    2.times do
-      data.gsub!(/［＃ルビ＝(\d+)］/) do
-        ruby_stack[$1.to_i]
-      end
+  def to_ruby(match, m1, m2, openclose_symbols)
+    last_char = m1[-1]
+    case
+    when last_char == "｜"
+      # 直前に｜がある場合ルビ化は抑制される
+      "#{m1[0...-1]}#{openclose_symbols[0]}#{m2}#{openclose_symbols[1]}"
+    when m2 =~ /^・+$/
+      # ルビが・だけの場合、傍点と判断
+      sesame(m1, m2)
+    when m1.include?("｜"), object_of_ruby?(last_char)
+      "#{m1}《#{m2}》"
+    else
+      replace_tatesen(match)
     end
   end
 
