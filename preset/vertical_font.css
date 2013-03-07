@@ -17,6 +17,14 @@ rt { font-size: 0.6em; }
 
 /* カスタム注記用 */
 
+/* 柱（もどき） */
+.running_head {
+	position: absolute !important;
+	top: 0;
+	left: 0;
+	font-size: 0.8em;
+}
+
 /* 濁点フォント */
 @font-face {
 	font-family: "DakutenAokinMincho";

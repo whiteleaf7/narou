@@ -13,5 +13,7 @@
 ここで後書き終わり	</div><div class="clear"></div>		1
 濁点	<span class="dakuten">
 濁点終わり	</span>
+ここから柱	<div class="running_head yoko">		1
+ここで柱終わり	</div>		1
 
 ### Narou.rb embedded custom chuki ###
