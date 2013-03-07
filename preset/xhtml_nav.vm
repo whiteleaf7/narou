@@ -97,7 +97,8 @@ li a {text-decoration:none; border-bottom-width:1px; border-bottom-style:solid; 
 #end
 #end
 #if (${navNest})
-#foreach (${end} in [${nest_level}..0])
+#set ($tag_close_count=$nest_level - 1)
+#foreach (${n} in [${tag_close_count}..0])
 			</li>
 			</ol>
 #end
