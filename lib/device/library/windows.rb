@@ -3,17 +3,18 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require "dl/import"
+require "fiddle"
 require "win32ole"
 
 module WinAPI
+  include Fiddle
   class InvalidOS < StandardError; end
-  extend DL::Importer
-  begin
-    dlload "kernel32"
-    extern "long GetLogicalDriveStrings(long, void*)"
-  rescue DL::DLError
-    raise InvalidOS, "not Windows"
+  Handle = RUBY_VERSION >= "2.0.0" ? Fiddle::Handle : DL::Handle
+
+  def self.GetLogicalDriveStrings(buf_size, buffer)
+    @@get_logical_drive_strings ||= Function.new(Handle.new("kernel32")["GetLogicalDriveStrings"],
+                                                 [TYPE_LONG, TYPE_VOIDP], TYPE_LONG)
+    @@get_logical_drive_strings.call(buf_size, buffer)
   end
 end
 
