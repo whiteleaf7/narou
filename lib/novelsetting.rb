@@ -134,7 +134,7 @@ class NovelSetting
     {
       name: "enable_half_indent_bracket",
       value: true,
-      help: "行頭鍵カッコに二分アキを挿入する"
+      help: "行頭かぎ括弧に二分アキを挿入する"
     },
     {
       name: "enable_auto_indent",
@@ -144,12 +144,12 @@ class NovelSetting
     {
       name: "enable_auto_join_in_brackets",
       value: true,
-      help: "鍵カッコ内自動連結を有効に\n例)\n「～～～！\n　＊＊＊？」  → 「～～～！　＊＊＊？」"
+      help: "かぎ括弧内自動連結を有効に\n例)\n「～～～！\n　＊＊＊？」  → 「～～～！　＊＊＊？」"
     },
     {
       name: "enable_inspect_invalid_openclose_brackets",
       value: true,
-      help: "鍵カッコ内のとじ開きが正しくされているかどうか調査する"
+      help: "かぎ括弧内のとじ開きが正しくされているかどうか調査する"
     },
     {
       name: "enable_auto_join_line",

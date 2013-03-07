@@ -103,7 +103,7 @@ class Inspector
   end
 
   #
-  # 連結した鍵カッコが正常かどうか
+  # 連結したかぎ括弧が正常かどうか
   #
   def validate_joined_inner_brackets(raw_strings, joined_strings, brackets)
     error_result = false
@@ -117,7 +117,7 @@ class Inspector
     # 連結した文章があまりにも長い場合、特殊な用途で使われている可能性がある
     when joined_strings.length >= LINE_LENGTH_THRESHOLD
       warning("連結結果が長過ぎます。連結を中止しました。" +
-              "特殊な用途(手紙形式)等で鍵カッコが使われている可能性があります。\n" +
+              "特殊な用途(手紙形式)等でかぎ括弧が使われている可能性があります。\n" +
             omit_message(raw_strings))
       error_result = true
     end
@@ -125,7 +125,7 @@ class Inspector
   end
 
   #
-  # 鍵カッコのとじ開きの異常部分を調査
+  # かぎ括弧のとじ開きの異常部分を調査
   #
   def inspect_invalid_openclose_brackets(data, brackets, stack)
     brackets.each do |bracket|
@@ -135,7 +135,7 @@ class Inspector
         match_after = $'.dup
         before = ConverterBase.rebuild_brackets(match_before, stack)
         after = ConverterBase.rebuild_brackets(match_after, stack)
-        error("鍵カッコ(#{bracket})が正しく閉じていません。\n" +
+        error("かぎ括弧(#{bracket})が正しく閉じていません。\n" +
               omit_message((before[-15..-1] || before) + bracket + after))
         buffer = match_before
       end

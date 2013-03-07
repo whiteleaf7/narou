@@ -398,7 +398,7 @@ class ConverterBase
   HALF_INDENT_TARGET = /^[ 　\t]*([「『(（【〈《≪])/
   FULL_INDENT_TARGET = /^[ 　\t]*(――)/
   #
-  # 行頭鍵カッコ(等)に二分アキを追加する
+  # 行頭かぎ括弧(等)に二分アキを追加する
   #
   # 「や（などの前にカスタム注記（［＃二分アキ］）を追加し、半文字分字下げする(二分アキ)。
   # kindle paperwhite で鍵括弧のインデントがおかしいことへの対応
@@ -577,7 +577,7 @@ class ConverterBase
 
   BRACKETS = [%w(「 」), %w(『 』)]
 
-  # ネストに対応した鍵カッコの正規表現
+  # ネストに対応したかぎ括弧の正規表現
   OPENCLOSE_REGEXPS = BRACKETS.map { |bracket|
     bo, bc = bracket
     /(?<oc>#{bo}[^#{bo+bc}]*(?:\g<oc>[^#{bo+bc}]*)*#{bc})/m
@@ -599,7 +599,7 @@ class ConverterBase
   end
 
   #
-  # 鍵カッコ内自動連結
+  # かぎ括弧内自動連結
   #
   def auto_join_in_brackets(data)
     if !@setting.enable_auto_join_in_brackets && !@setting.enable_inspect_invalid_openclose_brackets
@@ -615,10 +615,10 @@ class ConverterBase
         else
           stack[j] = match
         end
-        "［＃鍵カッコ＝#{j}］"
+        "［＃かぎ括弧＝#{j}］"
       end
       if @setting.enable_inspect_invalid_openclose_brackets
-        # 正しく閉じてない鍵カッコだけが data に残ってる
+        # 正しく閉じてないかぎ括弧だけが data に残ってる
         @inspector.inspect_invalid_openclose_brackets(data, BRACKETS[i], stack)
       end
       data.replace(ConverterBase.rebuild_brackets(data, stack))
@@ -626,7 +626,7 @@ class ConverterBase
   end
 
   def self.rebuild_brackets(data, stack)
-    data.gsub(/［＃鍵カッコ＝(\d+)］/) do
+    data.gsub(/［＃かぎ括弧＝(\d+)］/) do
       stack[$1.to_i]
     end
   end
