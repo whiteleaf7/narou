@@ -724,7 +724,7 @@ class ConverterBase
   def rebuild_url(data)
     @url_list.each_with_index do |url, id|
       data.sub!("［＃ＵＲＬ＝#{convert_numbers(id.to_s)}］",
-                "［＃リンク開始］#{url}［＃リンクアドレスここまで］#{url}［＃リンク終了］")
+                "<a href=\"#{url}\">#{url}</a>")
     end
   end
 
