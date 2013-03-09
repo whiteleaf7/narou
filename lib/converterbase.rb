@@ -313,7 +313,7 @@ class ConverterBase
     # 原則偶数個を１セットで使うべき文字を偶数個に補正
     # MEMO:（―も偶数個セットにするべきだが、記号的な意味で使われる場合もあるので無視）
     %w(…).each do |target|
-      data.gsub!(/#{target}{3,}/) do |match|
+      data.gsub!(/#{target}+/) do |match|
         len = match.length
         len += 1 if len.odd?
         target * len
