@@ -62,7 +62,9 @@ module Command
         is_updated = Downloader.start(target)
         if is_updated
           unless @options["no-convert"]
-            Convert.execute_and_rescue_exit([target, (no_open ? "--no-open" : "")])
+            convert_argv = [target]
+            convert_argv << "--no-open" if no_open
+            Convert.execute_and_rescue_exit(convert_argv)
           end
         else
           puts "#{data["title"]} に更新はありません"
