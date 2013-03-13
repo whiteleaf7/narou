@@ -3,18 +3,35 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require "fiddle"
 require "win32ole"
 
-module WinAPI
-  include Fiddle
-  class InvalidOS < StandardError; end
-  Handle = RUBY_VERSION >= "2.0.0" ? Fiddle::Handle : DL::Handle
+class InvalidOS < StandardError; end
 
-  def self.GetLogicalDriveStrings(buf_size, buffer)
-    @@get_logical_drive_strings ||= Function.new(Handle.new("kernel32")["GetLogicalDriveStrings"],
-                                                 [TYPE_LONG, TYPE_VOIDP], TYPE_LONG)
-    @@get_logical_drive_strings.call(buf_size, buffer)
+begin
+  require "fiddle"
+
+  module WinAPI
+    include Fiddle
+    Handle = RUBY_VERSION >= "2.0.0" ? Fiddle::Handle : DL::Handle
+
+    def self.GetLogicalDriveStrings(buf_size, buffer)
+      @@get_logical_drive_strings ||= Function.new(Handle.new("kernel32")["GetLogicalDriveStrings"],
+      [TYPE_LONG, TYPE_VOIDP], TYPE_LONG)
+      @@get_logical_drive_strings.call(buf_size, buffer)
+    end
+  end
+rescue LoadError
+  # Fiddle がない環境用(http://www.artonx.org/data/asr/ の1.9.3とか)
+  require "dl/import"
+
+  module WinAPI
+    extend DL::Importer
+    begin
+      dlload "kernel32"
+      extern "long GetLogicalDriveStrings(long, void*)"
+    rescue DL::DLError
+      raise InvalidOS, "not Windows"
+    end
   end
 end
 
