@@ -22,7 +22,7 @@ module Command
     def display_help
       puts HEADER
       puts
-      puts " <green>Usage: narou &lt;command&gt; [arguments...] [options...]</green>".termcolor
+      puts " <green>Usage: narou &lt;command&gt; [arguments...] [options...] [--no-color]</green>".termcolor
       puts
       puts " コマンドの簡単な説明:"
       cmd_list = Command.get_list
@@ -37,6 +37,8 @@ module Command
       puts "  各コマンドの詳細は narou <command> -h/--help を参照してください。"
       puts "  各コマンドは先頭の一文字か二文字でも指定できます。"
       puts "  (e.g. `<yellow>narou d n4259s</yellow>', `<yellow>narou fr musyoku</yellow>')".termcolor
+      puts
+      puts "  表示の色は--no-colorとオプションを付けるか`<yellow>narou s no-color=true</yellow>'で消せます。".termcolor
     end
 
     def display_help_first_time

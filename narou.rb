@@ -18,6 +18,8 @@ rescue_level = $debug ? Exception : StandardError
 begin
   display_backtrace = ARGV.delete("--backtrace")
   display_backtrace ||= $debug
+  $disable_color = ARGV.delete("--no-color")
+  $disable_color ||= GlobalSetting.get["global_setting"]["no-color"]
   CommandLine.run(ARGV)
 rescue rescue_level => e
   warn $@.shift + ": #{e.message} (#{e.class})"

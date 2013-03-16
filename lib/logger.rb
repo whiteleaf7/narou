@@ -41,6 +41,7 @@ class Logger < StringIO
   def write(str)
     super(strip_color(str))
     unless @is_silent
+      str = strip_color(str) if $disable_color
       write_color(str, STDOUT)
     end
   end
@@ -57,6 +58,7 @@ class LoggerError < StringIO
   def write(str)
     super(strip_color(str))
     unless @is_silent
+      str = strip_color(str) if $disable_color
       write_color(str, STDERR)
     end
   end
