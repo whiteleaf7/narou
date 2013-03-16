@@ -1,5 +1,5 @@
 #! ruby
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 #
 # It was translated into Ruby script by whiteleaf.
 #

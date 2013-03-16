@@ -1,5 +1,5 @@
 #! ruby
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Narou.rb ― 小説家になろうダウンロード＆整形スクリプト
 #
