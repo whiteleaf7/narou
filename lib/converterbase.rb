@@ -248,6 +248,8 @@ class ConverterBase
     data.tr!("“”‘’", %!""''!)
     data.gsub!(/"([^"]+)"/, "“\\1”")
     data.gsub!(/'([^']+)'/, "“\\1”")   # MEMO: シングルミュート(ノノカギ)を表示出来るフォントはほとんど無い
+    data.gsub!("≪", "※［＃始め二重山括弧］")
+    data.gsub!("≫", "※［＃終わり二重山括弧］")
     data.tr!("-=+/*《》'\"%$#&!?､<>＜＞()|‐,._;:",
              "－＝＋／＊≪≫’”％＄＃＆！？、〈〉〈〉（）｜－，．＿；：")
     data.gsub!("\\", "￥")
@@ -645,8 +647,7 @@ class ConverterBase
   #
   # 小説家になろうのルビ対策
   #
-  # TODO:
-  # 既知の問題―同一行にルビ開始文字でない｜と、ルビ開始用｜が同時に存在するとき、
+  # 既知の問題：同一行にルビ開始文字でない｜と、ルビ開始用｜が同時に存在するとき、
   # ルビ開始文字でない｜が［＃縦線］に置換されない
   # →存在するかも疑わしいパターンなため、仕様とする
   #
@@ -661,10 +662,12 @@ class ConverterBase
       "［＃ルビ＝#{i}］"
     end
     # （）なルビの対処
-    data.gsub!(/(.+?)（([ぁ-んァ-ヴーゞ・Ａ-Ｚａ-ｚA-Za-z]{,20})）/).with_index(last_i + 1) do |match, i|
-      ruby_str = to_ruby(match, $1, $2, ["（", "）"])
-      ruby_stack[i] = ruby_str
-      "［＃ルビ＝#{i}］"
+    if @text_type != "subtitle"
+      data.gsub!(/(.+?)（([ぁ-んァ-ヴーゞ・Ａ-Ｚａ-ｚA-Za-z　]{,20})）/).with_index(last_i + 1) do |match, i|
+        ruby_str = to_ruby(match, $1, $2, ["（", "）"])
+        ruby_stack[i] = ruby_str
+        "［＃ルビ＝#{i}］"
+      end
     end
     data.replace(replace_tatesen(data))
     data.gsub!(/［＃ルビ＝(\d+)］/) do
@@ -672,8 +675,10 @@ class ConverterBase
     end
   end
 
+  CHARACTER_OF_RUBY = "一-龠Ａ-Ｚａ-ｚA-Za-z"
+
   def object_of_ruby?(char)
-    char =~ /[一-龠Ａ-Ｚａ-ｚA-Za-z]/
+    char =~ /[#{CHARACTER_OF_RUBY}]/
   end
 
   def sesame(str, ten)
@@ -697,8 +702,17 @@ class ConverterBase
     when m2 =~ /^・+$/
       # ルビが・だけの場合、傍点と判断
       sesame(m1, m2)
-    when m1.include?("｜"), object_of_ruby?(last_char)
+    when m1.include?("｜")
       "#{m1}《#{m2}》"
+    when object_of_ruby?(last_char)
+      # なろうのルビ対象文字を辿って｜を挿入する（青空文庫となろうのルビ仕様の差異吸収のため）
+      m1.gsub(/([#{CHARACTER_OF_RUBY}　]+)$/) {
+        if $1[0] == "　"
+          "　｜#{$1[1..-1]}"
+        else
+          "｜#{$1}"
+        end
+      } + "《#{m2}》"
     else
       replace_tatesen(match)
     end
@@ -810,7 +824,7 @@ class ConverterBase
   #
   # 小説データ全体に対して施す変換
   #
-  def convert_for_all_data(data, text_type)
+  def convert_for_all_data(data)
     auto_join_in_brackets(data)
     auto_join_line(data) if @setting.enable_auto_join_line
     erase_comments_block(data)
@@ -827,44 +841,45 @@ class ConverterBase
     insert_separate_space(data)
     convert_special_characters(data)
     convert_fraction_and_date(data)
-    if text_type == "body" || text_type == "textfile"
+    if @text_type == "body" || @text_type == "textfile"
       half_indent_bracket(data)
       auto_indent(data)
     end
     convert_dakuten_char_to_font(data)
   end
 
-  def before_convert(io, text_type)
-    before(io, text_type)
+  def before_convert(io)
+    before(io, @text_type)
   end
 
-  def after_convert(io, text_type)
-    after(io, text_type)
+  def after_convert(io)
+    after(io, @text_type)
   end
 
   def convert(text, text_type)
     return "" if text == ""
+    @text_type = text_type
     io = StringIO.new(rstrip_all_lines(text))
-    (io = before_convert(io, text_type)).rewind
-    (io = convert_main(io, text_type)).rewind
-    (io = after_convert(io, text_type)).rewind
+    (io = before_convert(io)).rewind
+    (io = convert_main(io)).rewind
+    (io = after_convert(io)).rewind
     return io.read
   end
 
   #
   # 変換処理本体
   #
-  # text_type: 渡されるテキストの種類。subtitle, introduction, body, postscript, textfile のどれか
+  # @text_type: 渡されるテキストの種類。subtitle, introduction, body, postscript, textfile のどれか
   #
-  def convert_main(io, text_type)
+  def convert_main(io)
     @write_fp = StringIO.new
-    case text_type
+    case @text_type
     when "introduction"
       return @write_fp if @setting.enable_erase_introduction
     when "postscript"
       return @write_fp if @setting.enable_erase_postscript
     end
-    if text_type == "textfile"
+    if @text_type == "textfile"
       @write_fp.puts(io.gets + io.gets)   # タイトル・著者名スキップ
       data = io.read
       progressbar = ProgressBar.new(data.count("\n") + 1)
@@ -873,17 +888,17 @@ class ConverterBase
       data = io.read
     end
     initialize_member_values
-    convert_for_all_data(data, text_type)
+    convert_for_all_data(data)
     @read_fp = StringIO.new(data)
     @read_fp.each_with_index do |line, i|
-      progressbar.output(i) if text_type == "textfile"
+      progressbar.output(i) if @text_type == "textfile"
       @request_skip_output_line = false
       zenkaku_rstrip(line)
       if @request_insert_blank_next_line
         outputs unless blank_line?(line)
         @request_insert_blank_next_line = false
       end
-      process_author_comment(line) if text_type == "textfile"
+      process_author_comment(line) if @text_type == "textfile"
       insert_blank_line_to_border_symbol(line)
       force_indent_special_chapter(line)
 
@@ -896,11 +911,11 @@ class ConverterBase
         @before_line = line
       end
     end
-    author_comment_force_close if text_type == "textfile"
+    author_comment_force_close if @text_type == "textfile"
 
     @write_fp.rewind
     data = @write_fp.string
-    if text_type == "textfile"
+    if @text_type == "textfile"
       if @setting.enable_author_comments
         erase_introduction(data) if @setting.enable_erase_introduction
         erase_postscript(data) if @setting.enable_erase_postscript
@@ -916,7 +931,7 @@ class ConverterBase
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
     data.strip!
-    progressbar.clear if text_type == "textfile"
+    progressbar.clear if @text_type == "textfile"
     @write_fp
   end
 
