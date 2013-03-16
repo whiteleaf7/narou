@@ -3,12 +3,14 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require "yaml"
 require "fileutils"
 require_relative "narou"
 require_relative "sitesetting"
 require_relative "template"
 require_relative "database"
 require_relative "localsetting"
+require_relative "narou/api"
 
 #
 # 小説サイトからのダウンロード
@@ -22,6 +24,8 @@ class Downloader
   RETRY_MAX_FOR_503 = 5   # 503 のときに何回再試行するか
 
   attr_reader :id
+
+  class NoSerialNovel < StandardError; end
 
   #
   # ターゲット(ID、URL、Nコード、小説名)を指定して小説データのダウンロードを開始する
@@ -295,12 +299,18 @@ class Downloader
   # ダウンロード処理本体
   #
   # 返り値：ダウンロードしたものが１話でもあったかどうか(Boolean)
+  #         nil なら何らかの原因でダウンロード自体出来なかった
   #
   def start_download
-    latest_toc = get_latest_table_of_contents
+    begin
+      latest_toc = get_latest_table_of_contents
+    rescue NoSerialNovel
+      warn @setting["ncode"] + " は短編小説です。現在短編小説には対応していません"
+      return nil
+    end
     unless latest_toc
-      warn "目次データが取得出来ませんでした"
-      exit 1
+      warn @setting["url"] + " の目次データが取得出来ませんでした"
+      return nil
     end
     if @setting["confirm_over18"]
       unless confirm_over18?
@@ -324,7 +334,7 @@ class Downloader
         sections_download_and_save(update_subtitles)
       rescue Interrupt
         remove_cache_dir
-        puts "ダウンロードを中断しました"
+        warn "ダウンロードを中断しました"
         exit 1
       end
       update_database
@@ -364,9 +374,23 @@ class Downloader
       "file_title" => @file_title,
       "toc_url" => @setting["toc_url"],
       "sitename" => @setting["name"],
+      "novel_type" => @novel_type,
       "last_update" => Time.now
     }
     @@database.save_database
+  end
+
+  #
+  # 連載小説かどうか調べる
+  #
+  def serial_novel?
+    if @@database[@id]
+      @novel_type = @@database[@id]["novel_type"] || 1
+    else
+      api = Narou::API.new(@setting, "nt")
+      @novel_type = api["novel_type"]
+    end
+    @novel_type == 1
   end
 
   #
@@ -395,6 +419,9 @@ class Downloader
       else
         raise
       end
+    end
+    if @setting["narou_api_url"] && !serial_novel?
+      raise NoSerialNovel
     end
     @setting.multi_match(toc_source, "title", "author", "story", "tcode")
     @title = @setting["title"]

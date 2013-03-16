@@ -30,4 +30,5 @@ tcode: <li><a href="\\k<domain>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
 txtdownload_url: \\k<domain>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
 
 # ------------------------------------------------------------
-# 各話ページ設定
+# 特殊な設定
+narou_api_url: http://api.syosetu.com/novel18api/api/
