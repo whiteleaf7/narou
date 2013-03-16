@@ -58,8 +58,8 @@ class Template
   def self.target_binary_version(version)
     @@src_version = version
     if invalid_templace_version?
-      warn "テンプレートのバージョンが古いので意図しない動作をする可能性があります\n" +
-           "(#{@@src_filename}.erb ver #{version.to_f} < #{@@binary_version.to_f})"
+      error "テンプレートのバージョンが古いので意図しない動作をする可能性があります\n" +
+            "(#{@@src_filename}.erb ver #{version.to_f} < #{@@binary_version.to_f})"
     end
   end
 end

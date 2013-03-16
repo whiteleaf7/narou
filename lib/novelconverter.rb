@@ -110,7 +110,7 @@ class NovelConverter
 
     aozoraepub3_path = Narou.get_aozoraepub3_path
     unless aozoraepub3_path
-      warn "AozoraEpub3が見つからなかったので、EPUBが出力出来ませんでした"
+      error "AozoraEpub3が見つからなかったので、EPUBが出力出来ませんでした"
       return nil
     end
     aozoraepub3_basename = File.basename(aozoraepub3_path)
@@ -150,7 +150,7 @@ class NovelConverter
         # AozoraEpub3 のエラーにはEPUBが出力されないエラーとEPUBが出力されるエラーの2種類ある。
         # EPUBが出力される場合は「変換完了」という文字があるのでそれを検出する
         if stdout_capture !~ /^変換完了/
-          warn "AozoraEpub3実行中にエラーが発生したため、EPUBが出力出来ませんでした"
+          error "AozoraEpub3実行中にエラーが発生したため、EPUBが出力出来ませんでした"
           return :error
         end
       end
@@ -168,7 +168,7 @@ class NovelConverter
   def self.epub_to_mobi(epub_path, verbose = false)
     kindlegen_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "kindlegen")
     if Dir.glob(kindlegen_path + "*").empty?
-      warn "kindlegenが見つかりませんでした。AozoraEpub3と同じディレクトリにインストールして下さい"
+      error "kindlegenが見つかりませんでした。AozoraEpub3と同じディレクトリにインストールして下さい"
       return :error
     end
 
@@ -193,15 +193,15 @@ class NovelConverter
     if proccess_status.exited?
       if proccess_status.exitstatus == 2
         puts ""
-        warn "kindlegen実行中にエラーが発生したため、MOBIが出力出来ませんでした"
+        error "kindlegen実行中にエラーが発生したため、MOBIが出力出来ませんでした"
         if stdout_capture.scan(/(エラー\(.+?\):\w+?:.+)$/)
-          warn $1
+          error $1
         end
         return :error
       end
     else
       puts ""
-      warn "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
+      error "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
       return :abort
     end
     puts "変換しました"
@@ -340,16 +340,16 @@ class NovelConverter
     else
       # 小説の監視・検査状況を表示する
       if @inspector.error? || @inspector.warning?
-        warn "―――― 小説にエラーもしくは警告が存在します ――――"
-        warn ""
+        puts "<yellow>―――― 小説にエラーもしくは警告が存在します ――――</yellow>".termcolor
+        puts ""
         @inspector.display(Inspector::ERROR | Inspector::WARNING)
-        warn ""
+        puts ""
       end
       if @inspector.info?
-        warn "―――― 小説の検査状況を表示します ――――"
-        warn ""
+        puts "<yellow>―――― 小説の検査状況を表示します ――――</yellow>".termcolor
+        puts ""
         @inspector.display(Inspector::INFO)
-        warn ""
+        puts ""
       end
     end
 

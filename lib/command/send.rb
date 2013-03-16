@@ -45,26 +45,26 @@ module Command
         return
       end
       unless Helper.os_windows?
-        warn "このコマンドはWindows専用です"
+        error "このコマンドはWindows専用です"
         exit 1
       end
       device = get_device(argv)
       unless device
-        warn "デバイス名を指定して下さい"
+        error "デバイス名を指定して下さい"
         exit 1
       end
       unless device.connecting?
-        warn "#{device.name}が接続されていません"
+        error "#{device.name}が接続されていません"
         exit 1
       end
       argv.each do |target|
         ebook_path = Narou.get_ebook_file_path(target, device.ebook_file_ext)
         unless ebook_path
-          warn "#{target} は存在しません"
+          error "#{target} は存在しません"
           next
         end
         unless File.exists?(ebook_path)
-          warn "まだファイル(#{File.basename(ebook_path)})が無いようです"
+          error "まだファイル(#{File.basename(ebook_path)})が無いようです"
           next
         end
         print "#{device.name}へ送信しています"
@@ -82,7 +82,7 @@ module Command
         if copy_to_path
           puts copy_to_path + " へコピーしました"
         else
-          warn "#{device.name}が見つからなかったためコピー出来ませんでした"
+          error "#{device.name}が見つからなかったためコピー出来ませんでした"
           exit 1   # next しても次も失敗すると分かりきっているためここで終了する
         end
       end

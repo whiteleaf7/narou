@@ -39,13 +39,13 @@ class Downloader
     when :url, :ncode
       setting = get_sitesetting_by_target(target)
       unless setting
-        warn "対応外の#{type}です(#{target})"
+        error "対応外の#{type}です(#{target})"
         return false
       end
     when :id
       data = @@database[target.to_i]
       unless data
-        warn "指定のID(#{target})は存在しません"
+        error "指定のID(#{target})は存在しません"
         return false
       end
       setting = get_sitesetting_by_sitename(data["sitename"])
@@ -56,7 +56,7 @@ class Downloader
         setting = get_sitesetting_by_sitename(data["sitename"])
         setting.multi_match(data["toc_url"], "url")
       else
-        warn "指定の小説(#{target})は存在しません"
+        error "指定の小説(#{target})は存在しません"
         return false
       end
     end
@@ -130,7 +130,7 @@ class Downloader
     else
       @@database.delete(id)
       @@database.save_database
-      warn "#{path} が見つかりません。"
+      error "#{path} が見つかりません。"
       warn "保存フォルダが消去されていたため、データベースのインデックスを削除しました。"
       return nil
     end
@@ -214,7 +214,7 @@ class Downloader
   def self.get_sitesetting_by_sitename(sitename)
     setting = @@settings.find { |s| s["name"] == sitename }
     return setting if setting
-    warn "#{data["sitename"]} の設定ファイルが見つかりません"
+    error "#{data["sitename"]} の設定ファイルが見つかりません"
     exit 1
   end
 
@@ -231,11 +231,11 @@ class Downloader
       settings << setting
     end
     if settings.empty?
-      warn "小説サイトの定義ファイルがひとつもありません"
+      error "小説サイトの定義ファイルがひとつもありません"
       exit 1
     end
     unless @@narou
-      warn "小説家になろうの定義ファイルが見つかりませんでした"
+      error "小説家になろうの定義ファイルが見つかりませんでした"
       exit 1
     end
     settings
@@ -305,11 +305,11 @@ class Downloader
     begin
       latest_toc = get_latest_table_of_contents
     rescue NoSerialNovel
-      warn @setting["ncode"] + " は短編小説です。現在短編小説には対応していません"
+      error @setting["ncode"] + " は短編小説です。現在短編小説には対応していません"
       return nil
     end
     unless latest_toc
-      warn @setting["url"] + " の目次データが取得出来ませんでした"
+      error @setting["url"] + " の目次データが取得出来ませんでした"
       return nil
     end
     if @setting["confirm_over18"]
@@ -334,7 +334,7 @@ class Downloader
         sections_download_and_save(update_subtitles)
       rescue Interrupt
         remove_cache_dir
-        warn "ダウンロードを中断しました"
+        puts "ダウンロードを中断しました"
         exit 1
       end
       update_database
@@ -414,7 +414,7 @@ class Downloader
       end
     rescue OpenURI::HTTPError => e
       if e.message =~ /^404/
-        warn "指定されたURLは存在しません"
+        error "指定されたURLは存在しません"
         return false
       else
         raise
@@ -488,7 +488,7 @@ class Downloader
   def sections_download_and_save(subtitles)
     max = subtitles.count
     return if max == 0
-    puts "ID:#{@id}　#{@title} のDL開始"
+    puts ("<green>" + TermColor.escape("ID:#{@id}　#{@title} のDL開始") + "</green>").termcolor
     interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"] || 0
     interval_sleep_time = 0 if interval_sleep_time < 0
     save_least_one = false
@@ -563,7 +563,7 @@ class Downloader
     rescue OpenURI::HTTPError => e
       if e.message =~ /^503/
         if retry_count == 0
-          warn "上限までリトライしましたがファイルがダウンロード出来ませんでした"
+          error "上限までリトライしましたがファイルがダウンロード出来ませんでした"
           exit 1
         end
         retry_count -= 1

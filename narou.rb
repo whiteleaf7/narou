@@ -26,8 +26,8 @@ rescue rescue_level => e
       warn "  from #{b}"
     end
   else
-    puts "  エラーが発生したため終了しました。"
-    puts "  詳細なエラーは --backtrace オプションを付けて再度実行して下さい。"
+    warn "  エラーが発生したため終了しました。"
+    warn "  詳細なエラーは --backtrace オプションを付けて再度実行して下さい。"
   end
   exit 1
 end

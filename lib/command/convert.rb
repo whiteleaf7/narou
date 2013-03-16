@@ -104,7 +104,7 @@ module Command
       if @options["encoding"]
         @enc = Encoding.find(@options["encoding"]) rescue nil
         unless @enc
-          warn "--enc で指定された文字コードは存在しません。sjis, eucjp, utf-8 等を指定して下さい"
+          error "--enc で指定された文字コードは存在しません。sjis, eucjp, utf-8 等を指定して下さい"
           return
         end
       end
@@ -126,7 +126,7 @@ module Command
         else
           @argument_target_type = :novel
           unless Downloader.novel_exists?(target)
-            warn "#{target} は存在しません"
+            error "#{target} は存在しません"
             next
           end
           res = NovelConverter.convert(target, @output_filename, @options["inspect"])
@@ -161,8 +161,7 @@ module Command
       return NovelConverter.convert_file(target, @enc, @output_filename, @options["inspect"])
     rescue ArgumentError => e
       if e.message =~ /invalid byte sequence in UTF-8/
-        warn "#{target}"
-        warn "テキストファイルの文字コードがUTF-8ではありません。" +
+        error "テキストファイルの文字コードがUTF-8ではありません。" +
         "--enc オプションでテキストの文字コードを指定して下さい"
         warn "(#{e.message})"
         return nil
@@ -170,8 +169,8 @@ module Command
         raise
       end
     rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
-      warn "#{target}"
-      warn "テキストファイルの文字コードは#{@options["encoding"]}ではありませんでした。" +
+      warn "#{target}:"
+      error "テキストファイルの文字コードは#{@options["encoding"]}ではありませんでした。" +
       "正しい文字コードを指定して下さい"
       return nil
     end
@@ -203,10 +202,10 @@ module Command
         begin
           SectionStripper.strip(mobi_path, nil, false)
         rescue StripException => e
-          warn "Error: #{e.message}"
+          error "#{e.message}"
         end
       end
-      puts "MOBIファイルを出力しました"
+      puts "<green>MOBIファイルを出力しました</green>".termcolor
 
       return mobi_path
     end
@@ -218,7 +217,7 @@ module Command
         FileUtils.copy(src_path, copy_to_dir)
         return File.join(copy_to_dir, File.basename(src_path))
       else
-        warn "#{copy_to_dir} はフォルダではないかすでに削除されています。コピー出来ませんでした"
+        error "#{copy_to_dir} はフォルダではないかすでに削除されています。コピー出来ませんでした"
         return nil
       end
     end

@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
 #
-# Copyright 2013 whiteleaf. All rights reserved.
 #
 
 require_relative "../localsetting"
@@ -172,16 +171,16 @@ module Command
       argv.each do |arg|
         name, value = arg.split("=", 2).map(&:strip)
         if name == ""
-          warn "書式が間違っています。変数名=値 のように書いて下さい"
+          error "書式が間違っています。変数名=値 のように書いて下さい"
           next
         end
         scope = get_scope_of_variable_name(name)
         unless scope
-          warn "#{name} という変数は存在しません"
+          error "#{name} という変数は存在しません"
           next
         end
         if value.nil?
-          warn "書式が間違っています。#{name}=値 のように書いて下さい"
+          error "書式が間違っています。#{name}=値 のように書いて下さい"
           next
         end
         if value == ""
@@ -192,7 +191,7 @@ module Command
         begin
           scope, casted_value = casting_variable(name, value)
         rescue InvalidVariableName, InvalidVariableType => e
-          warn e.message
+          error e.message
           next
         end
         settings[scope][name] = casted_value

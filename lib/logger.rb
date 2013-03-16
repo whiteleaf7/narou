@@ -5,6 +5,7 @@
 
 require "singleton"
 require "stringio"
+require_relative "color"
 
 module LoggerModule
   def initialize
@@ -18,6 +19,10 @@ module LoggerModule
 
   def silent
     @is_silent
+  end
+
+  def strip_color(str)
+    str.gsub(/(?:\e\[\d*[a-zA-Z])+/, "")
   end
 
   def save(path)
@@ -34,9 +39,9 @@ class Logger < StringIO
   end
 
   def write(str)
-    super
+    super(strip_color(str))
     unless @is_silent
-      STDOUT.write(str)
+      write_color(str, STDOUT)
     end
   end
 end
@@ -50,11 +55,15 @@ class LoggerError < StringIO
   end
 
   def write(str)
-    super
+    super(strip_color(str))
     unless @is_silent
-      STDERR.write(str)
+      write_color(str, STDERR)
     end
   end
+end
+
+def error(str)
+  warn "<red>[ERROR]</red> #{str}".termcolor
 end
 
 $stdout = Logger.get

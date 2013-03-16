@@ -65,7 +65,7 @@ class Device
         capture = `#{cmd}`
         if $?.exitstatus > 0
           puts
-          warn capture.force_encoding(Encoding::Windows_31J).rstrip
+          error capture.force_encoding(Encoding::Windows_31J).rstrip
           exit 1
         end
       else
@@ -73,7 +73,7 @@ class Device
           FileUtils.cp(src_file, dst_path)
         rescue => e
           puts
-          warn e.message
+          error e.message
           exit 1
         end
       end

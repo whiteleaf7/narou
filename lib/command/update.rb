@@ -46,7 +46,7 @@ module Command
         display_message = nil
         data = Downloader.get_data_by_target(target)
         if !data
-          display_message = "#{target} は管理小説の中に存在しません"
+          display_message = "<red>[ERROR]</red> #{target} は管理小説の中に存在しません".termcolor
         elsif Narou.novel_frozen?(target)
           if argv.length > 0
             display_message = "#{data["title"]} は凍結中です"

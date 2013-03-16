@@ -32,7 +32,7 @@ module Command
       argv.each do |target|
         data = Downloader.get_data_by_target(target)
         unless data
-          warn "#{target} は存在しません"
+          error "#{target} は存在しません"
           next
         end
         toc_url = data["toc_url"]

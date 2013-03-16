@@ -58,7 +58,7 @@ class Inspector
     @info
   end
 
-  def display(klass = ALL, target = $stderr)
+  def display(klass = ALL, target = $stdout)
     target.puts @messages.map { |msg|
       if msg =~ /^\[(.+)\]/
         key = KLASS_TAG.key($1)

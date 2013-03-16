@@ -32,7 +32,7 @@ module Narou
             @api_result["novel_type"] = @api_result["noveltype"]
           end
         else
-          warn "なろうAPIから情報が取得出来ませんでした"
+          error "なろうAPIから情報が取得出来ませんでした"
           exit 1
         end
       end

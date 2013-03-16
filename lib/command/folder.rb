@@ -31,7 +31,7 @@ module Command
           Helper.open_directory_by_os_filer(dir)
           puts dir
         else
-          warn "#{target} は存在しません"
+          error "#{target} は存在しません"
         end
       end
     end

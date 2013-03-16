@@ -9,17 +9,19 @@ module Command
   class CommandBase
     def initialize(postfix = "")
       @opt = OptionParser.new(nil, 20)
-      @opt.banner = "Usage: #{@opt.program_name} #{self.class.to_s.scan(/::(.+)$/)[0][0].downcase} #{postfix}"
+      @opt.banner = ("<green>" +
+                     TermColor.escape("Usage: narou #{self.class.to_s.scan(/::(.+)$/)[0][0].downcase} #{postfix}") +
+                     "</green>").termcolor
       @options = {}
     end
 
     def execute(argv)
       @opt.parse!(argv)
     rescue OptionParser::InvalidOption => e
-      warn "不正なオプションです(#{e})"
+      error "不正なオプションです(#{e})"
       exit 1
     rescue OptionParser::MissingArgument => e
-      warn "オプションの引数が不正です(#{e})"
+      error "オプションの引数が不正です(#{e})"
       exit 1
     end
 

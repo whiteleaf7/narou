@@ -72,7 +72,7 @@ def load_converter(title, archive_path)
   if conv
     return conv
   else
-    warn "converter.rbは見つかりましたが、`converter'で登録されていないようです。" +
+    error "converter.rbは見つかりましたが、`converter'で登録されていないようです。" +
          "変換処理は converter \"#{title}\" として登録する必要があります"
     return BlankConverter
   end

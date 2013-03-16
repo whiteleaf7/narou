@@ -38,8 +38,11 @@ module Command
       puts "  ID |  更新日  |     タイトル"
       novels.each do |novel|
         id = novel["id"]
+        frozen = Narou.novel_frozen?(id)
+        disp_id = ((frozen ? "*" : "") + id.to_s).rjust(4)
+        disp_id = "<blue>#{disp_id}</blue>".termcolor if frozen
         puts [
-          ((Narou.novel_frozen?(id) ? "*" : "") + id.to_s).rjust(4),
+          disp_id,
           novel["last_update"].strftime("%y/%m/%d"),
           novel["title"],
           @options["url"] ? novel["toc_url"] : nil

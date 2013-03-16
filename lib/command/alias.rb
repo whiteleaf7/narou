@@ -50,11 +50,11 @@ module Command
         Helper.print_horizontal_rule if i > 0
         alias_name, target = arg.split("=", 2)
         unless alias_name =~ /^\w+$/
-          warn "別名にはアルファベット・数字・アンダースコアしか使えません"
+          error "別名にはアルファベット・数字・アンダースコアしか使えません"
           next
         end
         if target.nil?
-          warn "書式が間違っています。#{alias_name}=別名 のように書いて下さい"
+          error "書式が間違っています。#{alias_name}=別名 のように書いて下さい"
           next
         end
         if target == ""
@@ -63,7 +63,7 @@ module Command
           next
         end
         unless Downloader.novel_exists?(target)
-          warn "#{target} は存在しません"
+          error "#{target} は存在しません"
           next
         end
         data = Downloader.get_data_by_target(target)

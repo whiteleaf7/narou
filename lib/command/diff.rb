@@ -77,13 +77,13 @@ module Command
         id = Downloader.get_id_by_target(target)
       end
       unless id
-        warn "#{target} は存在しません"
+        error "#{target} は存在しません"
         return
       end
       view_diff_version = argv.shift
       if view_diff_version
         if invalid_diff_version_string?(view_diff_version)
-          warn "差分指定の書式が違います(正しい例:2013.02.21@01;39;46)"
+          error "差分指定の書式が違います(正しい例:2013.02.21@01;39;46)"
           return
         end
         @options["view_diff_version"] = view_diff_version
@@ -98,7 +98,7 @@ module Command
       end
       @difftool = GlobalSetting.get["global_setting"]["difftool"]
       unless @difftool
-        warn "difftool が設定されていません。narou setting で difftool を設定して下さい"
+        error "difftool が設定されていません。narou setting で difftool を設定して下さい"
         return
       end
       exec_difftool(id)
@@ -131,13 +131,13 @@ module Command
       begin
         res = Open3.capture3(diff_cmd)
       rescue Errno::ENOENT => e
-        warn e.message
+        error e.message
         exit 1
       ensure
         temp_paths.each { |tmp| tmp.close(true) }
       end
       puts res[0] unless res[0].empty?
-      warn res[1] unless res[1].empty?
+      error res[1] unless res[1].empty?
     end
 
     def create_difftool_command_string(left, right)
