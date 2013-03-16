@@ -271,6 +271,9 @@ class ConverterBase
     # 見出しの中では自動で縦中横にはならないため、明示的指定をしておく
     # 事前に !? は全角にしておく
     data.gsub!(/！+/) do |match|
+      if "#{$`[-1]}#{$'[0]}".include?("？")
+        next match
+      end
       len = match.length
       if len == 3
         tcy("!!!")
@@ -283,9 +286,16 @@ class ConverterBase
       end
     end
     data.gsub!(/[！？]+/) do |match|
-      len = match.length
-      if len == 2
+      case match.length
+      when 2
         tcy(match.tr("！？", "!?"))
+      when 3
+        # 見た目的にこのパターンだけ縦中横化を許容する
+        if %w(！！？ ？！！).find { |v| v == match }
+          tcy(match.tr("！？", "!?"))
+        else
+          match
+        end
       else
         match
       end
