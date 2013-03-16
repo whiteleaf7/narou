@@ -162,7 +162,7 @@ module Command
     rescue ArgumentError => e
       if e.message =~ /invalid byte sequence in UTF-8/
         error "テキストファイルの文字コードがUTF-8ではありません。" +
-        "--enc オプションでテキストの文字コードを指定して下さい"
+              "--enc オプションでテキストの文字コードを指定して下さい"
         warn "(#{e.message})"
         return nil
       else
@@ -171,7 +171,7 @@ module Command
     rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
       warn "#{target}:"
       error "テキストファイルの文字コードは#{@options["encoding"]}ではありませんでした。" +
-      "正しい文字コードを指定して下さい"
+            "正しい文字コードを指定して下さい"
       return nil
     end
 
@@ -188,6 +188,8 @@ module Command
       epub_path = @converted_txt_path.sub(/.txt$/, epub_ext)
 
       if !@device || !@device.kindle? || @options["no-mobi"]
+        puts File.basename(epub_path) + " を出力しました"
+        puts "<green>EPUBファイルを出力しました</green>".termcolor
         return epub_path
       end
 
@@ -205,6 +207,7 @@ module Command
           error "#{e.message}"
         end
       end
+      puts File.basename(mobi_path).encode(Encoding::UTF_8) + " を出力しました"
       puts "<green>MOBIファイルを出力しました</green>".termcolor
 
       return mobi_path

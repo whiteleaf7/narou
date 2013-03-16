@@ -307,7 +307,7 @@ class NovelConverter
       end
     end
     File.write(save_path, result)
-    puts "#{File.basename(save_path)} を出力しました"
+    puts "縦書用の変換が終了しました"
 
     update_latest_convert_novel
 
