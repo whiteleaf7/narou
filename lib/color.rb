@@ -84,6 +84,6 @@ if RUBY_PLATFORM =~ /mswin(?!ce)|mingw|bccwin/i   # without cygwin
   end
 else
   def write_color(str, console = STDOUT)
-    console.write str.termcolor
+    console.write str
   end
 end
