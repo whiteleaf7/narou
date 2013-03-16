@@ -16,6 +16,8 @@ module Command
   Example:
     narou browser n9669bk
     narou browser musyoku
+
+  Options:
       EOS
 
       @opt.on("-v", "--vote", "指定した小説の投票・感想を投稿するページを表示する") {
