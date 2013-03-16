@@ -660,10 +660,6 @@ class ConverterBase
   #
   # 小説家になろうのルビ対策
   #
-  # 既知の問題：同一行にルビ開始文字でない｜と、ルビ開始用｜が同時に存在するとき、
-  # ルビ開始文字でない｜が［＃縦線］に置換されない
-  # →存在するかも疑わしいパターンなため、仕様とする
-  #
   def narou_ruby(data)
     # 《》なルビの対処
     last_i = 0
@@ -671,21 +667,17 @@ class ConverterBase
     data.gsub!(/(.+?)≪(.+?)≫/).with_index do |match, i|
       ruby_str = to_ruby(match, $1, $2, ["≪", "≫"])
       last_i = i
-      ruby_stack[i] = ruby_str
-      "［＃ルビ＝#{i}］"
+      ruby_str
     end
     # （）なルビの対処
     if @text_type != "subtitle"
       data.gsub!(/(.+?)（([ぁ-んァ-ヴーゞ・Ａ-Ｚａ-ｚA-Za-z　]{,20})）/).with_index(last_i + 1) do |match, i|
         ruby_str = to_ruby(match, $1, $2, ["（", "）"])
-        ruby_stack[i] = ruby_str
-        "［＃ルビ＝#{i}］"
+        ruby_str
       end
     end
     data.replace(replace_tatesen(data))
-    data.gsub!(/［＃ルビ＝(\d+)］/) do
-      ruby_stack[$1.to_i]
-    end
+    data.gsub!("［＃ルビ用縦線］", "｜")
   end
 
   CHARACTER_OF_RUBY = "一-龠Ａ-Ｚａ-ｚA-Za-z"
@@ -716,18 +708,18 @@ class ConverterBase
       # ルビが・だけの場合、傍点と判断
       sesame(m1, m2)
     when m1.include?("｜")
-      "#{m1}《#{m2}》"
+      "#{m1.sub(/｜([^｜]*)$/, "［＃ルビ用縦線］\\1")}《#{m2}》"
     when object_of_ruby?(last_char)
       # なろうのルビ対象文字を辿って｜を挿入する（青空文庫となろうのルビ仕様の差異吸収のため）
       m1.gsub(/([#{CHARACTER_OF_RUBY}　]+)$/) {
         if $1[0] == "　"
-          "　｜#{$1[1..-1]}"
+          "　［＃ルビ用縦線］#{$1[1..-1]}"
         else
-          "｜#{$1}"
+          "［＃ルビ用縦線］#{$1}"
         end
       } + "《#{m2}》"
     else
-      replace_tatesen(match)
+      match
     end
   end
 
