@@ -35,7 +35,7 @@ module Command
       database = Database.instance
       aliases.each do |name, id|
         title = database[id]["title"] rescue "(すでに削除されています)"
-        puts "#{name} = #{title}"
+        puts "<green>#{name}</green>=#{title}".termcolor
       end
     end
 

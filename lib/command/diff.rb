@@ -105,7 +105,7 @@ module Command
     end
 
     def invalid_diff_version_string?(str)
-      !str =~ /^\d{4}\.\d{2}\.\d{2}@\d{2};\d{2};\d{2}$/
+      str !~ /^\d{4}\.\d{2}\.\d{2}@\d{2};\d{2};\d{2}$/
     end
 
     def clean_diff(id)
@@ -212,7 +212,7 @@ module Command
       end
       puts "差分一覧"
       cache_list.each.with_index(1) do |cache_path, i|
-        puts File.basename(cache_path) + "   -#{i}"
+        puts ("<yellow>" + File.basename(cache_path) + "   -#{i}</yellow>").termcolor
         cache_section_list = Dir.glob(File.join(cache_path, "*.yaml"))
         if cache_section_list.length > 0
           cache_section_list.map { |section_path|

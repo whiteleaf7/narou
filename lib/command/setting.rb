@@ -153,7 +153,7 @@ module Command
           if value =~ / /
             value = "'#{value}'"
           end
-          puts "#{name}=#{value}"
+          puts "<green>#{name}</green>=#{value}".termcolor
         end
       end
     end
@@ -206,7 +206,7 @@ module Command
       SETTING_VARIABLES[scope].each do |name, info|
         if @options["all"] || info[2] != INVISIBLE
           type_description = self.class.variable_type_to_description(info[0])
-          result << "    #{name.ljust(18)} #{type_description} #{info[1]}\n"
+          result << "    <green>#{name.ljust(18)}</green> #{type_description} #{info[1]}\n".termcolor
         end
       end
       result
