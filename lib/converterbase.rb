@@ -766,6 +766,21 @@ class ConverterBase
   end
 
   #
+  # 中黒(・)を並べて三点リーダーもどきにしているのを三点リーダーに変換
+  #
+  def convert_horizontal_ellipsis(data)
+    return if !@setting.enable_convert_horizontal_ellipsis || @text_type == "subtitle"
+    data.gsub!(/・{3,}/) do |match|
+      pre_char, post_char = $`[-1], $'[0]
+      if pre_char == "―" || post_char == "―"
+        match
+      else
+        "…" * ((match.length / 3.0 / 2).ceil * 2)
+      end
+    end
+  end
+
+  #
   # ［＃改ページ］直後の行を見出しに設定する
   #
   def enchant_midashi(data)
@@ -930,6 +945,8 @@ class ConverterBase
     # rebuild_english_sentences で再構築された英文にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
+    # 三点リーダーの変換は、ルビで圏点として・・・を使っている場合を考慮して、ルビ処理後にする
+    convert_horizontal_ellipsis(data)
     data.strip!
     progressbar.clear if @text_type == "textfile"
     @write_fp

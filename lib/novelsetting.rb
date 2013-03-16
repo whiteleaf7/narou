@@ -200,6 +200,11 @@ class NovelSetting
       name: "date_format",
       value: "%Y年%m月%d日",
       help: "書式は http://goo.gl/gvJ5u を参考"
-    }
+    },
+    {
+      name: "enable_convert_horizontal_ellipsis",
+      value: true,
+      help: "中黒(・)を並べて三点リーダーもどきにしているのを三点リーダーに変換する"
+    },
   ]
 end
