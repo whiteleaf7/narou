@@ -28,6 +28,16 @@ module LoggerModule
   def save(path)
     File.write(path, string)
   end
+
+  def write_console(str, target)
+    if str.encoding == Encoding::ASCII_8BIT
+      str.force_encoding("utf-8")
+    end
+    unless @is_silent
+      str = strip_color(str) if $disable_color
+      write_color(str, target)
+    end
+  end
 end
 
 class Logger < StringIO
@@ -39,11 +49,9 @@ class Logger < StringIO
   end
 
   def write(str)
+    str = str.to_s
     super(strip_color(str))
-    unless @is_silent
-      str = strip_color(str) if $disable_color
-      write_color(str, STDOUT)
-    end
+    write_console(str, STDOUT)
   end
 end
 
@@ -56,11 +64,9 @@ class LoggerError < StringIO
   end
 
   def write(str)
+    str = str.to_s
     super(strip_color(str))
-    unless @is_silent
-      str = strip_color(str) if $disable_color
-      write_color(str, STDERR)
-    end
+    write_console(str, STDERR)
   end
 end
 
