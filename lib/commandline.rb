@@ -25,7 +25,7 @@ module CommandLine
       end
     end
     unless Command.get_list.include?(arg)
-      puts "不明なコマンドです"
+      error "不明なコマンドです"
       puts
       arg = "help"
     end
