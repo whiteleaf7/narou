@@ -36,9 +36,8 @@ module Command
       puts
       puts "  各コマンドの詳細は narou <command> -h/--help を参照してください。"
       puts "  各コマンドは先頭の一文字か二文字でも指定できます。"
-      puts "  (e.g. `<yellow>narou d n4259s</yellow>', `<yellow>narou fr musyoku</yellow>')".termcolor
-      puts
-      puts "  表示の色は--no-colorとオプションを付けるか`<yellow>narou s no-color=true</yellow>'で消せます。".termcolor
+      puts "  (e.g. `narou <yellow>d</yellow> n4259s', `narou <yellow>fr</yellow> musyoku')".termcolor
+      puts "  表示の色は--no-colorとオプションを付けるか`narou s no-color=true'で消せます。".termcolor
     end
 
     def display_help_first_time

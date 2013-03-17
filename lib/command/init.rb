@@ -66,8 +66,10 @@ module Command
         return
       end
       puts "<green>AozoraEpub3の設定を行います</green>".termcolor
-      puts ("<red>" + "!!!WARNING!!!".center(70) + "</red>").termcolor
-      puts "AozoraEpub3の構成ファイルを書き換えます。narouコマンド用に別途新規インストールしておくことをオススメします"
+      unless @global_setting["aozoraepub3dir"]
+        puts ("<red>" + "!!!WARNING!!!".center(70) + "</red>").termcolor
+        puts "AozoraEpub3の構成ファイルを書き換えます。narouコマンド用に別途新規インストールしておくことをオススメします"
+      end
       aozora_path = ask_aozoraepub3_path
       unless aozora_path
         puts "設定をスキップしました。あとで " + "<yellow>narou init</yellow>".termcolor + " で再度設定出来ます"
