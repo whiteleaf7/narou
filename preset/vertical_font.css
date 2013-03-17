@@ -20,8 +20,8 @@ rt { font-size: 0.6em; }
 /* 柱（もどき） */
 .running_head {
 	position: absolute !important;
-	top: 0;
-	left: 0;
+	top: 15px;
+	left: 10px;
 	font-size: 0.8em;
 }
 
