@@ -123,7 +123,7 @@ class NovelSetting
     },
     {
       name: "kanji_num_with_units_lower_digit_zero",
-      value: 2,
+      value: 3,
       help: "〇(ゼロ)が最低この数字以上付いてないと千・万などをつける対象にしない"
     },
     {
