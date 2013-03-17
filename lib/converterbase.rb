@@ -662,18 +662,13 @@ class ConverterBase
   #
   def narou_ruby(data)
     # 《》なルビの対処
-    last_i = 0
-    ruby_stack = {}
-    data.gsub!(/(.+?)≪(.+?)≫/).with_index do |match, i|
-      ruby_str = to_ruby(match, $1, $2, ["≪", "≫"])
-      last_i = i
-      ruby_str
+    data.gsub!(/(.+?)≪(.+?)≫/) do |match|
+      to_ruby(match, $1, $2, ["≪", "≫"])
     end
     # （）なルビの対処
     if @text_type != "subtitle"
-      data.gsub!(/(.+?)（([ぁ-んァ-ヴーゞ・Ａ-Ｚａ-ｚA-Za-z　]{,20})）/).with_index(last_i + 1) do |match, i|
-        ruby_str = to_ruby(match, $1, $2, ["（", "）"])
-        ruby_str
+      data.gsub!(/(.+?)（([ぁ-んァ-ヴーゞ・Ａ-Ｚａ-ｚA-Za-z　]{,20})）/) do |match|
+        to_ruby(match, $1, $2, ["（", "）"])
       end
     end
     data.replace(replace_tatesen(data))
