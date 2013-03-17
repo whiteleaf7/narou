@@ -6,20 +6,23 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-$debug = File.exists?(File.join(File.expand_path(File.dirname($0)), "debug"))
-Encoding.default_external = Encoding::UTF_8
-
-require_relative "lib/logger"
-require_relative "lib/version"
-require_relative "lib/commandline"
-
-rescue_level = $debug ? Exception : StandardError
-
 begin
+  $debug = File.exists?(File.join(File.expand_path(File.dirname($0)), "debug"))
+  Encoding.default_external = Encoding::UTF_8
+
+  require_relative "lib/globalsetting"
+
   display_backtrace = ARGV.delete("--backtrace")
   display_backtrace ||= $debug
   $disable_color = ARGV.delete("--no-color")
   $disable_color ||= GlobalSetting.get["global_setting"]["no-color"]
+
+  require_relative "lib/logger"
+  require_relative "lib/version"
+  require_relative "lib/commandline"
+
+  rescue_level = $debug ? Exception : StandardError
+
   CommandLine.run(ARGV)
 rescue rescue_level => e
   warn $@.shift + ": #{e.message} (#{e.class})"

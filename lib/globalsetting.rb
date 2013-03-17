@@ -5,6 +5,7 @@
 
 require "yaml"
 require "singleton"
+require_relative "narou"
 
 #
 # ユーザープロファイルに保存するのでいつでも反映される設定

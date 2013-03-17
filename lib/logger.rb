@@ -7,6 +7,14 @@ require "singleton"
 require "stringio"
 require_relative "color"
 
+if $disable_color
+  class String
+    def termcolor
+      self.gsub(/<\/?.+?>/, "").gsub("&lt;", "<").gsub("&gt;", ">")
+    end
+  end
+end
+
 module LoggerModule
   def initialize
     super
@@ -22,7 +30,11 @@ module LoggerModule
   end
 
   def strip_color(str)
-    str.gsub(/(?:\e\[\d*[a-zA-Z])+/, "")
+    if $disable_color
+      str
+    else
+      str.gsub(/(?:\e\[\d*[a-zA-Z])+/, "")
+    end
   end
 
   def save(path)
@@ -30,12 +42,12 @@ module LoggerModule
   end
 
   def write_console(str, target)
-    if str.encoding == Encoding::ASCII_8BIT
-      str.force_encoding("utf-8")
-    end
     unless @is_silent
-      str = strip_color(str) if $disable_color
-      write_color(str, target)
+      if $disable_color
+        target.write(str)
+      else
+        write_color(str, target)
+      end
     end
   end
 end
@@ -50,6 +62,9 @@ class Logger < StringIO
 
   def write(str)
     str = str.to_s
+    if str.encoding == Encoding::ASCII_8BIT
+      str.force_encoding(Encoding::UTF_8)
+    end
     super(strip_color(str))
     write_console(str, STDOUT)
   end
@@ -65,6 +80,9 @@ class LoggerError < StringIO
 
   def write(str)
     str = str.to_s
+    if str.encoding == Encoding::ASCII_8BIT
+      str.force_encoding(Encoding::UTF_8)
+    end
     super(strip_color(str))
     write_console(str, STDERR)
   end
