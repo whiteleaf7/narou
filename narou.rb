@@ -23,7 +23,7 @@ begin
 
   rescue_level = $debug ? Exception : StandardError
 
-  CommandLine.run(ARGV)
+  CommandLine.run(ARGV.map { |v| v.dup })
 rescue rescue_level => e
   warn $@.shift + ": #{e.message} (#{e.class})"
   if display_backtrace
