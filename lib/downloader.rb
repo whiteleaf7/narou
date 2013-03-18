@@ -178,7 +178,7 @@ class Downloader
           return data["toc_url"]
         end
       end
-      return "#{@@narou["domain"]}/#{target}/"
+      return "#{@@narou["top_url"]}/#{target}/"
     when :id
       data = @@database[target.to_i]
       return data["toc_url"] if data
@@ -550,7 +550,7 @@ class Downloader
     if @setting["tcode"]
       subtitle_url = @setting.replace_group_values("txtdownload_url", subtitle_info)
     elsif href[0] == "/"
-      subtitle_url = @setting["domain"] + href
+      subtitle_url = @setting["top_url"] + href
     else
       subtitle_url = @setting["toc_url"] + href
     end
@@ -654,12 +654,23 @@ class Downloader
   # 小説データの格納ディレクトリを初期設定する
   #
   def init_novel_dir
-    dir_path = get_novel_data_dir
-    FileUtils.mkdir_p(dir_path) unless File.exists?(dir_path)
+    novel_dir_path = get_novel_data_dir
+    FileUtils.mkdir_p(novel_dir_path) unless File.exists?(novel_dir_path)
     default_settings = NovelSetting::DEFAULT_SETTINGS
-    Template.write(NovelSetting::INI_NAME, dir_path, binding)
-    Template.write("converter.rb", dir_path, binding)
-    Template.write(NovelSetting::REPLACE_NAME, dir_path, binding)
+    special_preset_dir = File.join(Narou.get_preset_dir, @setting["domain"], @setting["ncode"])
+    exists_special_preset_dir = File.exists?(special_preset_dir)
+    [NovelSetting::INI_NAME, "converter.rb", NovelSetting::REPLACE_NAME].each do |filename|
+      if exists_special_preset_dir
+        preset_file_path = File.join(special_preset_dir, filename)
+        if File.exists?(preset_file_path)
+          unless File.exists?(File.join(novel_dir_path, filename))
+            FileUtils.cp(preset_file_path, novel_dir_path)
+          end
+          next
+        end
+      end
+      Template.write(filename, novel_dir_path, binding)
+    end
   end
 
   #

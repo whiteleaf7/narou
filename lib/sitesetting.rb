@@ -60,7 +60,14 @@ class SiteSetting
     values = @yaml_setting.merge(@match_values).merge(option_values)
     result = dest.dup
     result.gsub!(/\\\\k<(.+?)>/) do |match|
-      values[$1] || match
+      value = values[$1]
+      if value
+        value.gsub(/\\\\k<(.+?)>/) do
+          replace_group_values($1, option_values)
+        end
+      else
+        match
+      end
     end
     result
   end

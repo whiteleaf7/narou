@@ -1,8 +1,10 @@
 # ------------------------------------------------------------
 # 小説サイト定義
 name: ノクターン・ムーンライト
-domain: http://novel18.syosetu.com
-url: \\k<domain>/(?<ncode>n\d+[a-z]+)
+scheme: http
+domain: novel18.syosetu.com
+top_url: \\k<scheme>://\\k<domain>
+url: \\k<top_url>/(?<ncode>n\d+[a-z]+)
 encoding: UTF-8
 confirm_over18: yes
 
@@ -14,7 +16,7 @@ story: <div class="novel_ex">(?<story>.+?)</div>
 
 # ------------------------------------------------------------
 # 目次取得設定
-toc_url: \\k<domain>/\\k<ncode>/
+toc_url: \\k<top_url>/\\k<ncode>/
 subtitles: |-
   (?:<tr><td class="chapter" colspan="4">(?<chapter>.+?)</td></tr>
    <tr> 
@@ -26,8 +28,8 @@ subtitles: |-
   </td>
   </tr>
 
-tcode: <li><a href="\\k<domain>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
-txtdownload_url: \\k<domain>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
+tcode: <li><a href="\\k<top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
+txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
 
 # ------------------------------------------------------------
 # 特殊な設定
