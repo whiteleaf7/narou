@@ -21,7 +21,6 @@ module Command
     <device>には現在 #{Device::DEVICES.keys.join(", ")} が指定出来ます。
   ・narou setting device=<device>としておけば、<device>の入力を省略できます。
     また、convertコマンドで変換時に(端末がPCに接続されていれば)自動でデータを送信するようになります。
-  ！Windows専用コマンドです！
 
   Example:
     narou send kindle 6
@@ -43,10 +42,6 @@ module Command
       if argv.empty?
         puts @opt.help
         return
-      end
-      unless Helper.os_windows?
-        error "このコマンドはWindows専用です"
-        exit 1
       end
       device = get_device(argv)
       unless device

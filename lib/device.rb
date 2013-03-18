@@ -7,9 +7,13 @@ require "fileutils"
 require_relative "helper"
 
 class Device
-  if Helper.os_windows?
+  case Helper.determine_os
+  when :windows
     require_relative "device/library/windows"
     extend Device::Library::Windows
+  else
+    require_relative "device/library/linux"
+    extend Device::Library::Linux
   end
 
   require_relative "device/kindle"
@@ -48,7 +52,7 @@ class Device
   end
 
   def get_documents_path
-    if Helper.os_windows?
+    if Device.respond_to?(:get_device_root_dir)
       dir = Device.get_device_root_dir(@device::VOLUME_NAME)
       return File.join(dir, @device::DOCUMENTS_PATH) if dir
     end
