@@ -45,17 +45,25 @@ module Helper
     end
   end
 
+  def self.open_browser_linux(address, error_message)
+    %w(xdg-open firefox w3m).each do |browser|
+      system(%!#{browser} "#{address}"!)
+      return if $?.exitstatus != 127
+    end
+    error error_message
+  end
+
   def self.open_directory(path, confirm_message = nil)
-    os = determine_os
-    return if os == :other
     if confirm_message
       return unless confirm(confirm_message)
     end
-    case os
+    case determine_os
     when :windows
       `explorer "file:///#{path.encode(Encoding::Windows_31J)}"`
     when :mac
       `open "#{path}"`
+    else
+      open_browser_linux(path, "フォルダが開けませんでした")
     end
   end
 
@@ -63,9 +71,12 @@ module Helper
     case determine_os
     when :windows
       escaped_url = url.gsub("%", "%^").gsub("&", "^&")
+      # MEMO: start の引数を "" で囲むと動かない
       `start #{escaped_url}`
     when :mac
       `open "#{url}"`
+    else
+      open_browser_linux(url, "ブラウザが見つかりませんでした")
     end
   end
 
