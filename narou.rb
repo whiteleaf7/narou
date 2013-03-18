@@ -1,4 +1,4 @@
-#! ruby
+#! /bin/env ruby
 # -*- coding: utf-8 -*-
 #
 # Narou.rb ― 小説家になろうダウンロード＆整形スクリプト

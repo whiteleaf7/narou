@@ -1,4 +1,4 @@
-#! ruby
+#! /bin/env ruby
 # -*- mode: ruby -*-
 # -*- coding: utf-8 -*-
 #
