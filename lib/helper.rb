@@ -45,7 +45,7 @@ module Helper
     end
   end
 
-  def self.open_directory_by_os_filer(path, confirm_message = nil)
+  def self.open_directory(path, confirm_message = nil)
     os = determine_os
     return if os == :other
     if confirm_message
@@ -59,7 +59,7 @@ module Helper
     end
   end
 
-  def self.open_url_by_browser(url)
+  def self.open_browser(url)
     case determine_os
     when :windows
       escaped_url = url.gsub("%", "%^").gsub("&", "^&")

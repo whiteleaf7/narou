@@ -46,7 +46,7 @@ module Command
         else
           open_url = toc_url
         end
-        Helper.open_url_by_browser(open_url)
+        Helper.open_browser(open_url)
         puts open_url
       end
     end

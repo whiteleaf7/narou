@@ -28,7 +28,7 @@ module Command
       argv.each do |target|
         dir = Downloader.get_novel_data_dir_by_target(target)
         if dir
-          Helper.open_directory_by_os_filer(dir)
+          Helper.open_directory(dir)
           puts dir
         else
           error "#{target} は存在しません"

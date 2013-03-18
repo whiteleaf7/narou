@@ -148,7 +148,7 @@ module Command
         end
 
         unless @options["no-open"]
-          Helper.open_directory_by_os_filer(File.dirname(@converted_txt_path), "小説の保存フォルダを開きますか")
+          Helper.open_directory(File.dirname(@converted_txt_path), "小説の保存フォルダを開きますか")
         end
       end
     rescue Interrupt
