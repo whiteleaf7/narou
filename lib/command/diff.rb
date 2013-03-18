@@ -212,7 +212,7 @@ module Command
       end
       puts "差分一覧"
       cache_list.each.with_index(1) do |cache_path, i|
-        puts ("<yellow>" + File.basename(cache_path) + "   -#{i}</yellow>").termcolor
+        puts ("<bold><yellow>" + File.basename(cache_path) + "   -#{i}</yellow></bold>").termcolor
         cache_section_list = Dir.glob(File.join(cache_path, "*.yaml"))
         if cache_section_list.length > 0
           cache_section_list.map { |section_path|

@@ -65,21 +65,21 @@ module Command
       if !force && @global_setting["aozoraepub3dir"]
         return
       end
-      puts "<green>AozoraEpub3の設定を行います</green>".termcolor
+      puts "<bold><green>AozoraEpub3の設定を行います</green></bold>".termcolor
       unless @global_setting["aozoraepub3dir"]
         puts ("<red>" + "!!!WARNING!!!".center(70) + "</red>").termcolor
         puts "AozoraEpub3の構成ファイルを書き換えます。narouコマンド用に別途新規インストールしておくことをオススメします"
       end
       aozora_path = ask_aozoraepub3_path
       unless aozora_path
-        puts "設定をスキップしました。あとで " + "<yellow>narou init</yellow>".termcolor + " で再度設定出来ます"
+        puts "設定をスキップしました。あとで " + "<bold><yellow>narou init</yellow></bold>".termcolor + " で再度設定出来ます"
         return
       end
       puts
       rewrite_aozoraepub3_files(aozora_path)
       @global_setting["aozoraepub3dir"] = aozora_path
       GlobalSetting.get.save_settings("global_setting")
-      puts "<green>AozoraEpub3の設定を終了しました</green>".termcolor
+      puts "<bold><green>AozoraEpub3の設定を終了しました</green></bold>".termcolor
     end
 
     def rewrite_aozoraepub3_files(aozora_path)
@@ -113,7 +113,7 @@ module Command
 
     def ask_aozoraepub3_path
       puts
-      print "<green>AozoraEpub3のあるフォルダを入力して下さい:</green>\n(未入力でスキップ".termcolor
+      print "<bold><green>AozoraEpub3のあるフォルダを入力して下さい:</green></bold>\n(未入力でスキップ".termcolor
       if @global_setting["aozoraepub3dir"]
         print "、:keep で前回と同じ設定"
       end
@@ -131,7 +131,8 @@ module Command
         when input == ""
           break
         end
-        print "\n<green>入力されたフォルダにAozoraEpub3がありません。もう一度入力して下さい:</green>\n&gt;".termcolor
+        print ("\n<bold><green>入力されたフォルダにAozoraEpub3がありません。" +
+               "もう一度入力して下さい:</green></bold>\n&gt;").termcolor
       end
       nil
     end

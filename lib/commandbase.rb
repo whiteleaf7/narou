@@ -9,9 +9,9 @@ module Command
   class CommandBase
     def initialize(postfix = "")
       @opt = OptionParser.new(nil, 20)
-      @opt.banner = ("<green>" +
+      @opt.banner = ("<bold><green>" +
                      TermColor.escape("Usage: narou #{self.class.to_s.scan(/::(.+)$/)[0][0].downcase} #{postfix}") +
-                     "</green>").termcolor
+                     "</green></bold>").termcolor
       @options = {}
     end
 

@@ -344,13 +344,13 @@ class NovelConverter
     else
       # 小説の監視・検査状況を表示する
       if @inspector.error? || @inspector.warning?
-        puts "<yellow>―――― 小説にエラーもしくは警告が存在します ――――</yellow>".termcolor
+        puts "<bold><yellow>―――― 小説にエラーもしくは警告が存在します ――――</yellow></bold>".termcolor
         puts ""
         @inspector.display(Inspector::ERROR | Inspector::WARNING)
         puts ""
       end
       if @inspector.info?
-        puts "<yellow>―――― 小説の検査状況を表示します ――――</yellow>".termcolor
+        puts "<bold><yellow>―――― 小説の検査状況を表示します ――――</yellow></bold>".termcolor
         puts ""
         @inspector.display(Inspector::INFO)
         puts ""

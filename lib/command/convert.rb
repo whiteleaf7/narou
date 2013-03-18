@@ -189,7 +189,7 @@ module Command
 
       if !@device || !@device.kindle? || @options["no-mobi"]
         puts File.basename(epub_path) + " を出力しました"
-        puts "<green>EPUBファイルを出力しました</green>".termcolor
+        puts "<bold><green>EPUBファイルを出力しました</green></bold>".termcolor
         return epub_path
       end
 
@@ -208,7 +208,7 @@ module Command
         end
       end
       puts File.basename(mobi_path).encode(Encoding::UTF_8) + " を出力しました"
-      puts "<green>MOBIファイルを出力しました</green>".termcolor
+      puts "<bold><green>MOBIファイルを出力しました</green></bold>".termcolor
 
       return mobi_path
     end

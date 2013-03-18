@@ -22,13 +22,13 @@ module Command
     def display_help
       puts HEADER
       puts
-      puts " <green>Usage: narou &lt;command&gt; [arguments...] [options...] [--no-color]</green>".termcolor
+      puts " <bold><green>Usage: narou &lt;command&gt; [arguments...] [options...] [--no-color]</green></bold>".termcolor
       puts
       puts " コマンドの簡単な説明:"
       cmd_list = Command.get_list
       cmd_list.each do |key, command|
         oneline = command.oneline_help.split("\n")
-        puts "   <green>#{key.ljust(12)}</green> #{oneline.shift}".termcolor
+        puts "   <bold><green>#{key.ljust(12)}</green></bold> #{oneline.shift}".termcolor
         oneline.each do |h|
           puts " " * 16 + h
         end
@@ -36,17 +36,17 @@ module Command
       puts
       puts "  各コマンドの詳細は narou <command> -h/--help を参照してください。"
       puts "  各コマンドは先頭の一文字か二文字でも指定できます。"
-      puts "  (e.g. `narou <yellow>d</yellow> n4259s', `narou <yellow>fr</yellow> musyoku')".termcolor
+      puts "  (e.g. `narou <bold><yellow>d</yellow></bold> n4259s', `narou <bold><yellow>fr</yellow></bold> musyoku')".termcolor
       puts "  表示の色は--no-colorとオプションを付けるか`narou s no-color=true'で消せます。".termcolor
     end
 
     def display_help_first_time
       puts HEADER
       puts
-      puts " <green>Usage: narou init</green>".termcolor
+      puts " <bold><green>Usage: narou init</green></bold>".termcolor
       puts
       puts "   まだこのフォルダは初期化されていません。"
-      puts "   <yellow>narou init</yellow> コマンドを実行して初期化を行いましょう。".termcolor
+      puts "   <bold><yellow>narou init</yellow></bold> コマンドを実行して初期化を行いましょう。".termcolor
     end
   end
 end
