@@ -110,7 +110,8 @@ class NovelConverter
 
     aozoraepub3_path = Narou.get_aozoraepub3_path
     unless aozoraepub3_path
-      error "AozoraEpub3が見つからなかったので、EPUBが出力出来ませんでした"
+      error "AozoraEpub3が見つからなかったのでEPUBが出力出来ませんでした。" +
+            "narou initでAozoraEpub3の設定を行なって下さい"
       return nil
     end
     aozoraepub3_basename = File.basename(aozoraepub3_path)
@@ -128,8 +129,11 @@ class NovelConverter
       print "."
     end
     visible_aozora_fonts_directory unless use_dakuten_font
-    # MEMO: Windows環境以外で出力される文字コードはSJISなのか？
-    stdout_capture = res[0].force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
+
+    stdout_capture = res[0]
+    if Helper.os_windows?
+      stdout_capture = stdout_capture.force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
+    end
 
     Dir.chdir(pwd)
 
@@ -175,7 +179,7 @@ class NovelConverter
     if Helper.os_windows?
       epub_path.encode!(Encoding::Windows_31J)
     end
-    command = %!"#{kindlegen_path}" "#{epub_path}"!
+    command = %!"#{kindlegen_path}" -locale ja "#{epub_path}"!
     print "kindlegen実行中"
     res = Helper::AsyncCommand.exec(command) do
       print "."
