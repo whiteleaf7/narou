@@ -1,5 +1,5 @@
 # -*- mode: ruby -*-
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
@@ -53,7 +53,5 @@ narou コマンドのインストール or アップデートが完了しまし�
   gem.files         = `git ls-files`.split("\n") << Narou.create_git_commit_version
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  #gem.require_paths = ["lib"]
   gem.add_dependency "termcolor", ">=1.2.2"
-  gem.add_development_dependency "rspec"
 end
