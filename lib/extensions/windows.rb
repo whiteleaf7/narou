@@ -47,9 +47,9 @@ rescue LoadError
     begin
       dlload "kernel32"
       extern "long GetLogicalDriveStrings(long, void*)"
-      extern "long SetConsoleTextAttribute(long, long)"
-      extern "long GetConsoleScreenBufferInfo(long, void*)"
-      extern "long GetStdHandle(long)"
+      extern "unsigned long SetConsoleTextAttribute(unsigned long, unsigned long)"
+      extern "unsigned long GetConsoleScreenBufferInfo(unsigned long, void*)"
+      extern "unsigned long GetStdHandle(unsigned long)"
       extern "long GetLastError()"
     rescue DL::DLError
       raise InvalidOS, "not Windows"
