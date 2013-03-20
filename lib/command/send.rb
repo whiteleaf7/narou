@@ -14,24 +14,29 @@ module Command
     end
 
     def initialize
-      super("<device> <target1> [<target2> ...]")
+      super("<device> [<target1> <target2> ...]")
       @opt.separator <<-EOS
 
-  ・指定した小説の電子書籍データ(#{Device::DEVICES.map{|_,d| d::EBOOK_FILE_EXT}.join(", ")})を<device>で指定した端末に送信します。
+  ・<target>で指定した小説の電子書籍データ(#{Device::DEVICES.map{|_,d| d::EBOOK_FILE_EXT}.join(", ")})を<device>で指定した端末に送信します。
     <device>には現在 #{Device::DEVICES.keys.join(", ")} が指定出来ます。
   ・narou setting device=<device>としておけば、<device>の入力を省略できます。
     また、convertコマンドで変換時に(端末がPCに接続されていれば)自動でデータを送信するようになります。
+  ・<target>を省略した場合、管理している小説全てのファイルのタイムスタンプを端末のものと比べて新しければ送信します。
 
   Example:
     narou send kindle 6
     narou send kobo 6
+
+    # <device>の省略
     narou setting device=kindle
-    narou send 6        # <device>の省略
+    narou send 6
+
+    narou send      # 端末のファイルより新しいファイルがあれば送信
       EOS
     end
 
     def get_device(argv)
-      if Device.exists?(argv.first)
+      if argv.first && Device.exists?(argv.first)
         return Narou.get_device(argv.shift)
       end
       Narou.get_device
@@ -39,10 +44,6 @@ module Command
 
     def execute(argv)
       super
-      if argv.empty?
-        puts @opt.help
-        return
-      end
       device = get_device(argv)
       unless device
         error "デバイス名を指定して下さい"
@@ -52,6 +53,15 @@ module Command
         error "#{device.name}が接続されていません"
         exit 1
       end
+      send_all = false
+      titles = {}
+      if argv.empty?
+        send_all = true
+        Database.instance.each do |id, data|
+          argv << id
+          titles[id] = data["title"]
+        end
+      end
       argv.each do |target|
         ebook_path = Narou.get_ebook_file_path(target, device.ebook_file_ext)
         unless ebook_path
@@ -59,8 +69,15 @@ module Command
           next
         end
         unless File.exists?(ebook_path)
-          error "まだファイル(#{File.basename(ebook_path)})が無いようです"
+          error "まだファイル(#{File.basename(ebook_path)})が無いようです" unless send_all
           next
+        end
+        if send_all
+          if device.ebook_file_old?(ebook_path)
+            puts "<green>ID:#{target}　#{titles[target]}</green>".termcolor
+          else
+            next
+          end
         end
         print "#{device.name}へ送信しています"
         exit_copy = false
@@ -73,8 +90,8 @@ module Command
           print "."
           sleep(0.5)
         end
-        puts
         if copy_to_path
+          puts
           puts copy_to_path + " へコピーしました"
         else
           error "#{device.name}が見つからなかったためコピー出来ませんでした"

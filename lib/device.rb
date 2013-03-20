@@ -59,6 +59,17 @@ class Device
     nil
   end
 
+  def ebook_file_old?(src_file)
+    documents_path = get_documents_path
+    if documents_path
+      dst_path = File.join(documents_path, File.basename(src_file))
+      if File.exists?(dst_path)
+        return File.mtime(src_file) > File.mtime(dst_path)
+      end
+    end
+    true
+  end
+
   def copy_to_documents(src_file)
     documents_path = get_documents_path
     if documents_path
@@ -68,23 +79,19 @@ class Device
         cmd = "copy /B " + %!"#{src_file}" "#{dst_path}"!.gsub("/", "\\").encode(Encoding::Windows_31J)
         capture = `#{cmd}`
         if $?.exitstatus > 0
-          puts
-          error capture.force_encoding(Encoding::Windows_31J).rstrip
-          exit 1
+          raise capture.force_encoding(Encoding::Windows_31J).rstrip
         end
       else
-        begin
-          FileUtils.cp(src_file, dst_path)
-        rescue => e
-          puts
-          error e.message
-          exit 1
-        end
+        FileUtils.cp(src_file, dst_path)
       end
       dst_path
     else
       nil
     end
+  rescue Exception => e
+    puts
+    error $@.shift + ": #{e.message} (#{e.class})"
+    exit 1
   end
 
   private

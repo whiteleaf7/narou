@@ -35,6 +35,14 @@ class Database
     end
   end
 
+  def each_key(&block)
+    if block
+      @database.each_key(&block)
+    else
+      @database.each_key
+    end
+  end
+
   def delete(key)
     @database.delete(key)
   end

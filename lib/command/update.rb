@@ -37,7 +37,7 @@ module Command
       update_target_list = argv.dup
       no_open = false
       if update_target_list.empty?
-        Database.instance.each do |id, _|
+        Database.instance.each_key do |id|
           update_target_list << id
         end
         no_open = true
