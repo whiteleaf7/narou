@@ -41,6 +41,7 @@ class ConverterBase
     @english_sentences = []
     @url_list = []
     @illust_chuki_list = []
+    @kanji_num_list = {}
     @in_author_comment_block = nil
   end
 
@@ -81,8 +82,10 @@ class ConverterBase
   # アラビア数字を漢数字に
   #
   # カンマ区切りの数字はアラビア数字のままにしておく
+  # もともと漢数字なのは他の変換を受けないように退避させておく
   #
   def num_to_kanji(data)
+    stash_kanji_num(data)
     data.gsub!(/[\d０-９,，]+/) do |match|
       if match =~ /[,，]/
         match
@@ -91,6 +94,22 @@ class ConverterBase
       end
     end
     data
+  end
+
+  def stash_kanji_num(data)
+    data.gsub!(/[#{KANJI_NUM}十百千万億兆京]+/).with_index do |match, i|
+      if "#{$`[-1]}#{$'[0]}" =~ /[\d０-９]/
+        next match
+      end
+      @kanji_num_list[convert_numbers(i.to_s)] = match
+      "［＃漢数字＝#{i}］"
+    end
+  end
+
+  def rebuild_kanji_num(data)
+    data.gsub!(/［＃漢数字＝(.+?)］/) do
+      @kanji_num_list[$1]
+    end
   end
 
   #
@@ -105,6 +124,25 @@ class ConverterBase
   KANJI_NUM_UNITS_DIGIT = {
     "十" => 1, "百" => 2, "千" => 3, "万" => 4, "億" => 8, "兆" => 12, "京" => 16
   }
+
+  def __calc_kanji_num_with_unit(string)
+    total = 0
+    string.scan(/([#{KANJI_NUM}]*)([十百千]*)/) do |num, units|
+      break if num + units == ""
+      num = "1" if num.empty?
+      total += (num.tr(KANJI_NUM, "0-9") + units.each_char.map { |c| "0" * KANJI_NUM_UNITS_DIGIT[c] }.join).to_i
+    end
+    total
+  end
+
+  def kanji_num_to_integer(string)
+    total = 0
+    string.scan(/([#{KANJI_NUM}十百千]+)([万億兆京]*)/) do |num, units|
+      total += (__calc_kanji_num_with_unit(num).to_s + units.each_char.map { |c| "0" * KANJI_NUM_UNITS_DIGIT[c] }.join).to_i
+    end
+    total
+  end
+
   #
   # 漢数字を単位を使った表現に変換
   #
@@ -114,16 +152,13 @@ class ConverterBase
   def convert_kanji_num_with_unit(data, lower_digit_zero = 0)
     #data.gsub!(/([#{KANJI_NUM}]+)([十百千万億兆京]?)/) do |match|
     data.gsub!(/([#{KANJI_NUM}十百千万億兆京]+)/) do |match|
-      total = 0
-      $1.scan(/([#{KANJI_NUM}]+)([十百千万億兆京]*)/) do |num, units|
-        total += (num.tr(KANJI_NUM, "0-9") + units.each_char.map { |c| "0" * KANJI_NUM_UNITS_DIGIT[c] }.join).to_i
-      end
+      total = kanji_num_to_integer($1)
       m1 = total.to_s.tr("0-9", KANJI_NUM)
       if m1 =~ /〇{#{lower_digit_zero},}$/
         digits = m1.reverse.scan(/.{1,4}/).map(&:reverse).reverse   # 下の桁から4桁ずつ区切った配列を作成
         keta = digits.count - 1
         digits.map.with_index { |nums, keta_i|
-          nums.scan(/./).map.with_index { |d, di|
+          four_digit_num = nums.scan(/./).map.with_index { |d, di|
             next "" if d == "〇"
             kurai = KANJI_KURAI[nums.length - di - 1]
             if d == "一"
@@ -134,7 +169,12 @@ class ConverterBase
               end
             end
             d + kurai
-          }.join + KANJI_NUM_UNITS[keta - keta_i]
+          }.join
+          if four_digit_num.length > 0
+            four_digit_num + KANJI_NUM_UNITS[keta - keta_i]
+          else
+            ""
+          end
         }.join
       else
         match
@@ -944,7 +984,8 @@ class ConverterBase
     rebuild_illust(data)
     rebuild_url(data)
     rebuild_english_sentences(data)
-    # rebuild_english_sentences で再構築された英文にルビがふられる可能性を考慮して、
+    rebuild_kanji_num(data)
+    # 再構築された文章にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
     # 三点リーダーの変換は、ルビで圏点として・・・を使っている場合を考慮して、ルビ処理後にする
