@@ -709,7 +709,7 @@ class ConverterBase
     end
     # （）なルビの対処
     if @text_type != "subtitle"
-      data.gsub!(/(.+?)（([ぁ-んァ-ヴーゞ・Ａ-Ｚａ-ｚA-Za-z　]{,20})）/) do |match|
+      data.gsub!(/(.+?)（([ぁ-んァ-ヶーゝゞ・Ａ-Ｚａ-ｚA-Za-z　]{,20})）/) do |match|
         to_ruby(match, $1, $2, ["（", "）"])
       end
     end
