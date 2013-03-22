@@ -22,7 +22,7 @@ module Command
       super("<target> [<target2> ...] [option]")
       @opt.separator <<-EOS
 
-  ・指定した小説を縦書用に整形及びEPUB、MOBIに変換します。
+  ・指定した小説を縦書き用に整形及びEPUB、MOBIに変換します。
   ・変換したい小説のNコード、URL、タイトルもしくはIDを指定して下さい。
     IDは #{@opt.program_name} list を参照して下さい。
   ・一度に複数の小説を指定する場合は空白で区切って下さい。

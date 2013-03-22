@@ -5,7 +5,7 @@
 
 module Command
   class Help < CommandBase
-    HEADER = "Narou.rb ― 小説家になろうダウンローダ＆縦書用整形スクリプト"
+    HEADER = "Narou.rb ― 小説家になろうダウンローダ＆縦書き用整形スクリプト"
 
     def oneline_help
       "このヘルプを表示します"
