@@ -40,7 +40,7 @@ module Command
         id = novel["id"]
         frozen = Narou.novel_frozen?(id)
         disp_id = ((frozen ? "*" : "") + id.to_s).rjust(4)
-        disp_id = disp_id.sub("*", "<blue>*</blue>").termcolor if frozen
+        disp_id = disp_id.sub("*", "<cyan>*</cyan>").termcolor if frozen
         puts [
           disp_id,
           novel["last_update"].strftime("%y/%m/%d"),
