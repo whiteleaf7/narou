@@ -240,6 +240,7 @@ module Command
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
         "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
+        
       },
       global: {
         "aozoraepub3dir" => [:directory, "AozoraEpub3のあるフォルダを指定", INVISIBLE],
@@ -255,6 +256,11 @@ module Command
         #TYPE_OF_VALUE[default[:value].class], "\n      " + default[:help], INVISIBLE
         TYPE_OF_VALUE[default[:value].class], "", INVISIBLE
       ]
+    end
+
+    Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), "*.rb"))) do |path|
+      cmd_name = File.basename(path, ".rb")
+      SETTING_VARIABLES[:local]["default_args." + cmd_name] = [:string, "", INVISIBLE]
     end
   end
 end

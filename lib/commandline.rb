@@ -6,6 +6,7 @@
 require_relative "narou"
 require_relative "command"
 require_relative "helper"
+require_relative "localsetting"
 
 module CommandLine
   def self.run(argv)
@@ -29,6 +30,12 @@ module CommandLine
       puts
       arg = "help"
     end
-    Command.get_list[arg].execute(argv)
+    default_arguments = load_default_arguments(arg)
+    Command.get_list[arg].execute(argv + default_arguments)
+  end
+
+  def self.load_default_arguments(cmd)
+    default_arguments_list = LocalSetting.get["local_setting"]
+    (default_arguments_list["default_args.#{cmd}"] || "").split
   end
 end
