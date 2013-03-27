@@ -1,0 +1,249 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Narou by whiteleaf7</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Narou</h1>
+        <p>Narou.rb ― 「小説家になろう」「小説を読もう！」ダウンローダ＆縦書用整形スクリプト</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/whiteleaf7/narou" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/whiteleaf7/narou/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/whiteleaf7/narou/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>Narou.rb ― 小説家になろうダウンローダ＆縦書用整形スクリプト</h1>
+
+<h2>概要 - Summary</h2>
+
+<p>このアプリは<a href="http://syosetu.com/">小説家になろう</a>、<a href="http://yomou.syosetu.com/">小説を読もう！</a>で公開されている小説の管理、
+及び電子書籍データへの変換を支援します。縦書用に特化されており、
+横書き用に特化されたWEB小説を違和感なく縦書で読むことが出来るようになります。
+また、若干の校正機能もありますので、小説としての一般的な整形ルールに矯正します。（例：感嘆符のあとにはスペースが必ずくる）</p>
+
+<p><a href="http://noc.syosetu.com/">ノクターンノベルズ</a>及び<a href="http://mnlt.syosetu.com/">ムーンライトノベルズ</a>にも対応しています。</p>
+
+<p>全てコンソールで操作するCUIアプリケーションです。</p>
+
+<p>主な機能は小説家になろうの小説のダウンロード、更新管理、テキスト整形、AozoraEpub3・kindlegen連携によるEPUB/MOBI出力です。</p>
+
+<p>詳細な説明やインストール方法は <strong><a href="https://github.com/whiteleaf7/narou/wiki">Narou.rb 説明書</a></strong> を御覧ください。</p>
+
+<h2>更新履歴 - ChangeLog</h2>
+
+<p>2013/03/23 : <strong>1.2.1</strong></p>
+
+<ul>
+<li>Bug Fix
+
+<ul>
+<li>ノノカギのとじ忘れがあると以降のノノカギのとじ開きが逆になってしまうバグを修正
+
+<ul>
+<li>この修正によって改行を含んだノノカギでおかしくなるが、仕様とする</li>
+</ul>
+</li>
+<li>濁点フォント(DMincho.ttf)に含まれていない文字は縦中横の擬似表現にする</li>
+<li>アラビア数字の漢数字化がちゃんと変換できていなかったのを修正</li>
+</ul>
+</li>
+<li>
+<p>追加機能もしくは仕様変更</p>
+
+<ul>
+<li>
+<code>send</code> コマンドで管理する全ての小説を送信する機能追加
+
+<ul>
+<li>
+<code>send</code> を引数なしで実行することで、端末にある書籍データより新しければ送信する</li>
+</ul>
+</li>
+<li>DMincho.ttfの濁点対応文字を増やした（ι゛ および カタカナに濁点）。 <strong>narou init でAozoraEpub3の再設定が必要です</strong>
+</li>
+<li>
+<p>コマンドのデフォルトのオプションを指定できる機能を追加</p>
+
+<ul>
+<li>
+<code>narou setting default_args.コマンド名="オプション"</code> で設定出来ます。注意：これは、直接コマンドを発行した時のみ有効です。
+他のコマンド経由で呼ばれる場合には有効にはなりません。</li>
+</ul>
+<pre><code># 使用例
+# list コマンドで、「更新日の」「古い順」に表示するオプションを設定(リストが長くなった時に便利)
+narou setting default_args.list="-lr"
+# オプションを指定しなくても、default_args.listで設定したオプションが使われる
+narou list
+
+# 削除確認メッセージ毎回表示しない
+narou setting default_args.remove="-y"
+narou remove 0
+</code></pre>
+</li>
+</ul>
+</li>
+</ul><p>2013/03/19 : <strong>1.2.0</strong></p>
+
+<ul>
+<li>Bug Fix 及び機能改善
+
+<ul>
+<li>Windows以外のOSでの動作状況を改善しました(Ubuntu Linuxで確認。Mac OS Xは未確認だが恐らく動くはず)
+
+<ul>
+<li>Nコードを指定した場合にエラーが出ていたのを修正</li>
+<li>AozoraEpub3の出力をうまく扱えていなくエラーが出ていたのを修正</li>
+<li>Linuxでも <code>folder</code> 及び <code>browser</code> コマンドを使えるように改善</li>
+<li>
+<code>send</code> コマンドでデバイスへ送信出来るように(Linuxのみ確認、Mac OS Xは未確認)
+
+<ul>
+<li>/media もしくは /mnt を探します。送信出来ない場合はこのフォルダにマウントされているか確認して下さい</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>shebangの記述をちゃんと動くように修正(gem でインストールした場合は影響なし)</li>
+<li>--no-color 時の処理の最適化</li>
+</ul>
+</li>
+<li>追加機能もしくは仕様変更
+
+<ul>
+<li>漢数字の単位化下限のデフォルトを3桁から4桁へ変更(kanji_num_with_units_lower_digit_zero=3)
+
+<ul>
+<li>
+<code>100 → 一〇〇、1000 → 千</code> と変換される</li>
+</ul>
+</li>
+<li>章タイトルページの柱の位置調整</li>
+<li>行頭二分アキをいれる対象にノノカギ（〝）を追加</li>
+<li>！？の直後に全角アキを自動挿入しないパターンに閉じノノカギ（〟）を追加</li>
+<li>小説のDL時に最初から用意された変換設定を適用する機能追加
+
+<ul>
+<li>以下の小説の設定を同梱しました（気まぐれで増えていきます）
+
+<ul>
+<li><a href="http://ncode.syosetu.com/n1839bd/">オーバーロード：後編</a></li>
+<li><a href="http://ncode.syosetu.com/n4259s/">異世界迷宮で奴隷ハーレムを</a></li>
+<li><a href="http://ncode.syosetu.com/n8725k/">ログ・ホライズン</a></li>
+<li><a href="http://ncode.syosetu.com/n9669bk/">無職転生　- 異世界行ったら本気だす -</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul><p>2013/03/18 : <strong>1.1.2.1</strong></p>
+
+<ul>
+<li>Bug Fix
+
+<ul>
+<li>Linuxで実行不可能になるエラー修正</li>
+</ul>
+</li>
+</ul><p>2013/03/17 : <strong>1.1.2</strong></p>
+
+<ul>
+<li>Bug Fix
+
+<ul>
+<li>Fiddleがない環境でエラーになってたので修正</li>
+<li>同一行に（）と《》のルビが混在していた時に正しく処理出来ていなかったのを修正</li>
+<li>短編小説をDLしようとした時にDL出来ない旨メッセージを表示するように</li>
+<li>！？の縦中横化で自然ではない変換パターンに対応</li>
+</ul>
+</li>
+<li>追加機能もしくは仕様変更
+
+<ul>
+<li>なろうのルビ仕様に追随
+
+<ul>
+<li>全角空白もルビ対象として許容する</li>
+<li>サブタイトルのカッコはルビをふらない</li>
+</ul>
+</li>
+<li>中黒(・)を３個以上連続して使っているのを三点リーダーに変換する機能実装
+
+<ul>
+<li>
+<code>setting.ini</code> に <code>enable_convert_horizontal_ellipsis</code> を追加</li>
+</ul>
+</li>
+<li>表示を若干色つけするように
+
+<ul>
+<li>色つけを抑制にするには <code>--no-color</code> オプションか <code>narou s no-color=true</code> で</li>
+</ul>
+</li>
+<li>節のタイトル（中見出し）の位置を若干調整 (template/novel.txt.erb)</li>
+</ul>
+</li>
+</ul><p>2013/03/09 : <strong>1.1.1</strong></p>
+
+<ul>
+<li>Bug Fix
+
+<ul>
+<li>URL文字列のリンクを a タグに変更し忘れ修正</li>
+<li>update コマンドにIDを直指定した時の変換時に不正な引数を渡していたのを修正</li>
+</ul>
+</li>
+<li>追加機能もしくは仕様変更
+
+<ul>
+<li>三点リーダーの偶数化を１つからするように変更</li>
+</ul>
+</li>
+</ul>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/whiteleaf7">whiteleaf7</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-2795178-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
