@@ -354,7 +354,7 @@ class ConverterBase
         @use_dakuten_font = true
         "［＃濁点］#{m1}［＃濁点終わり］"
       else
-        tcy($1 + "゛")
+        tcy(m1 + "゛")
       end
     end
   end
