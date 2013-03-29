@@ -82,13 +82,12 @@ class NovelConverter
   #
   def self.txt_to_epub(filename, use_dakuten_font = false, dst_dir = nil, device = nil, verbose = false)
     abs_srcpath = File.expand_path(filename)
-    #cover_path = File.join(File.dirname(filename), "cover.jpg")
+
     cover_option = ""
     # MEMO: 外部実行からだと -c FILENAME, -c 1 オプションはぬるぽが出て動かない
-    #if File.exists?(cover_path)
-      #cover_option = %!--cover "#{cover_path}"!
+    if get_cover_filename(File.dirname(abs_srcpath))
       cover_option = "-c 0"   # 先頭の挿絵を表紙として利用
-    #end
+    end
 
     dst_option = ""
     if dst_dir
@@ -238,19 +237,29 @@ class NovelConverter
   end
 
   #
+  # 表紙用の画像名取得
+  #
+  def self.get_cover_filename(archive_path)
+    [".jpg", ".png", ".jpeg"].each do |ext|
+      filename = "cover#{ext}"
+      cover_path = File.join(archive_path, filename)
+      if File.exists?(cover_path)
+        return filename
+      end
+    end
+    nil
+  end
+
+  #
   # 表紙用挿絵注記作成
   #
   def create_cover_chuki
-    result = ""
-    [".jpg", ".png", ".jpeg"].each do |ext|
-      filename = "cover#{ext}"
-      cover_path = File.join(@setting.archive_path, filename)
-      if File.exists?(cover_path)
-        result = "［＃挿絵（#{filename}）入る］"
-        break
-      end
+    cover_filename = self.class.get_cover_filename(@setting.archive_path)
+    if cover_filename
+      "［＃挿絵（#{cover_filename}）入る］"
+    else
+      ""
     end
-    result
   end
 
   #
