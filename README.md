@@ -16,6 +16,8 @@ Narou.rb ― 小説家になろうダウンローダ＆縦書用整形スクリ�
 
 詳細な説明やインストール方法は **[Narou.rb 説明書](https://github.com/whiteleaf7/narou/wiki)** を御覧ください。
 
+![ScreenCapture](https://raw.github.com/wiki/whiteleaf7/narou/images/narou_cap.gif)
+
 更新履歴 - ChangeLog
 --------------------
 2013/03/29 : **1.2.2**
