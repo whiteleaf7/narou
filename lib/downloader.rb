@@ -309,13 +309,13 @@ class Downloader
       return nil
     end
     unless latest_toc
-      error @setting["url"] + " の目次データが取得出来ませんでした"
+      error @setting["toc_url"] + " の目次データが取得出来ませんでした"
       return nil
     end
     if @setting["confirm_over18"]
       unless confirm_over18?
         puts "18歳以上のみ閲覧出来る小説です。ダウンロードを中止しました"
-        return false
+        return nil
       end
     end
     old_toc = load_novel_data(TOC_FILE_NAME)
@@ -414,7 +414,7 @@ class Downloader
       end
     rescue OpenURI::HTTPError => e
       if e.message =~ /^404/
-        error "指定されたURLは存在しません"
+        error "<red>[404]</red> 小説が削除されている可能性があります"
         return false
       else
         raise

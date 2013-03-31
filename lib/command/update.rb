@@ -66,6 +66,8 @@ module Command
             convert_argv << "--no-open" if no_open
             Convert.execute_and_rescue_exit(convert_argv)
           end
+        elsif is_updated.nil?
+          puts "#{data["title"]} の更新に失敗しました"
         else
           puts "#{data["title"]} に更新はありません"
         end
