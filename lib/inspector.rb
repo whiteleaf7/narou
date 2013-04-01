@@ -19,7 +19,7 @@ class Inspector
 
   KLASS_TAG = { ERROR => "エラー", WARNING =>  "警告", INFO => "INFO" }
 
-  IGNORE_INDENT_CHAR = "　(（「『〈《≪【〔―・※"
+  IGNORE_INDENT_CHAR = "　(（「『〈《≪【〔―・※［"
   AUTO_INDENT_THRESHOLD_RATIO = 0.6   # 全行のうちこの割合以上字下げされてなければ強制字下げする
 
   attr_writer :messages, :subtitle
