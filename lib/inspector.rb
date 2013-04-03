@@ -19,8 +19,8 @@ class Inspector
 
   KLASS_TAG = { ERROR => "エラー", WARNING =>  "警告", INFO => "INFO" }
 
-  IGNORE_INDENT_CHAR = "　(（「『〈《≪【〔―・※［"
-  AUTO_INDENT_THRESHOLD_RATIO = 0.6   # 全行のうちこの割合以上字下げされてなければ強制字下げする
+  IGNORE_INDENT_CHAR = "(（「『〈《≪【〔―・※［〝"
+  AUTO_INDENT_THRESHOLD_RATIO = 0.5   # 括弧等を除く全ての行のうちこの割合以上字下げされてなければ強制字下げする
 
   attr_writer :messages, :subtitle
 
@@ -191,11 +191,17 @@ class Inspector
   # 行頭字下げをするべきか調べる
   #
   def inspect_indent(data)
-    dont_indent_line_count = data.scan(/^[^#{IGNORE_INDENT_CHAR}]/).count
-    lines = data.lines
-    # MEMO: Enumerable#size (via http://jp.rubyist.net/magazine/?0041-200Special-note#l11)
-    line_count = (lines.respond_to?(:size) ? lines.size : lines.count)
-    ratio = dont_indent_line_count / line_count.to_f
+    target_line_count = 0
+    dont_indent_line_count = 0
+    data.scan(/^[^#{IGNORE_INDENT_CHAR}]/).tap { |a|
+      target_line_count = a.count
+    }.each { |line|
+      head = line[0]
+      unless head == " " || head == "　"
+        dont_indent_line_count += 1
+      end
+    }
+    ratio = dont_indent_line_count / target_line_count.to_f
     return ratio > AUTO_INDENT_THRESHOLD_RATIO
   end
 end

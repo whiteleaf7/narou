@@ -475,7 +475,7 @@ class ConverterBase
     data.gsub!(FULL_INDENT_TARGET, "　\\1")
     if @setting.enable_auto_indent && @inspector.inspect_indent(data)
       data.gsub!(/^([^#{Inspector::IGNORE_INDENT_CHAR}])/) do
-        $1 == " " ? "　" : "　#{$1}"
+        $1 == " " || $1 == "　" ? "　" : "　#{$1}"
       end
     end
   end
