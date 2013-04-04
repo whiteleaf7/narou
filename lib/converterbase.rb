@@ -70,7 +70,7 @@ class ConverterBase
   def convert_numbers(data)
     # 小数点を・に
     data.gsub!(/([\d０-９#{KANJI_NUM}]+?)[\.．]([\d０-９#{KANJI_NUM}]+?)/, "\\1・\\2")
-    if @setting.enable_convert_num_to_kanji
+    if @setting.enable_convert_num_to_kanji && @text_type != "subtitle"
       num_to_kanji(data)
     else
       hankaku_num_to_zenkaku_num(data)
