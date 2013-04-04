@@ -896,6 +896,7 @@ class ConverterBase
     if @setting.enable_kanji_num_with_units
       convert_kanji_num_with_unit(data, @setting.kanji_num_with_units_lower_digit_zero)
     end
+    rebuild_kanji_num(data)
     insert_separate_space(data)
     convert_special_characters(data)
     convert_fraction_and_date(data)
@@ -985,7 +986,6 @@ class ConverterBase
     rebuild_illust(data)
     rebuild_url(data)
     rebuild_english_sentences(data)
-    rebuild_kanji_num(data)
     # 再構築された文章にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
