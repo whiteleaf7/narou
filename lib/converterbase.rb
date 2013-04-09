@@ -375,11 +375,6 @@ class ConverterBase
       end
     end
     # たまに見かける誤字対策
-    # MEMO: 。。。　検索結果：355作品
-    #       、、、　検索結果：171作品
-    # 上記の三点リーダー的使い方は考慮しない
-    data.gsub!(/。+/, "。")
-    data.gsub!(/、+/, "、")
     data.gsub!(/。　/, "。")
     data.gsub!(/([？！])。/, "\\1")
   end
@@ -694,7 +689,7 @@ class ConverterBase
   #
   def auto_join_line(data)
     # 次の行の冒頭が開き記号だったら意図的な改行だと判断して連結しない
-    data.gsub!(/、\n　([^「『(（【<＜〈《≪…―])/, "、\\1")
+    data.gsub!(/([^、])、\n　([^「『(（【<＜〈《≪…‥―])/, "\\1、\\2")
     # TODO: 文章の途中で不自然に改行しているところを連結
     #       不自然な改行の検出方法が不明
     #data.gsub!(/[^。…―－\-」』)）>＞］\]〉》】〕｝\}0-9０-９]/
@@ -809,18 +804,22 @@ class ConverterBase
   end
 
   #
-  # 中黒(・)を並べて三点リーダーもどきにしているのを三点リーダーに変換
+  # 中黒(・)や句読点を並べて三点リーダーもどきにしているのを三点リーダーに変換
   #
   def convert_horizontal_ellipsis(data)
     return if !@setting.enable_convert_horizontal_ellipsis || @text_type == "subtitle"
-    data.gsub!(/・{3,}/) do |match|
-      pre_char, post_char = $`[-1], $'[0]
-      if pre_char == "―" || post_char == "―"
-        match
-      else
-        "…" * ((match.length / 3.0 / 2).ceil * 2)
+    %w(・ 。 、).each do |char|
+      data.gsub!(/#{char}{3,}/) do |match|
+        pre_char, post_char = $`[-1], $'[0]
+        if pre_char == "―" || post_char == "―"
+          match
+        else
+          "…" * ((match.length / 3.0 / 2).ceil * 2)
+        end
       end
     end
+    data.gsub!("。。", "。")
+    data.gsub!("、、", "、")
   end
 
   #
