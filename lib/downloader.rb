@@ -448,6 +448,11 @@ class Downloader
       index_in_old_toc = old_subtitles.index { |item| item["index"] == index }
       next true unless index_in_old_toc
       old = old_subtitles[index_in_old_toc]
+      # タイトルチェック
+      if old["subtitle"] != latest["subtitle"]
+        next true
+      end
+      # 更新日チェック
       old_subupdate = old["subupdate"]
       latest_subupdate = latest["subupdate"]
       if old_subupdate == ""
@@ -509,12 +514,10 @@ class Downloader
       info["element"] = section_element
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
-      if different_section?(section_file_path, info)
-        print " (更新あり)" if @force
-        move_to_cache_dir(section_file_path)
-        save_novel_data(section_file_path, info)
-        save_least_one = true
-      end
+      print " (更新あり)" if @force && different_section?(section_file_path, info)
+      move_to_cache_dir(section_file_path)
+      save_novel_data(section_file_path, info)
+      save_least_one = true
       puts
     end
     remove_cache_dir unless save_least_one

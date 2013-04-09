@@ -26,7 +26,7 @@ module Command
 
   Options:
       EOS
-      @opt.on("-f", "--force", "全話を再ダウンロードする。中身が同じなら上書きはしない") {
+      @opt.on("-f", "--force", "全話を強制再ダウンロードする") {
         @options["force"] = true
       }
       @opt.on("-n", "--no-convert", "変換をせずダウンロードのみ実行する") {
