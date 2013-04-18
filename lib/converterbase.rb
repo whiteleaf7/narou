@@ -15,6 +15,7 @@ class ConverterBase
 
   def before(io, text_type)
     data = io.string
+    convert_page_break(data)
     data.gsub!("\n\n", "\n")
     data.gsub!("\n\n\n", "\n\n")
     io
@@ -875,6 +876,17 @@ class ConverterBase
     end
     if del_count > 0
       @inspector.info("後書きをすべて削除しました。削除した数は#{del_count}個です。")
+    end
+  end
+
+  #
+  # 一定以上の連続する空行を改ページに変換
+  #
+  def convert_page_break(data)
+    if @setting.enable_convert_page_break
+      threshold = @setting.to_page_break_threshold + 1
+      # `改ページ' を使うと見出し付与等で混乱するので自動生成したものは区別する
+      data.gsub!(/\n{#{threshold},}/, "\n［＃改頁］\n")
     end
   end
 

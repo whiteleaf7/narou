@@ -206,5 +206,15 @@ class NovelSetting
       value: true,
       help: "中黒(・)を並べて三点リーダーもどきにしているのを三点リーダーに変換する"
     },
+    {
+      name: "enable_convert_page_break",
+      value: true,
+      help: "`to_page_break_threshold` で設定した個数以上連続する空行を改ページに変換する"
+    },
+    {
+      name: "to_page_break_threshold",
+      value: 8,
+      help: "ここで設定した値が `enable_convert_page_break` に反映される"
+    },
   ]
 end
