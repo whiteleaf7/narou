@@ -440,11 +440,10 @@ class ConverterBase
   end
 
   #
-  # 半角アラビア数字の処理
-  #
-  # 1,2桁：縦中横化
+  # 半角アラビア数字の全角化
   #
   # 3桁以上：全角化
+  # 1,2桁：縦中横化
   #
   def hankaku_num_to_zenkaku_num(data)
     data.gsub!(/\d+/) do |num|
@@ -496,7 +495,7 @@ class ConverterBase
         bottom = " ―"
       end
       (blank_line?(@before_line) ? "" : "\n") + "　　　［＃ゴシック体］" + \
-      top + zenkaku_num_to_hankaku_num(chapter) + bottom + "［＃ゴシック体終わり］"
+      top + hankaku_num_to_zenkaku_num(zenkaku_num_to_hankaku_num(chapter)) + bottom + "［＃ゴシック体終わり］"
     end
   end
 
