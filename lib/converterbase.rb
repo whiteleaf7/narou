@@ -480,10 +480,10 @@ class ConverterBase
   # 章見出しっぽい文字列を字下げして前後に空行を入れる
   #
   def force_indent_special_chapter(line)
-    line.sub!(/^[ 　\t]*([－―<＜〈-])([0-9０-９#{KANJI_NUM}]+)([－―>＞〉-])$/) do
+    line.sub!(/^(?:[ 　\t]|［＃二分アキ］)*([－―<＜〈-]*)([0-9０-９#{KANJI_NUM}]+)([－―>＞〉-]*)$/) do
       @request_insert_blank_next_line = true
       top, chapter, bottom = $1, $2, $3
-      if "―－-".include?(top)
+      if top != "" && "―－-".include?(top)
         top = "― "
         bottom = " ―"
       end
