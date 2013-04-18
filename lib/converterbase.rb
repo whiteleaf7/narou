@@ -440,11 +440,19 @@ class ConverterBase
   end
 
   #
-  # ３桁以上の半角数字を全角アラビア数字に
+  # 半角アラビア数字の処理
+  #
+  # 1,2桁：縦中横化
+  #
+  # 3桁以上：全角化
   #
   def hankaku_num_to_zenkaku_num(data)
-    data.gsub!(/\d{3,}/) do |num|
-      num.tr("0-9", "０-９")
+    data.gsub!(/\d+/) do |num|
+      if num.length > 2
+        num.tr("0-9", "０-９")
+      else
+        tcy(num)
+      end
     end
     data
   end
