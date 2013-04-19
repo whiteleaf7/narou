@@ -15,7 +15,7 @@ class ConverterBase
 
   def before(io, text_type)
     data = io.string
-    convert_page_break(data)
+    convert_page_break(data) if @text_type == "body"
     data.gsub!("\n\n", "\n")
     data.gsub!("\n\n\n", "\n\n")
     io
