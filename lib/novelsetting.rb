@@ -208,12 +208,12 @@ class NovelSetting
     },
     {
       name: "enable_convert_page_break",
-      value: true,
+      value: false,
       help: "`to_page_break_threshold` で設定した個数以上連続する空行を改ページに変換する"
     },
     {
       name: "to_page_break_threshold",
-      value: 8,
+      value: 10,
       help: "ここで設定した値が `enable_convert_page_break` に反映される"
     },
   ]
