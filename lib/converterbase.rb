@@ -753,10 +753,11 @@ class ConverterBase
     when object_of_ruby?(last_char)
       # なろうのルビ対象文字を辿って｜を挿入する（青空文庫となろうのルビ仕様の差異吸収のため）
       m1.gsub(/([#{CHARACTER_OF_RUBY}　]+)$/) {
-        if $1[0] == "　"
-          "　［＃ルビ用縦線］#{$1[1..-1]}"
+        match_target = $1
+        if match_target =~ /^(　+)/
+          "#{$1}［＃ルビ用縦線］#{match_target[$1.length..-1]}"
         else
-          "［＃ルビ用縦線］#{$1}"
+          "［＃ルビ用縦線］#{match_target}"
         end
       } + "《#{m2}》"
     else
