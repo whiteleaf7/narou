@@ -40,6 +40,7 @@ module Command
     #            %OLD : 古い方の差分用ファイルパス
     narou setting difftool.arg='-e -x -ub -dl "NEW" -dr "OLD" %NEW %OLD'
 
+  Options:
       EOS
 
       @options["number"] = 1
