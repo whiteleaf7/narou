@@ -24,8 +24,12 @@ class Template
     unless overwrite
       return if File.exists?(dest_filepath)
     end
-    result = get(src_filename, _binding) or return nil
-    File.write(dest_filepath, result)
+    result = get(src_filename, _binding).lstrip or return nil
+    if Helper.os_windows?
+      File.write(dest_filepath, result)
+    else
+      File.binwrite(dest_filepath, result)
+    end
   end
 
   #

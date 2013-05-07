@@ -132,6 +132,8 @@ class NovelConverter
     stdout_capture = res[0]
     if Helper.os_windows?
       stdout_capture = stdout_capture.force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
+    else
+      stdout_capture.force_encoding(Encoding::UTF_8)
     end
 
     Dir.chdir(pwd)
