@@ -143,7 +143,17 @@ module Command
             puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
           end
           if @device && @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
-            Send.execute_and_rescue_exit([@device.name, target])
+            if @argument_target_type == :novel
+              Send.execute_and_rescue_exit([@device.name, target])
+            else
+              puts @device.name + "へ送信しています"
+              copy_to_path = @device.copy_to_documents(ebook_file)
+              if copy_to_path
+                puts copy_to_path.encode(Encoding::UTF_8) + " へコピーしました"
+              else
+                error "送信に失敗しました"
+              end
+            end
           end
         end
 
