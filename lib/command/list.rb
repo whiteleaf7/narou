@@ -43,7 +43,11 @@ module Command
         disp_id = disp_id.sub("*", "<cyan>*</cyan>").termcolor if frozen
         puts [
           disp_id,
-          novel["last_update"].strftime("%y/%m/%d"),
+          novel["last_update"].strftime("%y/%m/%d").tap { |s|
+            if s == Time.now.strftime("%y/%m/%d")
+              s.replace "<bold><green>#{s}</green></bold>".termcolor
+            end
+          },
           novel["title"],
           @options["url"] ? novel["toc_url"] : nil
         ].compact.join(" | ")
