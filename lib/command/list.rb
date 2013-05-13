@@ -35,6 +35,7 @@ module Command
     end
 
     def output_list(novels)
+      today = Time.now.strftime("%y/%m/%d")
       puts "  ID |  更新日  |     タイトル"
       novels.each do |novel|
         id = novel["id"]
@@ -44,7 +45,7 @@ module Command
         puts [
           disp_id,
           novel["last_update"].strftime("%y/%m/%d").tap { |s|
-            if s == Time.now.strftime("%y/%m/%d")
+            if s == today
               s.replace "<bold><green>#{s}</green></bold>".termcolor
             end
           },
