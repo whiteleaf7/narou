@@ -5,6 +5,6 @@
 
 module Device::Kobo
   VOLUME_NAME = "KOBOeReader"
-  DOCUMENTS_PATH = "/"
+  DOCUMENTS_PATH_LIST = ["/"]
   EBOOK_FILE_EXT = ".kepub.epub"
 end

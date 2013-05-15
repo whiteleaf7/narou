@@ -51,10 +51,20 @@ class Device
     !!get_documents_path
   end
 
+  def find_documents_directory(device_root_dir)
+    @device::DOCUMENTS_PATH_LIST.each do |documents_path|
+      documents_directory = File.join(device_root_dir, documents_path)
+      return documents_directory if File.directory?(documents_directory)
+    end
+    nil
+  end
+
   def get_documents_path
     if Device.respond_to?(:get_device_root_dir)
       dir = Device.get_device_root_dir(@device::VOLUME_NAME)
-      return File.join(dir, @device::DOCUMENTS_PATH) if dir
+      if dir
+        return find_documents_directory(dir)
+      end
     end
     nil
   end

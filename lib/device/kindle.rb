@@ -5,6 +5,6 @@
 
 module Device::Kindle
   VOLUME_NAME = "Kindle"
-  DOCUMENTS_PATH = "documents"
+  DOCUMENTS_PATH_LIST = %w(documents Documents Books)
   EBOOK_FILE_EXT = ".mobi"
 end
