@@ -3,7 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-Version = "1.2.5.1"
+Version = "1.2.6"
 
 cv_path = File.expand_path(File.join(File.dirname(__FILE__), "../commitversion"))
 if File.exists?(cv_path)
