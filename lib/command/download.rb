@@ -61,7 +61,7 @@ module Command
           end
           next
         end
-        unless Downloader.start(download_target, @options["force"])
+        unless Downloader.start(download_target, @options["force"], true)
           next
         end
         unless @options["no-convert"]

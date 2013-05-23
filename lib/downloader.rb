@@ -32,7 +32,7 @@ class Downloader
   #
   # force が true なら全話強制ダウンロード
   #
-  def self.start(target, force = false)
+  def self.start(target, force = false, from_download = false)
     setting = nil
     target = Narou.alias_to_id(target)
     case type = get_target_type(target)
@@ -60,7 +60,7 @@ class Downloader
         return false
       end
     end
-    downloader = Downloader.new(setting, force)
+    downloader = Downloader.new(setting, force, from_download)
     result = downloader.start_download
     setting.clear
     result
@@ -271,10 +271,12 @@ class Downloader
   #
   # コンストラクタ
   #
-  def initialize(site_setting, force = false)
+  def initialize(site_setting, force = false, from_download = false)
     @setting = site_setting
     @force = force
+    @from_download = from_download
     @cache_dir = nil
+    @new_arrivals = false
     @id = @@database.get_id("toc_url", @setting["toc_url"]) || @@database.get_new_id
   end
 
@@ -375,7 +377,8 @@ class Downloader
       "toc_url" => @setting["toc_url"],
       "sitename" => @setting["name"],
       "novel_type" => @novel_type,
-      "last_update" => Time.now
+      "last_update" => Time.now,
+      "new_arrivals_date" => (@new_arrivals ? Time.now : @@database[@id]["new_arrivals_date"])
     }
     @@database.save_database
   end
@@ -514,7 +517,16 @@ class Downloader
       info["element"] = section_element
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
-      print " (更新あり)" if @force && different_section?(section_file_path, info)
+      if File.exists?(File.join(get_novel_data_dir, section_file_path))
+        if @force && different_section?(section_file_path, info)
+          print " (更新あり)"
+        end
+      else
+        if !@from_download || (@from_download && @force)
+          print " <bold><magenta>(新着)</magenta></bold>".termcolor
+        end
+        @new_arrivals = true
+      end
       move_to_cache_dir(section_file_path)
       save_novel_data(section_file_path, info)
       save_least_one = true
