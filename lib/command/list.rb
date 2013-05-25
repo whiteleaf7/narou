@@ -45,7 +45,7 @@ module Command
         puts [
           disp_id,
           novel["last_update"].strftime("%y/%m/%d").tap { |s|
-            if novel["new_arrivals_date"] && s == novel["new_arrivals_date"].strftime("%y/%m/%d")
+            if novel["new_arrivals_date"] && novel["new_arrivals_date"].strftime("%y/%m/%d") == today
               s.replace "<bold><magenta>#{s}</magenta></bold>".termcolor
             elsif s == today
               s.replace "<bold><green>#{s}</green></bold>".termcolor
