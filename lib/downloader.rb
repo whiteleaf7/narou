@@ -600,7 +600,7 @@ class Downloader
   # 本文に含まれるタイトルは消す
   #
   def extract_elements_in_section(section, subtitle)
-    lines = section.lines.map(&:rstrip)
+    lines = section.lstrip.lines.map(&:rstrip)
     introduction = slice_introduction(lines)
     postscript = slice_postscript(lines)
     if lines[0] == subtitle
