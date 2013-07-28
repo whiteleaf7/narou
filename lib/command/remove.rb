@@ -57,7 +57,7 @@ module Command
           next unless Helper.confirm("#{title} を#{(@options["with-file"] ? "“完全に”" : "")}削除しますか")
         end
         Downloader.remove_novel(target, @options["with-file"])
-        puts "<green>#{title} を削除しました</green>".termcolor
+        puts "<green>#{TermColor.escape(title)} を削除しました</green>".termcolor
       end
     end
 

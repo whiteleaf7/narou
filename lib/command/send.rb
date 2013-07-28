@@ -74,7 +74,7 @@ module Command
         end
         if send_all
           if device.ebook_file_old?(ebook_path)
-            puts "<green>ID:#{target}　#{titles[target]}</green>".termcolor
+            puts "<green>ID:#{target}　#{TermColor.escape(titles[target])}</green>".termcolor
           else
             next
           end
