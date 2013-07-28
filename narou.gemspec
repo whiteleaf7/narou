@@ -25,6 +25,7 @@ Encoding.default_external = Encoding::UTF_8
 Gem::Specification.new do |gem|
   gem.name          = "narou"
   gem.version       = Version
+  gem.license       = "MIT"
   gem.authors       = ["whiteleaf7"]
   gem.email         = ["2nd.leaf@gmail.com"]
   gem.homepage      = "http://whiteleaf.hatenablog.com/"
