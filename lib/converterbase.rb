@@ -191,7 +191,7 @@ class ConverterBase
     data.gsub!(/([Ａ-Ｚａ-ｚ])([#{KANJI_NUM}・]+)/) do   # ｖｅｒ１・０１ のようなパターンも許容する
       $1 + $2.tr(KANJI_NUM, "０-９")
     end
-    data.gsub!(/([#{KANJI_NUM}]+)([Ａ-Ｚａ-ｚ])/) do
+    data.gsub!(/([#{KANJI_NUM}・]+)([Ａ-Ｚａ-ｚ])/) do
       $1.tr(KANJI_NUM, "０-９") + $2
     end
   end
