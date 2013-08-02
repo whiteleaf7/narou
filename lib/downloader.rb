@@ -17,8 +17,9 @@ require_relative "narou/api"
 #
 class Downloader
   NOVEL_SITE_SETTING_DIR = "webnovel/"
-  SECTION_SAVE_DIR_NAME = "本文"    # 本文を保存するディレクトリの名前
-  CACHE_SAVE_DIR_NAME = "cache"   # 差分用キャッシュ保存用ディレクトリの名前
+  SECTION_SAVE_DIR_NAME = "本文"    # 本文を保存するディレクトリ名
+  CACHE_SAVE_DIR_NAME = "cache"   # 差分用キャッシュ保存用ディレクトリ名
+  RAW_DATA_DIR_NAME = "raw"    # 本文の生データを保存するディレクトリ名
   TOC_FILE_NAME = "toc.yaml"
   WAITING_TIME_FOR_503 = 20   # 503 のときに待機する秒数
   RETRY_MAX_FOR_503 = 5   # 503 のときに何回再試行するか
@@ -325,6 +326,7 @@ class Downloader
       init_novel_dir
       old_toc = {}
     end
+    init_raw_dir
     if @force
       update_subtitles = latest_toc["subtitles"]
     else
@@ -574,6 +576,7 @@ class Downloader
     begin
       open(subtitle_url) do |fp|
         section = pretreatment_source(fp.read)
+        save_raw_data(section, subtitle_info)
       end
     rescue OpenURI::HTTPError => e
       if e.message =~ /^503/
@@ -594,6 +597,25 @@ class Downloader
     element
   end
 
+  def get_raw_dir
+    File.join(get_novel_data_dir, RAW_DATA_DIR_NAME)
+  end
+
+  def init_raw_dir
+    path = get_raw_dir
+    FileUtils.mkdir_p(path) unless File.exists?(path)
+  end
+
+  #
+  # テキストデータの生データを保存
+  #
+  def save_raw_data(raw_data, subtitle_info)
+    index = subtitle_info["index"]
+    file_subtitle = subtitle_info["file_subtitle"]
+    path = File.join(get_raw_dir, "#{index} #{file_subtitle}.txt")
+    File.write(path, raw_data)
+  end
+
   #
   # 本文を解析して前書き・本文・後書きの要素に分解する
   #
@@ -603,7 +625,7 @@ class Downloader
     lines = section.lstrip.lines.map(&:rstrip)
     introduction = slice_introduction(lines)
     postscript = slice_postscript(lines)
-    if lines[0] == subtitle
+    if lines[0] == subtitle.strip
       if lines[1] == ""
         lines.slice!(0, 2)
       else
