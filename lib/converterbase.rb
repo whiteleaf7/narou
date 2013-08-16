@@ -832,6 +832,15 @@ class ConverterBase
   end
 
   #
+  # 漢字の二じゃなくて間違えてカタカナのニを使ってるのを校正する
+  #
+  def modify_kana_ni_to_kanji_ni(data)
+    data.gsub!(/([^ァ-ヶ])ニ([^ァ-ヶ])/) do
+      "#{$1}二#{$2}"
+    end
+  end
+
+  #
   # ［＃改ページ］直後の行を見出しに設定する
   #
   def enchant_midashi(data)
@@ -919,6 +928,7 @@ class ConverterBase
     insert_separate_space(data)
     convert_special_characters(data)
     convert_fraction_and_date(data)
+    modify_kana_ni_to_kanji_ni(data)
     if @text_type == "body" || @text_type == "textfile"
       half_indent_bracket(data)
       auto_indent(data)
