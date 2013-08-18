@@ -835,9 +835,7 @@ class ConverterBase
   # 漢字の二じゃなくて間違えてカタカナのニを使ってるのを校正する
   #
   def modify_kana_ni_to_kanji_ni(data)
-    data.gsub!(/([^ァ-ヶー])ニ([^ァ-ヶー])/) do
-      "#{$1}二#{$2}"
-    end
+    data.gsub!(/([^ァ-ヶー])ニ([^ァ-ヶー])/, "\\1二\\2")
   end
 
   #
