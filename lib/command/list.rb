@@ -7,6 +7,8 @@ require_relative "../database"
 
 module Command
   class List < CommandBase
+    NEW_ARRIVALS_LIMIT = 12 * 60 * 60   # 更新してから何秒までを新着色にするか
+
     def initialize
       super("[<number>] [options]")
       @opt.separator <<-EOS
@@ -35,7 +37,8 @@ module Command
     end
 
     def output_list(novels)
-      today = Time.now.strftime("%y/%m/%d")
+      now = Time.now
+      today = now.strftime("%y/%m/%d")
       puts "  ID |  更新日  |     タイトル"
       novels.each do |novel|
         id = novel["id"]
@@ -45,9 +48,11 @@ module Command
         puts [
           disp_id,
           novel["last_update"].strftime("%y/%m/%d").tap { |s|
-            if novel["new_arrivals_date"] && novel["new_arrivals_date"].strftime("%y/%m/%d") == today
+            if novel["new_arrivals_date"] && novel["new_arrivals_date"] + NEW_ARRIVALS_LIMIT >= now
+              # 新着表示色
               s.replace "<bold><magenta>#{s}</magenta></bold>".termcolor
             elsif s == today
+              # 更新だけあった色
               s.replace "<bold><green>#{s}</green></bold>".termcolor
             end
           },
