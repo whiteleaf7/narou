@@ -148,7 +148,7 @@ class NovelSetting
     },
     {
       name: "enable_inspect_invalid_openclose_brackets",
-      value: true,
+      value: false,
       help: "かぎ括弧内のとじ開きが正しくされているかどうか調査する"
     },
     {
