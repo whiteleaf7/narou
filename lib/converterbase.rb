@@ -280,6 +280,7 @@ class ConverterBase
     symbols_to_zenkaku(data)
     convert_tatechuyoko(data)
     convert_novel_rule(data)
+    convert_arrow(data)
   end
 
   #
@@ -340,6 +341,17 @@ class ConverterBase
       else
         match
       end
+    end
+  end
+
+  #
+  # おかしくなりやすい矢印文字の変換
+  # 
+  def convert_arrow(data)
+    @@device ||= Narou.get_device
+    # Kindle PW でしか確認してないのでとりあえず device=kindle の場合のみ変換
+    if @@device && @@device.kindle?
+      data.tr!("⇒⇐", "→←")
     end
   end
 
