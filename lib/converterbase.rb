@@ -468,7 +468,7 @@ class ConverterBase
     data
   end
   
-  HALF_INDENT_TARGET = /^[ 　\t]*([「『(（【〈《≪〝])/
+  HALF_INDENT_TARGET = /^[ 　\t]*([〔「『(（【〈《≪〝])/
   FULL_INDENT_TARGET = /^[ 　\t]*(――)/
   #
   # 行頭かぎ括弧(等)に二分アキを追加する
