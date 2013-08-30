@@ -256,7 +256,7 @@ class ConverterBase
   #
   def replace_narou_tag(data)
     data.gsub!("【改ページ】", "")
-    data.gsub!(/<KBR>/i, "")
+    data.gsub!(/<KBR>/i, "\n")
     data.gsub!(/<PBR>/i, "\n")
   end
 
@@ -980,13 +980,17 @@ class ConverterBase
     if @text_type == "textfile"
       @write_fp.puts(io.gets + io.gets)   # タイトル・著者名スキップ
       data = io.read
-      progressbar = ProgressBar.new(data.count("\n") + 1)
-      progressbar.output(0)
     else
       data = io.read
     end
     initialize_member_values
     convert_for_all_data(data)
+    if @text_type == "textfile"
+      # convert_for_all_data -> replace_narou_tag
+      # で改行化を行わないと正確な改行数は分からない
+      progressbar = ProgressBar.new(data.count("\n") + 1)
+      progressbar.output(0)
+    end
     @read_fp = StringIO.new(data)
     @read_fp.each_with_index do |line, i|
       progressbar.output(i) if @text_type == "textfile"
