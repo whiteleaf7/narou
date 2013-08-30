@@ -7,7 +7,7 @@ require_relative "../database"
 
 module Command
   class List < CommandBase
-    NEW_ARRIVALS_LIMIT = 12 * 60 * 60   # 更新してから何秒までを新着色にするか
+    NEW_ARRIVALS_LIMIT = 6 * 60 * 60   # 更新してから何秒までを新着色にするか
 
     def initialize
       super("[<number>] [options]")
