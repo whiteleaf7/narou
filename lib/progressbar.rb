@@ -4,6 +4,8 @@
 #
 
 class ProgressBar
+  class OverRangeError < StandardError; end
+  
   def initialize(max, interval = 1, width = 50, char = "*")
     @max = max == 0 ? 1.0 : max.to_f
     @interval = interval
@@ -14,6 +16,9 @@ class ProgressBar
 
   def output(num)
     return if $debug
+    if num > @max
+      raise OverRangeError, "`#{num}` over `#{@max}(max)`"
+    end
     @counter += 1
     return unless @counter % @interval == 0
     ratio = calc_ratio(num)
