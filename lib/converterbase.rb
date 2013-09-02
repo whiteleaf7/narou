@@ -144,12 +144,23 @@ class ConverterBase
     "十" => 1, "百" => 2, "千" => 3, "万" => 4, "億" => 8, "兆" => 12, "京" => 16
   }
 
+  def __calc_sum_unit(units)
+    units.each_char.inject(0) do |sum, c|
+      sum + ("1" + "0" * KANJI_NUM_UNITS_DIGIT[c]).to_i
+    end
+  end
+
   def __calc_kanji_num_with_unit(string)
     total = 0
     string.scan(/([#{KANJI_NUM}]*)([十百千]*)/) do |num, units|
       break if num + units == ""
       num = "1" if num.empty?
-      total += (num.tr(KANJI_NUM, "0-9") + units.each_char.map { |c| "0" * KANJI_NUM_UNITS_DIGIT[c] }.join).to_i
+      num_tr = num.tr(KANJI_NUM, "0-9")
+      if units.empty?
+        total += num_tr.to_i
+      else
+        total += (num_tr + __calc_sum_unit(units).to_s[1, 99]).to_i
+      end
     end
     total
   end
@@ -169,7 +180,6 @@ class ConverterBase
   # lower_digit_zero はこの最後の 000 に適用される
   #
   def convert_kanji_num_with_unit(data, lower_digit_zero = 0)
-    #data.gsub!(/([#{KANJI_NUM}]+)([十百千万億兆京]?)/) do |match|
     data.gsub!(/([#{KANJI_NUM}十百千万億兆京]+)/) do |match|
       total = kanji_num_to_integer($1)
       m1 = total.to_s.tr("0-9", KANJI_NUM)
