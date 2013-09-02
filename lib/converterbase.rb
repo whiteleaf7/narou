@@ -957,7 +957,8 @@ class ConverterBase
     alphabet_to_zenkaku(data, @setting.enable_alphabet_force_zenkaku)
     convert_numbers(data)
     exception_reconvert_kanji_to_num(data)
-    if @setting.enable_kanji_num_with_units
+    if @setting.enable_convert_num_to_kanji && @text_type != "subtitle" \
+       && @setting.enable_kanji_num_with_units
       convert_kanji_num_with_unit(data, @setting.kanji_num_with_units_lower_digit_zero)
     end
     rebuild_kanji_num(data)
