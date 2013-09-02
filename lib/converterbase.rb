@@ -299,6 +299,7 @@ class ConverterBase
     convert_tatechuyoko(data)
     convert_novel_rule(data)
     convert_arrow(data)
+    convert_aozora_special_charactoers(data)
   end
 
   #
@@ -371,6 +372,13 @@ class ConverterBase
     if @@device && @@device.kindle?
       data.tr!("⇒⇐", "→←")
     end
+  end
+
+  #
+  # 青空文庫の特殊な記号を外字注記に変換
+  #
+  def convert_aozora_special_charactoers(data)
+    data.gsub!("※", "※［＃米印、1-2-8］")
   end
 
   #
