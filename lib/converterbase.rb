@@ -43,6 +43,7 @@ class ConverterBase
     @url_list = []
     @illust_chuki_list = []
     @kanji_num_list = {}
+    @num_and_comma_list = {}
     @in_author_comment_block = nil
   end
 
@@ -89,12 +90,29 @@ class ConverterBase
     stash_kanji_num(data)
     data.gsub!(/[\d０-９,，]+/) do |match|
       if match =~ /[,，]/
-        match
+        if match =~ /[\d]/
+          stash_hankaku_num_and_comma(match.tr("，", ","))
+        else
+          match
+        end
       else
         zenkaku_num_to_kanji(match.tr("0-9", KANJI_NUM))
       end
     end
     data
+  end
+
+  def stash_hankaku_num_and_comma(num)
+    @@num_and_comma_list_counter ||= 0
+    @@num_and_comma_list_counter += 1
+    @num_and_comma_list[@@num_and_comma_list_counter] = num
+    "［＃半角数字＝#{@@num_and_comma_list_counter}］"
+  end
+
+  def rebuild_hankaku_num_and_comma(data)
+    data.gsub!(/［＃半角数字＝(.+?)］/) do
+      @num_and_comma_list[$1.to_i]
+    end
   end
 
   def stash_kanji_num(data)
@@ -1029,6 +1047,7 @@ class ConverterBase
     rebuild_illust(data)
     rebuild_url(data)
     rebuild_english_sentences(data)
+    rebuild_hankaku_num_and_comma(data)
     # 再構築された文章にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
