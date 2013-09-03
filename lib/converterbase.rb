@@ -305,11 +305,11 @@ class ConverterBase
   # 特定の表現・記号を変換していく
   #
   def convert_special_characters(data)
+    convert_aozora_special_charactoers(data)
     symbols_to_zenkaku(data)
     convert_tatechuyoko(data)
     convert_novel_rule(data)
     convert_arrow(data)
-    convert_aozora_special_charactoers(data)
   end
 
   #
@@ -319,8 +319,6 @@ class ConverterBase
     data.tr!("“”‘’〝〟", %!""''""!)
     data.gsub!(/"([^"\n]+)"/, "〝\\1〟")
     data.gsub!(/'([^'\n]+)'/, "〝\\1〟")   # MEMO: シングルミュート(ノノカギ)を表示出来るフォントはほとんど無い
-    data.gsub!("≪", "※［＃始め二重山括弧］")
-    data.gsub!("≫", "※［＃終わり二重山括弧］")
     data.tr!("-=+/*《》'\"%$#&!?､<>＜＞()|‐,._;:[]",
              "－＝＋／＊≪≫’”％＄＃＆！？、〈〉〈〉（）｜－，．＿；：［］")
     data.gsub!("\\", "￥")
@@ -385,10 +383,12 @@ class ConverterBase
   end
 
   #
-  # 青空文庫の特殊な記号を外字注記に変換
+  # 特殊な記号を外字注記に変換
   #
   def convert_aozora_special_charactoers(data)
     data.gsub!("※", "※［＃米印、1-2-8］")
+    data.gsub!("≪", "※［＃始め二重山括弧］")
+    data.gsub!("≫", "※［＃終わり二重山括弧］")
   end
 
   #
