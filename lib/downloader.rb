@@ -330,7 +330,7 @@ class Downloader
     if @force
       update_subtitles = latest_toc["subtitles"]
     else
-      update_subtitles = update_check(old_toc["subtitles"], latest_toc["subtitles"])
+      update_subtitles = update_body_check(old_toc["subtitles"], latest_toc["subtitles"])
     end
     if update_subtitles.count > 0
       @cache_dir = create_cache_dir if old_toc.length > 0
@@ -441,20 +441,30 @@ class Downloader
     toc_objects
   end
 
+  def __search_index_in_subtitles(subtitles, index)
+    subtitles.index { |item|
+      item["index"] == index
+    }
+  end
+
   #
-  # 更新チェック
+  # 本文更新チェック
   #
   # 更新された subtitle だけまとまった配列を返す
   #
-  def update_check(old_subtitles, latest_subtitles)
+  def update_body_check(old_subtitles, latest_subtitles)
     return latest_subtitles unless old_subtitles
     latest_subtitles.dup.keep_if do |latest|
       index = latest["index"]
-      index_in_old_toc = old_subtitles.index { |item| item["index"] == index }
+      index_in_old_toc = __search_index_in_subtitles(old_subtitles, index)
       next true unless index_in_old_toc
       old = old_subtitles[index_in_old_toc]
       # タイトルチェック
       if old["subtitle"] != latest["subtitle"]
+        next true
+      end
+      # 章チェック
+      if old["chapter"] != latest["chapter"]
         next true
       end
       # 更新日チェック
@@ -512,7 +522,12 @@ class Downloader
       else
         sleep(interval_sleep_time) if i > 0
       end
-      index, subtitle, file_subtitle  = %w(index subtitle file_subtitle).map {|k| subtitle_info[k] }
+      index, subtitle, file_subtitle, chapter = %w(index subtitle file_subtitle chapter).map { |k|
+                                                  subtitle_info[k]
+                                                }
+      unless chapter.empty?
+        puts "#{chapter}"
+      end
       print "第#{index}部分　#{subtitle} (#{i+1}/#{max})"
       section_element = a_section_download(subtitle_info)
       info = subtitle_info.dup
