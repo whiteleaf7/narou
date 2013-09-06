@@ -386,9 +386,18 @@ class ConverterBase
   # 特殊な記号を外字注記に変換
   #
   def convert_aozora_special_charactoers(data)
-    data.gsub!("※", "※［＃米印、1-2-8］")
+    data.gsub!("※", "※※")   # 外字注記表記だと border_symbol? 等で困るのであとで外字注記化する
     data.gsub!("≪", "※［＃始め二重山括弧］")
     data.gsub!("≫", "※［＃終わり二重山括弧］")
+  end
+
+  #
+  # ※の外字注記化
+  #
+  # convert_aozora_special_charactoers で2つにしておいた※を外字注記化する
+  #
+  def rebuild_kome_to_gaiji(data)
+    data.gsub!("※※", "※［＃米印、1-2-8］")
   end
 
   #
@@ -1067,6 +1076,7 @@ class ConverterBase
     rebuild_url(data)
     rebuild_english_sentences(data)
     rebuild_hankaku_num_and_comma(data)
+    rebuild_kome_to_gaiji(data)
     # 再構築された文章にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
