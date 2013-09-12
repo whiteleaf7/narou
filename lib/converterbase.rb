@@ -499,15 +499,15 @@ class ConverterBase
   #
   # 半角アラビア数字の全角化
   #
-  # 3桁以上：全角化
-  # 1,2桁：縦中横化
+  # 1桁、3桁以上：全角化
+  # 2桁：縦中横化
   #
   def hankaku_num_to_zenkaku_num(data)
     data.gsub!(/\d+/) do |num|
-      if num.length > 2
-        num.tr("0-9", "０-９")
-      else
+      if num.length == 2
         tcy(num)
+      else
+        num.tr("0-9", "０-９")
       end
     end
     data
