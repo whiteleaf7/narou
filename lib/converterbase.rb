@@ -506,6 +506,8 @@ class ConverterBase
     data.gsub!(/\d+/) do |num|
       if num.length == 2
         tcy(num)
+      elsif num.length == 3 && @text_type == "subtitle" && $`.empty?
+        tcy(num)
       else
         num.tr("0-9", "０-９")
       end
@@ -542,6 +544,8 @@ class ConverterBase
 
   #
   # 章見出しっぽい文字列を字下げして前後に空行を入れる
+  #
+  # TODO: 半角数字の縦中横注記をいれた影響で、2桁の半角数字が認識されてないのをどうにかする
   #
   def force_indent_special_chapter(line)
     line.sub!(/^(?:[ 　\t]|［＃二分アキ］)*([－―<＜〈-]*)([0-9０-９#{KANJI_NUM}]+)([－―>＞〉-]*)$/) do
@@ -1038,28 +1042,32 @@ class ConverterBase
       progressbar.output(0)
     end
     @read_fp = StringIO.new(data)
-    @read_fp.each_with_index do |line, i|
-      progressbar.output(i) if @text_type == "textfile"
-      @request_skip_output_line = false
-      zenkaku_rstrip(line)
-      if @request_insert_blank_next_line
-        outputs unless blank_line?(line)
-        @request_insert_blank_next_line = false
-      end
-      process_author_comment(line) if @text_type == "textfile"
-      insert_blank_line_to_border_symbol(line)
-      force_indent_special_chapter(line)
+    if @text_type == "subtitle"
+      @write_fp.write(data)
+    else
+      @read_fp.each_with_index do |line, i|
+        progressbar.output(i) if @text_type == "textfile"
+        @request_skip_output_line = false
+        zenkaku_rstrip(line)
+        if @request_insert_blank_next_line
+          outputs unless blank_line?(line)
+          @request_insert_blank_next_line = false
+        end
+        process_author_comment(line) if @text_type == "textfile"
+        insert_blank_line_to_border_symbol(line)
+        force_indent_special_chapter(line)
 
-      outputs(line)
-      unless @delay_outputs_buffer.empty?
-        @write_fp.write(@delay_outputs_buffer)
-        @before_line = @delay_outputs_buffer
-        @delay_outputs_buffer = ""
-      else
-        @before_line = line
+        outputs(line)
+        unless @delay_outputs_buffer.empty?
+          @write_fp.write(@delay_outputs_buffer)
+          @before_line = @delay_outputs_buffer
+          @delay_outputs_buffer = ""
+        else
+          @before_line = line
+        end
       end
+      author_comment_force_close if @text_type == "textfile"
     end
-    author_comment_force_close if @text_type == "textfile"
 
     @write_fp.rewind
     data = @write_fp.string
