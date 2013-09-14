@@ -30,8 +30,10 @@ module CommandLine
       puts
       arg = "help"
     end
-    default_arguments = load_default_arguments(arg)
-    Command.get_list[arg].execute(argv + default_arguments)
+    if argv.empty?
+      argv += load_default_arguments(arg)
+    end
+    Command.get_list[arg].execute(argv)
   end
 
   def self.load_default_arguments(cmd)
