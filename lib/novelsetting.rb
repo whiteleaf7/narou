@@ -179,7 +179,7 @@ class NovelSetting
     {
       name: "enable_ruby",
       value: true,
-      help: "ルビ処理対策を有効に"
+      help: "ルビ処理を有効に"
     },
     {
       name: "enable_narou_illust",
