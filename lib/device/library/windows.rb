@@ -16,7 +16,7 @@ module Device::Library
       drives.each do |drive_letter|
         drive_info = @@FileSystemObject.GetDrive(drive_letter)
         vol = drive_info.VolumeName rescue ""
-        if vol == volume_name
+        if vol.downcase == volume_name.downcase
           return File.expand_path(drive_letter)
         end
       end
