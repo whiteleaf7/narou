@@ -59,16 +59,19 @@ module Command
           puts display_message
           next
         end
-        is_updated = Downloader.start(target)
-        if is_updated
+        update_status = Downloader.start(target)
+        case update_status
+        when :ok
           unless @options["no-convert"]
             convert_argv = [target]
             convert_argv << "--no-open" if no_open
             Convert.execute_and_rescue_exit(convert_argv)
           end
-        elsif is_updated.nil?
-          puts "#{data["title"]} の更新に失敗しました"
-        else
+        when :failed
+          puts "#{data["title"]} の更新は失敗しました"
+        when :canceled
+          puts "#{data["title"]} の更新はキャンセルされました"
+        when :none
           puts "#{data["title"]} に更新はありません"
         end
       end

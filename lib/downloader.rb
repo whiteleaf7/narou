@@ -309,16 +309,16 @@ class Downloader
       latest_toc = get_latest_table_of_contents
     rescue NoSerialNovel
       error @setting["ncode"] + " は短編小説です。現在短編小説には対応していません"
-      return nil
+      return :failed
     end
     unless latest_toc
       error @setting["toc_url"] + " の目次データが取得出来ませんでした"
-      return nil
+      return :failed
     end
     if @setting["confirm_over18"]
       unless confirm_over18?
         puts "18歳以上のみ閲覧出来る小説です。ダウンロードを中止しました"
-        return nil
+        return :canceled
       end
     end
     old_toc = load_novel_data(TOC_FILE_NAME)
@@ -333,6 +333,11 @@ class Downloader
       update_subtitles = update_body_check(old_toc["subtitles"], latest_toc["subtitles"])
     end
     if update_subtitles.count > 0
+      unless @force
+        if process_digest(old_toc, latest_toc)
+          return :canceled
+        end
+      end
       @cache_dir = create_cache_dir if old_toc.length > 0
       begin
         sections_download_and_save(update_subtitles)
@@ -343,10 +348,56 @@ class Downloader
       end
       update_database
       save_novel_data(TOC_FILE_NAME, latest_toc)
-      return true
+      return :ok
+    else
+      return :none
+    end
+  end
+
+  #
+  # ダイジェスト化に関する処理
+  #
+  def process_digest(old_toc, latest_toc)
+    return false unless old_toc["subtitles"]
+    latest_subtitles_count = latest_toc["subtitles"].count
+    old_subtitles_count = old_toc["subtitles"].count
+    if latest_subtitles_count < old_subtitles_count
+      STDOUT.puts "#{latest_toc["title"]}"
+      STDOUT.puts "更新後の話数が保存されている話数より減少していることを検知しました"
+      STDOUT.puts "ダイジェスト化されている可能性があるので、更新に関しての処理を選択して下さい"
+      digest_output_interface(old_subtitles_count, latest_subtitles_count)
+      while input = $stdin.gets
+        case input[0]
+        when "1"
+          return false
+        when "2"
+          return true
+        when "3"
+          Command::Freeze.execute_and_rescue_exit([old_toc["title"]])
+          return true
+        when "4"
+          STDOUT.puts "あらすじ"
+          STDOUT.puts latest_toc["story"]
+        when "5"
+          Helper.open_browser(latest_toc["toc_url"])
+        end
+        digest_output_interface(old_subtitles_count, latest_subtitles_count)
+      end
     else
       return false
     end
+  end
+
+  def digest_output_interface(old_subtitles_count, latest_subtitles_count)
+    STDOUT.puts
+    STDOUT.puts "保存済み話数: #{old_subtitles_count}\n更新後の話数: #{latest_subtitles_count}"
+    STDOUT.puts
+    STDOUT.puts "1: このまま更新する"
+    STDOUT.puts "2: 更新をキャンセル"
+    STDOUT.puts "3: 更新をキャンセルして小説を凍結する"
+    STDOUT.puts "4: 最新のあらすじを表示する"
+    STDOUT.puts "5: 小説ページを開く"
+    STDOUT.print "選択する処理の番号を入力: "
   end
 
   #
