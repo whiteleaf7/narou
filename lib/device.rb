@@ -16,12 +16,12 @@ class Device
     extend Device::Library::Linux
   end
 
-  require_relative "device/kindle"
-  require_relative "device/kobo"
-
   attr_reader :name, :ebook_file_ext
 
-  DEVICES = { "kindle" => Kindle, "kobo" => Kobo }
+  require_relative "device/kindle"
+  require_relative "device/kobo"
+  require_relative "device/reader"
+  DEVICES = { "kindle" => Kindle, "kobo" => Kobo, "reader" => Reader }
 
   class UnknownDevice < StandardError; end
 
