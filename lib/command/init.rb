@@ -118,7 +118,7 @@ module Command
         print "、:keep で前回と同じ設定"
       end
       print ")\n>"
-      while input = $stdin.gets.rstrip
+      while input = $stdin.gets.rstrip.gsub(/"/, "")
         path = File.expand_path(input)
         case
         when input == ":keep"
