@@ -85,7 +85,7 @@ module Helper
   end
 
   def self.replace_filename_special_chars(str)
-    str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥").strip
+    str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥")
   end
 
   #
