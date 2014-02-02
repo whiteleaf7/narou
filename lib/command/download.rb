@@ -32,6 +32,9 @@ module Command
       @opt.on("-n", "--no-convert", "変換をせずダウンロードのみ実行する") {
         @options["no-convert"] = true
       }
+      @opt.on("-z", "--freeze", "ダウンロードが終了したあと凍結する") {
+        @options["freeze"] = true
+      }
     end
 
     def execute(argv)
@@ -66,6 +69,9 @@ module Command
         end
         unless @options["no-convert"]
           Convert.execute_and_rescue_exit([download_target])
+        end
+        if @options["freeze"]
+          Freeze.execute_and_rescue_exit([download_target])
         end
       end
     end
