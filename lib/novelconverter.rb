@@ -116,8 +116,10 @@ class NovelConverter
     aozoraepub3_basename = File.basename(aozoraepub3_path)
     aozoraepub3_dir = File.dirname(aozoraepub3_path)
 
+    java_encoding = Helper.os_mac? ? "-Dfile.encoding=UTF-8" : ""
+
     Dir.chdir(aozoraepub3_dir)
-    command = %!java -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 -of #{device_option} ! +
+    command = %!java #{java_encoding} -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 -of #{device_option} ! +
               %!#{cover_option} #{dst_option} #{ext_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)

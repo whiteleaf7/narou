@@ -11,6 +11,9 @@ class Device
   when :windows
     require_relative "device/library/windows"
     extend Device::Library::Windows
+  when :mac
+    require_relative "device/library/mac"
+    extend Device::Library::Mac
   else
     require_relative "device/library/linux"
     extend Device::Library::Linux
