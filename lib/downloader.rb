@@ -325,6 +325,7 @@ class Downloader
     unless old_toc
       init_novel_dir
       old_toc = {}
+      @new_arrivals = true
     end
     init_raw_dir
     if @force
