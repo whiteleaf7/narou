@@ -12,21 +12,22 @@ confirm_over18: yes
 # 書籍情報取得設定
 title: <title>(?<title>.+?)</title>
 author: 作者：(?:<a href="http://xmypage.syosetu.com/.+?/">)?(?<author>.+?)(?:</a>)?$
-story: <div class="novel_ex">(?<story>.+?)</div>
+story: <div id="novel_ex">(?<story>.+?)</div>
 
 # ------------------------------------------------------------
 # 目次取得設定
 toc_url: \\k<top_url>/\\k<ncode>/
 subtitles: |-
-  (?:<tr><td class="chapter" colspan="4">(?<chapter>.+?)</td></tr>
-   <tr> 
-  )?<td class="(?:long_subtitle|period_subtitle)"><a href="(?<href>/.+?/(?<index>\d+?)/)">(?<subtitle>.+?)</a></td>
-  <td class="long_update">
+  (?:<div class="chapter_title">(?<chapter>.+?)</div>
+  
+  )?<dl class="novel_sublist2" onclick="javascript:location.href='(?<href>/.+?/(?<index>\d+?)/)'">
+  <dd class="subtitle"><a href=".+?">(?<subtitle>.+?)</a></dd>
+  <dt class="long_update">
   (?<subdate>.+?)(?:
   <span title="(?<subupdate>.+?) 改稿">
   （<u>改</u>）</span>)?
-  </td>
-  </tr>
+  </dt>
+  </dl>
 
 tcode: <li><a href="\\k<top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
 txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
