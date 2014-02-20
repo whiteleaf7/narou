@@ -99,9 +99,8 @@ module Command
       puts chuki_tag_path
       puts
       # ファイルコピー
-      src = ["AozoraEpub3.ini", "vertical_font.css", "DMincho.ttf", "xhtml_nav.vm"]
-      dst = ["AozoraEpub3.ini", "template/OPS/css_custom/vertical_font.css", "template/OPS/fonts/DMincho.ttf",
-             "template/OPS/xhtml/xhtml_nav.vm"]
+      src = ["AozoraEpub3.ini", "vertical_font.css", "DMincho.ttf"]
+      dst = ["AozoraEpub3.ini", "template/OPS/css_custom/vertical_font.css", "template/OPS/fonts/DMincho.ttf"]
       puts "(次のファイルをコピーor上書きしました)"
       src.count.times do |i|
         src_full_path = File.join(Narou.get_preset_dir, src[i])
