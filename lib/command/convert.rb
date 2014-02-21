@@ -59,6 +59,9 @@ module Command
       @opt.on("--no-strip", "MOBIをstripしない") {
         @options["no-strip"] = true
       }
+      @opt.on("--no-zip", "i文庫用のzipファイルを作らない") {
+        @options["no-zip"] = true
+      }
       @opt.on("--no-open", "出力時に保存フォルダを開かない") {
         @options["no-open"] = true
       }
@@ -109,6 +112,9 @@ module Command
         end
       end
       @device = Narou.get_device
+      if @device && @device.ibunko?
+        change_settings_for_ibunko
+      end
       convert_novels(argv)
     end
 
@@ -135,14 +141,19 @@ module Command
         @converted_txt_path = res[:converted_txt_path]
         @use_dakuten_font = res[:use_dakuten_font]
 
-        ebook_file = convert_txt_to_ebook_file
+        if @device && @device.ibunko?
+          ebook_file = archive_ibunko_zipfile
+        else
+          ebook_file = convert_txt_to_ebook_file
+        end
         next if ebook_file.nil?
         if ebook_file
           copied_file_path = copy_to_converted_file(ebook_file)
           if copied_file_path
             puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
           end
-          if @device && @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
+          if @device && @device.physical_support? &&
+             @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
             if @argument_target_type == :novel
               Send.execute_and_rescue_exit([@device.name, target])
             else
@@ -167,6 +178,9 @@ module Command
       exit 1
     end
 
+    #
+    # 直接指定されたテキストファイルを変換する
+    #
     def convert_txt(target)
       return NovelConverter.convert_file(target, @enc, @output_filename, @options["inspect"])
     rescue ArgumentError => e
@@ -185,6 +199,9 @@ module Command
       return nil
     end
 
+    #
+    # 変換された整形済みテキストファイルをデバイスに対応した書籍データに変換する
+    #
     def convert_txt_to_ebook_file
       return false if @options["no-epub"]
       # epub
@@ -223,6 +240,56 @@ module Command
       return mobi_path
     end
 
+    #
+    # i文庫用にテキストと挿絵ファイルをzipアーカイブ化する
+    #
+    def archive_ibunko_zipfile
+      return false if @options["no-zip"]
+      require "zip"
+      Zip.unicode_names = true
+      dirpath = File.dirname(@converted_txt_path)
+      zipfile_path = @converted_txt_path.sub(/.txt$/, @device.ebook_file_ext)
+      File.delete(zipfile_path) if File.exists?(zipfile_path)
+      Zip::File.open(zipfile_path, Zip::File::CREATE) do |zip|
+        zip.add(File.basename(@converted_txt_path), @converted_txt_path)
+        illust_dirpath = File.join(dirpath, Illustration::ILLUST_DIR)
+        # 挿絵
+        if File.exists?(illust_dirpath)
+          Dir.glob(File.join(illust_dirpath, "*")) do |img_path|
+            zip.add(File.join(Illustration::ILLUST_DIR, File.basename(img_path)), img_path)
+          end
+        end
+        # 表紙画像
+        cover_name = NovelConverter.get_cover_filename(dirpath)
+        if cover_name
+          zip.add(cover_name, File.join(dirpath, cover_name))
+        end
+      end
+      puts File.basename(zipfile_path) + " を出力しました"
+      puts "<bold><green>#{@device.display_name}用ファイルを出力しました</green></bold>".termcolor
+      return zipfile_path
+    end
+
+    #
+    # i文庫用に設定を強制設定する
+    #
+    def change_settings_for_ibunko
+      settings = LocalSetting.get["local_setting"]
+      modified = false
+      %w(enable_half_indent_bracket enable_dakuten_font).each do |word|
+        name = "force.#{word}"
+        if settings[name].nil? || settings[name] == true
+          settings[name] = false
+          puts "#{name} を#{@device.display_name}用に false に強制変更しました"
+          modified = true
+        end
+      end
+      LocalSetting.get.save_settings("local_setting") if modified
+    end
+
+    #
+    # convert.copy_to で指定されたディレクトリに書籍データをコピーする
+    #
     def copy_to_converted_file(src_path)
       copy_to_dir = @options["copy_to"]
       return nil unless copy_to_dir

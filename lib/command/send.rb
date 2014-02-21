@@ -46,11 +46,17 @@ module Command
       super
       device = get_device(argv)
       unless device
-        error "デバイス名を指定して下さい"
+        error "デバイス名が指定されていないか、間違っています。\n" +
+              "narou setting device=デバイス名 で指定出来ます。\n" +
+              "指定出来るデバイス名：" + Device::DEVICES.keys.join(", ")
+        exit 1
+      end
+      unless device.physical_support?
+        error "#{device.display_name} への直接送信は対応していません"
         exit 1
       end
       unless device.connecting?
-        error "#{device.name}が接続されていません"
+        error "#{device.display_name} が接続されていません"
         exit 1
       end
       send_all = false

@@ -17,6 +17,7 @@ require_relative "localsetting"
 
 class NovelConverter
   NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
+  NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO = "ibunko_novel.txt"
 
   attr_reader :use_dakuten_font
 
@@ -237,7 +238,8 @@ class NovelConverter
     toc = @toc
     cover_chuki = @cover_chuki
     device = Narou.get_device
-    Template.get(NOVEL_TEXT_TEMPLATE_NAME, binding)
+    tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
+    Template.get(tempalte_name, binding)
   end
 
   #

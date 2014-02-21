@@ -408,7 +408,7 @@ class ConverterBase
   def convert_dakuten_char_to_font(data)
     data.gsub!(/(.)[゛ﾞ]/) do
       m1 = $1
-      if m1 =~ /[ぁ-んァ-ヶι]/
+      if m1 =~ /[ぁ-んァ-ヶι]/ && @setting.enable_dakuten_font
         @use_dakuten_font = true
         "［＃濁点］#{m1}［＃濁点終わり］"
       else

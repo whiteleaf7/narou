@@ -4,7 +4,10 @@
 #
 
 module Device::Reader
+  PHYSICAL_SUPPORT = true
   VOLUME_NAME = "READER"
   DOCUMENTS_PATH_LIST = ["Sony_Reader/media/books"]
   EBOOK_FILE_EXT = ".epub"
+  NAME = "Reader"
+  DISPLAY_NAME = "SonyReader"
 end

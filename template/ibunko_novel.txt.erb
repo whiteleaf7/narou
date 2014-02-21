@@ -1,0 +1,41 @@
+<%# -*- coding: utf-8 -*- -%>
+<% Template.target_binary_version(1.0) -%>
+<%= toc["title"] %>
+<%= toc["author"] %>
+<%= cover_chuki %>
+――――――――――――――――――――――――
+あらすじ：
+<%= toc["story"] %>
+
+掲載ページ: <%= toc["toc_url"] %>
+――――――――――――――――――――――――
+
+<% sections.each_with_index do |section, i| -%>
+［＃改ページ］
+<% if section["chapter"] != "" -%>
+［＃ページの左右中央］
+
+
+［＃３字下げ］［＃ここから大見出し］<%= section["chapter"] %>［＃ここで大見出し終わり］
+
+
+［＃改ページ］
+<% end -%>
+
+［＃３字下げ］［＃ここから中見出し］<%= section["subtitle"].rstrip %>［＃ここで中見出し終わり］
+
+<% if section["element"]["introduction"] != "" -%>
+［＃ここから６字下げ］
+<%= section["element"]["introduction"] %>
+［＃ここで字下げ終わり］
+<% end -%>
+
+
+<%= section["element"]["body"] %>
+
+<% if section["element"]["postscript"] != "" -%>
+［＃ここから６字下げ］
+<%= section["element"]["postscript"] %>
+［＃ここで字下げ終わり］
+<% end -%>
+<% end -%>

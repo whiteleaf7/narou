@@ -9,6 +9,8 @@ require_relative "narou"
 class Template
   TEMPLATE_DIR = "template/"
 
+  class LoadError < StandardError; end
+
   #
   # テンプレートを元にファイルを作成
   #
@@ -49,7 +51,7 @@ class Template
       result = ERB.new(src, nil, "-").result(_binding)
       return result
     end
-    nil
+    raise LoadError, "テンプレートファイルが見つかりません。(#{src_filename}.erb)"
   end
 
   def self.invalid_templace_version?

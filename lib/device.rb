@@ -19,12 +19,15 @@ class Device
     extend Device::Library::Linux
   end
 
-  attr_reader :name, :ebook_file_ext
+  attr_reader :name, :ebook_file_ext, :display_name
 
-  require_relative "device/kindle"
-  require_relative "device/kobo"
-  require_relative "device/reader"
-  DEVICES = { "kindle" => Kindle, "kobo" => Kobo, "reader" => Reader }
+  DEVICES = {}.tap do |h|
+    Dir.glob(File.join(File.dirname(__FILE__), "device", "*.rb")).each do |name|
+      name = File.basename(name, ".rb")
+      require_relative "device/#{name}"
+      h[name] = eval(name.capitalize)
+    end
+  end
 
   class UnknownDevice < StandardError; end
 
@@ -45,7 +48,8 @@ class Device
       raise UnknownDevice, "#{device_name} は存在しません"
     end
     @device = DEVICES[device_name.downcase]
-    @name = device_name.capitalize
+    @name = @device::NAME
+    @display_name = @device::DISPLAY_NAME
     @ebook_file_ext = @device::EBOOK_FILE_EXT
     create_device_check_methods
   end
@@ -105,6 +109,10 @@ class Device
     puts
     error $@.shift + ": #{e.message} (#{e.class})"
     exit 1
+  end
+
+  def physical_support?
+    @device::PHYSICAL_SUPPORT
   end
 
   private

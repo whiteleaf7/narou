@@ -216,5 +216,10 @@ class NovelSetting
       value: 10,
       help: "ここで設定した値が `enable_convert_page_break` に反映される"
     },
+    {
+      name: "enable_dakuten_font",
+      value: true,
+      help: "濁点フォントを使用するか。false の場合は縦中横による擬似表現を使用する"
+    },
   ]
 end
