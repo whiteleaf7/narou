@@ -248,6 +248,7 @@ module Command
       require "zip"
       Zip.unicode_names = true
       dirpath = File.dirname(@converted_txt_path)
+      translate_illust_chuki_to_img_tag
       zipfile_path = @converted_txt_path.sub(/.txt$/, @device.ebook_file_ext)
       File.delete(zipfile_path) if File.exists?(zipfile_path)
       Zip::File.open(zipfile_path, Zip::File::CREATE) do |zip|
@@ -285,6 +286,15 @@ module Command
         end
       end
       LocalSetting.get.save_settings("local_setting") if modified
+    end
+
+    #
+    # i文庫用に挿絵注記をimgタグに変換する
+    #
+    def translate_illust_chuki_to_img_tag
+      data = File.read(@converted_txt_path, encoding: Encoding::UTF_8)
+      data.gsub!(/［＃挿絵（(.+?)）入る］/, "<img src=\"\\1\">")
+      File.write(@converted_txt_path, data)
     end
 
     #
