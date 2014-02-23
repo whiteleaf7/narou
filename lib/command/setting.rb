@@ -230,10 +230,11 @@ module Command
     SETTING_VARIABLES = {
       local: {
         # 変数名 => [受け付ける型, 説明(, 不可視化フラグ)]
-        "convert.no-epub" => [:boolean, "EPUB変換を無効にするかどうか"],
-        "convert.no-mobi" => [:boolean, "MOBI変換を無効にするかどうか"],
-        "convert.no-strip" => [:boolean, "MOBIのstripを無効にするかどうか\n" +
+        "convert.no-epub" => [:boolean, "EPUB変換を無効にする"],
+        "convert.no-mobi" => [:boolean, "MOBI変換を無効にする"],
+        "convert.no-strip" => [:boolean, "MOBIのstripを無効にする\n" +
                                          " " * 6 + "※注意：KDP用のMOBIはstripしないでください"],
+        "convert.no-zip" => [:boolean, "i文庫用のzipファイルを作らない"],
         "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開かない"],
         "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
