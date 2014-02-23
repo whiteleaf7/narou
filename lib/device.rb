@@ -93,10 +93,16 @@ class Device
       dst_path = File.join(documents_path, File.basename(src_file))
       case Helper.determine_os
       when :windows
-        cmd = "copy /B " + %!"#{src_file}" "#{dst_path}"!.gsub("/", "\\").encode(Encoding::Windows_31J)
-        capture = `#{cmd}`
-        if $?.exitstatus > 0
-          raise capture.force_encoding(Encoding::Windows_31J).rstrip
+        begin
+          # Rubyでコピーするのは遅いのでOSのコマンドを叩く
+          cmd = "copy /B " + %!"#{src_file}" "#{dst_path}"!.gsub("/", "\\").encode(Encoding::Windows_31J)
+          capture = `#{cmd}`
+          if $?.exitstatus > 0
+            raise capture.force_encoding(Encoding::Windows_31J).rstrip
+          end
+        rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError => e
+          # Windows-31J に変換できない文字をファイル名に含むものはRubyでコピーする
+          FileUtils.cp(src_file, dst_path)
         end
       else
         FileUtils.cp(src_file, dst_path)

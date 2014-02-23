@@ -5,6 +5,7 @@
 
 require "fileutils"
 require "stringio"
+require "tmpdir"
 require_relative "novelsetting"
 require_relative "inspector"
 require_relative "illustration"
@@ -83,10 +84,12 @@ class NovelConverter
   #
   def self.txt_to_epub(filename, use_dakuten_font = false, dst_dir = nil, device = nil, verbose = false)
     abs_srcpath = File.expand_path(filename)
+    src_dir = File.dirname(abs_srcpath)
 
     cover_option = ""
     # MEMO: 外部実行からだと -c FILENAME, -c 1 オプションはぬるぽが出て動かない
-    if get_cover_filename(File.dirname(abs_srcpath))
+    cover_filename = get_cover_filename(src_dir)
+    if cover_filename
       cover_option = "-c 0"   # 先頭の挿絵を表紙として利用
     end
 
@@ -117,11 +120,24 @@ class NovelConverter
     aozoraepub3_basename = File.basename(aozoraepub3_path)
     aozoraepub3_dir = File.dirname(aozoraepub3_path)
 
-    java_encoding = Helper.os_mac? ? "-Dfile.encoding=UTF-8" : ""
+    java_encoding = "-Dfile.encoding=UTF-8"
+
+    # ファイル名にUTF-8な文字が混ざらないように一時的にてTempディレクトリにコピーする
+    temp_txt_path = Helper.move_to_temporary(abs_srcpath)
+    illust_dir = File.join(src_dir, Illustration::ILLUST_DIR)
+    temp_illust_path = nil
+    if File.exists?(illust_dir)
+      temp_illust_path = File.join(Dir.tmpdir, Illustration::ILLUST_DIR)
+      File.rename(illust_dir, temp_illust_path)
+    end
+    if cover_filename
+      temp_cover_path = File.join(Dir.tmpdir, cover_filename)
+      File.rename(File.join(src_dir, cover_filename), temp_cover_path)
+    end
 
     Dir.chdir(aozoraepub3_dir)
     command = %!java #{java_encoding} -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 -of #{device_option} ! +
-              %!#{cover_option} #{dst_option} #{ext_option} "#{abs_srcpath}"!
+              %!#{cover_option} #{dst_option} #{ext_option} "#{temp_txt_path}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
@@ -131,15 +147,16 @@ class NovelConverter
       print "."
     end
     visible_aozora_fonts_directory unless use_dakuten_font
+    Helper.return_from_temporary(abs_srcpath, wild: true)
+    if temp_illust_path
+      File.rename(temp_illust_path, illust_dir)
+    end
+    if cover_filename
+      File.rename(temp_cover_path, File.join(src_dir, cover_filename))
+    end
+    Dir.chdir(pwd)
 
     stdout_capture = res[0]
-    if Helper.os_windows?
-      stdout_capture = stdout_capture.force_encoding(Encoding::Shift_JIS).encode(Encoding::UTF_8)
-    else
-      stdout_capture.force_encoding(Encoding::UTF_8)
-    end
-
-    Dir.chdir(pwd)
 
     if verbose
       puts
@@ -180,16 +197,20 @@ class NovelConverter
       return :error
     end
 
+    temp_path = Helper.move_to_temporary(epub_path)
+
+    command = %!"#{kindlegen_path}" -locale ja "#{temp_path}"!
     if Helper.os_windows?
-      epub_path.encode!(Encoding::Windows_31J)
+      command.encode!(Encoding::Windows_31J)
     end
-    command = %!"#{kindlegen_path}" -locale ja "#{epub_path}"!
     print "kindlegen実行中"
     res = Helper::AsyncCommand.exec(command) do
       print "."
     end
     stdout_capture, _, proccess_status = res
     stdout_capture.force_encoding(Encoding::UTF_8)
+
+    Helper.return_from_temporary(epub_path, wild: true)
 
     if verbose
       puts

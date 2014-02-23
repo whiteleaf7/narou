@@ -4,6 +4,7 @@
 #
 
 require "open3"
+require "tmpdir"
 
 #
 # 雑多なお助けメソッド群
@@ -86,6 +87,46 @@ module Helper
 
   def self.replace_filename_special_chars(str)
     str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥")
+  end
+
+  #
+  # 指定されたファイルをTempディレクトリに移す
+  #
+  # マルチバイト文字が入らないようにファイル名を変更するが、拡張子は維持する。
+  # 移動先のパスを返す。
+  # wild を有効にした時、拡張子をワイルドカードとして複数ファイル移動する
+  #
+  def self.move_to_temporary(src_path, wild: false)
+    if wild
+      paths = []
+      dir_path = File.dirname(src_path)
+      src_basename = File.basename(src_path, ".*")
+      Dir.foreach(dir_path) do |path|
+        next if File.basename(path, ".*") != src_basename
+        ext = File.extname(path)
+        temp_path = File.join(Dir.tmpdir, "$temporary$" + ext)
+        File.rename(path, temp_path)
+        paths << temp_path
+      end
+      return paths
+    else
+      temp_path = File.join(Dir.tmpdir, "$temporary$" + File.extname(src_path))
+      File.rename(src_path, temp_path)
+      return temp_path
+    end
+  end
+
+  #
+  # Tempディレクトリに移しておいたファイルを元に戻す
+  #
+  def self.return_from_temporary(src_path, wild: false)
+    pattern = File.join(Dir.tmpdir, "$temporary$" + (wild ? ".*" : File.extname(src_path)))
+    dir_path = File.dirname(src_path)
+    Dir.glob(pattern) do |temp_path|
+      ext = File.extname(temp_path)
+      path = File.join(dir_path, File.basename(src_path, ".*") + ext)
+      File.rename(temp_path, path)
+    end
   end
 
   #

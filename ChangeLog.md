@@ -11,6 +11,8 @@
 		+ i文庫専用レイアウトテンプレート、ibunko_novel.txt.erb が追加されました
 		+ `narou convert` コマンドに `--no-zip` オプションが追加されました
 	- `setting.ini` に濁点フォントの埋め込みを制御できる `enable_dakuten_font` が追加されました
+* Bug Fix
+	- Windowsにおいて、タイトル及び作者名にCP392外の文字が使われていた場合に変換がエラーになる問題を修正
 
 2014/02/20 : **1.4.1.1**
 * Bug Fix
