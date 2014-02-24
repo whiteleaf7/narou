@@ -44,7 +44,7 @@ module Command
         @options["type"] = true
       }
       @opt.on("-f", "--filter VAL", String,
-              "表示を絞るためのフィルターの種類(連載:serial, 短編:ss)") { |filter|
+              "表示を絞るためのフィルターの種類(連載:series, 短編:ss)") { |filter|
         @options["filter"] = filter
       }
     end
@@ -58,7 +58,7 @@ module Command
       novels.each do |novel|
         novel_type = novel["novel_type"].to_i
         if filter
-          if filter == "serial" && novel_type != 0 && novel_type != 1
+          if filter == "series" && novel_type != 0 && novel_type != 1
             next
           elsif filter == "ss" && novel_type != 2
             next

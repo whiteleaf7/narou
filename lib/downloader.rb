@@ -438,7 +438,7 @@ class Downloader
   #
   # 連載小説かどうか調べる
   #
-  def serial_novel?
+  def series_novel?
     unless @novel_type
       if @@database[@id]
         @novel_type = get_novel_type
@@ -478,7 +478,7 @@ class Downloader
       end
     end
     @setting.multi_match(toc_source, "title", "author", "story", "tcode")
-    if @setting["narou_api_url"] && serial_novel?
+    if @setting["narou_api_url"] && series_novel?
       # 連載小説
       subtitles = get_subtitles(toc_source)
     else
