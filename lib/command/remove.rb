@@ -16,7 +16,7 @@ module Command
     IDは #{@opt.program_name} list を参照して下さい。
   ・一度に複数の小説を指定する場合は空白で区切って下さい。
   ・削除確認をスキップするには -y オプションを有効にして下さい。
-  ・削除するのはデータベースのインデックスだけで、変換済みテキストファイルやMOBIファイル等はそのまま残ります。
+  ・削除するのはデータベースのインデックスだけで、変換済みテキストファイルやMOBIファイル等はそのまま残ります。ファイルをすべて削除する場合は --with-file オプションを指定して下さい。
 
   Example:
     narou remove n9669bk
@@ -24,6 +24,8 @@ module Command
     narou remove n9669bk http://ncode.syosetu.com/n4259s/
     narou remove 0 1 -y
     narou remove n9669bk --with-file   # ファイルも完全に削除する
+    narou remove --all-ss              # 連載小説をすべて削除する
+    narou remove --all-ss --with-file  # 短編小説をファイルも含めてすべて削除する
 
   Options:
       EOS
@@ -33,10 +35,26 @@ module Command
       @opt.on("--with-file", "小説の保存フォルダ・ファイルも全て削除する") {
         @options["with-file"] = true
       }
+      @opt.on("--all-ss", "短編小説をすべて削除する") {
+        @options["all-ss"] = true
+      }
+    end
+
+    def get_all_short_story
+      Database.instance.get_object.values.select { |v| v["novel_type"] == 2 }
     end
 
     def execute(argv)
       super
+      novels = []
+      if @options["all-ss"]
+        novels = get_all_short_story
+        if novels.count == 0
+          puts "短編小説がひとつもありません"
+          return
+        end
+        argv += novels.map { |n| n["id"].to_s }
+      end
       if argv.empty?
         puts @opt.help
         return
