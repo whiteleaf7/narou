@@ -16,8 +16,10 @@ class ConverterBase
   def before(io, text_type)
     data = io.string
     convert_page_break(data) if @text_type == "body"
-    data.gsub!("\n\n", "\n")
-    data.gsub!("\n\n\n", "\n\n")
+    if @text_type != "story"
+      data.gsub!("\n\n", "\n")
+      data.gsub!("\n\n\n", "\n\n")
+    end
     io
   end
 
@@ -72,7 +74,8 @@ class ConverterBase
   def convert_numbers(data)
     # 小数点を・に
     data.gsub!(/([\d０-９#{KANJI_NUM}]+?)[\.．]([\d０-９#{KANJI_NUM}]+?)/, "\\1・\\2")
-    if @setting.enable_convert_num_to_kanji && @text_type != "subtitle"
+    if @setting.enable_convert_num_to_kanji &&
+       @text_type != "subtitle" && @text_type != "chapter" && @text_type != "story"
       num_to_kanji(data)
     else
       hankaku_num_to_zenkaku_num(data)

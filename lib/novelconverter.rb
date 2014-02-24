@@ -285,10 +285,14 @@ class NovelConverter
     else
       @section_save_dir = Downloader.get_novel_section_save_dir(@setting.archive_path)
       @toc = Downloader.get_toc_data(@setting.archive_path)
+      @toc["story"] = conv.convert(@toc["story"], "story")
       progressbar = ProgressBar.new(@toc["subtitles"].count)
       @toc["subtitles"].each_with_index do |subinfo, i|
         progressbar.output(i)
         section = load_novel_section(subinfo)
+        if section["chapter"].length > 0
+          section["chapter"] = conv.convert(section["chapter"], "chapter")
+        end
         @inspector.subtitle = section["subtitle"]
         element = section["element"]
         element.each do |text_type, elm_text|
