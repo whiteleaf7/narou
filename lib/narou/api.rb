@@ -22,8 +22,8 @@ module Narou
       @api_result[key]
     end
 
-    def request_api(of)
-      url = "#{@api_url}?ncode=#{@ncode}&of=#{of}"
+    def request_api(of, gzip = 5)
+      url = "#{@api_url}?gzip=#{gzip}&ncode=#{@ncode}&of=#{of}"
       open(url) do |fp|
         result = YAML.load(fp.read)
         if result[0]["allcount"] == 1

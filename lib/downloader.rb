@@ -26,8 +26,6 @@ class Downloader
 
   attr_reader :id
 
-  class NoSerialNovel < StandardError; end
-
   #
   # ターゲット(ID、URL、Nコード、小説名)を指定して小説データのダウンロードを開始する
   #
@@ -278,6 +276,7 @@ class Downloader
     @from_download = from_download
     @cache_dir = nil
     @new_arrivals = false
+    @novel_type = nil
     @id = @@database.get_id("toc_url", @setting["toc_url"]) || @@database.get_new_id
   end
 
@@ -305,12 +304,7 @@ class Downloader
   #         nil なら何らかの原因でダウンロード自体出来なかった
   #
   def start_download
-    begin
-      latest_toc = get_latest_table_of_contents
-    rescue NoSerialNovel
-      error @setting["ncode"] + " は短編小説です。現在短編小説には対応していません"
-      return :failed
-    end
+    latest_toc = get_latest_table_of_contents
     unless latest_toc
       error @setting["toc_url"] + " の目次データが取得出来ませんでした"
       return :failed
@@ -430,22 +424,28 @@ class Downloader
       "file_title" => @file_title,
       "toc_url" => @setting["toc_url"],
       "sitename" => @setting["name"],
-      "novel_type" => @novel_type,
+      "novel_type" => get_novel_type,
       "last_update" => Time.now,
       "new_arrivals_date" => (@new_arrivals ? Time.now : @@database[@id]["new_arrivals_date"])
     }
     @@database.save_database
   end
 
+  def get_novel_type
+    @novel_type ||= @@database[@id]["novel_type"] || 1
+  end
+
   #
   # 連載小説かどうか調べる
   #
   def serial_novel?
-    if @@database[@id]
-      @novel_type = @@database[@id]["novel_type"] || 1
-    else
-      api = Narou::API.new(@setting, "nt")
-      @novel_type = api["novel_type"]
+    unless @novel_type
+      if @@database[@id]
+        @novel_type = get_novel_type
+      else
+        api = Narou::API.new(@setting, "nt")
+        @novel_type = api["novel_type"]
+      end
     end
     @novel_type == 1
   end
@@ -477,10 +477,16 @@ class Downloader
         raise
       end
     end
-    if @setting["narou_api_url"] && !serial_novel?
-      raise NoSerialNovel
-    end
     @setting.multi_match(toc_source, "title", "author", "story", "tcode")
+    if @setting["narou_api_url"] && serial_novel?
+      # 連載小説
+      subtitles = get_subtitles(toc_source)
+    else
+      # 短編小説
+      api = Narou::API.new(@setting, "s-gf-nu")
+      @setting["story"] = api["story"]
+      subtitles = create_short_story_subtitles(api)
+    end
     @title = @setting["title"]
     @file_title = Helper.replace_filename_special_chars(@title, invalid_replace: true).strip
     @setting["story"] = @setting["story"].gsub("<br />", "")
@@ -489,7 +495,7 @@ class Downloader
       "author" => @setting["author"],
       "toc_url" => @setting["toc_url"],
       "story" => @setting["story"],
-      "subtitles" => get_subtitles(toc_source)
+      "subtitles" => subtitles
     }
     toc_objects
   end
@@ -554,6 +560,22 @@ class Downloader
   end
 
   #
+  # 短編用の情報を生成
+  #
+  def create_short_story_subtitles(api)
+    subtitle = {
+      "index" => "1",
+      "href" => "/",
+      "chapter" => "",
+      "subtitle" => @setting["title"],
+      "file_subtitle" => Helper.replace_filename_special_chars(@setting["title"]),
+      "subdate" => api["general_firstup"],
+      "subupdate" => api["novelupdated_at"]
+    }
+    [subtitle]
+  end
+
+  #
   # 小説本文をまとめてダウンロードして保存
   #
   # subtitles にダウンロードしたいものをまとめた subtitle info を渡す
@@ -581,7 +603,12 @@ class Downloader
       unless chapter.empty?
         puts "#{chapter}"
       end
-      print "第#{index}部分　#{subtitle} (#{i+1}/#{max})"
+      if @novel_type == 1
+        print "第#{index}部分"
+      else
+        print "短編"
+      end
+      print "　#{subtitle} (#{i+1}/#{max})"
       section_element = a_section_download(subtitle_info)
       info = subtitle_info.dup
       info["element"] = section_element
@@ -639,12 +666,21 @@ class Downloader
     else
       subtitle_url = @setting["toc_url"] + href
     end
-    section = nil
+    section = download_raw_data(subtitle_url)
+    save_raw_data(section, subtitle_info)
+    element = extract_elements_in_section(section, subtitle_info["subtitle"])
+    element
+  end
+
+  #
+  # 指定したURLからデータをダウンロード
+  #
+  def download_raw_data(url)
+    raw = nil
     retry_count = RETRY_MAX_FOR_503
     begin
-      open(subtitle_url) do |fp|
-        section = pretreatment_source(fp.read)
-        save_raw_data(section, subtitle_info)
+      open(url) do |fp|
+        raw = pretreatment_source(fp.read)
       end
     rescue OpenURI::HTTPError => e
       if e.message =~ /^503/
@@ -661,8 +697,7 @@ class Downloader
         raise
       end
     end
-    element = extract_elements_in_section(section, subtitle_info["subtitle"])
-    element
+    raw
   end
 
   def get_raw_dir
