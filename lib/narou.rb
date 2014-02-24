@@ -131,7 +131,7 @@ module Narou
 
   def self.create_novel_filename(novel_data, ext = "")
     author, title = %w(author title).map { |k|
-      Helper.replace_filename_special_chars(novel_data[k])
+      Helper.replace_filename_special_chars(novel_data[k], invalid_replace: true)
     }
     "[#{author}] #{title}#{ext}"
   end

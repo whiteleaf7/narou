@@ -84,8 +84,14 @@ module Helper
     puts "―" * 35
   end
 
-  def self.replace_filename_special_chars(str)
-    str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥")
+  def self.replace_filename_special_chars(str, invalid_replace: false)
+    result = str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥")
+    if invalid_replace
+      org_encoding = result.encoding
+      result = result.encode(Encoding::Windows_31J, invalid: :replace, undef: :replace, replace: "_")
+                     .encode(org_encoding)
+    end
+    result
   end
 
   #

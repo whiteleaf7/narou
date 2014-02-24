@@ -482,7 +482,7 @@ class Downloader
     end
     @setting.multi_match(toc_source, "title", "author", "story", "tcode")
     @title = @setting["title"]
-    @file_title = Helper.replace_filename_special_chars(@title).strip
+    @file_title = Helper.replace_filename_special_chars(@title, invalid_replace: true).strip
     @setting["story"] = @setting["story"].gsub("<br />", "")
     toc_objects = {
       "title" => @title,
