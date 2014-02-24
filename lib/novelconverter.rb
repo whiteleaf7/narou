@@ -5,7 +5,6 @@
 
 require "fileutils"
 require "stringio"
-require "tmpdir"
 require_relative "novelsetting"
 require_relative "inspector"
 require_relative "illustration"
@@ -122,22 +121,9 @@ class NovelConverter
 
     java_encoding = "-Dfile.encoding=UTF-8"
 
-    # ファイル名にUTF-8な文字が混ざらないように一時的にてTempディレクトリにコピーする
-    temp_txt_path = Helper.move_to_temporary(abs_srcpath)
-    illust_dir = File.join(src_dir, Illustration::ILLUST_DIR)
-    temp_illust_path = nil
-    if File.exists?(illust_dir)
-      temp_illust_path = File.join(Dir.tmpdir, Illustration::ILLUST_DIR)
-      File.rename(illust_dir, temp_illust_path)
-    end
-    if cover_filename
-      temp_cover_path = File.join(Dir.tmpdir, cover_filename)
-      File.rename(File.join(src_dir, cover_filename), temp_cover_path)
-    end
-
     Dir.chdir(aozoraepub3_dir)
     command = %!java #{java_encoding} -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 -of #{device_option} ! +
-              %!#{cover_option} #{dst_option} #{ext_option} "#{temp_txt_path}"!
+              %!#{cover_option} #{dst_option} #{ext_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
@@ -147,13 +133,6 @@ class NovelConverter
       print "."
     end
     visible_aozora_fonts_directory unless use_dakuten_font
-    Helper.return_from_temporary(abs_srcpath, wild: true)
-    if temp_illust_path
-      File.rename(temp_illust_path, illust_dir)
-    end
-    if cover_filename
-      File.rename(temp_cover_path, File.join(src_dir, cover_filename))
-    end
     Dir.chdir(pwd)
 
     stdout_capture = res[0]
@@ -197,9 +176,7 @@ class NovelConverter
       return :error
     end
 
-    temp_path = Helper.move_to_temporary(epub_path)
-
-    command = %!"#{kindlegen_path}" -locale ja "#{temp_path}"!
+    command = %!"#{kindlegen_path}" -locale ja "#{epub_path}"!
     if Helper.os_windows?
       command.encode!(Encoding::Windows_31J)
     end
@@ -209,8 +186,6 @@ class NovelConverter
     end
     stdout_capture, _, proccess_status = res
     stdout_capture.force_encoding(Encoding::UTF_8)
-
-    Helper.return_from_temporary(epub_path, wild: true)
 
     if verbose
       puts
