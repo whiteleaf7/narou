@@ -9,6 +9,10 @@ module Command
   class List < CommandBase
     NEW_ARRIVALS_LIMIT = 6 * 60 * 60   # 更新してから何秒までを新着色にするか
 
+    # MEMO: 0 は昔の小説を凍結したままな場合、novel_type が設定されていないので、
+    #       nil.to_i → 0 という互換性維持のため
+    NOVEL_TYPE_LABEL = ["連載", "連載", "短編"]
+
     def initialize
       super("[<number>] [options]")
       @opt.separator <<-EOS
@@ -16,12 +20,14 @@ module Command
   ・現在管理している小説の一覧を表示します。
   ・表示されるIDは各コマンドで指定することで小説名等を入力する手間を省けます。
   ・個数を与えることで、最大表示数を制限できます(デフォルトは全て表示)
+  ・narou listのデフォルト動作を narou s default_arg.list= で設定すると便利です
 
   Example:
     narou list             # IDの小さい順に全て表示
     narou list 10 -r       # IDの大きい順に10件表示
     narou list 5 -l        # 最近更新のあった5件表示
-    narou list 10 -rl      # 最新10件を古い順に表示
+    narou list 10 -rl      # 古い順に10件表示
+    narou list -f ss       # 短編小説だけ表示
 
   Options:
       EOS
@@ -34,13 +40,30 @@ module Command
       @opt.on("-u", "--url", "小説の掲載ページも表示する") {
         @options["url"] = true
       }
+      @opt.on("-t", "--type", "小説の種別（短編／連載）も表示する") {
+        @options["type"] = true
+      }
+      @opt.on("-f", "--filter VAL", String,
+              "表示を絞るためのフィルターの種類(連載:serial, 短編:ss)") { |filter|
+        @options["filter"] = filter
+      }
     end
 
     def output_list(novels)
       now = Time.now
       today = now.strftime("%y/%m/%d")
-      puts "  ID |  更新日  |     タイトル"
+      filter = @options["filter"]
+      header = [" ID ", " 更新日 ", @options["type"] ? "種別" : nil, "     タイトル"].compact
+      puts header.join(" | ")
       novels.each do |novel|
+        novel_type = novel["novel_type"].to_i
+        if filter
+          if filter == "serial" && novel_type != 0 && novel_type != 1
+            next
+          elsif filter == "ss" && novel_type != 2
+            next
+          end
+        end
         id = novel["id"]
         frozen = Narou.novel_frozen?(id)
         disp_id = ((frozen ? "*" : "") + id.to_s).rjust(4)
@@ -56,7 +79,8 @@ module Command
               s.replace "<bold><green>#{s}</green></bold>".termcolor
             end
           },
-          novel["title"],
+          @options["type"] ? NOVEL_TYPE_LABEL[novel_type] : nil,
+          novel["title"] + (!@options["type"] && novel_type == 2 ? "  (#{NOVEL_TYPE_LABEL[novel_type]})" : ""),
           @options["url"] ? novel["toc_url"] : nil
         ].compact.join(" | ")
       end
