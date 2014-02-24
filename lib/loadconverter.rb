@@ -9,6 +9,7 @@ require_relative "helper"
 BlankConverter = Class.new(ConverterBase) {}
 
 $converter_container = {}
+$converter_load_once = {}
 
 def converter(title, &block)
   $converter_container[title] = Class.new(ConverterBase, &block)
@@ -61,7 +62,10 @@ def load_converter(title, archive_path)
   if File.exists?(converter_path)
     if Helper.os_windows?
       # TODO: RubyのバグでUTF-8なパスをrequireが見えてない。修正されたら消す
-      require converter_path.encode(Encoding::Windows_31J)
+      unless $converter_load_once[archive_path]
+        eval(File.read(converter_path, encoding: Encoding::UTF_8))
+        $converter_load_once[archive_path] = true
+      end
     else
       require converter_path
     end
