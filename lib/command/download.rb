@@ -16,6 +16,7 @@ module Command
   ・一度に複数の小説を指定する場合は空白で区切って下さい。
   ・ダウンロード終了後に変換処理を行います。ダウンロードのみする場合は-nオプションを指定して下さい。
   ・すでにダウンロード済みの小説の場合は何もしません。
+  ・--remove オプションをつけてダウンロードすると、ダウンロード（とその後の変換、送信）が終わったあと削除します。データベースのインデックスを外すだけなので、変換した書籍データは残ったままになります。ファイルを全て消す場合は手動で削除する必要があります。
 
   Example:
     narou download n9669bk
@@ -23,6 +24,7 @@ module Command
     narou download n9669bk http://ncode.syosetu.com/n4259s/
     narou download 0 1 -f
     narou download n9669bk -n
+    narou download n6864bt --remove
 
   Options:
       EOS
@@ -34,6 +36,9 @@ module Command
       }
       @opt.on("-z", "--freeze", "ダウンロードが終了したあと凍結する") {
         @options["freeze"] = true
+      }
+      @opt.on("-r", "--remove", "ダウンロードが終了したあと削除する") {
+        @options["remove"] = true
       }
     end
 
@@ -72,6 +77,9 @@ module Command
         end
         if @options["freeze"]
           Freeze.execute_and_rescue_exit([download_target])
+        elsif @options["remove"]
+          # --freeze オプションが指定された場合は --remove オプションは無視する
+          Remove.execute_and_rescue_exit([download_target, "-y"])
         end
       end
     end
