@@ -10,6 +10,8 @@ require_relative "globalsetting"
 require_relative "device"
 
 module Narou
+  extend self
+
   LOCAL_SETTING_DIR = ".narou"
   GLOBAL_SETTING_DIR = ".narousetting"
   AOZORAEPUB3_JAR_NAME = "AozoraEpub3.jar"
@@ -22,7 +24,7 @@ module Narou
   @@aozora_jar_path = nil
   @@preset_dir = nil
 
-  def self.get_root_dir
+  def get_root_dir
     return @@root_dir if @@root_dir
     path = File.expand_path(File.dirname("."))
     drive_letter = ""
@@ -40,7 +42,7 @@ module Narou
     @@root_dir
   end
 
-  def self.get_local_setting_dir
+  def get_local_setting_dir
     return @@local_setting_dir if @@local_setting_dir
     root_dir = get_root_dir
     if root_dir
@@ -49,7 +51,7 @@ module Narou
     @@local_setting_dir
   end
 
-  def self.get_global_setting_dir
+  def get_global_setting_dir
     return @@global_setting_dir if @@global_setting_dir
     @@global_setting_dir = File.expand_path(File.join("~", GLOBAL_SETTING_DIR))
     unless File.exists?(@@global_setting_dir)
@@ -58,24 +60,22 @@ module Narou
     @@global_setting_dir
   end
 
-  def self.get_script_dir
+  def get_script_dir
     @@script_dir ||= File.expand_path(File.join(File.dirname(__FILE__), ".."))
   end
 
-  def self.already_init?
+  def already_init?
     !!get_root_dir
   end
 
-  def self.init
+  def init
     return nil if already_init?
     FileUtils.mkdir(LOCAL_SETTING_DIR)
     puts LOCAL_SETTING_DIR + "/ を作成しました"
     Database.init
-    #LocalSetting.get["local_setting"]["device"] = "kindle"
-    #LocalSetting.get.save_settings
   end
 
-  def self.alias_to_id(target)
+  def alias_to_id(target)
     aliases = LocalSetting.get["alias"]
     if aliases[target]
       return aliases[target]
@@ -83,22 +83,22 @@ module Narou
     target
   end
 
-  def self.novel_frozen?(target)
+  def novel_frozen?(target)
     id = Downloader.get_id_by_target(target) or return false
     LocalSetting.get["freeze"].include?(id)
   end
 
-  def self.get_preset_dir
+  def get_preset_dir
     return @@preset_dir if @@preset_dir
     @@preset_dir = File.expand_path(File.join(get_script_dir, PRESET_DIR))
     @@preset_dir
   end
 
-  def self.create_aozoraepub3_jar_path(*paths)
+  def create_aozoraepub3_jar_path(*paths)
     File.expand_path(File.join(*paths, AOZORAEPUB3_JAR_NAME))
   end
 
-  def self.aozoraepub3_directory?(path)
+  def aozoraepub3_directory?(path)
     File.exists?(create_aozoraepub3_jar_path(path))
   end
 
@@ -109,7 +109,7 @@ module Narou
   # 2. 小説保存ディレクトリ(Narou.get_root_dir) 直下の AozoraEpub3
   # 3. スクリプト保存ディレクトリ(Narou.get_script_dir) 直下の AozoraEpub3
   #
-  def self.get_aozoraepub3_path
+  def get_aozoraepub3_path
     return @@aozora_jar_path if @@aozora_jar_path
     global_setting_aozora_path = GlobalSetting.get["global_setting"]["aozoraepub3dir"]
     if global_setting_aozora_path
@@ -129,25 +129,25 @@ module Narou
     nil
   end
 
-  def self.create_novel_filename(novel_data, ext = "")
+  def create_novel_filename(novel_data, ext = "")
     author, title = %w(author title).map { |k|
       Helper.replace_filename_special_chars(novel_data[k], invalid_replace: true)
     }
     "[#{author}] #{title}#{ext}"
   end
 
-  def self.get_mobi_path(target)
+  def get_mobi_path(target)
     get_ebook_file_path(target, ".mobi")
   end
 
-  def self.get_ebook_file_path(target, ext)
+  def get_ebook_file_path(target, ext)
     data = Downloader.get_data_by_target(target)
     return nil unless data
     dir = Downloader.get_novel_data_dir_by_target(target)
     File.join(dir, create_novel_filename(data, ext))
   end
 
-  def self.get_device(device_name = nil)
+  def get_device(device_name = nil)
     device_name = LocalSetting.get["local_setting"]["device"] unless device_name
     if device_name && Device.exists?(device_name)
       return Device.create(device_name)
