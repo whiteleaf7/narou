@@ -135,7 +135,7 @@ module Command
         error e.message
         exit 1
       ensure
-        temp_paths.each { |tmp| tmp.close(true) }
+        temp_paths.each { |tmp| tmp.delete }
       end
       puts res[0] unless res[0].empty?
       error res[1] unless res[1].empty?
@@ -194,12 +194,14 @@ module Command
       novel_info = Database.instance[id]
 
       sections = latest_novel_sections
-      temp_new = Tempfile.open("new")
+      temp_new = Tempfile.open(["new", ".txt"])
       temp_new.write(Template.get("diff.txt", binding))
+      temp_new.close
 
       sections = cache_sections
-      temp_old = Tempfile.open("old")
+      temp_old = Tempfile.open(["old", ".txt"])
       temp_old.write(Template.get("diff.txt", binding))
+      temp_old.close
 
       [temp_new, temp_old]
     end
