@@ -520,6 +520,7 @@ class ConverterBase
   
   HALF_INDENT_TARGET = /^[ 　\t]*([〔「『(（【〈《≪〝])/
   FULL_INDENT_TARGET = /^[ 　\t]*(――)/
+  AUTO_INDENT_IGNORE_INDENT_CHAR = Inspector::IGNORE_INDENT_CHAR.sub("・", "")
   #
   # 行頭かぎ括弧(等)に二分アキを追加する
   #
@@ -539,8 +540,15 @@ class ConverterBase
   def auto_indent(data)
     data.gsub!(FULL_INDENT_TARGET, "　\\1")
     if @setting.enable_auto_indent && @inspector.inspect_indent(data)
-      data.gsub!(/^([^#{Inspector::IGNORE_INDENT_CHAR}])/) do
-        $1 == " " || $1 == "　" ? "　" : "　#{$1}"
+      data.gsub!(/^([^#{AUTO_INDENT_IGNORE_INDENT_CHAR}])/) do
+        # 行頭に三点リーダーの代わりに連続中黒（・・・）が来た場合の対策
+        # https://github.com/whiteleaf7/narou/issues/35
+        # 行頭に中黒１個だけの場合はよくある表現なので字下げしない
+        if $1 == "・" && $'[0] != "・"
+          "・"
+        else
+          $1 == " " || $1 == "　" ? "　" : "　#{$1}"
+        end
       end
     end
   end
