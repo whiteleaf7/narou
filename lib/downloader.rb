@@ -467,7 +467,7 @@ class Downloader
           @setting = Downloader.get_sitesetting_by_target(toc_fp.base_uri.to_s)
           toc_url = @setting["toc_url"]
         end
-        toc_source = pretreatment_source(toc_fp.read)
+        toc_source = Helper.pretreatment_source(toc_fp.read, @setting["encoding"])
       end
     rescue OpenURI::HTTPError => e
       if e.message =~ /^404/
@@ -680,7 +680,7 @@ class Downloader
     retry_count = RETRY_MAX_FOR_503
     begin
       open(url) do |fp|
-        raw = pretreatment_source(fp.read)
+        raw = Helper.pretreatment_source(fp.read, @setting["encoding"])
       end
     rescue OpenURI::HTTPError => e
       if e.message =~ /^503/
@@ -811,24 +811,5 @@ class Downloader
       end
       Template.write(filename, novel_dir_path, binding)
     end
-  end
-
-  #
-  # ダウンロードしてきたデータを使いやすいように処理
-  #
-  def pretreatment_source(src)
-    restor_entity(src.force_encoding(@setting["encoding"])).gsub("\r", "")
-  end
-
-  ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)" }
-  #
-  # エンティティ復号
-  #
-  def restor_entity(str)
-    result = str.dup
-    ENTITIES.each do |key, value|
-      result.gsub!("&#{key};", value)
-    end
-    result
   end
 end

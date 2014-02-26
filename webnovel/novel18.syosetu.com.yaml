@@ -35,3 +35,4 @@ txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index
 # ------------------------------------------------------------
 # 特殊な設定
 narou_api_url: http://api.syosetu.com/novel18api/api/
+narou_info_url: \\k<top_url>/novelview/infotop/ncode/\\k<ncode>/

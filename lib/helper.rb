@@ -11,15 +11,17 @@ require "open3"
 # MacOSX 関連は確認してないので動作するか不明
 #
 module Helper
-  def self.os_windows?
+  extend self
+
+  def os_windows?
     @@os_is_windows ||= RUBY_PLATFORM =~ /mswin(?!ce)|mingw|cygwin|bccwin/i
   end
 
-  def self.os_mac?
+  def os_mac?
     @@os_is_mac ||= RUBY_PLATFORM =~ /darwin/
   end
 
-  def self.determine_os
+  def determine_os
     case
     when os_windows?
       :windows
@@ -30,7 +32,7 @@ module Helper
     end
   end
 
-  def self.confirm(message)
+  def confirm(message)
     confirm_msg = "#{message} (y/n)?: "
     STDOUT.print confirm_msg   # Logger でロギングされないように直接標準出力に表示
     while input = $stdin.gets
@@ -45,7 +47,7 @@ module Helper
     end
   end
 
-  def self.open_browser_linux(address, error_message)
+  def open_browser_linux(address, error_message)
     %w(xdg-open firefox w3m).each do |browser|
       system(%!#{browser} "#{address}"!)
       return if $?.exitstatus != 127
@@ -53,7 +55,7 @@ module Helper
     error error_message
   end
 
-  def self.open_directory(path, confirm_message = nil)
+  def open_directory(path, confirm_message = nil)
     if confirm_message
       return unless confirm(confirm_message)
     end
@@ -67,7 +69,7 @@ module Helper
     end
   end
 
-  def self.open_browser(url)
+  def open_browser(url)
     case determine_os
     when :windows
       escaped_url = url.gsub("%", "%^").gsub("&", "^&")
@@ -80,16 +82,35 @@ module Helper
     end
   end
 
-  def self.print_horizontal_rule
+  def print_horizontal_rule
     puts "―" * 35
   end
 
-  def self.replace_filename_special_chars(str, invalid_replace: false)
+  def replace_filename_special_chars(str, invalid_replace: false)
     result = str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥")
     if invalid_replace
       org_encoding = result.encoding
       result = result.encode(Encoding::Windows_31J, invalid: :replace, undef: :replace, replace: "_")
                      .encode(org_encoding)
+    end
+    result
+  end
+
+  #
+  # ダウンロードしてきたデータを使いやすいように処理
+  #
+  def pretreatment_source(src, encoding = Encoding::UTF_8)
+    restor_entity(src.force_encoding(encoding)).gsub("\r", "")
+  end
+
+  ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)" }
+  #
+  # エンティティ復号
+  #
+  def restor_entity(str)
+    result = str.dup
+    ENTITIES.each do |key, value|
+      result.gsub!("&#{key};", value)
     end
     result
   end
