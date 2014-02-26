@@ -488,7 +488,7 @@ class Downloader
       subtitles = create_short_story_subtitles(api)
     end
     @title = @setting["title"]
-    @file_title = Helper.replace_filename_special_chars(@title, invalid_replace: true).strip
+    @file_title = Helper.replace_filename_special_chars(@title, true).strip
     @setting["story"] = @setting["story"].gsub("<br />", "")
     toc_objects = {
       "title" => @title,
