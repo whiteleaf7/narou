@@ -32,7 +32,14 @@ module Command
     narou send 6
 
     narou send      # 端末のファイルより新しいファイルがあれば送信
+    narou send --without-freeze   # 凍結済は対象外に
+
+  Options:
       EOS
+
+      @opt.on("--without-freeze", "`全話'送信時に凍結された小説は対象外にする") {
+        @options["without-freeze"] = true
+      }
     end
 
     def get_device(argv)
@@ -42,7 +49,17 @@ module Command
       Narou.get_device
     end
 
+    def load_local_settings
+      local_settings = LocalSetting.get["local_setting"]
+      local_settings.each do |name, value|
+        if name =~ /^send\.(.+)$/
+          @options[$1] = value
+        end
+      end
+    end
+
     def execute(argv)
+      load_local_settings
       super
       device = get_device(argv)
       unless device
@@ -64,6 +81,7 @@ module Command
       if argv.empty?
         send_all = true
         Database.instance.each do |id, data|
+          next if @options["without-freeze"] && Narou.novel_frozen?(id)
           argv << id
           titles[id] = data["title"]
         end

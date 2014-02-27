@@ -230,9 +230,9 @@ module Command
     SETTING_VARIABLES = {
       local: {
         # 変数名 => [受け付ける型, 説明(, 不可視化フラグ)]
-        "convert.no-epub" => [:boolean, "EPUB変換を無効にする"],
-        "convert.no-mobi" => [:boolean, "MOBI変換を無効にする"],
-        "convert.no-strip" => [:boolean, "MOBIのstripを無効にする\n" +
+        "convert.no-epub" => [:boolean, "EPUB変換を無効にするか"],
+        "convert.no-mobi" => [:boolean, "MOBI変換を無効にするか"],
+        "convert.no-strip" => [:boolean, "MOBIのstripを無効にするか\n" +
                                          " " * 6 + "※注意：KDP用のMOBIはstripしないでください"],
         "convert.no-zip" => [:boolean, "i文庫用のzipファイルを作らない"],
         "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開かない"],
@@ -240,6 +240,7 @@ module Command
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
+        "send.without-freeze" => [:boolean, "`全話'送信時に凍結された小説は対象外に"],
         "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
         
       },
