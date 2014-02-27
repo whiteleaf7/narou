@@ -44,14 +44,17 @@ module Command
       EOS
 
       @options["number"] = 1
-      @opt.on("-n NUM", "--number", "比較する差分を遡って指定する。最新のアップデートと直前のデータを比較するなら-n 1、2個前のアップデートなら-n 2。(デフォルトは-n 1)", Integer) do |number|
+      @opt.on("-n NUM", "--number", "比較する差分を遡って指定する。最新のアップデートと直前のデータを比較するなら-n 1、2個前のアップデートなら-n 2。(デフォルトは-n 1)", Integer) { |number|
         @options["number"] = number if number > 1
-      end
+      }
       @opt.on("-l", "--list", "指定した小説の差分一覧を表示する") {
         @options["list"] = true
       }
       @opt.on("-c", "--clean", "指定した小説の差分データを全て削除する") {
         @options["clean"] = true
+      }
+      @opt.on("--all-clean", "凍結済を除く全小説の差分データを削除する") {
+        @options["all-clean"] = true
       }
     end
 
@@ -95,6 +98,10 @@ module Command
       end
       if @options["clean"]
         clean_diff(id)
+        return
+      end
+      if @options["all-clean"]
+        clean_all_diff
         return
       end
       @difftool = GlobalSetting.get["global_setting"]["difftool"]
@@ -226,6 +233,16 @@ module Command
         else
           puts "   (最新話のみのアップデート)"
         end
+      end
+    end
+
+    def clean_all_diff
+      Database.instance.each do |id, data|
+        next if Narou.novel_frozen?(id)
+        cache_root_dir = Downloader.get_cache_root_dir(id)
+        next unless File.exists?(cache_root_dir)
+        FileUtils.remove_entry_secure(cache_root_dir)
+        puts "#{data["title"]} の差分を削除しました"
       end
     end
   end
