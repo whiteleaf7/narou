@@ -73,7 +73,7 @@ module Narou
       end
       info_setting = SiteSetting.load_file(File.join(Narou.get_preset_dir, INFO_SETTING_FILE))
       info_setting.multi_match(info_source, *request_output_parameters)
-      result["novel_type"] = NOVEL_TYPE[info_setting["novel_type"]].to_s
+      result["novel_type"] = NOVEL_TYPE[info_setting["novel_type"]]
       result["story"] = info_setting["story"].gsub("<br />", "")
       %w(general_firstup novelupdated_at general_lastup).each do |elm|
         result[elm] = date_string_to_time(info_setting[elm])
