@@ -25,6 +25,16 @@ module Command
       exit 1
     end
 
+    def load_local_settings
+      command_prefix = self.class.to_s.scan(/[^:]+$/)[0].downcase
+      local_settings = LocalSetting.get["local_setting"]
+      local_settings.each do |name, value|
+        if name =~ /^#{command_prefix}\.(.+)$/
+          @options[$1] = value
+        end
+      end
+    end
+
     #
     # 普通にコマンドを実行するけど、exit(2) を補足してexitstatus を返す
     # 正常終了なら0

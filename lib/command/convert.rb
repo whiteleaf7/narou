@@ -81,15 +81,6 @@ module Command
       EOS
     end
 
-    def load_local_settings
-      local_settings = LocalSetting.get["local_setting"]
-      local_settings.each do |name, value|
-        if name =~ /^convert\.(.+)$/
-          @options[$1] = value
-        end
-      end
-    end
-
     def execute(argv)
       load_local_settings    # @opt.on 実行前に設定ロードしたいので super 前で実行する
       super

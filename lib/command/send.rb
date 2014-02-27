@@ -49,15 +49,6 @@ module Command
       Narou.get_device
     end
 
-    def load_local_settings
-      local_settings = LocalSetting.get["local_setting"]
-      local_settings.each do |name, value|
-        if name =~ /^send\.(.+)$/
-          @options[$1] = value
-        end
-      end
-    end
-
     def execute(argv)
       load_local_settings
       super
