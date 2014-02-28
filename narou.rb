@@ -7,6 +7,7 @@
 #
 
 $debug = File.exists?(File.join(File.expand_path(File.dirname($0)), "debug"))
+watch = File.exists?(File.join(File.expand_path(File.dirname($0)), "watch"))
 Encoding.default_external = Encoding::UTF_8
 
 require_relative "lib/globalsetting"
@@ -21,6 +22,13 @@ require_relative "lib/version"
 require_relative "lib/commandline"
 
 rescue_level = $debug ? Exception : StandardError
+
+if watch
+  require_relative "lib/watcher"
+  Watcher.__regist__ Helper, LocalSetting, Device, WinAPI, Narou, GlobalSetting, Command,
+                     Database, SiteSetting, Template, Downloader, Ini, NovelSetting, Inspector,
+                     Illustration, ProgressBar, ConverterBase, NovelConverter, CommandLine
+end
 
 begin
   CommandLine.run(ARGV.map { |v| v.dup })
