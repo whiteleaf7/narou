@@ -23,6 +23,8 @@ class Downloader
   TOC_FILE_NAME = "toc.yaml"
   WAITING_TIME_FOR_503 = 20   # 503 のときに待機する秒数
   RETRY_MAX_FOR_503 = 5   # 503 のときに何回再試行するか
+  NOVEL_TYPE_SERIES = 1   # 連載
+  NOVEL_TYPE_SS = 2       # 短編
 
   attr_reader :id
 
@@ -432,22 +434,24 @@ class Downloader
   end
 
   def get_novel_type
-    @novel_type ||= @@database[@id]["novel_type"] || 1
+    type = @@database[@id] ? @@database[@id]["novel_type"] : nil
+    unless type
+      if @setting["narou_api_url"]
+        api = Narou::API.new(@setting, "nt")
+        type = api["novel_type"]
+      else
+        type = NOVEL_TYPE_SERIES
+      end
+    end
+    type
   end
 
   #
   # 連載小説かどうか調べる
   #
   def series_novel?
-    unless @novel_type
-      if @@database[@id]
-        @novel_type = get_novel_type
-      else
-        api = Narou::API.new(@setting, "nt")
-        @novel_type = api["novel_type"]
-      end
-    end
-    @novel_type == 1
+    @novel_type ||= get_novel_type
+    @novel_type == NOVEL_TYPE_SERIES
   end
 
   #
@@ -478,7 +482,7 @@ class Downloader
       end
     end
     @setting.multi_match(toc_source, "title", "author", "story", "tcode")
-    if @setting["narou_api_url"] && series_novel?
+    if series_novel?
       # 連載小説
       subtitles = get_subtitles(toc_source)
     else
