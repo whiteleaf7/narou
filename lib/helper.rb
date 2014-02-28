@@ -108,7 +108,7 @@ module Helper
   # エンティティ復号
   #
   def restor_entity(str)
-    result = str.dup
+    result = str.encode("UTF-16BE", "UTF-8", :invalid => :replace, :undef => :replace, :replace => "?").encode("UTF-8")
     ENTITIES.each do |key, value|
       result.gsub!("&#{key};", value)
     end
