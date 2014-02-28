@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -796,11 +796,22 @@ class ConverterBase
     char =~ /[#{CHARACTER_OF_RUBY}]/
   end
 
+  def is_sesame?(str, ten, last_char)
+    ten =~ /^[・、]+$/ && (str.include?("｜") || object_of_ruby?(last_char))
+  end
+
   def sesame(str, ten)
     if str.include?("｜")
       str.sub("｜", "［＃傍点］") + "［＃傍点終わり］"
     else
-      str.insert(-(ten.length + 1), "［＃傍点］") + "［＃傍点終わり］"
+      str.sub(/([#{CHARACTER_OF_RUBY}　]+)$/) {
+        match_target = $1
+        if match_target =~ /^(　+)/
+          "#{$1}［＃傍点］#{match_target[$1.length..-1]}"
+        else
+          "［＃傍点］#{match_target}"
+        end
+      } + "［＃傍点終わり］"
     end
   end
 
@@ -814,14 +825,13 @@ class ConverterBase
     when last_char == "｜"
       # 直前に｜がある場合ルビ化は抑制される
       "#{m1[0...-1]}#{openclose_symbols[0]}#{m2}#{openclose_symbols[1]}"
-    when m2 =~ /^・+$/
-      # ルビが・だけの場合、傍点と判断
+    when is_sesame?(m1, m2, last_char)
       sesame(m1, m2)
     when m1.include?("｜")
       "#{m1.sub(/｜([^｜]*)$/, "［＃ルビ用縦線］\\1")}《#{m2}》"
     when object_of_ruby?(last_char)
       # なろうのルビ対象文字を辿って｜を挿入する（青空文庫となろうのルビ仕様の差異吸収のため）
-      m1.gsub(/([#{CHARACTER_OF_RUBY}　]+)$/) {
+      m1.sub(/([#{CHARACTER_OF_RUBY}　]+)$/) {
         match_target = $1
         if match_target =~ /^(　+)/
           "#{$1}［＃ルビ用縦線］#{match_target[$1.length..-1]}"
@@ -885,7 +895,7 @@ class ConverterBase
   # 中黒(・)や句読点を並べて三点リーダーもどきにしているのを三点リーダーに変換
   #
   def convert_horizontal_ellipsis(data)
-    return if !@setting.enable_convert_horizontal_ellipsis || @text_type == "subtitle"
+    return if !@setting.enable_convert_horizontal_ellipsis || @text_type == "subtitle" || @text_type == "chapter"
     %w(・ 。 、).each do |char|
       data.gsub!(/#{char}{3,}/) do |match|
         pre_char, post_char = $`[-1], $'[0]
