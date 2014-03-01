@@ -2,9 +2,12 @@
 更新履歴 - ChangeLog
 --------------------
 
-2014/03/xx : **1.4.7**
+2014/03/xx : **1.5.0**
 * 追加機能もしくは仕様変更
-	- 
+	- 小説投稿サイト **[Arcadia](http://www.mai-net.net/)** に対応しました
+		+ `narou d "http://www.mai-net.net/bbs/sst/sst.php?act=dump&cate=original&all=1507&n=0&count=1"` のように
+		  URLを " で囲まないとコマンドがきちんと通りませんのでご注意下さい
+	- このバージョン以降ダウンロードした小説の保存フォルダ名には、タイトルの前にIDが付加されるようになりました
 * Bug Fix
 	- `narou browser --vote` コマンドがなろうのレイアウト変更に対応していなかったので修正
 
