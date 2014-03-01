@@ -468,10 +468,9 @@ class Downloader
       @file_title = @@database[@id]["file_title"]
       return @file_title
     end
-    if @setting["folder_name_by_title"]
-      @file_title = Helper.replace_filename_special_chars(get_title, true).strip
-    else
-      @file_title = @setting["ncode"]
+    @file_title = @setting["ncode"]
+    if @setting["append_title_to_folder_name"]
+      @file_title += " " + Helper.replace_filename_special_chars(get_title, true).strip
     end
     @file_title
   end
