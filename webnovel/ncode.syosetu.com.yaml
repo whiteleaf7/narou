@@ -7,6 +7,8 @@ top_url: \\k<scheme>://\\k<domain>
 url: \\k<top_url>/(?<ncode>n\d+[a-z]+)
 encoding: UTF-8
 confirm_over18: no
+folder_name_by_title: true
+title_strip_pattern: null
 
 # ------------------------------------------------------------
 # 書籍情報取得設定
@@ -29,10 +31,10 @@ subtitles: |-
   </dt>
   </dl>
 
-tcode: <li><a href="\\k<top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
-txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
-
 # ------------------------------------------------------------
 # 特殊な設定
+is_narou: true
+tcode: <li><a href="\\k<top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
+txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
 narou_api_url: http://api.syosetu.com/novelapi/api/
 narou_info_url: \\k<top_url>/novelview/infotop/ncode/\\k<ncode>/

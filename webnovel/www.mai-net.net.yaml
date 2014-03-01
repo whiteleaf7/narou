@@ -1,0 +1,33 @@
+# ------------------------------------------------------------
+# 小説サイト定義
+name: Arcadia
+scheme: http
+domain: www.mai-net.net
+top_url: \\k<scheme>://\\k<domain>
+url: \\k<top_url>/bbs/sst/sst.php\?act=dump&cate=(?<category>.+?)&all=(?<ncode>\d+)
+encoding: UTF-8
+confirm_over18: no
+folder_name_by_title: true
+title_strip_pattern: (【.+?】|\(.+?\)|（.+?）)
+
+# ------------------------------------------------------------
+# 書籍情報取得設定
+title: <font size=4 color=4444aa>(?<title>.+?)</font>
+author: "<tt>Name: (?<author>.+?)◆"
+story: ""
+
+# ------------------------------------------------------------
+# 目次取得設定
+toc_url: \\k<top_url>/bbs/sst/sst.php?act=dump&cate=\\k<category>&all=\\k<ncode>&n=0&count=1
+chapter: ""
+subtitles: |-
+  <td width="0%" style="font-size:60%">\[(?<index>\d+?)\]</td><td width="0%" style="font-size:60%"><b>
+  <a href="(?<href>.+?)#kiji">(?<subtitle>.+?)</a></b></td><td width="0%" style="font-size:60%">\[(.+?)\]</td><td width="0%" style="font-size:60%">\((?<subdate>.+?)\)</td>
+
+# subupdate が false 場合、更新チェックは subdate を使うようになる
+subupdate: false
+text_body: <blockquote><div style="line-height:1.5">(?<matched_text_body>.+?)</div></blockquote>
+define_new_line: <br>
+
+# ------------------------------------------------------------
+# 特殊な設定

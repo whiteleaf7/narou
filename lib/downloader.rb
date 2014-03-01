@@ -11,6 +11,7 @@ require_relative "template"
 require_relative "database"
 require_relative "localsetting"
 require_relative "narou/api"
+require_relative "html"
 
 #
 # 小説サイトからのダウンロード
@@ -273,12 +274,15 @@ class Downloader
   # コンストラクタ
   #
   def initialize(site_setting, force = false, from_download = false)
+    @title = nil
+    @file_title = nil
     @setting = site_setting
     @force = force
     @from_download = from_download
     @cache_dir = nil
     @new_arrivals = false
     @novel_type = nil
+    @novel_data_dir = nil
     @id = @@database.get_id("toc_url", @setting["toc_url"]) || @@database.get_new_id
   end
 
@@ -422,8 +426,8 @@ class Downloader
     @@database[@id] = {
       "id" => @id,
       "author" => @setting["author"],
-      "title" => @setting["title"],
-      "file_title" => @file_title,
+      "title" => get_title,
+      "file_title" => get_file_title,
       "toc_url" => @setting["toc_url"],
       "sitename" => @setting["name"],
       "novel_type" => get_novel_type,
@@ -434,24 +438,54 @@ class Downloader
   end
 
   def get_novel_type
-    type = @@database[@id] ? @@database[@id]["novel_type"] : nil
-    unless type
+    return @novel_type if @novel_type
+    @novel_type = @@database[@id] ? @@database[@id]["novel_type"] : nil
+    unless @novel_type
       if @setting["narou_api_url"]
         api = Narou::API.new(@setting, "nt")
-        type = api["novel_type"]
+        @novel_type = api["novel_type"]
       else
-        type = NOVEL_TYPE_SERIES
+        @novel_type = NOVEL_TYPE_SERIES
       end
     end
-    type
+    @novel_type
   end
 
   #
   # 連載小説かどうか調べる
   #
   def series_novel?
-    @novel_type ||= get_novel_type
-    @novel_type == NOVEL_TYPE_SERIES
+    get_novel_type == NOVEL_TYPE_SERIES
+  end
+
+  #
+  # 小説を格納するためのディレクトリ名を取得する
+  #
+  def get_file_title
+    return @file_title if @file_title
+    # すでにデータベースに登録されているならそれを引き続き使うようにする
+    if @@database[@id] && @@database[@id]["file_title"]
+      @file_title = @@database[@id]["file_title"]
+      return @file_title
+    end
+    if @setting["folder_name_by_title"]
+      @file_title = Helper.replace_filename_special_chars(get_title, true).strip
+    else
+      @file_title = @setting["ncode"]
+    end
+    @file_title
+  end
+
+  #
+  # 小説のタイトルを取得する
+  #
+  def get_title
+    return @title if @title
+    @title = @setting["title"]
+    if @setting["title_strip_pattern"]
+      @title = @title.gsub(/#{@setting["title_strip_pattern"]}/, "").gsub(/^[　\s]*(.+?)[　\s]*?$/, "\\1")
+    end
+    @title
   end
 
   #
@@ -482,6 +516,7 @@ class Downloader
       end
     end
     @setting.multi_match(toc_source, "title", "author", "story", "tcode")
+    @setting["title"] = get_title
     if series_novel?
       # 連載小説
       subtitles = get_subtitles(toc_source)
@@ -491,11 +526,9 @@ class Downloader
       @setting["story"] = api["story"]
       subtitles = create_short_story_subtitles(api)
     end
-    @title = @setting["title"]
-    @file_title = Helper.replace_filename_special_chars(@title, true).strip
     @setting["story"] = @setting["story"].gsub("<br />", "")
     toc_objects = {
-      "title" => @title,
+      "title" => get_title,
       "author" => @setting["author"],
       "toc_url" => @setting["toc_url"],
       "story" => @setting["story"],
@@ -533,10 +566,14 @@ class Downloader
       # 更新日チェック
       old_subupdate = old["subupdate"]
       latest_subupdate = latest["subupdate"]
-      if old_subupdate == ""
-        next latest_subupdate != ""
+      if old_subupdate
+        if old_subupdate == ""
+          next latest_subupdate != ""
+        end
+        latest_subupdate > old_subupdate
+      else
+        latest["subdate"] > old["subdate"]
       end
-      latest_subupdate > old_subupdate
     end
   end
 
@@ -589,7 +626,7 @@ class Downloader
     @@__narou_last_download_time ||= Time.now - 20
     max = subtitles.count
     return if max == 0
-    puts ("<bold><green>" + TermColor.escape("ID:#{@id}　#{@title} のDL開始") + "</green></bold>").termcolor
+    puts ("<bold><green>" + TermColor.escape("ID:#{@id}　#{get_title} のDL開始") + "</green></bold>").termcolor
     interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"] || 0
     interval_sleep_time = 0 if interval_sleep_time < 0
     save_least_one = false
@@ -597,7 +634,7 @@ class Downloader
       @@__narou_wait_counter = 0
     end
     subtitles.each_with_index do |subtitle_info, i|
-      if @setting["domain"] =~ /syosetu.com/ && (@@__narou_wait_counter % 10 == 0 && @@__narou_wait_counter >= 10)
+      if @setting["is_narou"] && (@@__narou_wait_counter % 10 == 0 && @@__narou_wait_counter >= 10)
         # MEMO:
         # 小説家になろうは連続DL規制があるため、ウェイトを入れる必要がある。
         # 10話ごとに規制が入るため、10話ごとにウェイトを挟む。
@@ -666,6 +703,25 @@ class Downloader
   end
 
   #
+  # 定義されたパターンを改行コードに置き換える
+  #
+  def replace_new_line(source)
+    if @setting["define_new_line"]
+      source.gsub(/#{@setting["define_new_line"]}/m, "\n")
+    else
+      source.dup
+    end
+  end
+
+  #
+  # HTMLタグを青空文庫形式の注記に変換
+  #
+  def convert_html_tag_to_aozora(source)
+    html = HTML.new(source)
+    html.to_aozora
+  end
+
+  #
   # 指定された話数の本文をダウンロード
   #
   def a_section_download(subtitle_info)
@@ -677,9 +733,19 @@ class Downloader
     else
       subtitle_url = @setting["toc_url"] + href
     end
-    section = download_raw_data(subtitle_url)
-    save_raw_data(section, subtitle_info)
-    element = extract_elements_in_section(section, subtitle_info["subtitle"])
+    raw = download_raw_data(subtitle_url)
+    if @setting["is_narou"]
+      save_raw_data(raw, subtitle_info)
+      element = extract_elements_in_section(raw, subtitle_info["subtitle"])
+    else
+      save_raw_data(raw, subtitle_info, ".html")
+      @setting.multi_match(raw, "text_body")
+      text_body = convert_html_tag_to_aozora(replace_new_line(@setting["matched_text_body"]))
+      element = {
+        "introduction" => "", "postscript" => "",
+        "body" => text_body
+      }
+    end
     element
   end
 
@@ -713,7 +779,7 @@ class Downloader
   end
 
   def get_raw_dir
-    File.join(get_novel_data_dir, RAW_DATA_DIR_NAME)
+    @raw_dir ||= File.join(get_novel_data_dir, RAW_DATA_DIR_NAME)
   end
 
   def init_raw_dir
@@ -724,10 +790,10 @@ class Downloader
   #
   # テキストデータの生データを保存
   #
-  def save_raw_data(raw_data, subtitle_info)
+  def save_raw_data(raw_data, subtitle_info, ext = ".txt")
     index = subtitle_info["index"]
     file_subtitle = subtitle_info["file_subtitle"]
-    path = File.join(get_raw_dir, "#{index} #{file_subtitle}.txt")
+    path = File.join(get_raw_dir, "#{index} #{file_subtitle}#{ext}")
     File.write(path, raw_data)
   end
 
@@ -777,8 +843,10 @@ class Downloader
   #
   # 小説データの格納ディレクトリパス
   def get_novel_data_dir
-    raise "小説名がまだ設定されていません" unless @file_title
-    File.join(Database.archive_root_path, @setting["name"], @file_title)
+    return @novel_data_dir if @novel_data_dir
+    raise "小説名がまだ設定されていません" unless get_file_title
+    @novel_data_dir = File.join(Database.archive_root_path, @setting["name"], get_file_title)
+    @novel_data_dir
   end
 
   #
