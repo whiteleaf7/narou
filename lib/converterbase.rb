@@ -7,6 +7,7 @@ require "stringio"
 require "date"
 require "uri"
 require_relative "progressbar"
+require_relative "inspector"
 
 class ConverterBase
   KANJI_NUM = "〇一二三四五六七八九"

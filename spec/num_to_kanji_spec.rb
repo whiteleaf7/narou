@@ -1206,7 +1206,7 @@ describe ConverterBase, "#convert_kanji_num_with_unit" do
 
   it "二百九十五" do
     compare_kanji_and_integer("二百九十五", 295)
-  end
+end
 
   it "二百九十六" do
     compare_kanji_and_integer("二百九十六", 296)
@@ -1840,7 +1840,6 @@ describe ConverterBase, "#convert_kanji_num_with_unit" do
     compare_kanji_and_integer("四百五十三", 453)
   end
 
-  it 
   it "九百八十三" do
     compare_kanji_and_integer("九百八十三", 983)
   end
@@ -2537,9 +2536,6 @@ describe ConverterBase, "#convert_kanji_num_with_unit" do
     compare_kanji_and_integer("千百五十六", 1156)
   end
 
-  it "千百五十七" do
-    c
-
   it "千三百四" do
     compare_kanji_and_integer("千三百四", 1304)
   end
@@ -2767,7 +2763,6 @@ describe ConverterBase, "#convert_kanji_num_with_unit" do
   it "千三百六十" do
     compare_kanji_and_integer("千三百六十", 1360)
   end
-
 
   it "千七百六十一" do
     compare_kanji_and_integer("千七百六十一", 1761)
