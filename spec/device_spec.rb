@@ -18,37 +18,21 @@ if Helper.os_windows?
 
     describe "Kindle" do
       before do
-        @device = Device.new("kindle")
+        @device = Device.create("kindle")
       end
 
       it "は存在するべき" do
         Device.exists?("kindle").should be_true
       end
-
-      it "と接続時connecting?はtrueになるべき" do
-        @device.connecting?.should be_true
-      end
-
-      it "のドキュメントディレクトリの名前は F:/documents" do
-        @device.get_documents_path.should == "F:/documents"
-      end
     end
 
     describe "Kobo" do
       before do
-        @device = Device.new("kobo")
+        @device = Device.create("kobo")
       end
 
       it "は存在するべき" do
         Device.exists?("kobo").should be_true
-      end
-
-      it "と接続時connecting?はtrueになるべき" do
-        @device.connecting?.should be_true
-      end
-
-      it "のドキュメントディレクトリの名前は ?:/" do
-        @device.get_documents_path.should == "?:/"
       end
     end
   end
