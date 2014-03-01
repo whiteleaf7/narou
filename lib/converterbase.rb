@@ -782,7 +782,7 @@ class ConverterBase
       to_ruby(match, $1, $2, ["≪", "≫"])
     end
     # （）なルビの対処
-    if @text_type != "subtitle"
+    if @text_type != "subtitle" && @text_type != "chapter"
       data.gsub!(/(.+?)（([ぁ-んァ-ヶーゝゞ・Ａ-Ｚａ-ｚA-Za-z　]{,20})）/) do |match|
         to_ruby(match, $1, $2, ["（", "）"])
       end
@@ -999,7 +999,7 @@ class ConverterBase
     alphabet_to_zenkaku(data, @setting.enable_alphabet_force_zenkaku)
     convert_numbers(data)
     exception_reconvert_kanji_to_num(data)
-    if @setting.enable_convert_num_to_kanji && @text_type != "subtitle" \
+    if @setting.enable_convert_num_to_kanji && @text_type != "subtitle" && @text_type != "chapter" \
        && @setting.enable_kanji_num_with_units
       convert_kanji_num_with_unit(data, @setting.kanji_num_with_units_lower_digit_zero)
     end
@@ -1036,7 +1036,8 @@ class ConverterBase
   #
   # 変換処理本体
   #
-  # @text_type: 渡されるテキストの種類。subtitle, introduction, body, postscript, textfile のどれか
+  # @text_type: 渡されるテキストの種類。
+  #             subtitle, introduction, body, postscript, textfile, chapter, story
   #
   def convert_main(io)
     @write_fp = StringIO.new
