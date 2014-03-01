@@ -16,6 +16,7 @@ module Command
   Example:
     narou folder n9669bk
     narou folder musyoku
+    narou f 0
       EOS
     end
 
