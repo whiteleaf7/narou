@@ -39,6 +39,10 @@ describe HTML do
     @html.s_to_aozora("次の文字は<s>取消線</s>に").should == "次の文字は［＃取消線］取消線［＃取消線終わり］に"
   end
 
+  it "<br> → 改行" do
+    @html.br_to_aozora("あいう<br>かきく<br />\nさしす<BR>").should == "あいう\nかきく\nさしす\n"
+  end
+
   it "HTML#to_aozora" do
     test_html = File.read(html_test_html_path, encoding: "utf-8")
     test_txt = File.read(html_test_txt_path, encoding: "utf-8")
