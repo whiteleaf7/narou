@@ -7,7 +7,7 @@ top_url: \\k<scheme>://\\k<domain>
 url: \\k<top_url>/(?<ncode>n\d+[a-z]+)
 encoding: UTF-8
 confirm_over18: no
-append_title_to_folder_name: true
+append_title_to_folder_name: yes
 title_strip_pattern: null
 
 # ------------------------------------------------------------
@@ -37,4 +37,40 @@ is_narou: true
 tcode: <li><a href="\\k<top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
 txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
 narou_api_url: http://api.syosetu.com/novelapi/api/
-narou_info_url: \\k<top_url>/novelview/infotop/ncode/\\k<ncode>/
+
+# ------------------------------------------------------------
+# 小説情報からパースするための設定
+novel_info_url: \\k<top_url>/novelview/infotop/ncode/\\k<ncode>/
+
+# novel_type 小説種別
+nt: <span id="noveltype(?:.*?)">(?<novel_type>.+?)</span>
+novel_type_string:
+  連載中: 1
+  完結済: 1
+  短編: 2
+
+# story あらすじ
+s: <td class="ex">(?<story>.+?)</td>
+
+# general_firstup 初回掲載日
+gf: |-
+  <th>掲載日</th>
+  <td>(?<general_firstup>.+?)</td>
+
+# novelupdated_at 小説の更新時刻。連載小説だと書いてないので最終掲載日で代用
+nu: |-
+  <th>(?:最終更新日|最終話掲載日)</th>
+  <td>(?:
+  )?(?<novelupdated_at>.+?)(?:
+  )?</td>
+
+# general_lastup 最終掲載日
+gl: |-
+  <th>最終話掲載日</th>
+  <td>(?<general_lastup>.+?)</td>
+
+# writer 作者名
+w: |-
+  <th>作者名</th>
+  <td>(?:<a href=".+?">)?(?<writer>.+?)(?:</a>)?
+  </td>
