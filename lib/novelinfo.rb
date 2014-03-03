@@ -33,7 +33,7 @@ class NovelInfo
       info_source = Helper.pretreatment_source(fp.read, @setting["encoding"])
     end
     @setting.multi_match(info_source, *request_output_parameters)
-    result["novel_type"] = @setting["novel_type_string"][@setting["novel_type"]]
+    result["novel_type"] = @setting["novel_type_string"][@setting["novel_type"]] || 1
     result["story"] = @setting["story"]
     result["writer"] = @setting["writer"]
     %w(general_firstup novelupdated_at general_lastup).each do |elm|
