@@ -12,6 +12,7 @@ Encoding.default_external = Encoding::UTF_8
 
 require_relative "lib/globalsetting"
 
+display_time = ARGV.delete("--time")
 display_backtrace = ARGV.delete("--backtrace")
 display_backtrace ||= $debug
 $disable_color = ARGV.delete("--no-color")
@@ -30,6 +31,13 @@ if watch
                      Illustration, ProgressBar, ConverterBase, NovelConverter, CommandLine
 end
 
+if display_time
+  now = Time.now
+  at_exit do
+    puts "実行時間 #{Time.now - now}秒"
+  end
+end
+
 begin
   CommandLine.run(ARGV.map { |v| v.dup })
 rescue rescue_level => e
@@ -44,3 +52,4 @@ rescue rescue_level => e
   end
   exit 1
 end
+
