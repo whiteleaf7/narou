@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2014 whiteleaf. All rights reserved.
+# Copyright 2013 whiteleaf. All rights reserved.
 #
 
 class HTML
