@@ -216,7 +216,7 @@ class Downloader
   def self.get_sitesetting_by_sitename(sitename)
     setting = @@settings.find { |s| s["name"] == sitename }
     return setting if setting
-    error "#{data["sitename"]} の設定ファイルが見つかりません"
+    error "#{sitename} の設定ファイルが見つかりません"
     exit 1
   end
 
