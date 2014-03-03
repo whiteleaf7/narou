@@ -711,7 +711,7 @@ class Downloader
   #
   def a_section_download(subtitle_info)
     href = subtitle_info["href"]
-    if @setting["tcode"]
+    if @setting["is_narou"]
       subtitle_url = @setting.replace_group_values("txtdownload_url", subtitle_info)
     elsif href[0] == "/"
       subtitle_url = @setting["top_url"] + href
@@ -722,12 +722,13 @@ class Downloader
     if @setting["is_narou"]
       save_raw_data(raw, subtitle_info)
       element = extract_elements_in_section(raw, subtitle_info["subtitle"])
+      element["data_type"] = "text"
     else
       save_raw_data(raw, subtitle_info, ".html")
       @setting.multi_match(raw, "text_body", "introduction", "postscript")
-      element = {}
-      %w(body introduction postscript).each { |type|
-        element[type] = HTML.new(@setting[type]).to_aozora
+      element = { "data_type" => "html" }
+      %w(introduction body postscript).each { |type|
+        element[type] = @setting[type]
       }
     end
     element

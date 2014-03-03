@@ -14,6 +14,7 @@ require_relative "template"
 require_relative "progressbar"
 require_relative "helper"
 require_relative "localsetting"
+require_relative "html"
 
 class NovelConverter
   NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
@@ -297,7 +298,9 @@ class NovelConverter
         end
         @inspector.subtitle = section["subtitle"]
         element = section["element"]
+        data_type = element.delete("data_type") || "text"
         element.each do |text_type, elm_text|
+          elm_text = HTML.new(elm_text).to_aozora if data_type == "html"
           element[text_type] = conv.convert(elm_text, text_type)
         end
         section["subtitle"] = conv.convert(section["subtitle"], "subtitle")
