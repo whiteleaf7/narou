@@ -215,6 +215,8 @@ class ConverterBase
     end
   end
 
+  RECONVERT_KANJI_TO_NUM_PATTERN_UNIT = "％㎜㎝㎞㎎㎏㏄㎡㎥"
+
   #
   # アラビア数字を使うべきところはアラビア数字に戻す
   #
@@ -223,7 +225,7 @@ class ConverterBase
     data.gsub!(/([Ａ-Ｚａ-ｚ])([#{KANJI_NUM}・～]+)/) do   # ｖｅｒ１・０１ のようなパターンも許容する
       $1 + $2.tr(KANJI_NUM, "０-９")
     end
-    data.gsub!(/([#{KANJI_NUM}・～]+)([Ａ-Ｚａ-ｚ])/) do
+    data.gsub!(/([#{KANJI_NUM}・～]+)([Ａ-Ｚａ-ｚ#{RECONVERT_KANJI_TO_NUM_PATTERN_UNIT}])/) do
       $1.tr(KANJI_NUM, "０-９") + $2
     end
   end
