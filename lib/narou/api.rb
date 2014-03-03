@@ -5,19 +5,13 @@
 
 require "open-uri"
 require "yaml"
-require "time"
-require_relative "../sitesetting"
+require_relative "../novelinfo"
 
 module Narou
   #
   # 小説家になろうデベロッパーAPI操作クラス
   #
   class API
-    INFO_SETTING_FILE = "narou_novel_info.yaml"
-    NOVEL_TYPE = { "連載中" => 1, "完結済" =>  1, "短編" =>  2 }
-
-    @@novel_info_parameters = {}
-
     #
     # なろうデベロッパーAPIから情報を取得
     #
@@ -49,7 +43,7 @@ module Narou
         else
           # なろうAPIからデータを取得出来なかった
           # 開示設定が検索から除外に設定されるとAPIからはアクセスできなくなる
-          result = parse_novel_info
+          result = NovelInfo.load(@setting)
           unless result
             error "小説家になろうからデータを取得出来ませんでした"
             exit
@@ -57,33 +51,6 @@ module Narou
           @api_result = result
         end
       end
-    end
-
-    #
-    # 小説情報ページをパースして必要な情報を取り出す
-    #
-    def parse_novel_info
-      return @@novel_info_parameters[@ncode] if @@novel_info_parameters[@ncode]
-      result = {}
-      of = "nt-s-gf-nu-gl"
-      request_output_parameters = of.split("-")
-      info_source = ""
-      open(@setting["narou_info_url"]) do |fp|
-        info_source = Helper.pretreatment_source(fp.read)
-      end
-      info_setting = SiteSetting.load_file(File.join(Narou.get_preset_dir, INFO_SETTING_FILE))
-      info_setting.multi_match(info_source, *request_output_parameters)
-      result["novel_type"] = NOVEL_TYPE[info_setting["novel_type"]]
-      result["story"] = info_setting["story"].gsub("<br />", "")
-      %w(general_firstup novelupdated_at general_lastup).each do |elm|
-        result[elm] = date_string_to_time(info_setting[elm])
-      end
-      @@novel_info_parameters[@ncode] = result
-      result
-    end
-
-    def date_string_to_time(date)
-      date ? Time.parse(date.tr("年月日時分秒", "///:::")) : nil
     end
   end
 end

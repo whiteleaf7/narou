@@ -1,0 +1,61 @@
+# ------------------------------------------------------------
+# 小説サイト定義
+name: ハーメルン
+scheme: http
+domain: novel.syosetu.org
+top_url: \\k<scheme>://\\k<domain>
+url: \\k<top_url>/(?<ncode>\d+)
+encoding: UTF-8
+confirm_over18: no
+append_title_to_folder_name: yes
+title_strip_pattern: null
+
+# ------------------------------------------------------------
+# 書籍情報取得設定
+title: <font size=\+2>(<a href=.+?>)?(?<title>.+?)(</a>)?</font>
+author: 作：<a href=.+?>(?<author>.+?)</a>
+story: |-
+  </div>
+  <div class="ss">(?<story>.+?)
+  <hr style="margin:20px 0px; border-width:1px 0 0 0;" color="#bbbbbb"></div>
+
+# ------------------------------------------------------------
+# 目次取得設定
+toc_url: \\k<top_url>/\\k<ncode>/
+subtitles: |-
+  (?:<tr><td colspan=2><strong>(?<chapter>.+?)</strong></td></tr>)?<tr bgcolor="#.+?" class="bgcolor\d"><td width=60%><span id="(?<index>\d+?)">　</span> <a href=.+? style="text-decoration:none;">(?<subtitle>.+?)</a></td><td><NOBR>(?<subdate>.+?)(?:<span title="(?<subupdate>.+?)改稿">\(<u>改</u>\)</span>)?</NOBR></td></tr>
+
+href: \\k<index>.html
+
+text_body: |-
+  (?:<div id=maegaki>(?<introduction>.+?)</div><BR><HR><BR>
+  )?<font size=\+1>.+?</font><BR><BR>
+  (?<body>.+?)
+  <BR>(?:<HR><BR><div id=atogaki>(?<postscript>.+?)</div>)?
+
+# ------------------------------------------------------------
+# 小説情報からパースするための設定
+novel_info_url: http://syosetu.org/?mode=ss_detail&nid=\\k<ncode>&volume=1
+
+# novel_type 小説種別
+nt: 状態</td><td>.+?,(?<novel_type>.+?)</td>
+novel_type_string:
+  連載(連載中): 1
+  連載(未完): 1
+  連載(完結): 1
+  短編: 2
+
+# story あらすじ
+s: "あらすじ</td><td colspan=3 bgcolor=#FFFFFF>(?<story>.+?)</td>"
+
+# general_firstup 初回掲載日
+gf: 掲載日</td><td>(?<general_firstup>.+?)</td>
+
+# novelupdated_at 小説の更新時刻。最終掲載日で代用
+nu: 最終投稿日</td><td>(?<novelupdated_at>.+?)</td>
+
+# general_lastup 最終掲載日
+gl: 最終投稿日</td><td>(?<novelupdated_at>.+?)</td>
+
+# writer 作者名
+w: 作者</td><td bgcolor=\#FFFFFF><a href=.+?>(?<writer>.+?)</a>

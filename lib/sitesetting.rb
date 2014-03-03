@@ -51,8 +51,13 @@ class SiteSetting
     end
   end
 
+  def is_container?(value)
+    value.kind_of?(Hash) || value.kind_of?(Array)
+  end
+
   def replace_group_values(key, option_values = {})
     dest = option_values[key] || @match_values[key] || @yaml_setting[key]
+    return dest if is_container?(dest)
     begin
       result = dest.dup
     rescue TypeError

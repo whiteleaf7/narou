@@ -7,7 +7,7 @@ top_url: \\k<scheme>://\\k<domain>
 url: \\k<top_url>/bbs/sst/sst.php\?act=dump&cate=(?<category>.+?)&all=(?<ncode>\d+)
 encoding: UTF-8
 confirm_over18: no
-append_title_to_folder_name: true
+append_title_to_folder_name: yes
 title_strip_pattern: (【.+?】|\(.+?\)|（.+?）)
 
 # ------------------------------------------------------------
@@ -24,10 +24,12 @@ subtitles: |-
   <td width="0%" style="font-size:60%">\[(?<index>\d+?)\]</td><td width="0%" style="font-size:60%"><b>
   <a href="(?<href>.+?)#kiji">(?<subtitle>.+?)</a></b></td><td width="0%" style="font-size:60%">\[(.+?)\]</td><td width="0%" style="font-size:60%">\((?<subdate>.+?)\)</td>
 
-# subupdate が false 場合、更新チェックは subdate を使うようになる
-subupdate: false
-text_body: <blockquote><div style="line-height:1.5">(?<matched_text_body>.+?)</div></blockquote>
-define_new_line: <br>
+# subupdate がない場合、更新チェックは subdate を使うようになる
+subupdate: no
+text_body: <blockquote><div style="line-height:1.5">(?<body>.+?)</div></blockquote>
+introduction: ""
+postscript: ""
 
 # ------------------------------------------------------------
-# 特殊な設定
+# 小説情報からパースするための設定
+novel_info_url: null

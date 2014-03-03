@@ -14,6 +14,7 @@ class HTML
   # 青空文庫形式に変換
   #
   def to_aozora
+    @string = br_to_aozora
     @string = ruby_to_aozora
     @string = b_to_aozora
     @string = i_to_aozora
@@ -27,6 +28,13 @@ class HTML
   #
   def delete_tag(text = @string)
     text.gsub(/<.+?>/, "")
+  end
+
+  #
+  # 改行タグを改行へ
+  #
+  def br_to_aozora(text = @string)
+    text.gsub(/[\r\n]+/, "").gsub(/<br.*?>/i, "\n")
   end
 
   #

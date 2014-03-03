@@ -4,8 +4,10 @@
 <%= toc["author"] %>
 <%= cover_chuki %>
 ［＃区切り線］
+<% if toc["story"] != "" -%>
 <%= toc["story"] %>
 
+<% end -%>
 掲載ページ: <a href="<%= toc["toc_url"] %>"><%= toc["toc_url"] %></a>
 ［＃区切り線］
 

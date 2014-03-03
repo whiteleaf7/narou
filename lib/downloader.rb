@@ -442,10 +442,10 @@ class Downloader
     @novel_type = @@database[@id] ? @@database[@id]["novel_type"] : nil
     unless @novel_type
       if @setting["narou_api_url"]
-        api = Narou::API.new(@setting, "nt")
-        @novel_type = api["novel_type"]
+        info = Narou::API.new(@setting, "nt")
       else
-        @novel_type = NOVEL_TYPE_SERIES
+        info = NovelInfo.load(@setting)
+        @novel_type = info ? info["novel_type"] : NOVEL_TYPE_SERIES
       end
     end
     @novel_type
@@ -521,11 +521,16 @@ class Downloader
       subtitles = get_subtitles(toc_source)
     else
       # 短編小説
-      api = Narou::API.new(@setting, "s-gf-nu")
-      @setting["story"] = api["story"]
-      subtitles = create_short_story_subtitles(api)
+      if @setting["narou_api_url"]
+        info = Narou::API.new(@setting, "s-gf-nu-w")
+      else
+        info = NovelInfo.load(@setting)
+      end
+      @setting["story"] = info["story"]
+      @setting["author"] = info["writer"]
+      subtitles = create_short_story_subtitles(info)
     end
-    @setting["story"] = @setting["story"].gsub("<br />", "")
+    @setting["story"] = HTML.new(@setting["story"]).to_aozora
     toc_objects = {
       "title" => get_title,
       "author" => @setting["author"],
@@ -602,15 +607,15 @@ class Downloader
   #
   # 短編用の情報を生成
   #
-  def create_short_story_subtitles(api)
+  def create_short_story_subtitles(info)
     subtitle = {
       "index" => "1",
-      "href" => "/",
+      "href" => @setting.replace_group_values("href", "index" => "1"),
       "chapter" => "",
       "subtitle" => @setting["title"],
       "file_subtitle" => Helper.replace_filename_special_chars(@setting["title"]),
-      "subdate" => api["general_firstup"],
-      "subupdate" => api["novelupdated_at"]
+      "subdate" => info["general_firstup"],
+      "subupdate" => info["novelupdated_at"]
     }
     [subtitle]
   end
@@ -650,7 +655,7 @@ class Downloader
       unless chapter.empty?
         puts "#{chapter}"
       end
-      if @novel_type == 1
+      if get_novel_type == NOVEL_TYPE_SERIES
         print "第#{index}部分"
       else
         print "短編"
@@ -702,25 +707,6 @@ class Downloader
   end
 
   #
-  # 定義されたパターンを改行コードに置き換える
-  #
-  def replace_new_line(source)
-    if @setting["define_new_line"]
-      source.gsub(/#{@setting["define_new_line"]}/m, "\n")
-    else
-      source.dup
-    end
-  end
-
-  #
-  # HTMLタグを青空文庫形式の注記に変換
-  #
-  def convert_html_tag_to_aozora(source)
-    html = HTML.new(source)
-    html.to_aozora
-  end
-
-  #
   # 指定された話数の本文をダウンロード
   #
   def a_section_download(subtitle_info)
@@ -738,11 +724,10 @@ class Downloader
       element = extract_elements_in_section(raw, subtitle_info["subtitle"])
     else
       save_raw_data(raw, subtitle_info, ".html")
-      @setting.multi_match(raw, "text_body")
-      text_body = convert_html_tag_to_aozora(replace_new_line(@setting["matched_text_body"]))
-      element = {
-        "introduction" => "", "postscript" => "",
-        "body" => text_body
+      @setting.multi_match(raw, "text_body", "introduction", "postscript")
+      element = {}
+      %w(body introduction postscript).each { |type|
+        element[type] = HTML.new(@setting[type]).to_aozora
       }
     end
     element
