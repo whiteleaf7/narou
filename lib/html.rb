@@ -41,7 +41,8 @@ class HTML
   # ルビタグを青空文庫形式に変換
   #
   def ruby_to_aozora(text = @string)
-    text.gsub(/<ruby>(.+?)<\/ruby>/i) do
+    text.tr("《》", "≪≫")
+        .gsub(/<ruby>(.+?)<\/ruby>/i) do
       splited_ruby = $1.split(/<rt>/i)
       next delete_tag(splited_ruby[0]) unless splited_ruby[1]
       ruby_base = delete_tag(splited_ruby[0].split(/<rp>/i)[0])
