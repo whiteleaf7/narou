@@ -313,17 +313,23 @@ class ConverterBase
   #
   def convert_special_characters(data)
     convert_aozora_special_charactoers(data)
+    symbols_to_zenkaku(data)
     convert_tatechuyoko(data)
     convert_novel_rule(data)
     convert_arrow(data)
   end
 
   #
-  # 全角にすべき半角記号等を変換
+  # 半角カナと ｢｣｡､･ 等を全角に変換
+  #
+  def hankakukana_to_zenkakukana(data)
+    data.replace(NKF.nkf("-w -X", data))
+  end
+
+  #
+  # 半角記号を全角に変換
   #
   def symbols_to_zenkaku(data)
-    # 半角カナと ｢｣｡､･ 等を全角に
-    data.replace(NKF.nkf("-w -X", data))
     data.tr!("“”‘’〝〟", %!""''""!)
     data.gsub!(/"([^"\n]+)"/, "〝\\1〟")
     data.gsub!(/'([^'\n]+)'/, "〝\\1〟")   # MEMO: シングルミュート(ノノカギ)を表示出来るフォントはほとんど無い
@@ -993,7 +999,7 @@ class ConverterBase
   # 小説データ全体に対して施す変換
   #
   def convert_for_all_data(data)
-    symbols_to_zenkaku(data)
+    hankakukana_to_zenkakukana(data)
     auto_join_in_brackets(data)
     auto_join_line(data) if @setting.enable_auto_join_line
     erase_comments_block(data)
