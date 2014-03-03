@@ -43,6 +43,14 @@ describe HTML do
     @html.br_to_aozora("あいう<br>かきく<br />\nさしす<BR>").should == "あいう\nかきく\nさしす\n"
   end
 
+  it "<img> → 挿絵注記" do
+    @html.img_to_aozora('<img src="./images/100.jpg">').should == "［＃挿絵（./images/100.jpg）入る］"
+    @html.set_illust_setting(current_url: "http://novel.example.com/10510/")
+    @html.img_to_aozora('<img src="./images/100.jpg">').should ==
+                        "［＃挿絵（http://novel.example.com/10510/images/100.jpg）入る］"
+    @html.set_illust_setting(current_url: nil)
+  end
+
   it "HTML#to_aozora" do
     test_html = File.read(html_test_html_path, encoding: "utf-8")
     test_txt = File.read(html_test_txt_path, encoding: "utf-8")

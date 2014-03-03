@@ -8,6 +8,19 @@ class HTML
 
   def initialize(string)
     @string = string
+    @illust_current_url = nil
+    @illust_grep_pattern = /<img.+?src=\"(?<src>.+?)\".*?>/i
+  end
+
+  #
+  # 挿絵を置換するための設定を変更する
+  #
+  def set_illust_setting(options)
+    unless options.kind_of?(Hash)
+      raise ArgumentError, "invalid parameter(s), need Hash"
+    end
+    @illust_current_url = options[:current_url] if options[:current_url]
+    @illust_grep_pattern = options[:grep_pattern] if options[:grep_pattern]
   end
 
   #
@@ -19,27 +32,19 @@ class HTML
     @string = b_to_aozora
     @string = i_to_aozora
     @string = s_to_aozora
+    @string = img_to_aozora
     @string = delete_tag
     @string
   end
 
-  #
-  # タグを削除
-  #
   def delete_tag(text = @string)
     text.gsub(/<.+?>/, "")
   end
 
-  #
-  # 改行タグを改行へ
-  #
   def br_to_aozora(text = @string)
     text.gsub(/[\r\n]+/, "").gsub(/<br.*?>/i, "\n")
   end
 
-  #
-  # ルビタグを青空文庫形式に変換
-  #
   def ruby_to_aozora(text = @string)
     text.tr("《》", "≪≫")
         .gsub(/<ruby>(.+?)<\/ruby>/i) do
@@ -51,24 +56,22 @@ class HTML
     end
   end
 
-  #
-  # <b>タグを青空文庫形式に変換
-  #
   def b_to_aozora(text = @string)
     text.gsub(/<b>/i, "［＃太字］").gsub(/<\/b>/i, "［＃太字終わり］")
   end
 
-  #
-  # <i>タグを青空文庫形式に変換
-  #
   def i_to_aozora(text = @string)
     text.gsub(/<i>/i, "［＃斜体］").gsub(/<\/i>/i, "［＃斜体終わり］")
   end
 
-  #
-  # <s>タグを青空文庫形式に変換
-  #
   def s_to_aozora(text = @string)
     text.gsub(/<s>/i, "［＃取消線］").gsub(/<\/s>/i, "［＃取消線終わり］")
+  end
+
+  def img_to_aozora(text = @string)
+    text.gsub(@illust_grep_pattern) do
+      url = @illust_current_url ? URI.join(@illust_current_url, $~[:src]) : $~[:src]
+      "［＃挿絵（#{url}）入る］"
+    end
   end
 end
