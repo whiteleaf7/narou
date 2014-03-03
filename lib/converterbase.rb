@@ -6,6 +6,7 @@
 require "stringio"
 require "date"
 require "uri"
+require "nkf"
 require_relative "progressbar"
 require_relative "inspector"
 
@@ -318,14 +319,16 @@ class ConverterBase
   end
 
   #
-  # 記号を全角に変換
+  # 全角にすべき半角記号等を変換
   #
   def symbols_to_zenkaku(data)
+    # 半角カナと ｢｣｡､･ 等を全角に
+    data.replace(NKF.nkf("-w -X", data))
     data.tr!("“”‘’〝〟", %!""''""!)
     data.gsub!(/"([^"\n]+)"/, "〝\\1〟")
     data.gsub!(/'([^'\n]+)'/, "〝\\1〟")   # MEMO: シングルミュート(ノノカギ)を表示出来るフォントはほとんど無い
-    data.tr!("-=+/*《》'\"%$#&!?､<>＜＞()|‐,._;:[]｢｣",
-             "－＝＋／＊≪≫’”％＄＃＆！？、〈〉〈〉（）｜－，．＿；：［］「」")
+    data.tr!("-=+/*《》'\"%$#&!?<>＜＞()|‐,._;:[]",
+             "－＝＋／＊≪≫’”％＄＃＆！？〈〉〈〉（）｜－，．＿；：［］")
     data.gsub!("\\", "￥")
   end
 
