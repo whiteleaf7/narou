@@ -224,7 +224,8 @@ class Downloader
   # 小説サイトの定義ファイルを全部読み込む
   #
   def self.load_settings
-    settings = []
+    settings = @@__settings_cache ||= []
+    return settings unless settings.empty?
     Dir.glob(File.join(Narou.get_script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")) do |path|
       setting = SiteSetting.load_file(path)
       if setting["name"] == "小説家になろう"
