@@ -312,6 +312,7 @@ class ConverterBase
   # 特定の表現・記号を変換していく
   #
   def convert_special_characters(data)
+    stash_komejirushi(data)
     convert_aozora_special_charactoers(data)
     symbols_to_zenkaku(data)
     convert_tatechuyoko(data)
@@ -397,10 +398,17 @@ class ConverterBase
   end
 
   #
+  # 単独※をあとあと外字注記化するために一時的に変換
+  # 外字注記表記だと border_symbol? 等で困るのであとで外字注記化する
+  #
+  def stash_komejirushi(data)
+    data.gsub!("※", "※※")
+  end
+
+  #
   # 特殊な記号を外字注記に変換
   #
   def convert_aozora_special_charactoers(data)
-    data.gsub!("※", "※※")   # 外字注記表記だと border_symbol? 等で困るのであとで外字注記化する
     data.gsub!("≪", "※［＃始め二重山括弧］")
     data.gsub!("≫", "※［＃終わり二重山括弧］")
   end
@@ -408,9 +416,9 @@ class ConverterBase
   #
   # ※の外字注記化
   #
-  # convert_aozora_special_charactoers で2つにしておいた※を外字注記化する
+  # stash_komejirushi で2つにしておいた※を外字注記化する
   #
-  def rebuild_kome_to_gaiji(data)
+  def rebuild_komejirushi_to_gaiji(data)
     data.gsub!("※※", "※［＃米印、1-2-8］")
   end
 
@@ -1110,12 +1118,14 @@ class ConverterBase
     rebuild_url(data)
     rebuild_english_sentences(data)
     rebuild_hankaku_num_and_comma(data)
-    rebuild_kome_to_gaiji(data)
+    rebuild_komejirushi_to_gaiji(data)
+    convert_aozora_special_charactoers(data)
     # 再構築された文章にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
     # 三点リーダーの変換は、ルビで圏点として・・・を使っている場合を考慮して、ルビ処理後にする
     convert_horizontal_ellipsis(data)
+    convert_aozora_special_charactoers(data)
     data.strip!
     progressbar.clear if @text_type == "textfile"
     @write_fp
