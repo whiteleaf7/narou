@@ -787,12 +787,12 @@ class ConverterBase
   # 小説家になろうのルビ対策
   #
   def narou_ruby(data)
-    # 《》なルビの対処
-    data.gsub!(/(.+?)≪(.+?)≫/) do |match|
-      to_ruby(match, $1, $2, ["≪", "≫"])
-    end
-    # （）なルビの対処
     if @text_type != "subtitle" && @text_type != "chapter"
+      # 《》なルビの対処
+      data.gsub!(/(.+?)≪(.+?)≫/) do |match|
+        to_ruby(match, $1, $2, ["≪", "≫"])
+      end
+      # （）なルビの対処
       data.gsub!(/(.+?)（([ぁ-んァ-ヶーゝゞ・Ａ-Ｚａ-ｚA-Za-z　]{,20})）/) do |match|
         to_ruby(match, $1, $2, ["（", "）"])
       end
