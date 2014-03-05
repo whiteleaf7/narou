@@ -182,9 +182,9 @@ class NovelSetting
       help: "ルビ処理を有効に"
     },
     {
-      name: "enable_narou_illust",
+      name: "enable_illust",
       value: true,
-      help: "小説家になろうの挿絵タグを有効にする（false なら削除）"
+      help: "挿絵タグを有効にする（false なら削除）"
     },
     {
       name: "enable_transform_fraction",

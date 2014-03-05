@@ -22,6 +22,10 @@ class NovelConverter
 
   attr_reader :use_dakuten_font
 
+  if Narou.already_init?
+    @@site_settings = Downloader.load_settings
+  end
+
   #
   # 指定の小説を整形・変換する
   #
@@ -267,6 +271,10 @@ class NovelConverter
     end
   end
 
+  def find_site_setting
+    @@site_settings.find { |s| s.multi_match(@toc["toc_url"], "url") }
+  end
+
   #
   # 変換処理メイン
   #
@@ -289,6 +297,10 @@ class NovelConverter
       @section_save_dir = Downloader.get_novel_section_save_dir(@setting.archive_path)
       @toc = Downloader.get_toc_data(@setting.archive_path)
       @toc["story"] = conv.convert(@toc["story"], "story")
+      html = HTML.new
+      site_setting = find_site_setting
+      html.set_illust_setting(current_url: site_setting["illust_current_url"],
+                              grep_pattern: site_setting["illust_grep_pattern"])
       progressbar = ProgressBar.new(@toc["subtitles"].count)
       @toc["subtitles"].each_with_index do |subinfo, i|
         progressbar.output(i)
@@ -300,7 +312,10 @@ class NovelConverter
         element = section["element"]
         data_type = element.delete("data_type") || "text"
         element.each do |text_type, elm_text|
-          elm_text = HTML.new(elm_text).to_aozora if data_type == "html"
+          if data_type == "html"
+            html.string = elm_text
+            elm_text = html.to_aozora
+          end
           element[text_type] = conv.convert(elm_text, text_type)
         end
         section["subtitle"] = conv.convert(section["subtitle"], "subtitle")

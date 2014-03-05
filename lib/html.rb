@@ -6,7 +6,7 @@
 class HTML
   attr_accessor :string
 
-  def initialize(string)
+  def initialize(string = "")
     @string = string
     @illust_current_url = nil
     @illust_grep_pattern = /<img.+?src=\"(?<src>.+?)\".*?>/i
@@ -20,7 +20,9 @@ class HTML
       raise ArgumentError, "invalid parameter(s), need Hash"
     end
     @illust_current_url = options[:current_url] if options[:current_url]
-    @illust_grep_pattern = options[:grep_pattern] if options[:grep_pattern]
+    if grep_pattern = options[:grep_pattern]
+      @illust_grep_pattern = grep_pattern.kind_of?(Regexp) ? grep_pattern : /#{grep_pattern}/m
+    end
   end
 
   #
@@ -69,9 +71,13 @@ class HTML
   end
 
   def img_to_aozora(text = @string)
-    text.gsub(@illust_grep_pattern) do
-      url = @illust_current_url ? URI.join(@illust_current_url, $~[:src]) : $~[:src]
-      "［＃挿絵（#{url}）入る］"
+    if @illust_grep_pattern
+      text.gsub(@illust_grep_pattern) do
+        url = @illust_current_url ? URI.join(@illust_current_url, $~[:src]) : $~[:src]
+        "［＃挿絵（#{url}）入る］"
+      end
+    else
+      text
     end
   end
 end

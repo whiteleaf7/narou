@@ -880,19 +880,14 @@ class ConverterBase
   end
 
   #
-  # なろうの挿絵タグを挿絵注釈に変換
+  # 挿絵タグやimgタグ等を挿絵注釈に変換
   # 挿絵画像が存在しなければダウンロードして保存する
   #
   def replace_illust_tag(data)
-    data.gsub!(/^(<i[0-9]+\|[0-9]+>)\n?/m) do
-      next "" unless @setting.enable_narou_illust
-      chuki = @illustration.get($1)
-      if chuki
-        @illust_chuki_list << chuki
-        "［＃挿絵＝#{@illust_chuki_list.count - 1}］\n"
-      else
-        ""
-      end
+    @illustration.scanner(data) do |chuki|
+      next "" unless @setting.enable_illust
+      @illust_chuki_list << chuki
+      "［＃挿絵＝#{@illust_chuki_list.count - 1}］\n"
     end
   end
 
