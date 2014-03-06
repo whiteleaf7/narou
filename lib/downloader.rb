@@ -446,8 +446,8 @@ class Downloader
         info = Narou::API.new(@setting, "nt")
       else
         info = NovelInfo.load(@setting)
-        @novel_type = info ? info["novel_type"] : NOVEL_TYPE_SERIES
       end
+      @novel_type = info ? info["novel_type"] : NOVEL_TYPE_SERIES
     end
     @novel_type
   end
