@@ -312,7 +312,8 @@ class ConverterBase
   # 特定の表現・記号を変換していく
   #
   def convert_special_characters(data)
-    convert_aozora_special_charactoers(data)
+    stash_kome(data)
+    convert_double_angle_quotation_to_gaiji(data)   # 最初からギュメなのはルビ対象外なので外字注記に
     symbols_to_zenkaku(data)
     convert_tatechuyoko(data)
     convert_novel_rule(data)
@@ -397,10 +398,16 @@ class ConverterBase
   end
 
   #
-  # 特殊な記号を外字注記に変換
+  # 先に外字注記にしてしまうと border_symbol? 等で困るので、あとで外字注記化出来るようにする
   #
-  def convert_aozora_special_charactoers(data)
-    data.gsub!("※", "※※")   # 外字注記表記だと border_symbol? 等で困るのであとで外字注記化する
+  def stash_kome(data)
+    data.gsub!("※", "※※")
+  end
+
+  #
+  # ギュメを二重山括弧（の外字）に変換
+  #
+  def convert_double_angle_quotation_to_gaiji(data)
     data.gsub!("≪", "※［＃始め二重山括弧］")
     data.gsub!("≫", "※［＃終わり二重山括弧］")
   end
@@ -408,7 +415,7 @@ class ConverterBase
   #
   # ※の外字注記化
   #
-  # convert_aozora_special_charactoers で2つにしておいた※を外字注記化する
+  # stash_kome で2つにしておいた※を外字注記化する
   #
   def rebuild_kome_to_gaiji(data)
     data.gsub!("※※", "※［＃米印、1-2-8］")
@@ -1116,6 +1123,8 @@ class ConverterBase
     narou_ruby(data) if @setting.enable_ruby
     # 三点リーダーの変換は、ルビで圏点として・・・を使っている場合を考慮して、ルビ処理後にする
     convert_horizontal_ellipsis(data)
+    # ルビ化されなくて残ったギュメを二重山括弧（の外字）に変換
+    convert_double_angle_quotation_to_gaiji(data)
     data.strip!
     progressbar.clear if @text_type == "textfile"
     @write_fp
