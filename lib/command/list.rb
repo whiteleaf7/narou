@@ -80,7 +80,9 @@ module Command
             end
           },
           @options["type"] ? NOVEL_TYPE_LABEL[novel_type] : nil,
-          novel["title"] + (!@options["type"] && novel_type == 2 ? "  (#{NOVEL_TYPE_LABEL[novel_type]})" : ""),
+          novel["title"] + (!@options["type"] && novel_type == 2 ?
+                           "  <gray>(#{NOVEL_TYPE_LABEL[novel_type]})</gray>".termcolor :
+                           ""),
           @options["url"] ? novel["toc_url"] : nil
         ].compact.join(" | ")
       end
