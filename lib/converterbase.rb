@@ -789,7 +789,7 @@ class ConverterBase
   def narou_ruby(data)
     if @text_type != "subtitle" && @text_type != "chapter"
       # 《》なルビの対処
-      data.gsub!(/(.+?)≪(.+?)≫/) do |match|
+      data.gsub!(/(.+?)≪([^≪]+?)≫/) do |match|
         to_ruby(match, $1, $2, ["≪", "≫"])
       end
       # （）なルビの対処
