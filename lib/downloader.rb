@@ -592,6 +592,7 @@ class Downloader
       match_data = @setting.multi_match(toc_post, "subtitles")
       break unless match_data
       toc_post = match_data.post_match
+      @setting["subtitle"] = @setting["subtitle"].gsub("\t", "")
       subtitles << {
         "index" => @setting["index"],
         "href" => @setting["href"],

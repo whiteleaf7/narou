@@ -87,7 +87,7 @@ module Helper
   end
 
   def replace_filename_special_chars(str, invalid_replace = false)
-    result = str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥")
+    result = str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥").gsub("\t", "")
     if invalid_replace
       org_encoding = result.encoding
       result = result.encode(Encoding::Windows_31J, invalid: :replace, undef: :replace, replace: "_")
