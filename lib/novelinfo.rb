@@ -5,7 +5,6 @@
 
 require "open-uri"
 require "time"
-require_relative "sitesetting"
 require_relative "html"
 
 class NovelInfo
