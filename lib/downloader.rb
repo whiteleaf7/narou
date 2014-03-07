@@ -201,7 +201,7 @@ class Downloader
     data = get_data_by_target(target) or return nil
     data_dir = get_novel_data_dir_by_target(target)
     if with_file
-      FileUtils.remove_entry_secure(data_dir)
+      FileUtils.remove_entry_secure(data_dir, true)
       puts "#{data_dir} を完全に削除しました"
     else
       # TOCは消しておかないと再DL時に古いデータがあると誤認する
