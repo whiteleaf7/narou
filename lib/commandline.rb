@@ -33,11 +33,24 @@ module CommandLine
     if argv.empty?
       argv += load_default_arguments(arg)
     end
+    if argv.delete("--multiple")
+      multiple_argument_extract(argv)
+    end
     Command.get_list[arg].execute(argv)
   end
 
   def self.load_default_arguments(cmd)
     default_arguments_list = LocalSetting.get["local_setting"]
     (default_arguments_list["default_args.#{cmd}"] || "").split
+  end
+
+  #
+  # 引数をスペース以外による区切り文字で展開する
+  #
+  def self.multiple_argument_extract(argv)
+    delimiter = LocalSetting.get["local_setting"]["multiple-delimiter"] || ","
+    argv.map! { |arg|
+      arg.split(delimiter)
+    }.flatten!
   end
 end

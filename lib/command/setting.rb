@@ -242,6 +242,7 @@ module Command
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
         "send.without-freeze" => [:boolean, "`全話'送信時に凍結された小説は対象外に"],
         "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
+        "multiple-delimiter" => [:string, "--multiple指定時の区切り文字"],
         
       },
       global: {
