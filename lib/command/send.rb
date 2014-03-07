@@ -37,7 +37,7 @@ module Command
   Options:
       EOS
 
-      @opt.on("--without-freeze", "`全話'送信時に凍結された小説は対象外にする") {
+      @opt.on("--without-freeze", "一括送信時に凍結された小説は対象外にする") {
         @options["without-freeze"] = true
       }
     end
