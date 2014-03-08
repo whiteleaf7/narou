@@ -59,7 +59,9 @@ class Template
   end
 
   #
-  # 書かれているテンプレートがどのバージョンのテンプレートを設定
+  # 書かれているテンプレートがどのバージョンのテンプレートかを設定
+  #
+  # テンプレート内部で使われる変数の変更があった場合に binary_version が上がる
   #
   def self.target_binary_version(version)
     @@src_version = version
