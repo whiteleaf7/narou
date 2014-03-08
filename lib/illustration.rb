@@ -23,10 +23,15 @@ class Illustration
   end
 
   def scanner(source, &block)
-    source.gsub!(/［＃挿絵（(.+?)）入る］/) do
+    source.gsub!(/［＃挿絵（(.+?)）入る］/) do |match|
       url = $1
-      path = url =~ URI.regexp ? download_image(url) : url
-      path ? block.call(make_illust_chuki(path)) : ""
+      if url =~ URI.regexp
+        path = download_image(url)
+        path ? block.call(make_illust_chuki(path)) : ""
+      else
+        # URLでなければ、ローカルのパスが指定されたと判断してそのままの注記を使う
+        block.call(match)
+      end
     end
     source.gsub!(NAROU_ILLUST_TAG_PATTERN) do
       id1, id2 = $1, $2
