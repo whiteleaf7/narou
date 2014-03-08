@@ -17,7 +17,7 @@ module Device::Library
         # volume_nameが "volume" とか "hoge(*)" などだとはまる。
         cmd     = "cmd /c vol #{drive}:".encode(Encoding::Windows_31J)
         capture = `#{cmd}`.force_encoding(Encoding::Windows_31J).encode(Encoding::UTF_8)
-        if capture.split("\n").first.match(/#{volume_name}/)
+        if capture.split("\n").first.match(/#{volume_name}/i)
           return drive_path
         end
       end
