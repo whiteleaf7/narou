@@ -105,8 +105,8 @@ module Command
           print "."
           sleep(0.5)
         end
+        puts
         if copy_to_path
-          puts
           puts copy_to_path + " へコピーしました"
         else
           error "#{device.name}が見つからなかったためコピー出来ませんでした"
