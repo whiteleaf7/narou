@@ -30,11 +30,14 @@ href: \\k<index>.html
 # ------------------------------------------------------------
 # 本文取得設定
 
-text_body: |-
+body_pattern: |-
   (?:<div id=maegaki>(?<introduction>.+?)</div><BR><HR><BR>
   )?<font size=\+1>.+?</font><BR><BR>
   (?<body>.+?)
   <BR>(?:<HR><BR><div id=atogaki>(?<postscript>.+?)</div>)?
+
+introduction_pattern: null
+postscript_pattern: null
 
 illust_current_url: null
 illust_grep_pattern: <a href="(?<src>.+?)" alt="挿絵" name='img'>【挿絵表示】</a>

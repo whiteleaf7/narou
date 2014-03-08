@@ -728,10 +728,10 @@ class Downloader
       element["data_type"] = "text"
     else
       save_raw_data(raw, subtitle_info, ".html")
-      @setting.multi_match(raw, "text_body", "introduction", "postscript")
+      @setting.multi_match(raw, "body_pattern", "introduction_pattern", "postscript_pattern")
       element = { "data_type" => "html" }
       %w(introduction body postscript).each { |type|
-        element[type] = @setting[type]
+        element[type] = @setting[type] || ""
       }
     end
     element

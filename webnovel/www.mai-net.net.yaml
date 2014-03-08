@@ -30,9 +30,9 @@ subupdate: no
 # ------------------------------------------------------------
 # 本文取得設定
 
-text_body: <blockquote><div style="line-height:1.5">(?<body>.+?)</div></blockquote>
-introduction: ""
-postscript: ""
+body_pattern: <blockquote><div style="line-height:1.5">(?<body>.+?)</div></blockquote>
+introduction_pattern: null
+postscript_pattern: null
 
 # ------------------------------------------------------------
 # 小説情報からパースするための設定
