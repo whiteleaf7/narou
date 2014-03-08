@@ -113,6 +113,9 @@ module Command
           exit 1   # next しても次も失敗すると分かりきっているためここで終了する
         end
       end
+    rescue Interrupt => e
+      puts "送信を中断しました"
+      exit 1
     end
   end
 end
