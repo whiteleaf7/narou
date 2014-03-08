@@ -193,7 +193,7 @@ class NovelSetting
     },
     {
       name: "enable_transform_date",
-      value: true,
+      value: false,
       help: "日付表記(20yy/mm/dd)を任意の形式(date_formatで指定)に変換する"
     },
     {
