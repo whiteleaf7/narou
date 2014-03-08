@@ -126,6 +126,9 @@ class NovelConverter
 
     java_encoding = "-Dfile.encoding=UTF-8"
 
+    if Helper.os_cygwin?
+      abs_srcpath = Helper.convert_to_windows_path(abs_srcpath)
+    end
     Dir.chdir(aozoraepub3_dir)
     command = %!java #{java_encoding} -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 -of #{device_option} ! +
               %!#{cover_option} #{dst_option} #{ext_option} "#{abs_srcpath}"!
@@ -181,6 +184,9 @@ class NovelConverter
       return :error
     end
 
+    if Helper.os_cygwin?
+      epub_path = Helper.convert_to_windows_path(epub_path)
+    end
     command = %!"#{kindlegen_path}" -locale ja "#{epub_path}"!
     if Helper.os_windows?
       command.encode!(Encoding::Windows_31J)

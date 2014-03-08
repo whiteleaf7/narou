@@ -14,7 +14,11 @@ module Helper
   extend self
 
   def os_windows?
-    @@os_is_windows ||= RUBY_PLATFORM =~ /mswin(?!ce)|mingw|cygwin|bccwin/i
+    @@os_is_windows ||= RUBY_PLATFORM =~ /mswin(?!ce)|mingw|bccwin/i
+  end
+
+  def os_cygwin?
+    @@os_is_cygwin ||= RUBY_PLATFORM =~ /cygwin/i
   end
 
   def os_mac?
@@ -25,6 +29,8 @@ module Helper
     case
     when os_windows?
       :windows
+    when os_cygwin?
+      :cygwin
     when os_mac?
       :mac
     else
@@ -62,6 +68,8 @@ module Helper
     case determine_os
     when :windows
       `explorer "file:///#{path.encode(Encoding::Windows_31J)}"`
+    when :cygwin
+      `cygstart "#{path}"`
     when :mac
       `open "#{path}"`
     else
@@ -75,6 +83,8 @@ module Helper
       escaped_url = url.gsub("%", "%^").gsub("&", "^&")
       # MEMO: start の引数を "" で囲むと動かない
       `start #{escaped_url}`
+    when :cygwin
+      `cygstart #{url}`
     when :mac
       `open "#{url}"`
     else
@@ -113,6 +123,13 @@ module Helper
       result.gsub!("&#{key};", value)
     end
     result
+  end
+
+  #
+  # CYGWINのパスからwindowsのパスへと変換(cygpathを呼び出すだけ)
+  #
+  def convert_to_windows_path(path)
+    `cygpath -aw \"#{path}\"`.strip
   end
 
   #

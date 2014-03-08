@@ -11,6 +11,9 @@ class Device
   when :windows
     require_relative "device/library/windows"
     extend Device::Library::Windows
+  when :cygwin
+    require_relative "device/library/cygwin"
+    extend Device::Library::Cygwin
   when :mac
     require_relative "device/library/mac"
     extend Device::Library::Mac
