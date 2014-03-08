@@ -104,7 +104,7 @@ module Command
       puts "メール送信を中断しました"
       exit 1
     ensure
-      database.save_database
+      database.save_database if database
     end
 
     def install_mailer_setting
