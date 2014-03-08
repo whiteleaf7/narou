@@ -425,7 +425,7 @@ class Downloader
   # データベース更新
   #
   def update_database
-    @@database[@id] = {
+    @@database[@id].merge!({
       "id" => @id,
       "author" => @setting["author"],
       "title" => get_title,
@@ -435,7 +435,7 @@ class Downloader
       "novel_type" => get_novel_type,
       "last_update" => Time.now,
       "new_arrivals_date" => (@new_arrivals ? Time.now : @@database[@id]["new_arrivals_date"])
-    }
+    })
     @@database.save_database
   end
 

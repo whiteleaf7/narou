@@ -1,0 +1,34 @@
+# ------------------------------------------------------------
+# メールの送信設定
+#
+# Gmail で Send to Kindle を使うためのサンプルです。
+# ご自分の環境に適宜書き換えて下さい。
+# ------------------------------------------------------------
+# Send to Kindle で使う場合の注意点
+# ・同じファイル名だとしてもパーソナルドキュメントに別ファイルとしてどんどん溜まっていきます。
+#   更新のたびに送信していると恐ろしいことになるので注意して下さい。
+
+# toのアドレスは
+#   My Kindle > パーソナル・ドキュメント設定 > Send-to-Kindle Eメールアドレスの設定
+#   https://www.amazon.co.jp/gp/digital/fiona/manage/ref=gno_yam_myk?#pdocSettings
+# に書いてあります。
+# 自分のメールアドレスが承認済みEメールアドレス一覧にあることを確認して下さい。
+:to : your_account@kindle.com
+
+# 件名を「変換」にすると Kindleフォーマット(.azw) に変換される
+:subject : ""
+
+:via : smtp
+:via_options :
+  :address              : smtp.gmail.com
+  :port                 : 587
+  :enable_starttls_auto : true
+  :user_name            : your_gmail_account
+  :password             : password
+                        # ２段階認証の場合はアプリケーション固有のパスワード
+                        # 参照 https://support.google.com/accounts/answer/185833?hl=ja
+  :authentication       : :plain
+  :domain               : gmail.com
+
+# 設定が終わったらこの項目を true にして下さい
+:complete : false
