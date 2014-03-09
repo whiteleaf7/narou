@@ -68,7 +68,7 @@ module Command
         data = Downloader.get_data_by_target(target)
         if send_all && !@options["force"]
           new_arrivals_date = data["new_arrivals_date"] || Time.now
-          if new_arrivals_date < data["last_mail_date"]
+          if data["last_mail_date"] && new_arrivals_date < data["last_mail_date"]
             next   # すでに送信済みなので送信しない
           end
         end
@@ -84,7 +84,6 @@ module Command
         mail_result = nil
         Thread.new do
           mail_result = mailer.send(File.basename(ebook_path), ebook_path)
-          mail_result = true
           exit_mail = true
         end
         until exit_mail
