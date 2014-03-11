@@ -245,6 +245,7 @@ class NovelConverter
     toc = @toc
     cover_chuki = @cover_chuki
     device = Narou.get_device
+    setting = @setting
     # タイトルがルビ化されてしまうのを抑制
     toc["title"] = toc["title"].gsub("《", "※［＃始め二重山括弧］").gsub("》", "※［＃終わり二重山括弧］")
     tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)

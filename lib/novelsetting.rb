@@ -221,5 +221,10 @@ class NovelSetting
       value: true,
       help: "濁点フォントを使用するか。false の場合は縦中横による擬似表現を使用する"
     },
+    {
+      name: "enable_display_end_of_book",
+      value: true,
+      help: "小説の最後に本を読み終わった表示をするかどうか"
+    },
   ]
 end
