@@ -2,11 +2,13 @@
 更新履歴 - ChangeLog
 --------------------
 
-2014/0x/xx : **1.5.3**
+2014/03/13 : **1.5.3**
 * 追加機能もしくは仕様変更
 	- 小説の最後に「（本を読み終わりました）」と表示されるようになりました
 		+ setting.ini で `enable_display_end_of_book` を false 、もしくはコマンドで
 		  `narou s force.enable_display_end_of_book=false` とすることで抑制出来ます
+* Bug Fix
+	- ◯つき数字などがまじると文字化けする可能性があった問題を修正
 
 2014/03/09 : **1.5.2.1**
 * Bug Fix

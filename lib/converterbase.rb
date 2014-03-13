@@ -324,7 +324,7 @@ class ConverterBase
   # 半角カナと ｢｣｡､･ 等を全角に変換
   #
   def hankakukana_to_zenkakukana(data)
-    data.replace(NKF.nkf("-w -X", data).tr("\u2014", "―"))
+    data.replace(NKF.nkf("-wWX", data).tr("\u2014", "―"))
   end
 
   #
