@@ -22,8 +22,8 @@ toc_url: \\k<top_url>/\\k<ncode>/
 subtitles: |-
   (?:<div class="chapter_title">(?<chapter>.+?)</div>
    
-  )?<dl class="novel_sublist2" onclick="javascript:location.href='(?<href>/.+?/(?<index>\d+?)/)'">
-  <dd class="subtitle"><a href=".+?">(?<subtitle>.+?)</a></dd>
+  )?<dl class="novel_sublist2">
+  <dd class="subtitle"><a href="(?<href>/.+?/(?<index>\d+?)/)">(?<subtitle>.+?)</a></dd>
   <dt class="long_update">
   (?<subdate>.+?)(?:
   <span title="(?<subupdate>.+?) 改稿">
