@@ -107,11 +107,9 @@ class Device
           # Windows-31J に変換できない文字をファイル名に含むものはRubyでコピーする
           FileUtils.cp(src_file, dst_path)
         end
-      when :cygwin
+      else
         capture = `cp "#{src_file}" "#{dst_path}"`
         raise capture.rstrip if $?.exitstatus > 0
-      else
-        FileUtils.cp(src_file, dst_path)
       end
       dst_path
     else
