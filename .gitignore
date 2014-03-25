@@ -13,6 +13,8 @@ MEMO.txt
 .narou/
 *.zip
 debug
+.DS_Store
+*.swp
 
 \#*\#
 
