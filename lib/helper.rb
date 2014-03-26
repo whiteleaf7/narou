@@ -8,8 +8,6 @@ require "open3"
 #
 # 雑多なお助けメソッド群
 #
-# MacOSX 関連は確認してないので動作するか不明
-#
 module Helper
   extend self
 
