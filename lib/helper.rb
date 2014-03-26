@@ -15,22 +15,22 @@ module Helper
     @@os_is_windows ||= RUBY_PLATFORM =~ /mswin(?!ce)|mingw|bccwin/i
   end
 
-  def os_cygwin?
-    @@os_is_cygwin ||= RUBY_PLATFORM =~ /cygwin/i
-  end
-
   def os_mac?
     @@os_is_mac ||= RUBY_PLATFORM =~ /darwin/
+  end
+
+  def os_cygwin?
+    @@os_is_cygwin ||= RUBY_PLATFORM =~ /cygwin/i
   end
 
   def determine_os
     case
     when os_windows?
       :windows
-    when os_cygwin?
-      :cygwin
     when os_mac?
       :mac
+    when os_cygwin?
+      :cygwin
     else
       :other
     end
