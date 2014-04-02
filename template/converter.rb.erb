@@ -7,7 +7,7 @@
 # 作者: <%= @setting["author"] %>
 # URL: <%= @setting["toc_url"] %>
 #
-converter "<%= @setting["title"] %>" do
+converter "<%= @setting["title"].gsub('"', '\"') %>" do
   def before(io, text_type)
     super
   end
