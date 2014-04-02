@@ -79,7 +79,7 @@ def load_converter(title, archive_path)
     return conv
   else
     error "converter.rbは見つかりましたが、`converter'で登録されていないようです。" +
-         "変換処理は converter \"#{title}\" として登録する必要があります"
+          "変換処理は converter \"#{title.gsub('"', '\\"')}\" として登録する必要があります"
     return BlankConverter
   end
 end
