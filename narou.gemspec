@@ -52,6 +52,10 @@ narou コマンドのインストール or アップデートが完了しまし�
 * Bug Fix
 	- タイトルに " が含まれている場合に正常に変換できない問題を修正
 
+2014/05/15 : **1.5.5.1**
+* Bug Fix
+	- 暁の小説で一部正常にDLできないものがあったので修正
+
 #{"*" * 79}
   EOS
   gem.post_install_message = install_message.gsub("\t", " ")

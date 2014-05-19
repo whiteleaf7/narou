@@ -604,7 +604,7 @@ class Downloader
         "index" => @setting["index"],
         "href" => @setting["href"],
         "chapter" => @setting["chapter"],
-        "subtitle" => @setting["subtitle"],
+        "subtitle" => @setting["subtitle"].gsub("\n", ""),
         "file_subtitle" => Helper.replace_filename_special_chars(@setting["subtitle"]),
         "subdate" => @setting["subdate"],
         "subupdate" => @setting["subupdate"]
@@ -665,11 +665,14 @@ class Downloader
         puts "#{chapter}"
       end
       if get_novel_type == NOVEL_TYPE_SERIES
-        print "第#{index}部分"
+        if index.to_s.length < 4
+          # indexの数字がでかいと見た目がみっともないので3桁までは表示する
+          print "第#{index}部分　"
+        end
       else
-        print "短編"
+        print "短編　"
       end
-      print "　#{subtitle} (#{i+1}/#{max})"
+      print "#{subtitle} (#{i+1}/#{max})"
       section_element = a_section_download(subtitle_info)
       info = subtitle_info.dup
       info["element"] = section_element
