@@ -425,7 +425,6 @@ class Downloader
   # データベース更新
   #
   def update_database
-    
     data = {
       "id" => @id,
       "author" => @setting["author"],
