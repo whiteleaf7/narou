@@ -199,7 +199,7 @@ class NovelSetting
     {
       name: "date_format",
       value: "%Y年%m月%d日",
-      help: "書式は http://goo.gl/gvJ5u を参考"
+      help: "書式は http://bit.ly/1m5e3w7 を参考"
     },
     {
       name: "enable_convert_horizontal_ellipsis",
@@ -225,6 +225,21 @@ class NovelSetting
       name: "enable_display_end_of_book",
       value: true,
       help: "小説の最後に本を読み終わった表示をするかどうか"
+    },
+    {
+      name: "enable_add_date_to_title",
+      value: false,
+      help: "変換後の小説のタイトルに更新日の日付を付加するかどうか"
+    },
+    {
+      name: "title_date_format",
+      value: " (%m/%d)",
+      help: "enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照"
+    },
+    {
+      name: "title_date_align",
+      value: "right",
+      help: "enable_add_date_to_title で付与する日付の位置。left か right"
     },
   ]
 end
