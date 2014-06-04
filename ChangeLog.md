@@ -5,8 +5,11 @@
 2014/05/xx : **1.5.6**
 * 追加機能もしくは仕様変更
 	- 小説のタイトルに更新日をつける機能を追加しました
-		+ `narou s force.enable_add_date_to_title=true` として設定して下さい（デフォではオフ）
+		+ `narou s force.enable_add_date_to_title=true` として設定して下さい（標準ではオフ）
 		+ 書式は `title_date_format` 、位置は `title_date_align` で指定出来ます（詳細は setting.ini 参照）
+	- `flag` コマンドを追加しました
+		+ `narou flag end 10` と指定出来ます
+		+ 現在は end（完結フラグ）のみ指定できます。`list` コマンド及び、小説タイトルに (完結) と表示されるようになります
 * Bug Fix
 	- !?の一文字表記（0x2049）等でゴミが出てしまう問題を修正
 

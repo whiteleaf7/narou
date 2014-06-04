@@ -68,6 +68,7 @@ module Command
         frozen = Narou.novel_frozen?(id)
         disp_id = ((frozen ? "*" : "") + id.to_s).rjust(4)
         disp_id = disp_id.sub("*", "<cyan>*</cyan>").termcolor if frozen
+        flags = novel["flags"] || {}
         puts [
           disp_id,
           novel["last_update"].strftime("%y/%m/%d").tap { |s|
@@ -82,7 +83,8 @@ module Command
           @options["type"] ? NOVEL_TYPE_LABEL[novel_type] : nil,
           novel["title"] + (!@options["type"] && novel_type == 2 ?
                            "  <gray>(#{NOVEL_TYPE_LABEL[novel_type]})</gray>".termcolor :
-                           ""),
+                           "") +
+                           (flags["end"] ? " <gray>(完結)</gray>".termcolor : ""),
           @options["url"] ? novel["toc_url"] : nil
         ].compact.join(" | ")
       end

@@ -246,16 +246,21 @@ class NovelConverter
     cover_chuki = @cover_chuki
     device = Narou.get_device
     setting = @setting
-    # タイトルに更新日を付加する
     processed_title = toc["title"]
+    data = Database.instance.get_data('title', toc['title'])
+    # タイトルに更新日を付加する
     if @setting.enable_add_date_to_title
-      data = Database.instance.get_data('title', toc['title'])
       date_str = data['last_update'].strftime(@setting.title_date_format)
       if @setting.title_date_align == "left"
         processed_title = date_str + processed_title
       else  # right
         processed_title += date_str
       end
+    end
+    # タイトルに完結したかどうかを付加する
+    flags = data["flags"] || {}
+    if flags["end"]
+      processed_title += " (完結)"
     end
     # タイトルがルビ化されてしまうのを抑制
     toc["title"] = toc["title"].gsub("《", "※［＃始め二重山括弧］").gsub("》", "※［＃終わり二重山括弧］")

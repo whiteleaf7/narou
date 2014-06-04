@@ -31,11 +31,10 @@ module Command
     "browser" => Browser.new,
     "remove" => Remove.new,
     "freeze" => Freeze.new,
+    "flag" => Flag.new,
     "mail" => Mail.new,
     "help" => Help.new,
     "version" => Version.new,
-    #"new" => New.new,
-    #"interactive" => Interactive.new,
     "init" => Init.new
   }
 
