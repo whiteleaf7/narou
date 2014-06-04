@@ -25,10 +25,12 @@ class Device
   attr_reader :name, :ebook_file_ext, :display_name
 
   DEVICES = {}.tap do |h|
-    Dir.glob(File.join(File.dirname(__FILE__), "device", "*.rb")).each do |name|
-      name = File.basename(name, ".rb")
-      require_relative "device/#{name}"
-      h[name] = eval(name.capitalize)
+    [File.dirname(__FILE__), Narou.get_root_dir].each do |dir|
+      Dir.glob(File.join(dir, "device", "*.rb")).each do |path|
+        eval(File.read(path, encoding: Encoding::UTF_8))
+        name = File.basename(path, ".rb")
+        h[name] = eval(name.capitalize)
+      end
     end
   end
 

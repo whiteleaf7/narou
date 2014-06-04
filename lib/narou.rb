@@ -7,7 +7,6 @@ require "fileutils"
 require_relative "helper"
 require_relative "localsetting"
 require_relative "globalsetting"
-require_relative "device"
 
 module Narou
   extend self
@@ -146,6 +145,8 @@ module Narou
     dir = Downloader.get_novel_data_dir_by_target(target)
     File.join(dir, create_novel_filename(data, ext))
   end
+
+  require_relative "device"
 
   def get_device(device_name = nil)
     device_name = LocalSetting.get["local_setting"]["device"] unless device_name
