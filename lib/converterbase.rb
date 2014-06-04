@@ -998,6 +998,14 @@ class ConverterBase
   end
 
   #
+  # 表示上化けてしまうゴミ削除
+  #
+  def delete_dust_char(data)
+    data.gsub!("︎", "")
+    data.gsub!("︎", "")
+  end
+
+  #
   # 小説データ全体に対して施す変換
   #
   def convert_for_all_data(data)
@@ -1125,6 +1133,7 @@ class ConverterBase
     convert_horizontal_ellipsis(data)
     # ルビ化されなくて残ったギュメを二重山括弧（の外字）に変換
     convert_double_angle_quotation_to_gaiji(data)
+    delete_dust_char(data)
     data.strip!
     progressbar.clear if @text_type == "textfile"
     @write_fp

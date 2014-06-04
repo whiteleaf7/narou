@@ -7,6 +7,8 @@
 	- 小説のタイトルに更新日をつける機能を追加しました
 		+ `narou s force.enable_add_date_to_title=true` として設定して下さい（デフォではオフ）
 		+ 書式は `title_date_format` 、位置は `title_date_align` で指定出来ます（詳細は setting.ini 参照）
+* Bug Fix
+	- !?の一文字表記（0x2049）等でゴミが出てしまう問題を修正
 
 2014/05/15 : **1.5.5.1**
 * Bug Fix
