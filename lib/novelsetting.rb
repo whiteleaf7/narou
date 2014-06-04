@@ -233,7 +233,7 @@ class NovelSetting
     },
     {
       name: "title_date_format",
-      value: " (%m/%d)",
+      value: " (%-m/%-d)",
       help: "enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照"
     },
     {
