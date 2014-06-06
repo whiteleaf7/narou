@@ -248,9 +248,10 @@ class NovelConverter
     setting = @setting
     processed_title = toc["title"]
     data = Database.instance.get_data("id", @novel_id)
-    # タイトルに更新日を付加する
+    # タイトルに新着更新日を付加する
     if @setting.enable_add_date_to_title
-      date_str = data["last_update"].strftime(@setting.title_date_format)
+      new_arrivals_date = data["new_arrivals_date"] || data["last_update"]
+      date_str = new_arrivals_date.strftime(@setting.title_date_format)
       if @setting.title_date_align == "left"
         processed_title = date_str + processed_title
       else  # right
