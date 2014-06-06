@@ -26,6 +26,7 @@ class Device
 
   DEVICES = {}.tap do |h|
     [File.dirname(__FILE__), Narou.get_root_dir].each do |dir|
+      next unless dir
       Dir.glob(File.join(dir, "device", "*.rb")).each do |path|
         eval(File.read(path, encoding: Encoding::UTF_8))
         name = File.basename(path, ".rb")
