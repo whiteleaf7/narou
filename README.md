@@ -38,13 +38,14 @@ Narou.rb ― 「小説家になろう」「小説を読もう！」ダウンロ�
 			* title_date_format: 付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照
 			* title_date_align: 付与する日付の位置。left か right
 			* `narou s force.title_date_format="(%-m/%-d)"`
-			* `narou s force.title_date_align=left
+			* `narou s force.title_date_align=left`
 	- `flag` コマンドを追加しました
 		+ `narou flag end 10` と指定出来ます
 		+ 現在は end（完結フラグ）のみ指定できます。`list` コマンド及び、小説タイトルに (完結) と表示されるようになります
+		 （小説タイトルについては次の変換から反映）
 	- 小説の管理フォルダ(narou initしたところ)に `device` フォルダをつくることで、 `send` コマンド用の設定ファイルを
-	  独自に用意出来るようになりました。
-		+ 設定ファイルは https://github.com/whiteleaf7/narou/tree/master/lib/device を参考に作成して下さい。
+	  独自に用意出来るようになりました
+		+ 設定ファイルは https://github.com/whiteleaf7/narou/tree/master/lib/device を参考に作成して下さい
 * Bug Fix
 	- !?の一文字表記（0x2049）等でゴミが出てしまう問題を修正
 
