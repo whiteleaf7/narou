@@ -634,29 +634,29 @@ class Downloader
   # subtitles にダウンロードしたいものをまとめた subtitle info を渡す
   #
   def sections_download_and_save(subtitles)
-    @@__narou_wait_counter ||= 0
-    @@__narou_last_download_time ||= Time.now - 20
+    #@@__narou_wait_counter ||= 0
+    #@@__narou_last_download_time ||= Time.now - 20
     max = subtitles.count
     return if max == 0
     puts ("<bold><green>" + TermColor.escape("ID:#{@id}　#{get_title} のDL開始") + "</green></bold>").termcolor
     interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"] || 0
     interval_sleep_time = 0 if interval_sleep_time < 0
     save_least_one = false
-    if Time.now - @@__narou_last_download_time > 5
-      @@__narou_wait_counter = 0
-    end
+    #if Time.now - @@__narou_last_download_time > 5
+    #  @@__narou_wait_counter = 0
+    #end
     subtitles.each_with_index do |subtitle_info, i|
-      if @setting["is_narou"] && (@@__narou_wait_counter % 10 == 0 && @@__narou_wait_counter >= 10)
+      #if @setting["is_narou"] && (@@__narou_wait_counter % 10 == 0 && @@__narou_wait_counter >= 10)
         # MEMO:
         # 小説家になろうは連続DL規制があるため、ウェイトを入れる必要がある。
         # 10話ごとに規制が入るため、10話ごとにウェイトを挟む。
         # 1話ごとに1秒待機を10回繰り返そうと、11回目に規制が入るため、ウェイトは必ず必要。
-        sleep(5)
-      else
-        sleep(interval_sleep_time) if @@__narou_wait_counter > 0
-      end
-      @@__narou_wait_counter += 1
-      @@__narou_last_download_time = Time.now
+      #  sleep(5)
+      #else
+        sleep(interval_sleep_time)# if @@__narou_wait_counter > 0
+      #end
+      #@@__narou_wait_counter += 1
+      #@@__narou_last_download_time = Time.now
       index, subtitle, file_subtitle, chapter = %w(index subtitle file_subtitle chapter).map { |k|
                                                   subtitle_info[k]
                                                 }
