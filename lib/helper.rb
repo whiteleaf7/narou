@@ -111,7 +111,7 @@ module Helper
     restor_entity(src.force_encoding(encoding)).gsub("\r", "")
   end
 
-  ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)" }
+  ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)", "#39" => "'" }
   #
   # エンティティ復号
   #
