@@ -516,10 +516,10 @@ class Downloader
     rescue OpenURI::HTTPError => e
       if e.message =~ /^404/
         error "<red>[404]</red> 小説が削除されている可能性があります"
-        return false
       else
-        raise
+        error "何らかの理由により目次が取得できませんでした(#{e.message})"
       end
+      return false
     end
     @setting.multi_match(toc_source, "title", "author", "story", "tcode")
     @setting["title"] = get_title
