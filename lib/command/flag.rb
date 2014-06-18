@@ -9,7 +9,7 @@ require_relative "../localsetting"
 
 module Command
   class Flag < CommandBase
-    ATTRIBUTES = %w(end)
+    ATTRIBUTES = %w(end delete)
 
     def oneline_help
       "小説の各種フラグを設定します"
