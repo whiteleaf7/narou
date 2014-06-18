@@ -516,6 +516,9 @@ class Downloader
     rescue OpenURI::HTTPError => e
       if e.message =~ /^404/
         error "<red>[404]</red> 小説が削除されている可能性があります"
+        $stdout.silent = true
+        Command::Flag.execute_and_rescue_exit(["delete", "--on", @id])
+        $stdout.silent = false
       else
         error "何らかの理由により目次が取得できませんでした(#{e.message})"
       end

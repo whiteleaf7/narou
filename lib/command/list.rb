@@ -84,7 +84,8 @@ module Command
           novel["title"] + (!@options["type"] && novel_type == 2 ?
                            "  <gray>(#{NOVEL_TYPE_LABEL[novel_type]})</gray>".termcolor :
                            "") +
-                           (flags["end"] ? " <gray>(完結)</gray>".termcolor : ""),
+                           (flags["end"] ? " <gray>(完結)</gray>".termcolor : "") +
+                           (flags["delete"] ? " <gray>(削除)</gray>".termcolor : ""),
           @options["url"] ? novel["toc_url"] : nil
         ].compact.join(" | ")
       end
