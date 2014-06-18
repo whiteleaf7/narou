@@ -29,6 +29,14 @@ module LoggerModule
     @is_silent
   end
 
+  def silence(&block)
+    raise "need a block" unless block
+    tmp = self.silent
+    self.silent = true
+    block.call
+    self.silent = tmp
+  end
+
   def strip_color(str)
     if $disable_color
       str
