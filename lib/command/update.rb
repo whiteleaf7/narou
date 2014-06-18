@@ -49,7 +49,7 @@ module Command
           display_message = "<red>[ERROR]</red> #{target} は管理小説の中に存在しません".termcolor
         elsif Narou.novel_frozen?(target)
           if argv.length > 0
-            display_message = "#{data["title"]} は凍結中です"
+            display_message = "ID:#{data["id"]}　#{data["title"]} は凍結中です"
           else
             next
           end
@@ -68,9 +68,9 @@ module Command
             Convert.execute_and_rescue_exit(convert_argv)
           end
         when :failed
-          puts "#{data["title"]} の更新は失敗しました"
+          puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
         when :canceled
-          puts "#{data["title"]} の更新はキャンセルされました"
+          puts "ID:#{data["id"]}　#{data["title"]} の更新はキャンセルされました"
         when :none
           puts "#{data["title"]} に更新はありません"
         end
