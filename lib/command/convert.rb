@@ -146,7 +146,7 @@ module Command
           if @device && @device.physical_support? &&
              @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
             if @argument_target_type == :novel
-              Send.execute_and_rescue_exit([@device.name, target])
+              Send.execute!([@device.name, target])
             else
               puts @device.name + "へ送信しています"
               copy_to_path = @device.copy_to_documents(ebook_file)

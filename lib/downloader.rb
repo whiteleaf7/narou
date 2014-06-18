@@ -376,7 +376,7 @@ class Downloader
         when "2"
           return true
         when "3"
-          Command::Freeze.execute_and_rescue_exit([old_toc["title"]])
+          Command::Freeze.execute!([old_toc["title"]])
           return true
         when "4"
           STDOUT.puts "あらすじ"
@@ -517,7 +517,7 @@ class Downloader
       if e.message =~ /^404/
         error "<red>[404]</red> 小説が削除されている可能性があります"
         $stdout.silence do
-          Command::Flag.execute_and_rescue_exit(["delete", "--on", @id])
+          Command::Flag.execute!(["delete", "--on", @id])
         end
       else
         error "何らかの理由により目次が取得できませんでした(#{e.message})"

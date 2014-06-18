@@ -65,11 +65,11 @@ module Command
           unless @options["no-convert"]
             convert_argv = [target]
             convert_argv << "--no-open" if no_open
-            Convert.execute_and_rescue_exit(convert_argv)
+            Convert.execute!(convert_argv)
           end
         when :failed
           puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
-          Freeze.execute_and_rescue_exit([target])
+          Freeze.execute!([target])
         when :canceled
           puts "ID:#{data["id"]}　#{data["title"]} の更新はキャンセルされました"
         when :none

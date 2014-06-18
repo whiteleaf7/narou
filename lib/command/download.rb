@@ -73,13 +73,13 @@ module Command
           next
         end
         unless @options["no-convert"]
-          Convert.execute_and_rescue_exit([download_target])
+          Convert.execute!([download_target])
         end
         if @options["freeze"]
-          Freeze.execute_and_rescue_exit([download_target])
+          Freeze.execute!([download_target])
         elsif @options["remove"]
           # --freeze オプションが指定された場合は --remove オプションは無視する
-          Remove.execute_and_rescue_exit([download_target, "-y"])
+          Remove.execute!([download_target, "-y"])
         end
       end
     end
