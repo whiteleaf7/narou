@@ -21,12 +21,23 @@ module Command
 
   ・指定した小説に各種フラグを設定します
   ・再実行で解除
+  ・--on, --off オプションを付けることで強制設定可能
   ・現在指定可能なフラグ
-      end : 小説が完結状態かどうか
+      end : 小説が完結状態
+      delete: 削除された状態
 
   Example:
     narou flag end 100   # ID:100の小説を完結状態にする
+    narou flag end --on  # 現在の状態に関わらず完結状態にする
+
+  Options:
       EOS
+      @opt.on("--on", "強制的にフラグを立てる") {
+        @options["on"] = true
+      }
+      @opt.on("--off", "強制的にフラグをはずす") {
+        @options["off"] = true
+      }
     end
 
     def execute(argv)
@@ -52,12 +63,15 @@ module Command
           next
         end
         flags = data["flags"] || {}
-        if flags.include?(attribute)
-          flags.delete(attribute)
-          puts "#{data['title']} から #{attribute} フラグを削除しました"
+        flag = !flags[attribute]
+        flag = true if @options["on"]
+        flag = false if @options["off"]
+        flags[attribute] = flag
+        if flag
+          puts "#{data['title']} の #{attribute} フラグを立てました"
         else
-          flags[attribute] = true
-          puts "#{data['title']} の #{attribute} フラグを設定しました"
+          flags.delete(attribute)
+          puts "#{data['title']} から #{attribute} フラグをはずしました"
         end
         database[data["id"]]["flags"] = flags
       end
