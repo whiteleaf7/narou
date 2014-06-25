@@ -74,7 +74,7 @@ def load_converter(title, archive_path)
   else
     return BlankConverter
   end
-  conv = $converter_container[title]
+  conv = $converter_container[title] || $converter_container[File.basename(archive_path)]
   if conv
     return conv
   else

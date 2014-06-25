@@ -874,6 +874,7 @@ class Downloader
   #
   def init_novel_dir
     novel_dir_path = get_novel_data_dir
+    file_title = File.basename(novel_dir_path)
     FileUtils.mkdir_p(novel_dir_path) unless File.exists?(novel_dir_path)
     default_settings = NovelSetting::DEFAULT_SETTINGS
     special_preset_dir = File.join(Narou.get_preset_dir, @setting["domain"], @setting["ncode"])
