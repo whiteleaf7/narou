@@ -856,10 +856,22 @@ class ConverterBase
         else
           "［＃ルビ用縦線］#{match_target}"
         end
-      } + "《#{m2}》"
+      } + "《#{ruby_youon_to_big(m2)}》"
     else
       match
     end
+  end
+
+  #
+  # ルビの拗音(ぁ、ぃ等)を商業書籍のように大きくする
+  #
+  def ruby_youon_to_big(ruby)
+    result = ruby
+    if @setting.enable_ruby_youon_to_big
+      result = ruby.tr("ぁぃぅぇぉゃゅょゎっァィゥェォャュョヮッヵヶ",
+                       "あいうえおやゆよわつアイウエオヤユヨワツカケ")
+    end
+    result
   end
 
   #

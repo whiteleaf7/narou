@@ -8,6 +8,9 @@
 	- 更新に失敗した小説を表示するときにIDも合わせて表示するようにしました
 	- `flag` コマンドに強制設定用の `--on` 及び `--off` オプションを追加しました
 	- `flag` コマンドに `delete` フラグを追加しました（削除表示への対応）
+	- ルビの拗音（ぁ、ぃ、ゃ等）を商業書籍のように大きくする機能を追加しました
+		+ `narou s force.enable_ruby_youon_to_big=true` とするか、
+		  setting.ini に `enable_ruby_youon_to_big=true` を追加して下さい（標準ではオフ）
 
 2014/06/15 : **1.5.7.1**
 * 追加機能もしくは仕様変更
@@ -28,7 +31,8 @@
 2014/06/04 : **1.5.6**
 * 追加機能もしくは仕様変更
 	- 小説のタイトルに更新日をつける機能を追加しました
-		+ `narou s force.enable_add_date_to_title=true` として有効にして下さい（標準ではオフ）
+		+ `narou s force.enable_add_date_to_title=true` とするか、
+		  setting.ini に `enable_add_date_to_title=true` を追加して下さい（標準ではオフ）
 		+ 書式は `title_date_format` 、位置は `title_date_align` で自由に変更出来ます
 			* title_date_format: 付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照
 			* title_date_align: 付与する日付の位置。left か right

@@ -241,5 +241,10 @@ class NovelSetting
       value: "right",
       help: "enable_add_date_to_title で付与する日付の位置。left か right"
     },
+    {
+      name: "enable_ruby_youon_to_big",
+      value: false,
+      help: "ルビの拗音(ぁ、ぃ等)を商業書籍のように大きくするかどうか"
+    },
   ]
 end
