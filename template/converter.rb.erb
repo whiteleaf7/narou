@@ -7,12 +7,20 @@
 # 作者: <%= @setting["author"] %>
 # URL: <%= @setting["toc_url"] %>
 #
+# 詳細については http://bit.ly/1vTEH04 を参照して下さい
+#
 converter "<%= file_title.gsub('"', '\"') %>" do
+  # 各種変換処理がされる「前」の生データに対しての変換処理を記述
   def before(io, text_type)
     super
+    # io.string.gsub!("こんばんわ", "こんばんは")
+    io
   end
 
+  # 各種変換処理がされた「後」のデータに対しての変換処理を記述
   def after(io, text_type)
     super
+    # io.string.gsub!("百％", "１００％")
+    io
   end
 end
