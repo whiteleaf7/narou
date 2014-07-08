@@ -9,7 +9,7 @@ require_relative "../downloader"
 module Command
   class Download < CommandBase
     def initialize
-      super("<target> [<target2> ...] [options]")
+      super("[<target> <target2> ...] [options]")
       @opt.separator <<-EOS
 
   ・ダウンロードしたい小説のNコードもしくはURLを指定して下さい。
@@ -18,6 +18,7 @@ module Command
   ・ダウンロード終了後に変換処理を行います。ダウンロードのみする場合は-nオプションを指定して下さい。
   ・すでにダウンロード済みの小説の場合は何もしません。
   ・--remove オプションをつけてダウンロードすると、ダウンロード（とその後の変換、送信）が終わったあと削除します。データベースのインデックスを外すだけなので、変換した書籍データは残ったままになります。ファイルを全て消す場合は手動で削除する必要があります。
+  ・NコードもURLも指定しなかった場合、対話モード移行します。
 
   Example:
     narou download n9669bk
@@ -43,11 +44,53 @@ module Command
       }
     end
 
+    def valid_target?(target)
+      @site_settings ||= Downloader.load_settings
+      case Downloader.get_target_type(target)
+      when :ncode
+        true
+      when :url
+        !!@site_settings.find { |s| s.multi_match(target, "url") }
+      else
+        false
+      end
+    end
+
+    def print_prompt(targets)
+      print "#{targets.count}> "
+    end
+
+    def interactive_mode
+      targets = []
+      puts "【対話モード】"
+      puts "ダウンロードしたい小説のNコードもしくはURLを入力して下さい。"
+      puts "連続して複数の小説を入力していきます。"
+      puts "入力を終了してダウンロードを開始するには未入力のままエンターを押して下さい。"
+      puts
+      print_prompt(targets)
+      while input = $stdin.gets
+        input.strip!
+        break if input == ""
+        if valid_target?(input)
+          if targets.include?(input)
+            error "入力済みです"
+          else
+            targets << input
+          end
+        else
+          error "対応外の小説です"
+        end
+        print_prompt(targets)
+      end
+      targets
+    end
+
     def execute(argv)
       super
       if argv.empty?
-        puts @opt.help
-        return
+        targets = interactive_mode
+        return if targets.count == 0
+        argv += targets
       end
       argv.each.with_index(1) do |target, i|
         download_target ||= target
