@@ -9,9 +9,14 @@
 $debug = File.exists?(File.join(File.expand_path(File.dirname($0)), "debug"))
 Encoding.default_external = Encoding::UTF_8
 
-require_relative "lib/globalsetting"
+if ARGV.delete("--time")
+  now = Time.now
+  at_exit do
+    puts "実行時間 #{Time.now - now}秒"
+  end
+end
 
-display_time = ARGV.delete("--time")
+require_relative "lib/globalsetting"
 display_backtrace = ARGV.delete("--backtrace")
 display_backtrace ||= $debug
 $disable_color = ARGV.delete("--no-color")
@@ -22,13 +27,6 @@ require_relative "lib/version"
 require_relative "lib/commandline"
 
 rescue_level = $debug ? Exception : StandardError
-
-if display_time
-  now = Time.now
-  at_exit do
-    puts "実行時間 #{Time.now - now}秒"
-  end
-end
 
 begin
   CommandLine.run(ARGV.map { |v| v.dup })
