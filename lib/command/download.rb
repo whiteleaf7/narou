@@ -8,12 +8,14 @@ require_relative "../downloader"
 
 module Command
   class Download < CommandBase
+    SUPPORT_NOVEL_SITES = %w(小説家になろう（小説を読もう） Arcadia ハーメルン 暁)
+
     def initialize
       super("[<target> <target2> ...] [options]")
       @opt.separator <<-EOS
 
   ・ダウンロードしたい小説のNコードもしくはURLを指定して下さい。
-  ・対応サイトは小説家になろう（小説を読もう）、Arcadia、ハーメルン、暁です。
+  ・対応サイトは#{SUPPORT_NOVEL_SITES.join("、")}です。
   ・一度に複数の小説を指定する場合は空白で区切って下さい。
   ・ダウンロード終了後に変換処理を行います。ダウンロードのみする場合は-nオプションを指定して下さい。
   ・すでにダウンロード済みの小説の場合は何もしません。
@@ -63,8 +65,9 @@ module Command
     def interactive_mode
       targets = []
       puts "【対話モード】"
-      puts "ダウンロードしたい小説のNコードもしくはURLを入力して下さい。"
+      puts "ダウンロードしたい小説のNコードもしくはURLを入力して下さい。(1行に1つ)"
       puts "連続して複数の小説を入力していきます。"
+      puts "対応サイトは#{SUPPORT_NOVEL_SITES.join("、")}です。"
       puts "入力を終了してダウンロードを開始するには未入力のままエンターを押して下さい。"
       puts
       print_prompt(targets)
