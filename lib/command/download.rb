@@ -113,7 +113,7 @@ module Command
           end
           next
         end
-        if Downloader.start(download_target, @options["force"], true) != :ok
+        if Downloader.start(download_target, @options["force"], true).status != :ok
           next
         end
         unless @options["no-convert"]

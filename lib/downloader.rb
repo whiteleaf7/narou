@@ -5,6 +5,7 @@
 
 require "yaml"
 require "fileutils"
+require "ostruct"
 require_relative "narou"
 require_relative "sitesetting"
 require_relative "template"
@@ -303,13 +304,26 @@ class Downloader
     end
   end
 
+
+  #
+  # ダウンロードを処理本体を起動
+  #
+  def start_download
+    @status = run_download
+    OpenStruct.new(
+      :id=>@id,
+      :new_arrivals=>@new_arrivals,
+      :status=>@status
+      ).freeze
+  end
+
   #
   # ダウンロード処理本体
   #
   # 返り値：ダウンロードしたものが１話でもあったかどうか(Boolean)
   #         nil なら何らかの原因でダウンロード自体出来なかった
   #
-  def start_download
+  def run_download
     latest_toc = get_latest_table_of_contents
     unless latest_toc
       error @setting["toc_url"] + " の目次データが取得出来ませんでした"
