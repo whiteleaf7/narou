@@ -78,8 +78,9 @@ def load_converter(title, archive_path)
   if conv
     return conv
   else
+    title_for_converter = (title =~ /.txt\z/ ? title : File.basename(archive_path))
     error "converter.rbは見つかりましたが、`converter'で登録されていないようです。" +
-          "変換処理は converter \"#{title.gsub('"', '\\"')}\" として登録する必要があります"
+          "変換処理は converter \"#{title_for_converter.gsub('"', '\\"')}\" として登録する必要があります"
     return BlankConverter
   end
 end
