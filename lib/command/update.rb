@@ -30,6 +30,9 @@ module Command
       @opt.on("-n", "--no-convert", "変換をせずアップデートのみ実行する") {
         @options["no-convert"] = true
       }
+      @opt.on("-a", "--convert-only-new-arrival", "新着のみ変換を実行する") {
+        @options["convert-only-new-arrival"] = true
+      }
     end
 
     def execute(argv)
@@ -59,10 +62,11 @@ module Command
           puts display_message
           next
         end
-        update_status = Downloader.start(target)
-        case update_status
+        result = Downloader.start(target)
+        case result.status
         when :ok
-          unless @options["no-convert"]
+          unless @options["no-convert"] or
+                 (@options["convert-only-new-arrival"] and not result.new_arrivals)
             convert_argv = [target]
             convert_argv << "--no-open" if no_open
             Convert.execute!(convert_argv)
