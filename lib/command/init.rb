@@ -114,7 +114,8 @@ module Command
       puts
       print "<bold><green>AozoraEpub3のあるフォルダを入力して下さい:</green></bold>\n(未入力でスキップ".termcolor
       if @global_setting["aozoraepub3dir"]
-        print "、:keep で前回と同じ設定"
+        puts "、:keep で現在と同じ場所を指定)"
+        print "(現在の場所:#{@global_setting["aozoraepub3dir"]}"
       end
       print ")\n>"
       while input = $stdin.gets.rstrip.gsub(/"/, "")
