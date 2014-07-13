@@ -6,7 +6,7 @@
 # 作者: 蘇我捨恥
 # URL: http://ncode.syosetu.com/n4259s/
 #
-converter "異世界迷宮で奴隷ハーレムを" do
+converter "n4259s 異世界迷宮で奴隷ハーレムを" do
   def before(io, text_type)
     data = io.read
     data.gsub!("\n\n", "\n")
@@ -14,7 +14,7 @@ converter "異世界迷宮で奴隷ハーレムを" do
   end
 
   def level_convert!(line)
-    line.gsub!(/Ｌｖ([0-9０-９])/, "Lv\\1")
+    line.gsub!(/Ｌｖ/, "Lv［＃「Lv」は縦中横］")
     line.gsub!(/Lv([0-9０-９]+)/, "Lv［＃「Lv」は縦中横］\\1［＃「\\1」は縦中横］")
   end
 
