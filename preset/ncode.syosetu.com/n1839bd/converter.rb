@@ -6,7 +6,7 @@
 # 作者: 丸山くがね
 # URL: http://ncode.syosetu.com/n1839bd/
 #
-converter "オーバーロード：後編" do
+converter "n1839bd オーバーロード：後編" do
   def before(io, text_type)
     super
   end

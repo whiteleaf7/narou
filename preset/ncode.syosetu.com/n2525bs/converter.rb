@@ -6,7 +6,7 @@
 # 作者: 木原ゆう
 # URL: http://ncode.syosetu.com/n2525bs/
 #
-converter "魔剣ゾルディの女主人公とっかえひっかえ成長記録" do
+converter "n2525bs 魔剣ゾルディの女主人公とっかえひっかえ成長記録" do
   def before(io, text_type)
     super
     io.string.gsub!(/(\/{2,})/) do

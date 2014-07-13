@@ -6,7 +6,7 @@
 # 作者: 橙乃ままれ
 # URL: http://ncode.syosetu.com/n8725k/
 #
-converter "ログ・ホライズン" do
+converter "n8725k ログ・ホライズン" do
   def before(io, element_type)
     super
   end

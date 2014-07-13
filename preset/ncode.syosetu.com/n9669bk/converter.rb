@@ -6,7 +6,7 @@
 # 作者: 理不尽な孫の手
 # URL: http://ncode.syosetu.com/n9669bk/
 #
-converter "無職転生　- 異世界行ったら本気だす -" do
+converter "n9669bk 無職転生　- 異世界行ったら本気だす -" do
   def before(io, type)
     super
   end
