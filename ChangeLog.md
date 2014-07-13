@@ -12,7 +12,7 @@
 				- `narou d < list.txt`
 			* BATファイル等で `narou d` のみを実行し、新規DL時の入力を簡便にする
 	- 自動生成される converter.rb に簡単な説明を付け加えるようにしました
-	- remove コマンドの --with-file オプションに短縮版 -w を追加しました
+	- `remove` コマンドの `--with-file` オプションに短縮版 `-w` を追加しました
 	- `narou init` 実行時に現在の AozoraEpub3 の場所を表示するようになりました
 	- `update` コマンドに新着小説のみを変換するオプション `--convert-only-new-arrival` (短縮 `-a` )が
 	  追加されました（naoh87さんによる実装）
