@@ -11,12 +11,18 @@ converter "n8725k ログ・ホライズン" do
     super
   end
 
-  def after(io, text_type)
+  def after(io, element_type)
     data = io.string
-    if text_type == "subtitle"
-      data.gsub!(/^[#{ConverterBase::KANJI_NUM}]+/) do |match|
-        match.tr(ConverterBase::KANJI_NUM, "０-９")
+    if element_type == "body"
+      if data =~ /[｜|]([^《]+)《(、+)》/
+        if $1.length == $2.length
+          data.gsub!(/[｜|]([^《]+)《(、+)》/) do |match|
+            "［＃傍点］" + $1 + "［＃傍点終わり］"
+          end
+        end
       end
+      data.gsub!("ルビ：", "")
+      data.gsub!("ロエ二", "ロエ２")
     end
     io
   end
