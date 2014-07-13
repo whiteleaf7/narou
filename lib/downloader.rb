@@ -311,17 +311,14 @@ class Downloader
   def start_download
     @status = run_download
     OpenStruct.new(
-      :id=>@id,
-      :new_arrivals=>@new_arrivals,
-      :status=>@status
+      :id => @id,
+      :new_arrivals => @new_arrivals,
+      :status => @status
       ).freeze
   end
 
   #
   # ダウンロード処理本体
-  #
-  # 返り値：ダウンロードしたものが１話でもあったかどうか(Boolean)
-  #         nil なら何らかの原因でダウンロード自体出来なかった
   #
   def run_download
     latest_toc = get_latest_table_of_contents
