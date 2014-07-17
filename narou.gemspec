@@ -73,6 +73,10 @@ narou コマンドのインストール or アップデートが完了しまし�
 	- replace.txt で置換対象を削除するという表現（あいう<tab><改行>）が出来なかったのを修正
 	- `--time` オプションで表示される実行時間がより正確になるように調整しました
 
+2014/07/18 : **1.5.10.1**
+* Bug Fix
+	- replace.txt による置換が正常に行えなかった問題を修正
+
 #{"*" * 79}
   EOS
   gem.post_install_message = install_message.gsub("\t", " ")

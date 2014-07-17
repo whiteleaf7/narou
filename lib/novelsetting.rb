@@ -95,14 +95,17 @@ class NovelSetting
     replace_txt_path = File.join(@archive_path, REPLACE_NAME)
     if File.exists?(replace_txt_path)
       open(replace_txt_path, "r:BOM|UTF-8") do |fp|
+        puts "================"
         fp.each do |line|
-          line.sub(/\n\z/, "")
+          p line
+          line.sub!(/\n\z/, "")
           next if line[0] == ";"    # コメント記号
           pattern = line.split("\t", 2)
           if pattern.length == 2 && pattern[0]
             @replace_pattern << pattern
           end
         end
+        puts "================"
       end
     end
   end
