@@ -8,7 +8,10 @@
 #
 converter "n3730bn まのわ ～魔物倒す・能力奪う・私強くなる～" do
   def before(io, text_type)
-    if text_type != "postscript"
+    if text_type == "postscript"
+      @__manowa_setting_num2kanji |= @setting.enable_convert_num_to_kanji
+      @setting.enable_convert_num_to_kanji = false
+    else
       super
     end
     io
@@ -25,8 +28,7 @@ converter "n3730bn まのわ ～魔物倒す・能力奪う・私強くなる～
       end
     end
     if text_type == "postscript"
-      buffer.string.tr!("#{ConverterBase::KANJI_NUM}", "０-９")
-      buffer.string.gsub!("２分アキ", "二分アキ")
+      @setting.enable_convert_num_to_kanji = @__manowa_setting_num2kanji
     end
     buffer
   end
