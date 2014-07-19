@@ -241,9 +241,9 @@ module Command
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
         "send.without-freeze" => [:boolean, "`全話'送信時に凍結された小説は対象外に"],
+        "update.strong" => [:boolean, "更新漏れが無いように改稿日の分は必ずDLする"],
         "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
         "multiple-delimiter" => [:string, "--multiple指定時の区切り文字"],
-        
       },
       global: {
         "aozoraepub3dir" => [:directory, "AozoraEpub3のあるフォルダを指定", INVISIBLE],

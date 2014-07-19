@@ -568,6 +568,10 @@ class Downloader
     }
   end
 
+  def __strdate_to_ymd(date)
+    Date.parse(date.to_s.tr("年月日時分秒", "///:::")).strftime("%Y%m%d")
+  end
+
   #
   # 本文更新チェック
   #
@@ -575,6 +579,7 @@ class Downloader
   #
   def update_body_check(old_subtitles, latest_subtitles)
     return latest_subtitles unless old_subtitles
+    strong_update = LocalSetting.get["local_setting"]["update.strong"]
     latest_subtitles.dup.keep_if do |latest|
       index = latest["index"]
       index_in_old_toc = __search_index_in_subtitles(old_subtitles, index)
@@ -589,17 +594,36 @@ class Downloader
         next true
       end
       # 更新日チェック
+      # subdate : 初稿投稿日(Arcadiaでは改稿日)
+      # subupdate : 改稿日
       old_subupdate = old["subupdate"]
       latest_subupdate = latest["subupdate"]
       if old_subupdate
         if old_subupdate == ""
           next latest_subupdate != ""
         end
+        if strong_update
+          if __strdate_to_ymd(old_subupdate) == __strdate_to_ymd(get_section_file_timestamp(latest))
+            next true
+          end
+        end
         latest_subupdate > old_subupdate
       else
+        if strong_update
+          if __strdate_to_ymd(old["subdate"]) == __strdate_to_ymd(get_section_file_timestamp(latest))
+            next true
+          end
+        end
         latest["subdate"] > old["subdate"]
       end
     end
+  end
+
+  #
+  # 対象話数のタイムスタンプを取得
+  #
+  def get_section_file_timestamp(subtitle_info)
+    File.mtime(create_section_file_path(subtitle_info))
   end
 
   #
@@ -852,11 +876,20 @@ class Downloader
 
   #
   # 小説データの格納ディレクトリパス
+  #
   def get_novel_data_dir
     return @novel_data_dir if @novel_data_dir
     raise "小説名がまだ設定されていません" unless get_file_title
     @novel_data_dir = File.join(Database.archive_root_path, @setting["name"], get_file_title)
     @novel_data_dir
+  end
+
+  #
+  # 小説本文の保存パスを生成
+  #
+  def create_section_file_path(subtitle_info)
+    filename = "#{subtitle_info["index"]} #{subtitle_info["file_subtitle"]}.yaml"
+    File.join(get_novel_data_dir, SECTION_SAVE_DIR_NAME, filename)
   end
 
   #
