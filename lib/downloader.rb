@@ -27,6 +27,7 @@ class Downloader
   RETRY_MAX_FOR_503 = 5   # 503 のときに何回再試行するか
   NOVEL_TYPE_SERIES = 1   # 連載
   NOVEL_TYPE_SS = 2       # 短編
+  DISPLAY_LIMIT_DIGITS = 4   # indexの表示桁数限界
 
   attr_reader :id
 
@@ -702,8 +703,8 @@ class Downloader
         puts "#{chapter}"
       end
       if get_novel_type == NOVEL_TYPE_SERIES
-        if index.to_s.length < 4
-          # indexの数字がでかいと見た目がみっともないので3桁までは表示する
+        if index.to_s.length <= DISPLAY_LIMIT_DIGITS
+          # indexの数字がでかいと見た目がみっともないので特定の桁以内だけ表示する
           print "第#{index}部分　"
         end
       else
