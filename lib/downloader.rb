@@ -23,6 +23,7 @@ class Downloader
   CACHE_SAVE_DIR_NAME = "cache"   # 差分用キャッシュ保存用ディレクトリ名
   RAW_DATA_DIR_NAME = "raw"    # 本文の生データを保存するディレクトリ名
   TOC_FILE_NAME = "toc.yaml"
+  STEPS_WAIT_TIME = 5   # 数話ごとにかかるwaitの秒数
   WAITING_TIME_FOR_503 = 20   # 503 のときに待機する秒数
   RETRY_MAX_FOR_503 = 5   # 503 のときに何回再試行するか
   NOVEL_TYPE_SERIES = 1   # 連載
@@ -690,7 +691,7 @@ class Downloader
         # 小説家になろうは連続DL規制があるため、ウェイトを入れる必要がある。
         # 10話ごとに規制が入るため、10話ごとにウェイトを挟む。
         # 1話ごとに1秒待機を10回繰り返そうと、11回目に規制が入るため、ウェイトは必ず必要。
-        sleep(5)
+        sleep(STEPS_WAIT_TIME)
       else
         sleep(interval_sleep_time) if @@__narou_wait_counter > 0
       end
