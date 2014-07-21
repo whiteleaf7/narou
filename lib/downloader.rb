@@ -681,12 +681,14 @@ class Downloader
     puts ("<bold><green>" + TermColor.escape("ID:#{@id}　#{get_title} のDL開始") + "</green></bold>").termcolor
     interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"] || 0
     interval_sleep_time = 0 if interval_sleep_time < 0
+    download_wait_steps = LocalSetting.get["local_setting"]["download.wait-steps"] || 0
+    download_wait_steps = 10 if @setting["is_narou"] && (download_wait_steps > 10 || download_wait_steps == 0)
     save_least_one = false
     if Time.now - @@__narou_last_download_time > 5
       @@__narou_wait_counter = 0
     end
     subtitles.each_with_index do |subtitle_info, i|
-      if @setting["is_narou"] && (@@__narou_wait_counter % 10 == 0 && @@__narou_wait_counter >= 10)
+      if download_wait_steps > 0 && @@__narou_wait_counter % download_wait_steps == 0 && @@__narou_wait_counter >= download_wait_steps
         # MEMO:
         # 小説家になろうは連続DL規制があるため、ウェイトを入れる必要がある。
         # 10話ごとに規制が入るため、10話ごとにウェイトを挟む。
