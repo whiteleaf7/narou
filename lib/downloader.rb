@@ -389,13 +389,17 @@ class Downloader
         when "2"
           return true
         when "3"
-          Command::Freeze.execute!([old_toc["title"]])
+          Command::Freeze.execute!([latest_toc["toc_url"]])
           return true
         when "4"
+          Command::Backup.execute!([latest_toc["toc_url"]])
+        when "5"
           STDOUT.puts "あらすじ"
           STDOUT.puts latest_toc["story"]
-        when "5"
+        when "6"
           Helper.open_browser(latest_toc["toc_url"])
+        when "7"
+          Helper.open_directory(Downloader.get_novel_data_dir_by_target(latest_toc["toc_url"]))
         end
         digest_output_interface(old_subtitles_count, latest_subtitles_count)
       end
@@ -406,13 +410,16 @@ class Downloader
 
   def digest_output_interface(old_subtitles_count, latest_subtitles_count)
     STDOUT.puts
-    STDOUT.puts "保存済み話数: #{old_subtitles_count}\n更新後の話数: #{latest_subtitles_count}"
+    STDOUT.puts "保存済み話数: #{old_subtitles_count}"
+    STDOUT.puts "更新後の話数: #{latest_subtitles_count}"
     STDOUT.puts
     STDOUT.puts "1: このまま更新する"
     STDOUT.puts "2: 更新をキャンセル"
     STDOUT.puts "3: 更新をキャンセルして小説を凍結する"
-    STDOUT.puts "4: 最新のあらすじを表示する"
-    STDOUT.puts "5: 小説ページを開く"
+    STDOUT.puts "4: バックアップを作成する"
+    STDOUT.puts "5: 最新のあらすじを表示する"
+    STDOUT.puts "6: 小説ページをブラウザで開く"
+    STDOUT.puts "7: 保存フォルダを開く"
     STDOUT.print "選択する処理の番号を入力: "
   end
 
