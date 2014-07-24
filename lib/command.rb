@@ -33,6 +33,7 @@ module Command
     "freeze" => Freeze.new,
     "flag" => Flag.new,
     "mail" => Mail.new,
+    "backup" => Backup.new,
     "help" => Help.new,
     "version" => Version.new,
     "init" => Init.new
