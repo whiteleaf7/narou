@@ -684,10 +684,10 @@ class Downloader
     download_wait_steps = LocalSetting.get["local_setting"]["download.wait-steps"] || 0
     download_wait_steps = 10 if @setting["is_narou"] && (download_wait_steps > 10 || download_wait_steps == 0)
     save_least_one = false
-    if Time.now - @@__last_download_time > 5
+    max_steps_wait_time = [STEPS_WAIT_TIME, interval_sleep_time].max
+    if Time.now - @@__last_download_time > max_steps_wait_time
       @@__wait_counter = 0
     end
-    max_steps_wait_time = [STEPS_WAIT_TIME, interval_sleep_time].max
     subtitles.each_with_index do |subtitle_info, i|
       if download_wait_steps > 0 && @@__wait_counter % download_wait_steps == 0 && @@__wait_counter >= download_wait_steps
         # MEMO:
