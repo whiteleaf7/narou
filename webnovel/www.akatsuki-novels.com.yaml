@@ -15,7 +15,7 @@ title_strip_pattern: null
 title: id="LookNovel">(?<title>.+?)</a>
 author: 作者：<a href="/users/view/\d+">(?<author>.+?)</a>
 story: |-
-  </strong></p><hr><br>                    <div>(?<story>.+?)</div>
+  <div class=" body-x1 body-normal body-w\d+">.+?<div>(?<story>.+?)</div>
 
 # ------------------------------------------------------------
 # 目次取得設定
