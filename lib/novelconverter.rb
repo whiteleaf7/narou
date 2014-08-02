@@ -137,11 +137,14 @@ class NovelConverter
     end
     stash_aozora_fonts_directory unless use_dakuten_font
     print "AozoraEpub3でEPUBに変換しています"
-    res = Helper::AsyncCommand.exec(command) do
-      print "."
+    begin
+      res = Helper::AsyncCommand.exec(command) do
+        print "."
+      end
+    ensure
+      visible_aozora_fonts_directory unless use_dakuten_font
+      Dir.chdir(pwd)
     end
-    visible_aozora_fonts_directory unless use_dakuten_font
-    Dir.chdir(pwd)
 
     stdout_capture = res[0]
 

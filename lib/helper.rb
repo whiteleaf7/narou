@@ -11,16 +11,18 @@ require "open3"
 module Helper
   extend self
 
+  HOST_OS = RbConfig::CONFIG["host_os"]
+
   def os_windows?
-    @@os_is_windows ||= RUBY_PLATFORM =~ /mswin(?!ce)|mingw|bccwin/i
+    @@os_is_windows ||= HOST_OS =~ /mswin(?!ce)|mingw|bccwin/i
   end
 
   def os_mac?
-    @@os_is_mac ||= RUBY_PLATFORM =~ /darwin/
+    @@os_is_mac ||= HOST_OS =~ /darwin/i
   end
 
   def os_cygwin?
-    @@os_is_cygwin ||= RUBY_PLATFORM =~ /cygwin/i
+    @@os_is_cygwin ||= HOST_OS =~ /cygwin/i
   end
 
   def determine_os
@@ -34,6 +36,10 @@ module Helper
     else
       :other
     end
+  end
+
+  def engine_jruby?
+    @@engine_is_jruby ||= RUBY_ENGINE == "jruby"
   end
 
   def confirm(message)
@@ -54,7 +60,7 @@ module Helper
   def open_browser_linux(address, error_message)
     %w(xdg-open firefox w3m).each do |browser|
       system(%!#{browser} "#{address}"!)
-      return if $?.exitstatus != 127
+      return if $?.success?
     end
     error error_message
   end
@@ -65,11 +71,11 @@ module Helper
     end
     case determine_os
     when :windows
-      `explorer "file:///#{path.encode(Encoding::Windows_31J)}"`
+      system(%!explorer "file:///#{path.encode(Encoding::Windows_31J)}"!)
     when :cygwin
-      `cygstart "#{path}"`
+      system(%!cygstart "#{path}"!)
     when :mac
-      `open "#{path}"`
+      system(%!open "#{path}"!)
     else
       open_browser_linux(path, "フォルダが開けませんでした")
     end
@@ -80,11 +86,11 @@ module Helper
     when :windows
       escaped_url = url.gsub("%", "%^").gsub("&", "^&")
       # MEMO: start の引数を "" で囲むと動かない
-      `start #{escaped_url}`
+      system(%!start #{escaped_url}!)
     when :cygwin
-      `cygstart #{url}`
+      system(%!cygstart #{url}!)
     when :mac
-      `open "#{url}"`
+      system(%!open "#{url}"!)
     else
       open_browser_linux(url, "ブラウザが見つかりませんでした")
     end
@@ -142,29 +148,28 @@ module Helper
   #
   class AsyncCommand
     def self.exec(command, sleep_time = 0.5, &block)
-      async_command = new(command)
-      while async_command.running?
-        block.call
-        sleep(sleep_time)
-      end
-      async_command.response
-    end
-
-    def initialize(command)
-      @command_response = nil
-      @command_running = true
-      Thread.new do
-        @command_response = Open3.capture3(command)
-        @command_running = false
-      end
-    end
-
-    def running?
-      @command_running
-    end
-
-    def response
-      @command_response
+      Thread.new {
+        loop do
+          block.call
+          sleep(sleep_time)
+        end
+      }.tap { |th|
+        if Helper::engine_jruby?
+          # MEMO:
+          #   Open3.capture3 - 全く動かない
+          #   `` バッククウォート - 出力が文字化けする
+          res = Open3.popen3(command) { |i, o, e|
+            i.close
+            `cd`   # create dummy Process::Status object to $?
+            [o.read, e.read, $?]
+          }
+        else
+          res = Open3.capture3(command)
+        end
+        th.kill
+        return res
+      }
     end
   end
 end
+
