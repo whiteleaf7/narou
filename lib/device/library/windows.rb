@@ -10,10 +10,7 @@ module Device::Library
   module Windows
     def get_device_root_dir(volume_name)
       @@FileSystemObject ||= WIN32OLE.new("Scripting.FileSystemObject")
-      drive_strings = " " * 1000
-      result_len = WinAPI.GetLogicalDriveStrings(1000, drive_strings)
-      drives = drive_strings[0, result_len].split("\0")
-      drives.each do |drive_letter|
+      get_drives.each do |drive_letter|
         drive_info = @@FileSystemObject.GetDrive(drive_letter)
         vol = drive_info.VolumeName rescue ""
         if vol.downcase == volume_name.downcase
@@ -21,6 +18,17 @@ module Device::Library
         end
       end
       nil
+    end
+
+    def get_drives
+      result = []
+      bits = WinAPI.GetLogicalDrives
+      26.times do |i|
+        if bits & (1 << i) != 0
+          result << "#{(65 + i).chr}:\\"
+        end
+      end
+      result
     end
   end
 end

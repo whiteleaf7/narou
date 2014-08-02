@@ -32,7 +32,7 @@ module Narou
       drive_letter = $&
     end
     while path != ""
-      if File.directory?("#{path}/#{LOCAL_SETTING_DIR}")
+      if File.directory?("#{drive_letter}#{path}/#{LOCAL_SETTING_DIR}")
         @@root_dir = drive_letter + path
         break
       end
