@@ -34,7 +34,7 @@ module Narou
       gzip_opt = RUBY_VERSION >= "2.0.0" ? "gzip=#{gzip}&" : ""
       url = "#{@api_url}?#{gzip_opt}ncode=#{@ncode}&of=#{of}"
       open(url) do |fp|
-        result = YAML.load(fp.read)
+        result = YAML.load(fp.read.force_encoding(Encoding::UTF_8))
         if result[0]["allcount"] == 1
           @api_result = result[1]
           if of.length > 0
