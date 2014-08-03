@@ -7,6 +7,9 @@ require "fileutils"
 require_relative "helper"
 require_relative "localsetting"
 require_relative "globalsetting"
+if Helper.engine_jruby?
+  require_relative "extensions/jruby"
+end
 
 module Narou
   extend self

@@ -103,11 +103,11 @@ class Device
           # Rubyでコピーするのは遅いのでOSのコマンドを叩く
           cmd = "copy /B " + %!"#{src_file}" "#{dst_path}"!.gsub("/", "\\").encode(Encoding::Windows_31J)
           capture = `#{cmd}`
-          if $?.exitstatus > 0
+          unless $?.success?
             raise capture.force_encoding(Encoding::Windows_31J).rstrip
           end
-        rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError => e
-          # Windows-31J に変換できない文字をファイル名に含むものはRubyでコピーする
+        rescue StandardError
+          # コマンドで送信出来ないものはRubyで直接コピーする
           FileUtils.cp(src_file, dst_path)
         end
       else
