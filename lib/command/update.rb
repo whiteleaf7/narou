@@ -73,7 +73,6 @@ module Command
           end
         when :failed
           puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
-          Freeze.execute!([target])
         when :canceled
           puts "ID:#{data["id"]}　#{data["title"]} の更新はキャンセルされました"
         when :none

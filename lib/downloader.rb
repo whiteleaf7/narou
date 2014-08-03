@@ -539,6 +539,7 @@ class Downloader
         $stdout.silence do
           Command::Flag.execute!(["delete", "--on", @id])
         end
+        Command::Freeze.execute!([@id])
       else
         error "何らかの理由により目次が取得できませんでした(#{e.message})"
       end
