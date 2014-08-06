@@ -103,9 +103,8 @@ module Command
         end
       end
       @device = Narou.get_device
-      if @device && @device.ibunko?
-        change_settings_for_ibunko
-      end
+      self.extend(@device.get_hook_module)
+      hook_call(:change_settings)
       convert_novels(argv)
     end
 
@@ -132,11 +131,7 @@ module Command
         @converted_txt_path = res[:converted_txt_path]
         @use_dakuten_font = res[:use_dakuten_font]
 
-        if @device && @device.ibunko?
-          ebook_file = archive_ibunko_zipfile
-        else
-          ebook_file = convert_txt_to_ebook_file
-        end
+        ebook_file = hook_call(:convert_txt_to_ebook_file)
         next if ebook_file.nil?
         if ebook_file
           copied_file_path = copy_to_converted_file(ebook_file)
@@ -232,60 +227,9 @@ module Command
     end
 
     #
-    # i文庫用にテキストと挿絵ファイルをzipアーカイブ化する
+    # 設定の変更（標準では何もしない）
     #
-    def archive_ibunko_zipfile
-      return false if @options["no-zip"]
-      require "zip"
-      Zip.unicode_names = true
-      dirpath = File.dirname(@converted_txt_path)
-      translate_illust_chuki_to_img_tag
-      zipfile_path = @converted_txt_path.sub(/.txt$/, @device.ebook_file_ext)
-      File.delete(zipfile_path) if File.exists?(zipfile_path)
-      Zip::File.open(zipfile_path, Zip::File::CREATE) do |zip|
-        zip.add(File.basename(@converted_txt_path), @converted_txt_path)
-        illust_dirpath = File.join(dirpath, Illustration::ILLUST_DIR)
-        # 挿絵
-        if File.exists?(illust_dirpath)
-          Dir.glob(File.join(illust_dirpath, "*")) do |img_path|
-            zip.add(File.join(Illustration::ILLUST_DIR, File.basename(img_path)), img_path)
-          end
-        end
-        # 表紙画像
-        cover_name = NovelConverter.get_cover_filename(dirpath)
-        if cover_name
-          zip.add(cover_name, File.join(dirpath, cover_name))
-        end
-      end
-      puts File.basename(zipfile_path) + " を出力しました"
-      puts "<bold><green>#{@device.display_name}用ファイルを出力しました</green></bold>".termcolor
-      return zipfile_path
-    end
-
-    #
-    # i文庫用に設定を強制設定する
-    #
-    def change_settings_for_ibunko
-      settings = LocalSetting.get["local_setting"]
-      modified = false
-      %w(enable_half_indent_bracket enable_dakuten_font).each do |word|
-        name = "force.#{word}"
-        if settings[name].nil? || settings[name] == true
-          settings[name] = false
-          puts "#{name} を#{@device.display_name}用に false に強制変更しました"
-          modified = true
-        end
-      end
-      LocalSetting.get.save_settings("local_setting") if modified
-    end
-
-    #
-    # i文庫用に挿絵注記をimgタグに変換する
-    #
-    def translate_illust_chuki_to_img_tag
-      data = File.read(@converted_txt_path, encoding: Encoding::UTF_8)
-      data.gsub!(/［＃挿絵（(.+?)）入る］/, "<img src=\"\\1\">")
-      File.write(@converted_txt_path, data)
+    def change_settings(&func)
     end
 
     #
@@ -300,6 +244,18 @@ module Command
       else
         error "#{copy_to_dir} はフォルダではないかすでに削除されています。コピー出来ませんでした"
         return nil
+      end
+    end
+
+    #
+    # 指定したメソッドを呼び出す際に、フック関数があればそれ経由で呼ぶ
+    #
+    def hook_call(target_method)
+      hook = "hook_#{target_method}"
+      if respond_to?(hook)
+        self.__send__(hook, &self.method(target_method))
+      else
+        self.__send__(target_method)
       end
     end
   end

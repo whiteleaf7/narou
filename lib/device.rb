@@ -128,6 +128,10 @@ class Device
     @device::PHYSICAL_SUPPORT
   end
 
+  def get_hook_module
+    @device
+  end
+
   private
 
   def create_device_check_methods

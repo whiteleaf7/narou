@@ -10,4 +10,62 @@ module Device::Ibunko
   EBOOK_FILE_EXT = ".zip"
   NAME = "iBunko"
   DISPLAY_NAME = "i文庫"
+
+  #
+  # i文庫用に設定を強制設定する
+  #
+  def hook_change_settings(&original_func)
+    settings = LocalSetting.get["local_setting"]
+    modified = false
+    %w(enable_half_indent_bracket enable_dakuten_font).each do |word|
+      name = "force.#{word}"
+      if settings[name].nil? || settings[name] == true
+        settings[name] = false
+        puts "<bold><cyan>#{name} を#{@device.display_name}用に " \
+          "false に強制変更しました</cyan></bold>".termcolor
+        modified = true
+      end
+    end
+    LocalSetting.get.save_settings("local_setting") if modified
+  end
+
+  #
+  # i文庫用にテキストと挿絵ファイルをzipアーカイブ化する
+  #
+  def hook_convert_txt_to_ebook_file(&original_func)
+    return false if @options["no-zip"]
+    require "zip"
+    Zip.unicode_names = true
+    dirpath = File.dirname(@converted_txt_path)
+    translate_illust_chuki_to_img_tag
+    zipfile_path = @converted_txt_path.sub(/.txt$/, @device.ebook_file_ext)
+    File.delete(zipfile_path) if File.exists?(zipfile_path)
+    Zip::File.open(zipfile_path, Zip::File::CREATE) do |zip|
+      zip.add(File.basename(@converted_txt_path), @converted_txt_path)
+      illust_dirpath = File.join(dirpath, Illustration::ILLUST_DIR)
+      # 挿絵
+      if File.exists?(illust_dirpath)
+        Dir.glob(File.join(illust_dirpath, "*")) do |img_path|
+          zip.add(File.join(Illustration::ILLUST_DIR, File.basename(img_path)), img_path)
+        end
+      end
+      # 表紙画像
+      cover_name = NovelConverter.get_cover_filename(dirpath)
+      if cover_name
+        zip.add(cover_name, File.join(dirpath, cover_name))
+      end
+    end
+    puts File.basename(zipfile_path) + " を出力しました"
+    puts "<bold><green>#{@device.display_name}用ファイルを出力しました</green></bold>".termcolor
+    zipfile_path
+  end
+
+  #
+  # 挿絵注記をimgタグに変換する
+  #
+  def translate_illust_chuki_to_img_tag
+    data = File.read(@converted_txt_path, encoding: Encoding::UTF_8)
+    data.gsub!(/［＃挿絵（(.+?)）入る］/, "<img src=\"\\1\">")
+    File.write(@converted_txt_path, data)
+  end
 end
