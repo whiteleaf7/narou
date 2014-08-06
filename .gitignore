@@ -15,6 +15,9 @@ MEMO.txt
 debug
 .DS_Store
 *.swp
+*.un~
+*.orig
+*.patch
 
 \#*\#
 
