@@ -13,7 +13,7 @@ title_strip_pattern: null
 # ------------------------------------------------------------
 # 書籍情報取得設定
 title: <font size=\+2>(<a href=.+?>)?(?<title>.+?)(</a>)?</font>
-author: 作：<a href=.+?>(?<author>.+?)</a>
+author: \(作：(<a href=.+?>)?(?<author>.+?)(</a>)?\)
 story: |-
   </div>
   <div class="ss">(?<story>.+?)
