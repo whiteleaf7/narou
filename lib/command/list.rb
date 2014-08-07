@@ -43,6 +43,9 @@ module Command
       @opt.on("-t", "--type", "小説の種別（短編／連載）も表示する") {
         @options["type"] = true
       }
+      @opt.on("-s", "--site", "掲載小説サイト名も表示") {
+        @options["site"] = true
+      }
       @opt.on("-f", "--filter VAL", String,
               "表示を絞るためのフィルターの種類(連載:series, 短編:ss)") { |filter|
         @options["filter"] = filter
@@ -53,7 +56,10 @@ module Command
       now = Time.now
       today = now.strftime("%y/%m/%d")
       filter = @options["filter"]
-      header = [" ID ", " 更新日 ", @options["type"] ? "種別" : nil, "     タイトル"].compact
+      header = [" ID ", " 更新日 ",
+                @options["type"] ? "種別" : nil,
+                @options["site"] ? "サイト名" : nil,
+                "     タイトル"].compact
       puts header.join(" | ")
       novels.each do |novel|
         novel_type = novel["novel_type"].to_i
@@ -81,6 +87,7 @@ module Command
             end
           },
           @options["type"] ? NOVEL_TYPE_LABEL[novel_type] : nil,
+          @options["site"] ? novel["sitename"] : nil,
           novel["title"] + (!@options["type"] && novel_type == 2 ?
                            "  <gray>(#{NOVEL_TYPE_LABEL[novel_type]})</gray>".termcolor :
                            "") +
