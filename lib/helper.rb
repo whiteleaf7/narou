@@ -137,6 +137,13 @@ module Helper
   end
 
   #
+  # アンパサンドをエンティティに変換
+  #
+  def ampersand_to_entity(str)
+    str.gsub(/&(?!amp;)/mi, "&amp;")
+  end
+
+  #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #
   # response = Helper::AsyncCommand.exec("処理に時間がかかる外部コマンド") do
