@@ -32,6 +32,7 @@ module Command
 
   ・各コマンドの設定の変更が出来ます。
   ・Global な設定はユーザープロファイルに保存され、すべての narou コマンドで使われます。
+  ・下の一覧は一部です。すべてを確認するには -a オプションを付けて確認して下さい。
 
   Local Variable List:
         <name>           <value>              説明
