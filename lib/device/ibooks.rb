@@ -78,8 +78,8 @@ module Device::Ibooks
 
   def watch_ibooks_container(ebook_file_path)
     just_before_list = get_ibooks_containing_epub_list
-    unless system(%!open "#{ebook_file_path}"!)
-      error "EPUBが開けませんでした。EPUBファイルがiBooksに関連付けられているか確認して下さい"
+    unless system(%!open -a iBooks "#{ebook_file_path}"!)
+      error "iBooksが開けませんでした"
       return nil
     end
     limit = 15
