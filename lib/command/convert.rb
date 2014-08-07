@@ -131,6 +131,7 @@ module Command
         @converted_txt_path = res[:converted_txt_path]
         @use_dakuten_font = res[:use_dakuten_font]
 
+        @id = Downloader.get_data_by_target(target)["id"]
         ebook_file = hook_call(:convert_txt_to_ebook_file)
         next if ebook_file.nil?
         if ebook_file
@@ -257,6 +258,23 @@ module Command
       else
         self.__send__(target_method)
       end
+    end
+
+    #
+    # 設定の強制設定
+    #
+    def force_change_settings_function(pairs)
+      settings = LocalSetting.get["local_setting"]
+      modified = false
+      pairs.each do |name, value|
+        if settings[name].nil? || settings[name] != value
+          settings[name] = value
+          puts "<bold><cyan>#{name} を#{@device.display_name}用に " \
+               "#{value} に強制変更しました</cyan></bold>".termcolor
+          modified = true
+        end
+      end
+      LocalSetting.get.save_settings("local_setting") if modified
     end
   end
 end

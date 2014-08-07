@@ -15,18 +15,13 @@ module Device::Ibunko
   # i文庫用に設定を強制設定する
   #
   def hook_change_settings(&original_func)
-    settings = LocalSetting.get["local_setting"]
-    modified = false
-    %w(enable_half_indent_bracket enable_dakuten_font).each do |word|
-      name = "force.#{word}"
-      if settings[name].nil? || settings[name] == true
-        settings[name] = false
-        puts "<bold><cyan>#{name} を#{@device.display_name}用に " \
-          "false に強制変更しました</cyan></bold>".termcolor
-        modified = true
-      end
-    end
-    LocalSetting.get.save_settings("local_setting") if modified
+    @@__already_exec_change_settings ||= false
+    return if @@__already_exec_change_settings
+    force_change_settings_function({
+      "force.enable_half_indent_bracket" => false,
+      "force.enable_dakuten_font" => false
+    })
+    @@__already_exec_change_settings = true
   end
 
   #
