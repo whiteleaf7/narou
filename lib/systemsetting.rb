@@ -32,6 +32,10 @@ class SystemSettingBase
       @list_ref[@name_ref] = true
       super
     end
+    def setting.delete(k)
+      @list_ref[@name_ref] = true
+      super
+    end
     setting
   end
 
