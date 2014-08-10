@@ -209,7 +209,7 @@ module Command
         scoped_settings[name] = value
         puts "#{name} を #{value} に設定しました"
       end
-      if name == "device"
+      if name == "device" && value
         modify_settings_when_device_changed(scoped_settings)
       end
     end
