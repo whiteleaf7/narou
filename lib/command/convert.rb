@@ -100,7 +100,7 @@ module Command
         end
       end
       @device = Narou.get_device
-      self.extend(@device.get_hook_module)
+      self.extend(@device.get_hook_module) if @device
       hook_call(:change_settings)
       convert_novels(argv)
     end
