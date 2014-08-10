@@ -79,7 +79,7 @@ module Command
           modified = true
         end
       end
-      LocalSetting.get.save_settings("local_setting") if modified
+      LocalSetting.get.save_settings
     end
   end
 end

@@ -198,8 +198,8 @@ module Command
         settings[scope][name] = casted_value
         puts "#{name} を #{casted_value} に設定しました"
       end
-      LocalSetting.get.save_settings("local_setting")
-      GlobalSetting.get.save_settings("global_setting")
+      LocalSetting.get.save_settings
+      GlobalSetting.get.save_settings
     end
 
     def get_variable_list_strings(scope)

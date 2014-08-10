@@ -104,6 +104,6 @@ module Device::Ibooks
   def regist_epubdir_path_to_setting(path)
     list = LocalSetting.get["ibooks_epubdir_path_list"]
     list[@id] = path
-    LocalSetting.get.save_settings("ibooks_epubdir_path_list")
+    LocalSetting.get.save_settings
   end
 end

@@ -69,7 +69,7 @@ class Database
   end
 
   def save_database
-    LocalSetting.get.save_settings(DATABASE_NAME)
+    LocalSetting.get.save_settings
   end
 
   def get_object

@@ -19,6 +19,7 @@ class GlobalSetting
 
   def initialize
     @global_settings = load_settings
+    @modified_list = {}
   end
 
   def [](name)
@@ -27,6 +28,13 @@ class GlobalSetting
       setting = {}
       @global_settings[name] = setting
     end
+    # 変更されたか監視する機能をHashオブジェクトに追加
+    setting.instance_variable_set(:@list_ref, @modified_list)
+    setting.instance_variable_set(:@name_ref, name)
+    def setting.[]=(k, v)
+      @list_ref[@name_ref] = true
+      super
+    end
     setting
   end
 
@@ -34,15 +42,10 @@ class GlobalSetting
     @global_settings[name] = setting
   end
 
-  def save_settings(name = nil)
-    if name
-      save_list = { name => @global_settings[name] }
-    else
-      save_list = @global_settings
-    end
-    save_list.each do |sname, setting|
+  def save_settings
+    @modified_list.each_key do |sname|
       path = File.join(Narou.get_global_setting_dir, sname + ".yaml")
-      File.write(path, YAML.dump(setting))
+      File.write(path, YAML.dump(@global_settings[sname]))
     end
   end
 

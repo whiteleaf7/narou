@@ -78,7 +78,7 @@ module Command
       puts
       rewrite_aozoraepub3_files(aozora_path)
       @global_setting["aozoraepub3dir"] = aozora_path
-      GlobalSetting.get.save_settings("global_setting")
+      GlobalSetting.get.save_settings
       puts "<bold><green>AozoraEpub3の設定を終了しました</green></bold>".termcolor
     end
 
