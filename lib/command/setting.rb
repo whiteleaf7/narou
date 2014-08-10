@@ -3,7 +3,6 @@
 #
 
 require_relative "../systemsetting"
-require_relative "../systemsetting"
 require_relative "../novelsetting"
 
 module Command
