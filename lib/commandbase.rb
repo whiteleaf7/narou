@@ -50,5 +50,36 @@ module Command
     def oneline_help(msg)
       ""
     end
+
+    #
+    # 指定したメソッドを呼び出す際に、フック関数があればそれ経由で呼ぶ
+    #
+    # 指定したメソッドは存在しなくてもいい。存在しなければ空のProcが作られる
+    #
+    def hook_call(target_method)
+      hook = "hook_#{target_method}"
+      target_method_proc = self.method(target_method) rescue ->{}
+      if respond_to?(hook)
+        self.__send__(hook, &target_method_proc)
+      else
+        target_method_proc.call
+      end
+    end
+
+    #
+    # 設定の強制設定
+    #
+    def force_change_settings_function(pairs)
+      settings = LocalSetting.get["local_setting"]
+      modified = false
+      pairs.each do |name, value|
+        if settings[name].nil? || settings[name] != value
+          settings[name] = value
+          puts "<bold><cyan>#{name} を #{value} に強制変更しました</cyan></bold>".termcolor
+          modified = true
+        end
+      end
+      LocalSetting.get.save_settings("local_setting") if modified
+    end
   end
 end

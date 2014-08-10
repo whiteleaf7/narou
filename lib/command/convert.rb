@@ -228,12 +228,6 @@ module Command
     end
 
     #
-    # 設定の変更（標準では何もしない）
-    #
-    def change_settings(&func)
-    end
-
-    #
     # convert.copy_to で指定されたディレクトリに書籍データをコピーする
     #
     def copy_to_converted_file(src_path)
@@ -246,35 +240,6 @@ module Command
         error "#{copy_to_dir} はフォルダではないかすでに削除されています。コピー出来ませんでした"
         return nil
       end
-    end
-
-    #
-    # 指定したメソッドを呼び出す際に、フック関数があればそれ経由で呼ぶ
-    #
-    def hook_call(target_method)
-      hook = "hook_#{target_method}"
-      if respond_to?(hook)
-        self.__send__(hook, &self.method(target_method))
-      else
-        self.__send__(target_method)
-      end
-    end
-
-    #
-    # 設定の強制設定
-    #
-    def force_change_settings_function(pairs)
-      settings = LocalSetting.get["local_setting"]
-      modified = false
-      pairs.each do |name, value|
-        if settings[name].nil? || settings[name] != value
-          settings[name] = value
-          puts "<bold><cyan>#{name} を#{@device.display_name}用に " \
-               "#{value} に強制変更しました</cyan></bold>".termcolor
-          modified = true
-        end
-      end
-      LocalSetting.get.save_settings("local_setting") if modified
     end
   end
 end
