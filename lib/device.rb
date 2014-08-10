@@ -53,10 +53,10 @@ class Device
     unless Device.exists?(device_name)
       raise UnknownDevice, "#{device_name} は存在しません"
     end
-    @device = DEVICES[device_name.downcase]
-    @name = @device::NAME
-    @display_name = @device::DISPLAY_NAME
-    @ebook_file_ext = @device::EBOOK_FILE_EXT
+    @device_module = DEVICES[device_name.downcase]
+    @name = @device_module::NAME
+    @display_name = @device_module::DISPLAY_NAME
+    @ebook_file_ext = @device_module::EBOOK_FILE_EXT
     create_device_check_methods
   end
 
@@ -65,7 +65,7 @@ class Device
   end
 
   def find_documents_directory(device_root_dir)
-    @device::DOCUMENTS_PATH_LIST.each do |documents_path|
+    @device_module::DOCUMENTS_PATH_LIST.each do |documents_path|
       documents_directory = File.join(device_root_dir, documents_path)
       return documents_directory if File.directory?(documents_directory)
     end
@@ -74,7 +74,7 @@ class Device
 
   def get_documents_path
     if Device.respond_to?(:get_device_root_dir)
-      dir = Device.get_device_root_dir(@device::VOLUME_NAME)
+      dir = Device.get_device_root_dir(@device_module::VOLUME_NAME)
       if dir
         return find_documents_directory(dir)
       end
@@ -125,11 +125,11 @@ class Device
   end
 
   def physical_support?
-    @device::PHYSICAL_SUPPORT
+    @device_module::PHYSICAL_SUPPORT
   end
 
   def get_hook_module
-    @device
+    @device_module
   end
 
   private
