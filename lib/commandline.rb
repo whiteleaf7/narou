@@ -6,7 +6,7 @@
 require_relative "narou"
 require_relative "command"
 require_relative "helper"
-require_relative "localsetting"
+require_relative "systemsetting"
 
 module CommandLine
   def self.run(argv)

@@ -7,7 +7,7 @@ require "fileutils"
 require "singleton"
 require "yaml"
 require_relative "narou"
-require_relative "localsetting"
+require_relative "systemsetting"
 
 class Database
   include Singleton

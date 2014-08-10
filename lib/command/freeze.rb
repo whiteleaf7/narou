@@ -5,7 +5,7 @@
 
 require_relative "../database"
 require_relative "../downloader"
-require_relative "../localsetting"
+require_relative "../systemsetting"
 
 module Command
   class Freeze < CommandBase

@@ -10,7 +10,7 @@ require_relative "narou"
 require_relative "sitesetting"
 require_relative "template"
 require_relative "database"
-require_relative "localsetting"
+require_relative "systemsetting"
 require_relative "narou/api"
 require_relative "html"
 

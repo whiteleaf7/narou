@@ -7,7 +7,7 @@ require "fileutils"
 require_relative "../downloader"
 require_relative "../inspector"
 require_relative "../novelsetting"
-require_relative "../localsetting"
+require_relative "../systemsetting"
 
 module Command
   class Inspect < CommandBase

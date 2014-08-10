@@ -7,7 +7,7 @@ require "fileutils"
 require_relative "../database"
 require_relative "../downloader"
 require_relative "../novelconverter"
-require_relative "../localsetting"
+require_relative "../systemsetting"
 require_relative "../kindlestrip"
 
 module Command

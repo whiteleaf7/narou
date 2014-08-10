@@ -13,7 +13,7 @@ require_relative "downloader"
 require_relative "template"
 require_relative "progressbar"
 require_relative "helper"
-require_relative "localsetting"
+require_relative "systemsetting"
 require_relative "html"
 
 class NovelConverter

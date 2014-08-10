@@ -7,10 +7,7 @@ require "yaml"
 require "singleton"
 require_relative "narou"
 
-#
-# ユーザープロファイルに保存するのでいつでも反映される設定
-#
-class GlobalSetting
+class SystemSettingBase
   include Singleton
 
   def self.get
@@ -18,15 +15,15 @@ class GlobalSetting
   end
 
   def initialize
-    @global_settings = load_settings
+    @settings = load_settings
     @modified_list = {}
   end
 
   def [](name)
-    setting = @global_settings[name]
+    setting = @settings[name]
     unless setting
       setting = {}
-      @global_settings[name] = setting
+      @settings[name] = setting
     end
     # 変更されたか監視する機能をHashオブジェクトに追加
     setting.instance_variable_set(:@list_ref, @modified_list)
@@ -39,13 +36,17 @@ class GlobalSetting
   end
 
   def []=(name, setting)
-    @global_settings[name] = setting
+    @settings[name] = setting
+  end
+
+  def get_setting_dir
+    raise "need override this function"
   end
 
   def save_settings
     @modified_list.each_key do |sname|
-      path = File.join(Narou.get_global_setting_dir, sname + ".yaml")
-      File.write(path, YAML.dump(@global_settings[sname]))
+      path = File.join(get_setting_dir, sname + ".yaml")
+      File.write(path, YAML.dump(@settings[sname]))
     end
   end
 
@@ -55,9 +56,9 @@ class GlobalSetting
   #
   def load_settings
     settings = {}
-    global_setting_dir = Narou.get_global_setting_dir
-    if global_setting_dir
-      Dir.glob(File.join(global_setting_dir, "*.yaml")) do |path|
+    setting_dir = get_setting_dir
+    if setting_dir
+      Dir.glob(File.join(setting_dir, "*.yaml")) do |path|
         name = File.basename(path, ".yaml")
         settings[name] = YAML.load_file(path)
       end
@@ -65,3 +66,16 @@ class GlobalSetting
     settings
   end
 end
+
+class LocalSetting < SystemSettingBase
+  def get_setting_dir
+    Narou.get_local_setting_dir
+  end
+end
+
+class GlobalSetting < SystemSettingBase
+  def get_setting_dir
+    Narou.get_global_setting_dir
+  end
+end
+

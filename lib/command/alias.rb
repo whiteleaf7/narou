@@ -3,7 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require_relative "../localsetting"
+require_relative "../systemsetting"
 
 module Command
   class Alias < CommandBase

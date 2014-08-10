@@ -9,7 +9,7 @@ require "open3"
 require_relative "../downloader"
 require_relative "../database"
 require_relative "../template"
-require_relative "../globalsetting"
+require_relative "../systemsetting"
 require_relative "../helper"
 
 module Command

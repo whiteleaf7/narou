@@ -5,8 +5,8 @@
 
 require "fileutils"
 require_relative "helper"
-require_relative "localsetting"
-require_relative "globalsetting"
+require_relative "systemsetting"
+require_relative "systemsetting"
 if Helper.engine_jruby?
   require_relative "extensions/jruby"
 end
