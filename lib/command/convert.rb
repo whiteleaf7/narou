@@ -4,7 +4,6 @@
 #
 
 require "fileutils"
-require_relative "../database"
 require_relative "../downloader"
 require_relative "../novelconverter"
 require_relative "../systemsetting"
@@ -12,8 +11,6 @@ require_relative "../kindlestrip"
 
 module Command
   class Convert < CommandBase
-    @@database = Database.instance
-
     def oneline_help
       "小説を変換します。管理小説以外にテキストファイルも変換可能"
     end
