@@ -13,15 +13,16 @@ module Device::Ibooks
 
   IBOOKS_CONTAINER_DIR = "~/Library/Containers/com.apple.BKAgentService/Data/Documents/iBooks/Books"
 
-  #
-  # iBooks用に設定を強制設定する
-  #
+  RELATED_VARIABLES = {
+    "force.enable_half_indent_bracket" => false,
+    "force.enable_add_date_to_title" => false,    # タイトルを変えてもiBooksに反映されないため
+  }
+
   def hook_change_settings(&original_func)
     @@__already_exec_change_settings ||= false
     return if @@__already_exec_change_settings
     force_change_settings_function({
       "force.enable_half_indent_bracket" => false,
-      "force.enable_add_date_to_title" => false,    # タイトルを変えてもiBooksに反映されないため
     })
     @@__ibooks_container_dir = File.expand_path(IBOOKS_CONTAINER_DIR)
     unless File.exists?(@@__ibooks_container_dir)

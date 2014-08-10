@@ -11,12 +11,7 @@ module Device::Kobo
   NAME = "Kobo"
   DISPLAY_NAME = "Kobo"
 
-  def hook_change_settings(&original_func)
-    @@__already_exec_change_settings ||= false
-    return if @@__already_exec_change_settings
-    force_change_settings_function({
-      "force.enable_half_indent_bracket" => false,
-    })
-    @@__already_exec_change_settings = true
-  end
+  RELATED_VARIABLES = {
+    "force.enable_half_indent_bracket" => false,
+  }
 end

@@ -51,7 +51,7 @@ class Device
 
   def initialize(device_name)
     unless Device.exists?(device_name)
-      raise UnknownDevice, "#{device_name} は存在しません"
+      raise UnknownDevice, "#{device_name} という端末は存在しません"
     end
     @device_module = DEVICES[device_name.downcase]
     @name = @device_module::NAME
@@ -130,6 +130,14 @@ class Device
 
   def get_hook_module
     @device_module
+  end
+
+  def get_relative_variables
+    if @device_module.const_defined?(:RELATED_VARIABLES)
+      @device_module::RELATED_VARIABLES
+    else
+      {}
+    end
   end
 
   private

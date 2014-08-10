@@ -56,13 +56,13 @@ module Command
     #
     # 指定したメソッドは存在しなくてもいい。存在しなければ空のProcが作られる
     #
-    def hook_call(target_method)
+    def hook_call(target_method, *argv)
       hook = "hook_#{target_method}"
       target_method_proc = self.method(target_method) rescue ->{}
       if respond_to?(hook)
-        self.__send__(hook, &target_method_proc)
+        self.__send__(hook, *argv, &target_method_proc)
       else
-        target_method_proc.call
+        target_method_proc.call(*argv)
       end
     end
 

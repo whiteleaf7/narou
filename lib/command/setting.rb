@@ -169,6 +169,8 @@ module Command
         local: LocalSetting.get["local_setting"],
         global: GlobalSetting.get["global_setting"]
       }
+      device = Narou.get_device
+      self.extend(device.get_hook_module) if device
       argv.each do |arg|
         name, value = arg.split("=", 2).map(&:strip)
         if name == ""
@@ -185,8 +187,7 @@ module Command
           next
         end
         if value == ""
-          settings[scope].delete(name)
-          puts "#{name} の設定を削除しました"
+          hook_call(:modify_settings, settings[scope], name, nil)
           next
         end
         begin
@@ -195,11 +196,44 @@ module Command
           error e.message
           next
         end
-        settings[scope][name] = casted_value
-        puts "#{name} を #{casted_value} に設定しました"
+        hook_call(:modify_settings, settings[scope], name, casted_value)
       end
       LocalSetting.get.save_settings
       GlobalSetting.get.save_settings
+    end
+
+    def modify_settings(scoped_settings, name, value)
+      if value.nil?
+        scoped_settings.delete(name)
+        puts "#{name} の設定を削除しました"
+      else
+        scoped_settings[name] = value
+        puts "#{name} を #{value} に設定しました"
+      end
+      if name == "device"
+        modify_settings_when_device_changed(scoped_settings)
+      end
+    end
+
+    def modify_settings_when_device_changed(settings)
+      device = Device.create(settings["device"])
+      message = StringIO.new
+      device.get_relative_variables.each do |name, value|
+        if value.nil?
+          settings.delete(name)
+          message.puts "  <red>← #{name} が削除されました</red>".termcolor
+        elsif settings[name].nil? || settings[name] != value
+          settings[name] = value
+          message.puts "  <green>→ #{name} が #{value} に変更されました</green>".termcolor
+        end
+      end
+      if message.length > 0
+        puts "端末を#{device.display_name}に指定したことで、以下の関連設定が変更されました"
+        puts message.string
+      end
+    rescue Device::UnknownDevice => e
+      error e.message
+      puts "設定できるのは #{Device::DEVICES.keys.join(", ")} です"
     end
 
     def get_variable_list_strings(scope)

@@ -11,12 +11,7 @@ module Device::Kindle
   NAME = "Kindle"
   DISPLAY_NAME = "Kindle"
 
-  def hook_change_settings(&original_func)
-    @@__already_exec_change_settings ||= false
-    return if @@__already_exec_change_settings
-    force_change_settings_function({
-      "force.enable_half_indent_bracket" => true,
-    })
-    @@__already_exec_change_settings = true
-  end
+  RELATED_VARIABLES = {
+    "force.enable_half_indent_bracket" => true,
+  }
 end

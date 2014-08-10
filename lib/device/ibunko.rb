@@ -11,18 +11,10 @@ module Device::Ibunko
   NAME = "iBunko"
   DISPLAY_NAME = "i文庫"
 
-  #
-  # i文庫用に設定を強制設定する
-  #
-  def hook_change_settings(&original_func)
-    @@__already_exec_change_settings ||= false
-    return if @@__already_exec_change_settings
-    force_change_settings_function({
-      "force.enable_half_indent_bracket" => false,
-      "force.enable_dakuten_font" => false
-    })
-    @@__already_exec_change_settings = true
-  end
+  RELATED_VARIABLES = {
+    "force.enable_half_indent_bracket" => false,
+    "force.enable_dakuten_font" => false
+  }
 
   #
   # i文庫用にテキストと挿絵ファイルをzipアーカイブ化する
