@@ -16,7 +16,7 @@ class SystemSettingBase
 
   def initialize
     @settings = load_settings
-    @modified_list = {}
+    @getted_list = {}
   end
 
   def [](name)
@@ -25,17 +25,7 @@ class SystemSettingBase
       setting = {}
       @settings[name] = setting
     end
-    # 変更されたか監視する機能をHashオブジェクトに追加
-    setting.instance_variable_set(:@list_ref, @modified_list)
-    setting.instance_variable_set(:@name_ref, name)
-    def setting.[]=(k, v)
-      @list_ref[@name_ref] = true
-      super
-    end
-    def setting.delete(k)
-      @list_ref[@name_ref] = true
-      super
-    end
+    @getted_list[name] = true
     setting
   end
 
@@ -48,7 +38,7 @@ class SystemSettingBase
   end
 
   def save_settings
-    @modified_list.each_key do |sname|
+    @getted_list.each_key do |sname|
       path = File.join(get_setting_dir, sname + ".yaml")
       File.write(path, YAML.dump(@settings[sname]))
     end
