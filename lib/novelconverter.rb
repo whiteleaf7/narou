@@ -13,7 +13,7 @@ require_relative "downloader"
 require_relative "template"
 require_relative "progressbar"
 require_relative "helper"
-require_relative "systemsetting"
+require_relative "inventory"
 require_relative "html"
 
 class NovelConverter
@@ -441,7 +441,9 @@ class NovelConverter
   #
   def update_latest_convert_novel
     id = Downloader.get_id_by_target(@novel_title)
-    LocalSetting.get["latest_convert"]["id"] = id
-    LocalSetting.get.save_settings
+    Inventory.load("latest_convert", :local).tap { |inv|
+      inv["id"] = id
+      inv.save
+    }
   end
 end

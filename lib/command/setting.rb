@@ -3,7 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require_relative "../systemsetting"
+require_relative "../inventory"
 require_relative "../novelsetting"
 
 module Command
@@ -145,8 +145,8 @@ module Command
 
     def output_setting_list
       settings = {
-        local: LocalSetting.get["local_setting"],
-        global: GlobalSetting.get["global_setting"]
+        local: Inventory.load("local_setting", :local),
+        global: Inventory.load("global_setting", :global)
       }
       settings.each do |scope, scoped_settings|
         puts "[#{scope.capitalize} Variables]"
@@ -166,8 +166,8 @@ module Command
         return
       end
       settings = {
-        local: LocalSetting.get["local_setting"],
-        global: GlobalSetting.get["global_setting"]
+        local: Inventory.load("local_setting", :local),
+        global: Inventory.load("global_setting", :global)
       }
       device = Narou.get_device
       self.extend(device.get_hook_module) if device
@@ -198,8 +198,8 @@ module Command
         end
         hook_call(:modify_settings, settings[scope], name, casted_value)
       end
-      LocalSetting.get.save_settings
-      GlobalSetting.get.save_settings
+      settings[:local].save
+      settings[:global].save
     end
 
     def modify_settings(scoped_settings, name, value)

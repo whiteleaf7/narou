@@ -16,11 +16,11 @@ if ARGV.delete("--time")
   end
 end
 
-require_relative "lib/systemsetting"
+require_relative "lib/inventory"
 display_backtrace = ARGV.delete("--backtrace")
 display_backtrace ||= $debug
 $disable_color = ARGV.delete("--no-color")
-$disable_color ||= GlobalSetting.get["global_setting"]["no-color"]
+$disable_color ||= Inventory.load("global_setting", :global)["no-color"]
 
 require_relative "lib/logger"
 require_relative "lib/version"

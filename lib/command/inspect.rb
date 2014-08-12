@@ -7,7 +7,7 @@ require "fileutils"
 require_relative "../downloader"
 require_relative "../inspector"
 require_relative "../novelsetting"
-require_relative "../systemsetting"
+require_relative "../inventory"
 
 module Command
   class Inspect < CommandBase
@@ -32,7 +32,7 @@ module Command
     def execute(argv)
       super
       if argv.empty?
-        latest_id = LocalSetting.get["latest_convert"]["id"]
+        latest_id = Inventory.load("latest_convert", :local)["id"]
         if latest_id
           data = Downloader.get_data_by_target(latest_id)
           display_log(data["title"])

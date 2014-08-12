@@ -5,7 +5,7 @@
 
 require "fileutils"
 require_relative "helper"
-require_relative "systemsetting"
+require_relative "inventory"
 if Helper.engine_jruby?
   require_relative "extensions/jruby"
 end
@@ -77,7 +77,7 @@ module Narou
   end
 
   def alias_to_id(target)
-    aliases = LocalSetting.get["alias"]
+    aliases = Inventory.load("alias", :local)
     if aliases[target]
       return aliases[target]
     end
@@ -86,7 +86,7 @@ module Narou
 
   def novel_frozen?(target)
     id = Downloader.get_id_by_target(target) or return false
-    LocalSetting.get["freeze"].include?(id)
+    Inventory.load("freeze", :local).include?(id)
   end
 
   def get_preset_dir
@@ -112,7 +112,7 @@ module Narou
   #
   def get_aozoraepub3_path
     return @@aozora_jar_path if @@aozora_jar_path
-    global_setting_aozora_path = GlobalSetting.get["global_setting"]["aozoraepub3dir"]
+    global_setting_aozora_path = Inventory.load("global_setting", :global)["aozoraepub3dir"]
     if global_setting_aozora_path
       aozora_jar_path = create_aozoraepub3_jar_path(global_setting_aozora_path)
       if File.exists?(aozora_jar_path)
@@ -151,7 +151,7 @@ module Narou
   require_relative "device"
 
   def get_device(device_name = nil)
-    device_name = LocalSetting.get["local_setting"]["device"] unless device_name
+    device_name = Inventory.load("local_setting", :local)["device"] unless device_name
     if device_name && Device.exists?(device_name)
       return Device.create(device_name)
     end

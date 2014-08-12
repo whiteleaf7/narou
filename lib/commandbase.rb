@@ -27,7 +27,7 @@ module Command
 
     def load_local_settings
       command_prefix = self.class.to_s.scan(/[^:]+$/)[0].downcase
-      local_settings = LocalSetting.get["local_setting"]
+      local_settings = Inventory.load("local_setting", :local)
       local_settings.each do |name, value|
         if name =~ /^#{command_prefix}\.(.+)$/
           @options[$1] = value
@@ -70,7 +70,7 @@ module Command
     # 設定の強制設定
     #
     def force_change_settings_function(pairs)
-      settings = LocalSetting.get["local_setting"]
+      settings = Inventory.load("local_setting", :local)
       modified = false
       pairs.each do |name, value|
         if settings[name].nil? || settings[name] != value
@@ -79,7 +79,7 @@ module Command
           modified = true
         end
       end
-      LocalSetting.get.save_settings
+      settings.save if modified
     end
   end
 end

@@ -7,7 +7,7 @@ require "fileutils"
 require "singleton"
 require "yaml"
 require_relative "narou"
-require_relative "systemsetting"
+require_relative "inventory"
 
 class Database
   include Singleton
@@ -48,7 +48,7 @@ class Database
   end
 
   def initialize
-    @database = LocalSetting.get[DATABASE_NAME]
+    @database = Inventory.load(DATABASE_NAME, :local)
   end
 
   #
@@ -69,7 +69,7 @@ class Database
   end
 
   def save_database
-    LocalSetting.get.save_settings
+    @database.save
   end
 
   def get_object

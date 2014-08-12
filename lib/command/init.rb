@@ -3,7 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require_relative "../systemsetting"
+require_relative "../inventory"
 require_relative "../commandbase"
 
 module Command
@@ -61,7 +61,7 @@ module Command
     end
 
     def init_aozoraepub3(force = false)
-      @global_setting = GlobalSetting.get["global_setting"]
+      @global_setting = Inventory.load("global_setting", :global)
       if !force && @global_setting["aozoraepub3dir"]
         return
       end
@@ -78,7 +78,7 @@ module Command
       puts
       rewrite_aozoraepub3_files(aozora_path)
       @global_setting["aozoraepub3dir"] = aozora_path
-      GlobalSetting.get.save_settings
+      @global_setting.save
       puts "<bold><green>AozoraEpub3の設定を終了しました</green></bold>".termcolor
     end
 

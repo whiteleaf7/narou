@@ -9,7 +9,7 @@ require "open3"
 require_relative "../downloader"
 require_relative "../database"
 require_relative "../template"
-require_relative "../systemsetting"
+require_relative "../inventory"
 require_relative "../helper"
 
 module Command
@@ -104,7 +104,7 @@ module Command
         clean_all_diff
         return
       end
-      @difftool = GlobalSetting.get["global_setting"]["difftool"]
+      @difftool = Inventory.load("global_setting", :global)["difftool"]
       unless @difftool
         error "difftool が設定されていません。narou setting で difftool を設定して下さい"
         return
@@ -149,7 +149,7 @@ module Command
     end
 
     def create_difftool_command_string(left, right)
-      diff_arg = GlobalSetting.get["global_setting"]["difftool.arg"]
+      diff_arg = Inventory.load("global_setting", :global)["difftool.arg"]
       diff_cmd = %!"#{@difftool}" !
       if diff_arg
         diff_arg.gsub!("%NEW", left)

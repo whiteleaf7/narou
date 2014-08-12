@@ -10,7 +10,7 @@ require_relative "narou"
 require_relative "sitesetting"
 require_relative "template"
 require_relative "database"
-require_relative "systemsetting"
+require_relative "inventory"
 require_relative "narou/api"
 require_relative "html"
 
@@ -293,13 +293,13 @@ class Downloader
   # 18歳以上か確認する
   #
   def confirm_over18?
-    global_setting = GlobalSetting.get["global_setting"]
+    global_setting = Inventory.load("global_setting", :global)
     if global_setting.include?("over18")
       return global_setting["over18"]
     end
     if Helper.confirm("年齢認証：あなたは18歳以上ですか")
       global_setting["over18"] = true
-      GlobalSetting.get.save_settings
+      global_setting.save
       return true
     else
       return false
@@ -589,7 +589,7 @@ class Downloader
   #
   def update_body_check(old_subtitles, latest_subtitles)
     return latest_subtitles unless old_subtitles
-    strong_update = LocalSetting.get["local_setting"]["update.strong"]
+    strong_update = Inventory.load("local_setting", :local)["update.strong"]
     latest_subtitles.dup.keep_if do |latest|
       index = latest["index"]
       index_in_old_toc = __search_index_in_subtitles(old_subtitles, index)
@@ -687,9 +687,9 @@ class Downloader
     max = subtitles.count
     return if max == 0
     puts ("<bold><green>" + TermColor.escape("ID:#{@id}　#{get_title} のDL開始") + "</green></bold>").termcolor
-    interval_sleep_time = LocalSetting.get["local_setting"]["download.interval"] || 0
+    interval_sleep_time = Inventory.load("local_setting", :local)["download.interval"] || 0
     interval_sleep_time = 0 if interval_sleep_time < 0
-    download_wait_steps = LocalSetting.get["local_setting"]["download.wait-steps"] || 0
+    download_wait_steps = Inventory.load("local_setting", :local)["download.wait-steps"] || 0
     download_wait_steps = 10 if @setting["is_narou"] && (download_wait_steps > 10 || download_wait_steps == 0)
     save_least_one = false
     max_steps_wait_time = [STEPS_WAIT_TIME, interval_sleep_time].max

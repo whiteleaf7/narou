@@ -47,7 +47,7 @@ class NovelSetting
     ini = Ini.load_file(ini_path) rescue Ini.load("")
     force_settings = {}
     # 設定値を強制的に上書きするデータの読込
-    LocalSetting.get["local_setting"].each { |name, value|
+    Inventory.load("local_setting", :local).each { |name, value|
       if name =~ /^force\.(.+)$/
         force_settings[$1] = value
       end

@@ -5,7 +5,7 @@
 
 require_relative "../database"
 require_relative "../downloader"
-require_relative "../systemsetting"
+require_relative "../inventory"
 
 module Command
   class Freeze < CommandBase
@@ -38,7 +38,7 @@ module Command
       database = Database.instance
       puts "凍結中小説一覧"
       puts " ID |     タイトル"
-      LocalSetting.get["freeze"].each do |id, _|
+      Inventory.load("freeze", :local).each do |id, _|
         data = database.get_data("id", id)
         if data
           puts "#{id.to_s.rjust(3)} | #{data["title"]}"
@@ -52,7 +52,7 @@ module Command
         puts @opt.help
         return
       end
-      frozen_list = LocalSetting.get["freeze"]
+      frozen_list = Inventory.load("freeze", :local)
       argv.each do |target|
         data = Downloader.get_data_by_target(target)
         unless data
@@ -69,7 +69,7 @@ module Command
           puts "#{title} を凍結しました"
         end
       end
-      LocalSetting.get.save_settings
+      frozen_list.save
     end
   end
 end

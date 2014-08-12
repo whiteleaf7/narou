@@ -3,7 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require_relative "../systemsetting"
+require_relative "../inventory"
 
 module Command
   class Browser < CommandBase

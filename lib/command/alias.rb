@@ -3,7 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require_relative "../systemsetting"
+require_relative "../inventory"
 
 module Command
   class Alias < CommandBase
@@ -31,7 +31,7 @@ module Command
     end
 
     def output_aliases_list
-      aliases = LocalSetting.get["alias"]
+      aliases = Inventory.load("alias", :local)
       database = Database.instance
       aliases.each do |name, id|
         title = database[id]["title"] rescue "(すでに削除されています)"
@@ -45,7 +45,7 @@ module Command
         puts @opt.help
         return
       end
-      aliases = LocalSetting.get["alias"]
+      aliases = Inventory.load("alias", :local)
       argv.each_with_index do |arg, i|
         Helper.print_horizontal_rule if i > 0
         alias_name, target = arg.split("=", 2)
@@ -72,7 +72,7 @@ module Command
         aliases[alias_name] = id
         puts "#{alias_name} を #{title} の別名に設定しました"
       end
-      LocalSetting.get.save_settings
+      aliases.save
     end
 
     def oneline_help

@@ -5,7 +5,7 @@
 
 require_relative "../database"
 require_relative "../downloader"
-require_relative "../systemsetting"
+require_relative "../inventory"
 
 module Command
   class Flag < CommandBase

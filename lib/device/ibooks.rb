@@ -57,7 +57,7 @@ module Device::Ibooks
   end
 
   def get_epubdir_path_in_ibooks_container
-    list = LocalSetting.get["ibooks_epubdir_path_list"]
+    list = Inventory.load("ibooks_epubdir_path_list", :local)
     if list[@id]
       list[@id]
     else
@@ -103,8 +103,8 @@ module Device::Ibooks
   end
 
   def regist_epubdir_path_to_setting(path)
-    list = LocalSetting.get["ibooks_epubdir_path_list"]
+    list = Inventory.load("ibooks_epubdir_path_list", :local)
     list[@id] = path
-    LocalSetting.get.save_settings
+    list.save
   end
 end
