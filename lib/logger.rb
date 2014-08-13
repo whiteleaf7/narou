@@ -26,6 +26,18 @@ module LoggerModule
   end
 
   def silent
+    if block_given?
+      if /^(.+?):(\d+)/ =~ caller.first
+        file = $1
+        line = $2.to_i
+        error_msg = "Did you mean: silence\n"
+        str = File.read(file).split("\n")[line-1]
+        error_msg += "in #{file}:#{line}\n"
+        error_msg += str + "\n"
+        error_msg +=  " " * str.index("silent") + "~~~~~~"
+        raise error_msg
+      end
+    end
     @is_silent
   end
 
