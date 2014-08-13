@@ -54,7 +54,7 @@ class NovelConverter
     setting.author = ""
     setting.title = File.basename(filename)
     novel_converter = new(setting, output_filename, display_inspector)
-    text = open(filename, "r:BOM|UTF-8") { |fp| fp.read }
+    text = open(filename, "r:BOM|UTF-8") { |fp| fp.read }.gsub("\r", "")
     if encoding
       text.force_encoding(encoding).encode!(Encoding::UTF_8)
     end
