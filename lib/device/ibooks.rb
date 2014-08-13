@@ -38,12 +38,12 @@ module Device::Ibooks
   #
   def hook_convert_txt_to_ebook_file(&original_func)
     ebook_file_path = original_func.call
+    return ebook_file_path unless ebook_file_path
     return ebook_file_path unless @@__ibooks_container_dir
     if @argument_target_type == :file
       warn "テキストファイル変換時はiBooksへの登録は行われません"
       return ebook_file_path
     end
-    @id = Downloader.get_data_by_target(target)["id"]
     epubdir_path = get_epubdir_path_in_ibooks_container
     if epubdir_path && File.exists?(epubdir_path)
       extract_epub(ebook_file_path, epubdir_path)

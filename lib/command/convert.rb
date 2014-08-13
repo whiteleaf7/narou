@@ -123,6 +123,7 @@ module Command
             next
           end
           res = NovelConverter.convert(target, @output_filename, @options["inspect"])
+          @id = Downloader.get_data_by_target(target)["id"]
         end
         next unless res
         @converted_txt_path = res[:converted_txt_path]
