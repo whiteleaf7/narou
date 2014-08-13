@@ -16,6 +16,8 @@ module Command
     end
 
     def execute(argv)
+      @options.clear
+      load_local_settings
       @opt.parse!(argv)
     rescue OptionParser::InvalidOption => e
       error "不正なオプションです(#{e})"

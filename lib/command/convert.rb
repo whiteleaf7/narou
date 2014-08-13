@@ -79,7 +79,6 @@ module Command
     end
 
     def execute(argv)
-      load_local_settings    # @opt.on 実行前に設定ロードしたいので super 前で実行する
       super
       if argv.empty?
         puts @opt.help

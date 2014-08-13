@@ -43,7 +43,6 @@ module Command
   Options:
       EOS
 
-      @options["number"] = 1
       @opt.on("-n NUM", "--number", "比較する差分を遡って指定する。最新のアップデートと直前のデータを比較するなら-n 1、2個前のアップデートなら-n 2。(デフォルトは-n 1)", Integer) { |number|
         @options["number"] = number if number > 1
       }
@@ -72,6 +71,7 @@ module Command
     def execute(argv)
       short_number_option_parse(argv)
       super
+      @options["number"] = 1
       if argv.empty?
         latest = Database.instance.sort_by_last_update.first
         return unless latest

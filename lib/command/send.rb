@@ -50,7 +50,6 @@ module Command
     end
 
     def execute(argv)
-      load_local_settings
       super
       device = get_device(argv)
       unless device
