@@ -36,7 +36,7 @@ module CommandLine
     if argv.delete("--multiple")
       multiple_argument_extract(argv)
     end
-    Command.get_list[arg].execute(argv)
+    Command.get_list[arg].new.execute(argv)
   end
 
   def self.load_default_arguments(cmd)
