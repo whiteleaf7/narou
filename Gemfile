@@ -7,3 +7,7 @@ end
 
 # Specify your gem's dependencies in narou.gemspec
 gemspec
+
+gem "rspec"
+gem "rspec-core"
+

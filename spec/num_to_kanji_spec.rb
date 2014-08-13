@@ -13,11 +13,11 @@ describe ConverterBase, "#convert_kanji_num_with_unit" do
   def compare(num)
     data = num.dup
     @converter.convert_kanji_num_with_unit(data, 2)
-    data.should == num
+    expect(data).to eq(num)
   end
 
   def compare_kanji_and_integer(kanji, integer)
-    @converter.kanji_num_to_integer(kanji).should == integer
+    expect(@converter.kanji_num_to_integer(kanji)).to eq(integer)
   end
 
   it "百十 == 百十" do

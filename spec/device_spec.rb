@@ -12,7 +12,7 @@ if Helper.os_windows?
         module Dummy
           extend Device::Library::Windows
         end
-        Dummy.get_device_root_dir("Windows7_OS").should == "C:/"
+        expect(Dummy.get_device_root_dir("Windows7_OS")).to eq("C:/")
       end
     end
 
@@ -22,7 +22,7 @@ if Helper.os_windows?
       end
 
       it "は存在するべき" do
-        Device.exists?("kindle").should be_true
+        expect(Device.exists?("kindle")).to be_truthy
       end
     end
 
@@ -32,7 +32,7 @@ if Helper.os_windows?
       end
 
       it "は存在するべき" do
-        Device.exists?("kobo").should be_true
+        expect(Device.exists?("kobo")).to be_truthy
       end
     end
   end

@@ -4,6 +4,7 @@
 #
 
 require "fileutils"
+require_relative "narou"
 require_relative "helper"
 
 class Device

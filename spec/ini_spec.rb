@@ -13,67 +13,67 @@ describe Ini, "#cast" do
   end
 
   it "class type should be Fixnum" do
-    @ini.cast("100").class.should == Fixnum
+    expect(@ini.cast("100").class).to eq Fixnum
   end
 
   it "return 100" do
-    @ini.cast("100").should == 100
+    expect(@ini.cast("100")).to eq 100
   end
 
   it "return 100" do
-    @ini.cast("+100").should == 100
+    expect(@ini.cast("+100")).to eq 100
   end
 
   it "return -100" do
-    @ini.cast("-100").should == -100
+    expect(@ini.cast("-100")).to eq -100
   end
 
-  it "class type should be Float" do
-    @ini.cast("10.5").class.should == Float
+  it "class type).to be Float" do
+    expect(@ini.cast("10.5").class).to eq Float
   end
 
   it "return 10.5" do
-    @ini.cast("10.5").should == 10.5
+    expect(@ini.cast("10.5")).to eq 10.5
   end
 
   it "return +10.5" do
-    @ini.cast("+10.5").should == 10.5
+    expect(@ini.cast("+10.5")).to eq 10.5
   end
 
   it "return -10.5" do
-    @ini.cast("-10.5").should == -10.5
+    expect(@ini.cast("-10.5")).to eq -10.5
   end
 
   it "return true" do
-    @ini.cast("true").should == true
+    expect(@ini.cast("true")).to eq true
   end
 
   it "return false" do
-    @ini.cast("false").should == false
+    expect(@ini.cast("false")).to eq false
   end
 
   it "return `string'" do
-    @ini.cast("string").should == "string"
+    expect(@ini.cast("string")).to eq "string"
   end
 
   it "return `string'" do
-    @ini.cast("'string'").should == "string"
+    expect(@ini.cast("'string'")).to eq "string"
   end
 
   it "return `string'" do
-    @ini.cast('"string"').should == "string"
+    expect(@ini.cast('"string"')).to eq "string"
   end
 
   it "return nil" do
-    @ini.cast("nil").should == nil
+    expect(@ini.cast("nil")).to eq nil
   end
 
   it "return nil" do
-    @ini.cast("null").should == nil
+    expect(@ini.cast("null")).to eq nil
   end
 
   it "empty string cast to nil" do
-    @ini.cast("null").should == nil
+    expect(@ini.cast("null")).to eq nil
   end
 end
 
@@ -84,12 +84,12 @@ describe Ini, "を初期化した場合：" do
     end
 
     it "は global セクションだけがあること" do
-      @ini.object.count.should == 1
-      @ini.object.include?("global").should be_true
+      expect(@ini.object.count).to eq 1
+      expect(@ini.object.include?("global")).to be_truthy
     end
 
     it "の global セクションは空のハッシュだけであること" do
-      @ini.object["global"].empty?.should be_true
+      expect(@ini.object["global"].empty?).to be_truthy
     end
   end
 end
@@ -100,46 +100,46 @@ describe "test.ini" do
   end
 
   it "は Hash であること" do
-    @ini_data.class.should == Hash
+    expect(@ini_data.class).to eq Hash
   end
 
   it "はセクションが２つであること" do
-    @ini_data.count.should == 2
+    expect(@ini_data.count).to eq 2
   end
 
   it "はglobalセクションが必ずあること" do
-    @ini_data.include?("global").should be_true
+    expect(@ini_data.include?("global")).to be_truthy
   end
 
   it "はsub_sectionがあること" do
-    @ini_data.include?("sub_section").should be_true
+    expect(@ini_data.include?("sub_section")).to be_truthy
   end
 
   it "は global_string が 文字列 という文字であること" do
-    @ini_data["global"]["global_string"].should == "文字列"
+    expect(@ini_data["global"]["global_string"]).to eq "文字列"
   end
 
   it "は true_value が true であること" do
-    @ini_data["sub_section"]["true_value"].should == true
+    expect(@ini_data["sub_section"]["true_value"]).to eq true
   end
 
   it "は false_value が false であること" do
-    @ini_data["sub_section"]["false_value"].should == false
+    expect(@ini_data["sub_section"]["false_value"]).to eq false
   end
 
   it "は nil_value_1 が nil であること" do
-    @ini_data["sub_section"]["nil_value_1"].should == nil
+    expect(@ini_data["sub_section"]["nil_value_1"]).to eq nil
   end
 
   it "は nil_value_2 が nil であること" do
-    @ini_data["sub_section"]["nil_value_2"].should == nil
+    expect(@ini_data["sub_section"]["nil_value_2"]).to eq nil
   end
 
   it "は number が 100 であること" do
-    @ini_data["sub_section"]["number"].should == 100
+    expect(@ini_data["sub_section"]["number"]).to eq 100
   end
 
   it 'は quote_string が 囲まれた文字列 であること' do
-    @ini_data["sub_section"]["quote_string"].should == '囲まれた文字列'
+    expect(@ini_data["sub_section"]["quote_string"]).to eq '囲まれた文字列'
   end
 end
