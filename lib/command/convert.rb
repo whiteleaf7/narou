@@ -128,7 +128,6 @@ module Command
         @converted_txt_path = res[:converted_txt_path]
         @use_dakuten_font = res[:use_dakuten_font]
 
-        @id = Downloader.get_data_by_target(target)["id"]
         ebook_file = hook_call(:convert_txt_to_ebook_file)
         next if ebook_file.nil?
         if ebook_file
