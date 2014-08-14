@@ -952,21 +952,30 @@ class ConverterBase
       "［＃３字下げ］［＃ここから中見出し］#{midashi_title}［＃ここで中見出し終わり］"
     end
 
+    def calc_cr_count(str)
+      head_cr_count = str.index(/[^\n]/)
+      head_cr_count > 2 ? 2 : head_cr_count
+    end
+
+    # 実際に見出しを付与する
     data.gsub!(/［＃改ページ］\n(.+?)\n/) do |match|
       m1 = $1
       rest = $'
+      # 前書きがある場合は今回は保留して、次の処理で見出しを付与する
       if $1 =~ /#{AUTHOR_COMMENT_CHUKI[:introduction][:open]}/
         match
       else
         # 見出しの次の行が空行ではない場合空行を追加する
-        add_tail = rest =~ /\A$/ ? "" : "\n\n"
+        add_tail = "\n" * (2 - calc_cr_count(rest))
+        # 見出しと本文の間には空行を２行挟む
         "［＃改ページ］\n#{midashi(m1)}\n#{add_tail}"
       end
     end
+    # 前書きがある場合は、前書き→見出しの順番を見出し→前書きに入れ替えて置換
     data.gsub!(/(［＃改ページ］\n)(#{AUTHOR_COMMENT_CHUKI[:introduction][:open]}.+?#{AUTHOR_COMMENT_CHUKI[:introduction][:close]}\n)(.+?\n)/m) do
       m1, m2, m3 = $1, $2, $3
       add_tail = $' =~ /\A$/ ? "" : "\n"
-      "#{m1 + midashi(m3) + m2}#{add_tail}"   # 前書き→見出しの順番を見出し→前書きに入れ替えて置換
+      "#{m1 + midashi(m3) + m2}#{add_tail}"
     end
   end
 
