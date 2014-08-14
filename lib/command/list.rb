@@ -114,7 +114,7 @@ module Command
       output_list(novels)
     end
 
-    def oneline_help
+    def self.oneline_help
       "現在管理している小説の一覧を表示します"
     end
   end

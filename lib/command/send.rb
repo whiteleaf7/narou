@@ -9,7 +9,7 @@ require_relative "../device"
 
 module Command
   class Send < CommandBase
-    def oneline_help
+    def self.oneline_help
       "変換したEPUB/MOBIを電子書籍端末に送信します"
     end
 

@@ -8,7 +8,7 @@ require_relative "../novelsetting"
 
 module Command
   class Setting < CommandBase
-    def oneline_help
+    def self.oneline_help
       "各コマンドの設定を変更します"
     end
 

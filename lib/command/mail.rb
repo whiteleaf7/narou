@@ -8,7 +8,7 @@ require_relative "../mailer"
 
 module Command
   class Mail < CommandBase
-    def oneline_help
+    def self.oneline_help
       "変換したEPUB/MOBIをメールで送信します"
     end
 

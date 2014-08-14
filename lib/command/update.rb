@@ -84,7 +84,7 @@ module Command
       exit 1
     end
 
-    def oneline_help
+    def self.oneline_help
       "小説を更新します"
     end
   end

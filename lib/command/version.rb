@@ -9,7 +9,7 @@ module Command
       puts ::Version + " build " + ::CommitVersion
     end
 
-    def oneline_help
+    def self.oneline_help
       "バージョンを表示します"
     end
   end

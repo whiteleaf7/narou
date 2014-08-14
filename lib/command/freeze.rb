@@ -9,7 +9,7 @@ require_relative "../inventory"
 
 module Command
   class Freeze < CommandBase
-    def oneline_help
+    def self.oneline_help
       "小説の凍結設定を行います"
     end
 

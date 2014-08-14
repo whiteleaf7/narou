@@ -11,7 +11,7 @@ require_relative "../kindlestrip"
 
 module Command
   class Convert < CommandBase
-    def oneline_help
+    def self.oneline_help
       "小説を変換します。管理小説以外にテキストファイルも変換可能"
     end
 

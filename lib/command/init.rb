@@ -8,7 +8,7 @@ require_relative "../commandbase"
 
 module Command
   class Init < CommandBase
-    def oneline_help
+    def self.oneline_help
       if Narou.already_init?
         "AozoraEpub3 の再設定を行います"
       else

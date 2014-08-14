@@ -49,7 +49,7 @@ module Command
       0
     end
 
-    def oneline_help(msg)
+    def self.oneline_help(msg)
       ""
     end
 

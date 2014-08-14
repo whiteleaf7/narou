@@ -11,7 +11,7 @@ module Command
   class Flag < CommandBase
     ATTRIBUTES = %w(end delete)
 
-    def oneline_help
+    def self.oneline_help
       "小説の各種フラグを設定します"
     end
 

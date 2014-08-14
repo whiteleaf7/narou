@@ -11,7 +11,7 @@ require_relative "../inventory"
 
 module Command
   class Inspect < CommandBase
-    def oneline_help
+    def self.oneline_help
       "小説状態の調査状況ログを表示します"
     end
 

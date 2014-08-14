@@ -75,7 +75,7 @@ module Command
       aliases.save
     end
 
-    def oneline_help
+    def self.oneline_help
       "小説のIDに紐付けた別名を作成します"
     end
   end

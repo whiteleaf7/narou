@@ -79,7 +79,7 @@ module Command
       end
     end
 
-    def oneline_help
+    def self.oneline_help
       "小説を削除します"
     end
   end

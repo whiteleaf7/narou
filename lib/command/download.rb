@@ -131,7 +131,7 @@ module Command
       end
     end
 
-    def oneline_help
+    def self.oneline_help
       "指定した小説をダウンロードします"
     end
   end

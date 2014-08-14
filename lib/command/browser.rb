@@ -52,7 +52,7 @@ module Command
       end
     end
 
-    def oneline_help
+    def self.oneline_help
       "小説の掲載ページをブラウザで開きます"
     end
   end

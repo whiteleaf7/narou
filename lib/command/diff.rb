@@ -14,7 +14,7 @@ require_relative "../helper"
 
 module Command
   class Diff < CommandBase
-    def oneline_help
+    def self.oneline_help
       "アップデートされた小説の変更点を表示します"
     end
 

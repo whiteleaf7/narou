@@ -10,7 +10,7 @@ module Command
   class Backup < CommandBase
     BACKUP_DIR_NAME = "backup"
 
-    def oneline_help
+    def self.oneline_help
       "小説のバックアップを作成します"
     end
 
