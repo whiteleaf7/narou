@@ -19,7 +19,7 @@ class Inspector
 
   KLASS_TAG = { ERROR => "エラー", WARNING =>  "警告", INFO => "INFO" }
 
-  IGNORE_INDENT_CHAR = "(（「『〈《≪【〔―・※［〝"
+  IGNORE_INDENT_CHAR = "(（「『〈《≪【〔―・※［〝\n"
   AUTO_INDENT_THRESHOLD_RATIO = 0.5   # 括弧等を除く全ての行のうちこの割合以上字下げされてなければ強制字下げする
 
   attr_writer :messages, :subtitle
@@ -197,7 +197,7 @@ class Inspector
       target_line_count = a.count
     }.each { |line|
       head = line[0]
-      unless head == " " || head == "　"
+      if head != " " && head != "　"
         dont_indent_line_count += 1
       end
     }
