@@ -20,7 +20,7 @@ class ConverterBase
     convert_page_break(data) if @text_type == "body"
     if @text_type != "story"
       data.gsub!("\n\n", "\n")
-      data.gsub!("\n\n\n", "\n\n")
+      data.gsub!(/(^\n){3}/m, "\n\n")   # 改行のみの行３つを２つに削減
     end
     io
   end
