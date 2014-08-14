@@ -68,6 +68,9 @@ module Command
       @opt.on("-v", "--verbose", "AozoraEpub3, kindlegen の標準出力を全て表示します") {
         @options["verbose"] = true
       }
+      @opt.on("--ignore-force", "settingコマンドのforce系設定を無視する") {
+        @options["ignore-force"] = true
+      }
       @opt.separator <<-EOS
 
   Configuration:
@@ -121,7 +124,11 @@ module Command
             error "#{target} は存在しません"
             next
           end
-          res = NovelConverter.convert(target, @output_filename, @options["inspect"])
+          res = NovelConverter.convert(target, {
+                  output_filename: @output_filename,
+                  display_inspector: @options["inspect"],
+                  ignore_force: @options["ignore-force"],
+                })
           @id = Downloader.get_data_by_target(target)["id"]
         end
         next unless res
@@ -165,7 +172,12 @@ module Command
     # 直接指定されたテキストファイルを変換する
     #
     def convert_txt(target)
-      return NovelConverter.convert_file(target, @enc, @output_filename, @options["inspect"])
+      return NovelConverter.convert_file(target, {
+               encoding: @enc,
+               output_filename: @output_filename,
+               display_inspector: @options["inspect"],
+               ignore_force: @options["ignore-force"],
+             })
     rescue ArgumentError => e
       if e.message =~ /invalid byte sequence in UTF-8/
         error "テキストファイルの文字コードがUTF-8ではありません。" +

@@ -29,10 +29,14 @@ class NovelConverter
   #
   # 指定の小説を整形・変換する
   #
-  def self.convert(target, output_filename = nil, display_inspector = false)
-    setting = NovelSetting.load(target)
+  def self.convert(target, options = {})
+    options.merge!({
+      # default paraeters
+      output_filename: nil, display_inspector: false, ignore_force: false,
+    }) { |_,v| v }
+    setting = NovelSetting.load(target, options[:ignore_force])
     if setting
-      novel_converter = new(setting, output_filename, display_inspector)
+      novel_converter = new(setting, options[:output_filename], options[:display_inspector])
       return {
         converted_txt_path: novel_converter.convert_main,
         use_dakuten_font: novel_converter.use_dakuten_font
@@ -44,19 +48,24 @@ class NovelConverter
   #
   # テキストファイルを整形・変換する
   #
-  def self.convert_file(filename, encoding = nil, output_filename = nil, display_inspector = false)
+  def self.convert_file(filename, options = {})
+    options.merge!({
+      # default parameters
+      encoding: nil, output_filename: nil, display_inspector: false, ignore_force: false,
+    }) { |_,v| v }
+    output_filename = options[:output_filename]
     if output_filename
       archive_path = File.dirname(output_filename) + "/"
     else
       archive_path = File.dirname(filename) + "/"
     end
-    setting = NovelSetting.new(archive_path)
+    setting = NovelSetting.new(archive_path, options[:ignore_force])
     setting.author = ""
     setting.title = File.basename(filename)
-    novel_converter = new(setting, output_filename, display_inspector)
+    novel_converter = new(setting, output_filename, options[:display_inspector])
     text = open(filename, "r:BOM|UTF-8") { |fp| fp.read }.gsub("\r", "")
-    if encoding
-      text.force_encoding(encoding).encode!(Encoding::UTF_8)
+    if options[:encoding]
+      text.force_encoding(options[:encoding]).encode!(Encoding::UTF_8)
     end
     {
       converted_txt_path: novel_converter.convert_main(text),

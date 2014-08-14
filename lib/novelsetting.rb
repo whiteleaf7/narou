@@ -12,10 +12,10 @@ class NovelSetting
 
   attr_accessor :id, :author, :title, :archive_path, :replace_pattern
 
-  def self.load(target)
+  def self.load(target, ignore_force)
     archive_path = Downloader.get_novel_data_dir_by_target(target)
     if archive_path
-      setting = new(archive_path)
+      setting = new(archive_path, ignore_force)
       data = Downloader.get_data_by_target(target)
       setting.id = data["id"]
       setting.author = data["author"]
@@ -26,8 +26,9 @@ class NovelSetting
     end
   end
 
-  def initialize(archive_path)
+  def initialize(archive_path, ignore_force)
     @archive_path = File.expand_path(archive_path)
+    @ignore_force = ignore_force
     load_settings
     set_attribute
     load_replace_pattern
@@ -47,11 +48,13 @@ class NovelSetting
     ini = Ini.load_file(ini_path) rescue Ini.load("")
     force_settings = {}
     # 設定値を強制的に上書きするデータの読込
-    Inventory.load("local_setting", :local).each { |name, value|
-      if name =~ /^force\.(.+)$/
-        force_settings[$1] = value
-      end
-    }
+    unless @ignore_force
+      Inventory.load("local_setting", :local).each { |name, value|
+        if name =~ /^force\.(.+)$/
+          force_settings[$1] = value
+        end
+      }
+    end
     DEFAULT_SETTINGS.each do |element|
       name, value = element[:name], element[:value]
       if force_settings.include?(name)
