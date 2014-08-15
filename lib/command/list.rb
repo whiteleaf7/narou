@@ -40,8 +40,8 @@ module Command
       @opt.on("-u", "--url", "小説の掲載ページも表示する") {
         @options["url"] = true
       }
-      @opt.on("-t", "--type", "小説の種別（短編／連載）も表示する") {
-        @options["type"] = true
+      @opt.on("-k", "--kind", "小説の種別（短編／連載）も表示する") {
+        @options["kind"] = true
       }
       @opt.on("-s", "--site", "掲載小説サイト名も表示") {
         @options["site"] = true
@@ -57,7 +57,7 @@ module Command
       today = now.strftime("%y/%m/%d")
       filter = @options["filter"]
       header = [" ID ", " 更新日 ",
-                @options["type"] ? "種別" : nil,
+                @options["kind"] ? "種別" : nil,
                 @options["site"] ? "サイト名" : nil,
                 "     タイトル"].compact
       puts header.join(" | ")
@@ -86,9 +86,9 @@ module Command
               s.replace "<bold><green>#{s}</green></bold>".termcolor
             end
           },
-          @options["type"] ? NOVEL_TYPE_LABEL[novel_type] : nil,
+          @options["kind"] ? NOVEL_TYPE_LABEL[novel_type] : nil,
           @options["site"] ? novel["sitename"] : nil,
-          novel["title"] + (!@options["type"] && novel_type == 2 ?
+          novel["title"] + (!@options["kind"] && novel_type == 2 ?
                            "  <gray>(#{NOVEL_TYPE_LABEL[novel_type]})</gray>".termcolor :
                            "") +
                            (flags["end"] ? " <gray>(完結)</gray>".termcolor : "") +
