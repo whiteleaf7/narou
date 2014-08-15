@@ -48,6 +48,7 @@ class ConverterBase
     @illust_chuki_list = []
     @kanji_num_list = {}
     @num_and_comma_list = {}
+    @force_indent_special_chapter_list = {}
     @in_author_comment_block = nil
   end
 
@@ -337,6 +338,7 @@ class ConverterBase
     data.tr!("-=+/*《》'\"%$#&!?<>＜＞()|‐,._;:[]",
              "－＝＋／＊≪≫’”％＄＃＆！？〈〉〈〉（）｜－，．＿；：［］")
     data.gsub!("\\", "￥")
+    data
   end
 
   #
@@ -511,7 +513,7 @@ class ConverterBase
   end
 
   #
-  # 全角数字を半角アラビア数字に
+  # 全角数字(漢数字含む)を半角アラビア数字に
   #
   def zenkaku_num_to_hankaku_num(num)
     num.tr("０-９#{KANJI_NUM}", "0-90-9")
@@ -572,20 +574,33 @@ class ConverterBase
   end
 
   #
-  # 章見出しっぽい文字列を字下げして前後に空行を入れる
+  # 章見出しっぽい文字列を字下げして後に空行を入れる
   #
-  # TODO: 半角数字の縦中横注記をいれた影響で、2桁の半角数字が認識されてないのをどうにかする
-  #
-  def force_indent_special_chapter(line)
-    line.sub!(/^(?:[ 　\t]|［＃二分アキ］)*([－―<＜〈-]*)([0-9０-９#{KANJI_NUM}]+)([－―>＞〉-]*)$/) do
-      @request_insert_blank_next_line = true
+  def force_indent_special_chapter(data)
+    @@count_of_rebuild_container ||= 0
+    data.gsub!(/^[ 　\t]*([－―<＜〈-]*)([0-9０-９#{KANJI_NUM}]+)([－―>＞〉-]*)$/) do
       top, chapter, bottom = $1, $2, $3
-      if top != "" && "―－-".include?(top)
+      pre, post = $`, $'
+      if top != "" && "―－-".include?(top)   # include?は空文字("")だとtrueなのでチェック必須
         top = "― "
         bottom = " ―"
       end
-      (blank_line?(@before_line) ? "" : "\n") + "　　　［＃ゴシック体］" + \
-      top + hankaku_num_to_zenkaku_num(zenkaku_num_to_hankaku_num(chapter)) + bottom + "［＃ゴシック体終わり］"
+      str = "　　　［＃ゴシック体］#{top}"
+      str += hankaku_num_to_zenkaku_num(chapter.tr("０-９", "0-9"))
+      str += "#{bottom}［＃ゴシック体終わり］"
+      if post =~ /\A\n[^\n]/
+        str += "\n"
+      end
+      symbols_to_zenkaku(str)
+      index = @@count_of_rebuild_container += 1
+      @force_indent_special_chapter_list[convert_numbers(index.to_s)] = str
+      "［＃章見出しっぽい文＝#{index}］"
+    end
+  end
+
+  def rebuild_force_indent_special_chapter(data)
+    data.gsub!(/［＃章見出しっぽい文＝(.+?)］/) do
+      @force_indent_special_chapter_list[$1]
     end
   end
 
@@ -1039,6 +1054,7 @@ class ConverterBase
     replace_narou_tag(data)
     convert_rome_numeric(data)
     alphabet_to_zenkaku(data, @setting.enable_alphabet_force_zenkaku)
+    force_indent_special_chapter(data)
     convert_numbers(data)
     exception_reconvert_kanji_to_num(data)
     if @setting.enable_convert_num_to_kanji && @text_type != "subtitle" && @text_type != "chapter" \
@@ -1117,7 +1133,6 @@ class ConverterBase
         end
         process_author_comment(line) if @text_type == "textfile"
         insert_blank_line_to_border_symbol(line)
-        force_indent_special_chapter(line)
 
         outputs(line)
         unless @delay_outputs_buffer.empty?
@@ -1147,6 +1162,7 @@ class ConverterBase
     rebuild_english_sentences(data)
     rebuild_hankaku_num_and_comma(data)
     rebuild_kome_to_gaiji(data)
+    rebuild_force_indent_special_chapter(data)
     # 再構築された文章にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
