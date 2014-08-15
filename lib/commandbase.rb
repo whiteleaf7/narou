@@ -16,6 +16,10 @@ module Command
       }.join("\n")
       @opt.banner = "<bold><green>#{TermColor.escape(buf)}</green></bold>".termcolor
       @options = {}
+      # Exampleのコメント部分を色付け
+      def @opt.help
+        super.gsub(/(#.+)$/, "<cyan>\\1</cyan>".termcolor)
+      end
     end
 
     def execute(argv)
