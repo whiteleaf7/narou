@@ -7,11 +7,14 @@ require "optparse"
 
 module Command
   class CommandBase
-    def initialize(postfix = "")
+    # postfixies は改行で区切ることで2パターン以上記述できる
+    def initialize(postfixies = "")
       @opt = OptionParser.new(nil, 20)
-      @opt.banner = ("<bold><green>" +
-                     TermColor.escape("Usage: narou #{self.class.to_s.scan(/::(.+)$/)[0][0].downcase} #{postfix}") +
-                     "</green></bold>").termcolor
+      command_name = self.class.to_s.scan(/::(.+)$/)[0][0].downcase
+      buf = postfixies.split("\n").map.with_index { |postfix, i|
+        (i == 0 ? "Usage: " : " " * 7) + "narou #{command_name} #{postfix}"
+      }.join("\n")
+      @opt.banner = "<bold><green>#{TermColor.escape(buf)}</green></bold>".termcolor
       @options = {}
     end
 
