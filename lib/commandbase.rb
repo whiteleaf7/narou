@@ -18,7 +18,9 @@ module Command
       @options = {}
       # Exampleのコメント部分を色付け
       def @opt.help
-        super.gsub(/(#.+)$/, "<cyan>\\1</cyan>".termcolor)
+        super.gsub(/(#.+)$/) do
+          "<cyan>#{TermColor.escape($1)}</cyan>".termcolor
+        end
       end
     end
 
