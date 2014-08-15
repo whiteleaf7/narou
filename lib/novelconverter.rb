@@ -30,10 +30,10 @@ class NovelConverter
   # 指定の小説を整形・変換する
   #
   def self.convert(target, options = {})
-    options.merge!({
+    options = {
       # default paraeters
       output_filename: nil, display_inspector: false, ignore_force: false,
-    }) { |_,v| v }
+    }.merge(options)
     setting = NovelSetting.load(target, options[:ignore_force])
     if setting
       novel_converter = new(setting, options[:output_filename], options[:display_inspector])
@@ -49,10 +49,10 @@ class NovelConverter
   # テキストファイルを整形・変換する
   #
   def self.convert_file(filename, options = {})
-    options.merge!({
+    options = {
       # default parameters
       encoding: nil, output_filename: nil, display_inspector: false, ignore_force: false,
-    }) { |_,v| v }
+    }.merge(options)
     output_filename = options[:output_filename]
     if output_filename
       archive_path = File.dirname(output_filename) + "/"
