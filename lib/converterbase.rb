@@ -17,7 +17,7 @@ class ConverterBase
 
   def before(io, text_type)
     data = io.string
-    convert_page_break(data) if @text_type == "body"
+    convert_page_break(data) if @text_type == "body" || @text_type == "textfile"
     if @text_type != "story"
       data.gsub!("\n\n", "\n")
       data.gsub!(/(^\n){3}/m, "\n\n")   # 改行のみの行３つを２つに削減
@@ -1012,9 +1012,9 @@ class ConverterBase
   #
   def convert_page_break(data)
     if @setting.enable_convert_page_break
-      threshold = @setting.to_page_break_threshold + 1
+      threshold = @setting.to_page_break_threshold
       # `改ページ' を使うと見出し付与等で混乱するので自動生成したものは区別する
-      data.gsub!(/\n{#{threshold},}/, "\n［＃改頁］\n")
+      data.gsub!(/(^\n){#{threshold},}/, "［＃改頁］\n")
     end
   end
 
