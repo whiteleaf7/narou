@@ -27,8 +27,8 @@ module Command
       delete: 削除された状態
 
   Example:
-    narou flag end 100   # ID:100の小説を完結状態にする
-    narou flag end --on  # 現在の状態に関わらず完結状態にする
+    narou flag end 100       # ID:100の小説を完結状態にする
+    narou flag end --on 100  # 現在の状態に関わらず完結状態にする
 
   Options:
       EOS
