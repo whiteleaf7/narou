@@ -34,11 +34,13 @@ module Command
 
     # 差分表示用プログラムの指定
     narou setting difftool="C:\\Program Files\\WinMerge\\WinMergeU.exe"
+    narou s difftool=colordiff      # コマンドラインツールを指定したり
 
     # difftoolに渡す引数(指定しなければ単純に新旧ファイルを引数に呼び出す)
     # 特殊な変数 %NEW : DLした最新データの差分用ファイルパス
     #            %OLD : 古い方の差分用ファイルパス
-    narou setting difftool.arg='-e -x -ub -dl "NEW" -dr "OLD" %NEW %OLD'
+    narou setting difftool.arg='-e -x -ub -dl "OLD" -dr "NEW" %OLD %NEW'
+    narou s difftool.arg="-u %OLD %NEW"
 
   Options:
       EOS
