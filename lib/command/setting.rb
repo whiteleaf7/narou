@@ -44,7 +44,7 @@ module Command
 
       @opt.separator <<-EOS
 
-  Example:
+  Examples:
     narou setting --list
     narou setting convert.no-open=true
     narou setting convert.no-epub=   # 右辺に何も書かないとその設定を削除できる

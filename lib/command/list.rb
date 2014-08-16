@@ -13,8 +13,12 @@ module Command
     #       nil.to_i → 0 という互換性維持のため
     NOVEL_TYPE_LABEL = ["連載", "連載", "短編"]
 
+    def self.oneline_help
+      "現在管理している小説の一覧を表示します"
+    end
+
     def initialize
-      super("[<number>] [options]")
+      super("[<limit>] [options]")
       @opt.separator <<-EOS
 
   ・現在管理している小説の一覧を表示します。
@@ -22,7 +26,7 @@ module Command
   ・個数を与えることで、最大表示数を制限できます(デフォルトは全て表示)
   ・narou listのデフォルト動作を narou s default_arg.list= で設定すると便利です
 
-  Example:
+  Examples:
     narou list             # IDの小さい順に全て表示
     narou list 10 -r       # IDの大きい順に10件表示
     narou list 5 -l        # 最近更新のあった5件表示
@@ -112,10 +116,6 @@ module Command
       database_values.reverse! if @options["reverse"]
       novels = database_values[0, num]
       output_list(novels)
-    end
-
-    def self.oneline_help
-      "現在管理している小説の一覧を表示します"
     end
   end
 end

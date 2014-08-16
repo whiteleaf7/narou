@@ -13,7 +13,7 @@ module Command
     end
 
     def initialize
-      super("[<target1> <target2> ...]")
+      super("[<target1> ...] [options]")
       @opt.separator <<-EOS
 
   ・主にSend to Kindleを使うためのコマンドです。
@@ -22,7 +22,7 @@ module Command
   ・メールの送信設定は、#{Mailer::SETTING_FILE}ファイルを編集します。
     (初めてコマンドを使うときに自動で作成されます)
 
-  Example:
+  Examples:
     narou mail 6         # 新着関係なくメール(送信済みフラグは立つ)
 
     narou update

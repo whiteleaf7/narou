@@ -14,14 +14,14 @@ module Command
     end
 
     def initialize
-      super("<target> [<target2> ...]")
+      super("<target> [<target2> ...] [options]")
       @opt.separator <<-EOS
 
   ・指定した小説を凍結し、変更不可属性を付与します。
   ・凍結することでダウンロード、アップデート及び削除が出来なくなります。
   ・凍結済みの小説を指定した場合、凍結が解除されます。
 
-  Example:
+  Examples:
     narou freeze --list
     narou freeze n9669bk
     narou freeze 0 1 musyoku

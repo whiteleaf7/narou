@@ -5,12 +5,12 @@
 
 module Command
   class Version < CommandBase
-    def execute(argv)
-      puts ::Version + " build " + ::CommitVersion
-    end
-
     def self.oneline_help
       "バージョンを表示します"
+    end
+
+    def execute(argv)
+      puts ::Version + " build " + ::CommitVersion
     end
   end
 end

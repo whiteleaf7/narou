@@ -22,7 +22,7 @@ module Command
   ・--remove オプションをつけてダウンロードすると、ダウンロード（とその後の変換、送信）が終わったあと削除します。データベースのインデックスを外すだけなので、変換した書籍データは残ったままになります。ファイルを全て消す場合は手動で削除する必要があります。
   ・NコードもURLも指定しなかった場合、対話モード移行します。
 
-  Example:
+  Examples:
     narou download n9669bk
     narou download http://ncode.syosetu.com/n9669bk/
     narou download n9669bk http://ncode.syosetu.com/n4259s/

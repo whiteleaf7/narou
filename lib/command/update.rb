@@ -8,8 +8,12 @@ require_relative "../downloader"
 
 module Command
   class Update < CommandBase
+    def self.oneline_help
+      "小説を更新します"
+    end
+
     def initialize
-      super("[<target> <target2> ...] [option]")
+      super("[<target> ...] [options]")
       @opt.separator <<-EOS
 
   ・管理対象の小説を更新します。
@@ -19,8 +23,9 @@ module Command
   ・一度に複数の小説を指定する場合は空白で区切って下さい。
   ・全て更新する場合、convert.no-openが設定されていなくても保存フォルダは開きません。
 
-  Example:
+  Examples:
     narou update               # 全て更新
+    narou u                    # 短縮コマンド
     narou update 0 1 2 4
     narou update n9669bk 異世界迷宮で奴隷ハーレムを
     narou update http://ncode.syosetu.com/n9669bk/
@@ -82,10 +87,6 @@ module Command
     rescue Interrupt
       puts "アップデートを中断しました"
       exit 1
-    end
-
-    def self.oneline_help
-      "小説を更新します"
     end
   end
 end

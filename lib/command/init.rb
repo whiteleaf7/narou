@@ -31,7 +31,7 @@ module Command
   ・現在のフォルダを小説格納用フォルダとして初期化します。
   ・初期化されるまでは他のコマンドは使えません。
 
-  Example:
+  Examples:
     narou init
       EOS
     end
@@ -41,7 +41,7 @@ module Command
 
   ・AozoraEpub3 の再設定を行います。
 
-  Example:
+  Examples:
     narou init
       EOS
     end

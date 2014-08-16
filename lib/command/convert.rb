@@ -16,7 +16,7 @@ module Command
     end
 
     def initialize
-      super("<target> [<target2> ...] [option]")
+      super("<target> [<target2> ...] [options]")
       @opt.separator <<-EOS
 
   ・指定した小説を縦書き用に整形及びEPUB、MOBIに変換します。
@@ -30,7 +30,7 @@ module Command
   ・MOBI化する場合は narou setting device=kindle をして下さい。
   ・device=kobo の場合、.kepub.epub を出力します。
 
-  Example:
+  Examples:
     narou convert n9669bk
     narou convert http://ncode.syosetu.com/n9669bk/
     narou convert 異世界迷宮で奴隷ハーレムを
@@ -65,7 +65,7 @@ module Command
       @opt.on("-i", "--inspect", "小説状態の調査結果を表示する") {
         @options["inspect"] = true
       }
-      @opt.on("-v", "--verbose", "AozoraEpub3, kindlegen の標準出力を全て表示します") {
+      @opt.on("-v", "--verbose", "AozoraEpub3, kindlegen の標準出力を全て表示する") {
         @options["verbose"] = true
       }
       @opt.on("--ignore-force", "settingコマンドのforce系設定を無視する") {

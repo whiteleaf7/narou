@@ -23,7 +23,7 @@ module Command
   ・小説を指定した場合はその小説のログを表示します。
   ・narou setting convert.inspect=true とすれば変換時に常に表示されるようになります。
 
-  Example:
+  Examples:
     narou inspect     # 直前の変換時のログを表示
     narou inspect 6   # ログを表示したい小説を指定する
       EOS

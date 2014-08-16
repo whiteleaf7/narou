@@ -22,7 +22,7 @@ module Command
   ・バックアップファイルはZIP圧縮され、小説保存フォルダ直下の#{BACKUP_DIR_NAME}フォルダに保存されます。
   ・バックアップ対象は、バックアップファイル以外の小説保存フォルダにあるファイル全てが対象です。
 
-  Example:
+  Examples:
     narou backup 0
     narou backup n9669bk
     narou backup 0 1 musyoku

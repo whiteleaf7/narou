@@ -7,6 +7,10 @@ require_relative "../inventory"
 
 module Command
   class Alias < CommandBase
+    def self.oneline_help
+      "小説のIDに紐付けた別名を作成します"
+    end
+
     def initialize
       super("[<alias_name>=<target> ...] [options]")
       @opt.separator <<-EOS
@@ -15,7 +19,7 @@ module Command
   ・<alias_name>にはアルファベット及び数字、アンダースコアが使用出来ます。
   ・<target>は他のコマンドで指定出来るものがそのまま使えますが、すでにダウンロード済みである必要があります。
 
-  Example:
+  Examples:
     narou alias --list
     narou alias musyoku=n9669bk
     narou alias harem=1
@@ -73,10 +77,6 @@ module Command
         puts "#{alias_name} を #{title} の別名に設定しました"
       end
       aliases.save
-    end
-
-    def self.oneline_help
-      "小説のIDに紐付けた別名を作成します"
     end
   end
 end

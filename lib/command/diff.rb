@@ -19,13 +19,13 @@ module Command
     end
 
     def initialize
-      super("[<target>] [options ...]")
+      super("[<target>] [options]")
       @opt.separator <<-EOS
 
   ・指定した小説のアップデート前後の変更部分を setting コマンドで指定した difftool で表示します。
   ・引数を指定しなかった場合は直前に更新した小説の変更点を表示します。
 
-  Example:
+  Examples:
     narou diff          # 直前に更新した小説の変更点を表示
     narou diff 6
     narou diff 6 -n 2   # 最新から2番目の差分との比較

@@ -8,6 +8,10 @@ require_relative "../helper"
 
 module Command
   class Remove < CommandBase
+    def self.oneline_help
+      "小説を削除します"
+    end
+
     def initialize
       super("<target> [<target2> ...] [options]")
       @opt.separator <<-EOS
@@ -18,14 +22,15 @@ module Command
   ・削除確認をスキップするには -y オプションを有効にして下さい。
   ・削除するのはデータベースのインデックスだけで、変換済みテキストファイルやMOBIファイル等はそのまま残ります。ファイルをすべて削除する場合は --with-file オプションを指定して下さい。
 
-  Example:
+  Examples:
     narou remove n9669bk
     narou remove http://ncode.syosetu.com/n9669bk/
     narou remove n9669bk http://ncode.syosetu.com/n4259s/
     narou remove 0 1 -y
     narou remove n9669bk --with-file   # ファイルも完全に削除する
     narou remove --all-ss              # 連載小説をすべて削除する
-    narou remove --all-ss --with-file  # 短編小説をファイルも含めてすべて削除する
+    narou remove --all-ss --with-file  # 短編小説をファイルも含めてすべて削除
+    narou r 0 -wy    # ID:0を確認メッセージなしにファイルも含めて完全に削除する
 
   Options:
       EOS
@@ -77,10 +82,6 @@ module Command
         Downloader.remove_novel(target, @options["with-file"])
         puts "<green>#{TermColor.escape(title)} を削除しました</green>".termcolor
       end
-    end
-
-    def self.oneline_help
-      "小説を削除します"
     end
   end
 end

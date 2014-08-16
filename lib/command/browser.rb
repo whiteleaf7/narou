@@ -7,13 +7,17 @@ require_relative "../inventory"
 
 module Command
   class Browser < CommandBase
+    def self.oneline_help
+      "小説の掲載ページをブラウザで開きます"
+    end
+
     def initialize
-      super("<target> [<target2> ...]")
+      super("<target> [<target2> ...] [options]")
       @opt.separator <<-EOS
 
   ・指定した小説の掲載ページをブラウザで開きます。
 
-  Example:
+  Examples:
     narou browser n9669bk
     narou browser musyoku -v
     narou b 0
@@ -50,10 +54,6 @@ module Command
         Helper.open_browser(open_url)
         puts open_url
       end
-    end
-
-    def self.oneline_help
-      "小説の掲載ページをブラウザで開きます"
     end
   end
 end
