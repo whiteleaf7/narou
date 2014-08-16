@@ -150,15 +150,15 @@ module Command
       error res[1] unless res[1].empty?
     end
 
-    def create_difftool_command_string(left, right)
+    def create_difftool_command_string(temp_old_path, temp_new_path)
       diff_arg = Inventory.load("global_setting", :global)["difftool.arg"]
       diff_cmd = %!"#{@difftool}" !
       if diff_arg
-        diff_arg.gsub!("%NEW", left)
-        diff_arg.gsub!("%OLD", right)
+        diff_arg.gsub!("%OLD", temp_old_path)
+        diff_arg.gsub!("%NEW", temp_new_path)
         diff_cmd += diff_arg
       else
-        diff_cmd += [left, right].join(" ")
+        diff_cmd += [temp_old_path, temp_new_path].join(" ")
       end
       diff_cmd
     end
@@ -212,7 +212,7 @@ module Command
       temp_old.write(Template.get("diff.txt", binding))
       temp_old.close
 
-      [temp_new, temp_old]
+      [temp_old, temp_new]
     end
 
     def display_diff_list(id)
