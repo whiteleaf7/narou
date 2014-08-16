@@ -11,16 +11,27 @@ module Command
     def initialize(postfixies = "")
       @opt = OptionParser.new(nil, 20)
       command_name = self.class.to_s.scan(/::(.+)$/)[0][0].downcase
-      buf = postfixies.split("\n").map.with_index { |postfix, i|
+      banner = postfixies.split("\n").map.with_index { |postfix, i|
         (i == 0 ? "Usage: " : " " * 7) + "narou #{command_name} #{postfix}"
       }.join("\n")
-      @opt.banner = "<bold><green>#{TermColor.escape(buf)}</green></bold>".termcolor
+      @opt.banner = "<bold><green>#{TermColor.escape(banner)}</green></bold>".termcolor
       @options = {}
-      # Exampleのコメント部分を色付け
+      # ヘルプを見やすく色付け
       def @opt.help
-        super.gsub(/(#.+)$/) do
+        msg = super
+        # 見出し部分
+        msg.gsub!(/((?:Examples|Options|Configuration):)/) do
+          "<underline><bold>#{$1}</bold></underline>".termcolor
+        end
+        # Examples のコメント部分
+        msg.gsub!(/(#.+)$/) do
           "<cyan>#{TermColor.escape($1)}</cyan>".termcolor
         end
+        # 文字列部分
+        msg.gsub!(/(".+?")/) do
+          "<yellow>#{TermColor.escape($1)}</yellow>".termcolor
+        end
+        msg
       end
     end
 
