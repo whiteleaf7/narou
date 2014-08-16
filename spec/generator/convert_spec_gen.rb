@@ -81,7 +81,7 @@ describe "convert" do
     end
     output_file = File.join(dir, "[#{AUTHOR}] #{filename}")
     correct_file = File.join(dir, "correct_#{filename}")
-    expect(load_file(correct_file)).to eq load_file(output_file)
+    expect(load_file(output_file)).to eq load_file(correct_file)
   end
 <% convert_test_text_list.each do |path| %>
   it "<%= path %>" do

@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2014-08-15 19:02:25 +0900
+# auto generated at 2014-08-16 20:00:06 +0900
 
 require "termcolor"
 require_relative "../lib/commandline"
@@ -41,7 +41,7 @@ describe "convert" do
     end
     output_file = File.join(dir, "[#{AUTHOR}] #{filename}")
     correct_file = File.join(dir, "correct_#{filename}")
-    expect(load_file(correct_file)).to eq load_file(output_file)
+    expect(load_file(output_file)).to eq load_file(correct_file)
   end
 
   it "auto_indent/test_auto_indent.txt" do

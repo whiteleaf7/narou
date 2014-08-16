@@ -574,7 +574,7 @@ class ConverterBase
   end
 
   #
-  # 章見出しっぽい文字列を字下げして後に空行を入れる
+  # 章見出しっぽい文字列を字下げする
   #
   def force_indent_special_chapter(data)
     @@count_of_rebuild_container ||= 0
@@ -588,9 +588,7 @@ class ConverterBase
       str = "　　　［＃ゴシック体］#{top}"
       str += hankaku_num_to_zenkaku_num(chapter.tr("０-９", "0-9"))
       str += "#{bottom}［＃ゴシック体終わり］"
-      if post =~ /\A\n[^\n]/
-        str += "\n"
-      end
+      # 前後に空行を入れたいが、それは行処理ループ中に行う
       symbols_to_zenkaku(str)
       index = @@count_of_rebuild_container += 1
       @force_indent_special_chapter_list[convert_numbers(index.to_s)] = str
@@ -602,6 +600,17 @@ class ConverterBase
     data.gsub!(/［＃章見出しっぽい文＝(.+?)］/) do
       @force_indent_special_chapter_list[$1]
     end
+  end
+
+  def insert_blank_before_line_and_behind_to_special_chapter(line)
+    result = ""
+    if line =~ /［＃章見出しっぽい文＝/
+      unless blank_line?(@before_line)
+        result << "\n"
+      end
+      @request_insert_blank_next_line = true
+    end
+    line.sub!(/\A/, result)
   end
 
   #
@@ -1130,8 +1139,10 @@ class ConverterBase
         if @request_insert_blank_next_line
           outputs unless blank_line?(line)
           @request_insert_blank_next_line = false
+          @before_line = ""
         end
         process_author_comment(line) if @text_type == "textfile"
+        insert_blank_before_line_and_behind_to_special_chapter(line)
         insert_blank_line_to_border_symbol(line)
 
         outputs(line)
