@@ -77,7 +77,7 @@ module Command
         id = novel["id"]
         frozen = Narou.novel_frozen?(id)
         disp_id = ((frozen ? "*" : "") + id.to_s).rjust(4)
-        disp_id = disp_id.sub("*", "<cyan>*</cyan>").termcolor if frozen
+        disp_id = disp_id.sub("*", "<bold><cyan>*</cyan></bold>").termcolor if frozen
         flags = novel["flags"] || {}
         puts [
           disp_id,
