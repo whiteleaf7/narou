@@ -355,6 +355,9 @@ class Downloader
       @cache_dir = create_cache_dir if old_toc.length > 0
       begin
         sections_download_and_save(update_subtitles)
+        if Dir.glob(File.join(@cache_dir, "*")).count == 0
+          remove_cache_dir
+        end
       rescue Interrupt
         remove_cache_dir
         puts "ダウンロードを中断しました"
@@ -438,7 +441,7 @@ class Downloader
   # 差分用キャッシュ保存ディレクトリを削除
   #
   def remove_cache_dir
-    FileUtils.remove_entry_secure(@cache_dir) if @cache_dir
+    FileUtils.remove_entry_secure(@cache_dir, true) if @cache_dir
   end
 
   #
