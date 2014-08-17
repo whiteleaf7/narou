@@ -20,7 +20,7 @@ module Command
       def @opt.help
         msg = super
         # 見出し部分
-        msg.gsub!(/((?:Examples|Options|Configuration):)/) do
+        msg.gsub!(/((?:Examples|Options|Configuration|[^\s]+? Variable List):)/) do
           "<underline><bold>#{$1}</bold></underline>".termcolor
         end
         # Examples のコメント部分
