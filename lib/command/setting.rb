@@ -51,7 +51,7 @@ module Command
     narou setting convert.copy_to=C:/dropbox/mobi
     narou s convert.copy_to="C:\\Documents and Settings\\user\\epub"
 
-  Optioins:
+  Options:
       EOS
       @opt.on("-l", "--list", "現在の設定値を確認する") {
         output_setting_list
