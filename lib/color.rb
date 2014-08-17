@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 #
 =begin
+original source is
 https://github.com/termtter/termtter/blob/master/lib/termtter/system_extensions/windows.rb
+
+customed by whiteleaf
 
 (The MIT License)
 
@@ -36,7 +39,8 @@ require "termcolor"
 
 alias :warn :original_warn
 
-if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i && RUBY_ENGINE != "jruby"
+if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i \
+     && RUBY_VERSION < "2.0.0" && RUBY_ENGINE != "jruby"
   require_relative "extensions/windows"
 
   $hStdOut = WinAPI.GetStdHandle(0xFFFFFFF5)
@@ -45,34 +49,57 @@ if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i && RUBY_ENGINE != 
   $oldColor = lpBuffer.unpack('SSSSSssssSS')[4]
 
   $colorMap = {
-    0 => 0x07|0x00|0x00|0x00, # black/white
+     0 => 0x07|0x00|0x00|0x00, # black/white
+     1 => 0x08               , # foreground_intensity
+     4 => 0x8000             , # underline
+     7 => 0x4000             , # reverse
     37 => 0x08|0x00|0x00|0x00, # white/intensity
-    31 => 0x04|0x08|0x00|0x00, # red/red
-    32 => 0x02|0x08|0x00|0x00, # green/green
-    33 => 0x06|0x08|0x00|0x00, # yellow/yellow
-    34 => 0x01|0x08|0x00|0x00, # blue/blue
-    35 => 0x05|0x08|0x00|0x00, # magenta/purple
-    36 => 0x03|0x08|0x00|0x00, # cyan/aqua
+    31 => 0x04|0x00|0x00|0x00, # red/red
+    32 => 0x02|0x00|0x00|0x00, # green/green
+    33 => 0x06|0x00|0x00|0x00, # yellow/yellow
+    34 => 0x01|0x00|0x00|0x00, # blue/blue
+    35 => 0x05|0x00|0x00|0x00, # magenta/purple
+    36 => 0x03|0x00|0x00|0x00, # cyan/aqua
     39 => 0x07,                # default
     40 => 0x00|0x00|0xf0|0x00, # background:white
-    41 => 0x07|0x00|0x40|0x00, # background:red
-    42 => 0x07|0x00|0x20|0x00, # background:green
-    43 => 0x07|0x00|0x60|0x00, # background:yellow
-    44 => 0x07|0x00|0x10|0x00, # background:blue
-    45 => 0x07|0x00|0x50|0x80, # background:magenta
-    46 => 0x07|0x00|0x30|0x80, # background:cyan
-    47 => 0x07|0x00|0x70|0x80, # background:gray
+    41 => 0x00|0x00|0x40|0x00, # background:red
+    42 => 0x00|0x00|0x20|0x00, # background:green
+    43 => 0x00|0x00|0x60|0x00, # background:yellow
+    44 => 0x00|0x00|0x10|0x00, # background:blue
+    45 => 0x00|0x00|0x50|0x80, # background:magenta
+    46 => 0x00|0x00|0x30|0x80, # background:cyan
+    47 => 0x00|0x00|0x70|0x80, # background:gray
     49 => 0x70,                # default
     90 => 0x07|0x00|0x00|0x00, # erase/white
   }
 
   def write_color(str, console = STDOUT)
+    @decoration ||= 0
+    @foreground ||= $colorMap[39]
+    @background ||= 0
     str.gsub("\xef\xbd\x9e", "\xe3\x80\x9c").split(/(\e\[\d*[a-zA-Z])/).each do |token|
       case token
       when /\e\[(\d+)m/
-        color = $1.to_i > 90 ? ($1.to_i % 60) : $1.to_i
+        code = $1.to_i
+        code = code > 90 ? (code % 60) : code
+        case code
+        when 0
+          @decoration = 0
+          @foreground = $colorMap[39]
+          @background = 0
+        when 1
+          @decoration |= $colorMap[1]
+        when 4
+          @decoration |= $colorMap[4]
+        when 7
+          @decoration |= $colorMap[7]
+        when 31..39
+          @foreground = $colorMap[code].to_i
+        when 40..49
+          @background = $colorMap[code].to_i
+        end
         loop do
-          error_code = WinAPI.SetConsoleTextAttribute $hStdOut, $colorMap[color].to_i
+          error_code = WinAPI.SetConsoleTextAttribute $hStdOut, @decoration | @foreground | @background
           if error_code == 0
             if WinAPI.GetLastError == 6
               $hStdOut = WinAPI.GetStdHandle(0xFFFFFFF5)
@@ -81,7 +108,7 @@ if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i && RUBY_ENGINE != 
           end
           break
         end
-      when /\e\[\d*[a-zA-Z]/
+      when /\e\[\d*[a-zA-Z]/, ""
         # do nothing
       else
         console.write token
