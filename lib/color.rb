@@ -39,14 +39,15 @@ require "termcolor"
 
 alias :warn :original_warn
 
-if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i \
-     && RUBY_VERSION < "2.0.0" && RUBY_ENGINE != "jruby"
+if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i && RUBY_ENGINE != "jruby"
   require_relative "extensions/windows"
 
   $hStdOut = WinAPI.GetStdHandle(0xFFFFFFF5)
   lpBuffer = ' ' * 22
   WinAPI.GetConsoleScreenBufferInfo($hStdOut, lpBuffer)
   $oldColor = lpBuffer.unpack('SSSSSssssSS')[4]
+  $default_foreground = $oldColor & 0x0f
+  $default_background = $oldColor & 0xf0
 
   $colorMap = {
      0 => 0x07|0x00|0x00|0x00, # black/white
@@ -60,23 +61,24 @@ if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i \
     34 => 0x01|0x00|0x00|0x00, # blue/blue
     35 => 0x05|0x00|0x00|0x00, # magenta/purple
     36 => 0x03|0x00|0x00|0x00, # cyan/aqua
-    39 => 0x07,                # default
+    39 => $default_foreground, # default
     40 => 0x00|0x00|0xf0|0x00, # background:white
     41 => 0x00|0x00|0x40|0x00, # background:red
     42 => 0x00|0x00|0x20|0x00, # background:green
     43 => 0x00|0x00|0x60|0x00, # background:yellow
     44 => 0x00|0x00|0x10|0x00, # background:blue
-    45 => 0x00|0x00|0x50|0x80, # background:magenta
-    46 => 0x00|0x00|0x30|0x80, # background:cyan
-    47 => 0x00|0x00|0x70|0x80, # background:gray
-    49 => 0x70,                # default
+    45 => 0x00|0x00|0x50|0x00, # background:magenta
+    46 => 0x00|0x00|0x30|0x00, # background:cyan
+    47 => 0x00|0x00|0x70|0x00, # background:gray
+    49 => $default_background, # default
     90 => 0x07|0x00|0x00|0x00, # erase/white
   }
 
   def write_color(str, console = STDOUT)
     @decoration ||= 0
-    @foreground ||= $colorMap[39]
-    @background ||= 0
+    @foreground ||= $default_foreground
+    @background ||= $default_background
+    @reverse ||= false
     str.gsub("\xef\xbd\x9e", "\xe3\x80\x9c").split(/(\e\[\d*[a-zA-Z])/).each do |token|
       case token
       when /\e\[(\d+)m/
@@ -85,21 +87,31 @@ if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i \
         case code
         when 0
           @decoration = 0
-          @foreground = $colorMap[39]
-          @background = 0
+          @foreground = $default_foreground
+          @background = $default_background
+          @reverse = false
         when 1
           @decoration |= $colorMap[1]
         when 4
           @decoration |= $colorMap[4]
         when 7
-          @decoration |= $colorMap[7]
+          @reverse = true
         when 31..39
           @foreground = $colorMap[code].to_i
         when 40..49
           @background = $colorMap[code].to_i
         end
+        foreground = @foreground
+        background = @background
+        if @reverse
+          foreground <<= 4
+          background >>= 4
+          # reverse では intensity 情報も文字と背景で入れ替わるでの、
+          # 1バイト目と2バイト目をスワップ
+          @decoration = @decoration & 0xff00 | @decoration >> 4 & 0xf | (@decoration & 0xf) << 4
+        end
         loop do
-          error_code = WinAPI.SetConsoleTextAttribute $hStdOut, @decoration | @foreground | @background
+          error_code = WinAPI.SetConsoleTextAttribute $hStdOut, @decoration | foreground | background
           if error_code == 0
             if WinAPI.GetLastError == 6
               $hStdOut = WinAPI.GetStdHandle(0xFFFFFFF5)
