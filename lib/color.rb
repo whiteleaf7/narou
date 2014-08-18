@@ -54,13 +54,14 @@ if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i && RUBY_ENGINE != 
      1 => 0x08               , # foreground_intensity
      4 => 0x8000             , # underline
      7 => 0x4000             , # reverse
-    37 => 0x08|0x00|0x00|0x00, # white/intensity
+    30 => 0x00|0x00|0x00|0x00, # black
     31 => 0x04|0x00|0x00|0x00, # red/red
     32 => 0x02|0x00|0x00|0x00, # green/green
     33 => 0x06|0x00|0x00|0x00, # yellow/yellow
     34 => 0x01|0x00|0x00|0x00, # blue/blue
     35 => 0x05|0x00|0x00|0x00, # magenta/purple
     36 => 0x03|0x00|0x00|0x00, # cyan/aqua
+    37 => 0x07|0x00|0x00|0x00, # white/gray
     39 => $default_foreground, # default
     40 => 0x00|0x00|0xf0|0x00, # background:white
     41 => 0x00|0x00|0x40|0x00, # background:red
@@ -96,7 +97,7 @@ if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i && RUBY_ENGINE != 
           @decoration |= $colorMap[4]
         when 7
           @reverse = true
-        when 31..39
+        when 30..39
           @foreground = $colorMap[code].to_i
         when 40..49
           @background = $colorMap[code].to_i
