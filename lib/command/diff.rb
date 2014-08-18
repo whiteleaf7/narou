@@ -89,7 +89,7 @@ module Command
       view_diff_version = argv.shift
       if view_diff_version
         if invalid_diff_version_string?(view_diff_version)
-          error "差分指定の書式が違います(正しい例:2013.02.21@01;39;46)"
+          error "差分指定の書式が違います(正しい例:2013.02.21@01.39.46)"
           return
         end
         @options["view_diff_version"] = view_diff_version
@@ -108,14 +108,16 @@ module Command
       end
       @difftool = Inventory.load("global_setting", :global)["difftool"]
       unless @difftool
-        error "difftool が設定されていません。narou setting で difftool を設定して下さい"
+        display_diff_on_oneself(id)
         return
+        #error "difftool が設定されていません。narou setting で difftool を設定して下さい"
+        #return
       end
       exec_difftool(id)
     end
 
     def invalid_diff_version_string?(str)
-      str !~ /^\d{4}\.\d{2}\.\d{2}@\d{2};\d{2};\d{2}$/
+      str !~ /^\d{4}\.\d{2}\.\d{2}@\d{2}[;.]\d{2}[;.]\d{2}$/
     end
 
     def clean_diff(id)

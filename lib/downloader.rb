@@ -431,7 +431,7 @@ class Downloader
   #
   def create_cache_dir
     now = Time.now
-    name = now.strftime("%Y.%m.%d@%H;%M;%S")
+    name = now.strftime("%Y.%m.%d@%H.%M.%S")
     cache_dir = File.join(get_novel_data_dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME, name)
     FileUtils.mkdir_p(cache_dir)
     cache_dir
