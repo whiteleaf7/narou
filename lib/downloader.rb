@@ -732,8 +732,13 @@ class Downloader
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
       if File.exists?(File.join(get_novel_data_dir, section_file_path))
-        if @force && different_section?(section_file_path, info)
-          print " (更新あり)"
+        if @force
+          if different_section?(section_file_path, info)
+            print " (更新あり)"
+            move_to_cache_dir(section_file_path)
+          end
+        else
+          move_to_cache_dir(section_file_path)
         end
       else
         if !@from_download || (@from_download && @force)
@@ -741,7 +746,6 @@ class Downloader
         end
         @new_arrivals = true
       end
-      move_to_cache_dir(section_file_path)
       save_novel_data(section_file_path, info)
       save_least_one = true
       puts
