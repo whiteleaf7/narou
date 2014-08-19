@@ -145,7 +145,7 @@ module Command
         %!"#{path}"!
       })
       begin
-        res = Open3.capture3(diff_cmd)
+        res = Helper::AsyncCommand.exec(diff_cmd)
       rescue Errno::ENOENT => e
         error e.message
         exit 1

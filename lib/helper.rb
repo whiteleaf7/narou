@@ -157,7 +157,7 @@ module Helper
     def self.exec(command, sleep_time = 0.5, &block)
       Thread.new {
         loop do
-          block.call
+          block.call if block
           sleep(sleep_time)
         end
       }.tap { |th|
