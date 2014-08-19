@@ -15,31 +15,35 @@ require_relative "../helper"
 module Command
   class Diff < CommandBase
     def self.oneline_help
-      "アップデートされた小説の変更点を表示します"
+      "更新された小説の差分を表示します"
     end
 
     def initialize
       super("[<target>] [options]")
       @opt.separator <<-EOS
 
-  ・指定した小説のアップデート前後の変更部分を setting コマンドで指定した difftool で表示します。
-  ・引数を指定しなかった場合は直前に更新した小説の変更点を表示します。
+  ・指定した小説の更新前後の変更点の差分を表示します。
+  ・対象小説を指定しなかった場合は直前に更新した小説の差分を表示します。
+  ・もし自分の好きな差分表示プログラムを使いたい場合、difftoolを設定して変更することが出来ます(下記参照)
 
   Examples:
-    narou diff          # 直前に更新した小説の変更点を表示
+    narou diff          # 直前に更新した小説の差分を表示
     narou diff 6
     narou diff 6 -n 2   # 最新から2番目の差分との比較
     narou diff 6 -2     # -n 2 の省略した記述方法
-    narou diff 6 2013.02.21@01;39;46   # 差分を直接指定
+    narou diff 6 2013.02.21@01.39.46   # 差分を直接指定
+    narou diff 6 -l     # 過去にどの話数の差分があるのかを確認
 
-    # 差分表示用プログラムの指定
-    narou setting difftool="C:\\Program Files\\WinMerge\\WinMergeU.exe"
+    # 自分の好きな差分表示プログラムを使う場合
+    narou s difftool="C:\\Program Files\\WinMerge\\WinMergeU.exe"
     narou s difftool=colordiff      # コマンドラインツールを指定したり
+    # Narou.rbオリジナルの差分表示に戻す場合は設定を削除する
+    narou s difftool=
 
     # difftoolに渡す引数(指定しなければ単純に新旧ファイルを引数に呼び出す)
-    # 特殊な変数 %NEW : DLした最新データの差分用ファイルパス
+    # 特殊な変数 %NEW : 最新データの差分用ファイルパス
     #            %OLD : 古い方の差分用ファイルパス
-    narou setting difftool.arg='-e -x -ub -dl "OLD" -dr "NEW" %OLD %NEW'
+    narou s difftool.arg='-e -x -ub -dl "OLD" -dr "NEW" %OLD %NEW'
     narou s difftool.arg="-u %OLD %NEW"
 
   Options:
@@ -73,7 +77,7 @@ module Command
     def execute(argv)
       short_number_option_parse(argv)
       super
-      @options["number"] = 1
+      @options["number"] = 1 unless @options["number"]
       if argv.empty?
         latest = Database.instance.sort_by_last_update.first
         return unless latest
@@ -146,7 +150,7 @@ module Command
         error e.message
         exit 1
       ensure
-        temp_paths.each { |tmp| tmp.delete }
+        temp_paths.map(&:delete)
       end
       puts res[0] unless res[0].empty?
       error res[1] unless res[1].empty?
@@ -180,7 +184,7 @@ module Command
       else
         nth = @options["number"]
         list = get_sorted_cache_list(id)
-        cache_dir = list[nth - 1] if list
+        cache_dir = list ? list[nth - 1] : nil
       end
       unless cache_dir
         puts "差分データがありません"
@@ -248,6 +252,17 @@ module Command
         FileUtils.remove_entry_secure(cache_root_dir)
         puts "#{data["title"]} の差分を削除しました"
       end
+    end
+
+    #
+    # diff-lcs を使って自力で差分表示
+    #
+    def display_diff_on_oneself(id)
+      require_relative "../diffviewer"
+      temp_paths = create_temp_files(id) or return
+      puts DiffViewer.new(*temp_paths).to_s
+    ensure
+      temp_paths.map(&:delete) if temp_paths
     end
   end
 end

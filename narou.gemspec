@@ -77,4 +77,5 @@ narou コマンドのインストール or アップデートが完了しまし�
   gem.add_runtime_dependency 'termcolor', '~> 1.2', '>= 1.2.2'
   gem.add_runtime_dependency 'rubyzip', '~> 1.1', '>= 1.1.0'
   gem.add_runtime_dependency 'pony', '~> 1.8'
+  gem.add_runtime_dependency 'diff-lcs', '~> 1.2.5'
 end
