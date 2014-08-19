@@ -50,6 +50,9 @@ module Command
       @opt.on("-s", "--site", "掲載小説サイト名も表示") {
         @options["site"] = true
       }
+      @opt.on("-a", "--author", "作者名も表示") {
+        @options["author"] = true
+      }
       @opt.on("-f", "--filter VAL", String,
               "表示を絞るためのフィルターの種類(連載:series, 短編:ss)") { |filter|
         @options["filter"] = filter
@@ -91,6 +94,7 @@ module Command
             end
           },
           @options["kind"] ? NOVEL_TYPE_LABEL[novel_type] : nil,
+          @options["author"] ? novel["author"] : nil,
           @options["site"] ? novel["sitename"] : nil,
           novel["title"] + (!@options["kind"] && novel_type == 2 ?
                            "  <gray>(#{NOVEL_TYPE_LABEL[novel_type]})</gray>".termcolor :
