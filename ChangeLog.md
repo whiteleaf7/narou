@@ -30,6 +30,9 @@
 			- `narou l -sg "ハーメルン.*SAO"` （並び順に注意）
 - `convert` コマンドに `--ignore-force` オプションが追加されました。
   `narou s force.設定名=値` として強制上書きされる設定を一時的に無効にします
+- 空改行の削除処理を制御する `enable_pack_blank_line` オプションが追加されました
+	+ デフォルトでは有効です。無効にするには各小説の setting.ini に `enable_pack_blank_line=true`
+	  を追加するか、 `narou s force.enable_pack_blank_line=false` を実行して下さい
 
 #### 仕様変更
 - デバイス設定時に最低限必要な関連項目を設定変更するようになりました

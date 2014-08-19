@@ -18,7 +18,7 @@ class ConverterBase
   def before(io, text_type)
     data = io.string
     convert_page_break(data) if @text_type == "body" || @text_type == "textfile"
-    if @text_type != "story"
+    if @text_type != "story" && @setting.enable_pack_blank_line
       data.gsub!("\n\n", "\n")
       data.gsub!(/(^\n){3}/m, "\n\n")   # 改行のみの行３つを２つに削減
     end

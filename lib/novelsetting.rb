@@ -249,5 +249,10 @@ class NovelSetting
       value: false,
       help: "ルビの拗音(ぁ、ぃ等)を商業書籍のように大きくするかどうか"
     },
+    {
+      name: "enable_pack_blank_line",
+      value: true,
+      help: "縦書きで読みやすいように空行を減らすかどうか"
+    },
   ]
 end
