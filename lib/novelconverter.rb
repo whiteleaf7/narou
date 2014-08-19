@@ -276,7 +276,8 @@ class NovelConverter
       processed_title += " (完結)"
     end
     # タイトルがルビ化されてしまうのを抑制
-    toc["title"] = toc["title"].gsub("《", "※［＃始め二重山括弧］").gsub("》", "※［＃終わり二重山括弧］")
+    processed_title = processed_title.gsub("《", "※［＃始め二重山括弧］")
+                                     .gsub("》", "※［＃終わり二重山括弧］")
     tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
     Template.get(tempalte_name, binding)
   end
