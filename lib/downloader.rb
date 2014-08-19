@@ -355,6 +355,9 @@ class Downloader
       @cache_dir = create_cache_dir if old_toc.length > 0
       begin
         sections_download_and_save(update_subtitles)
+        if Dir.glob(File.join(@cache_dir, "*")).count == 0
+          remove_cache_dir
+        end
       rescue Interrupt
         remove_cache_dir
         puts "ダウンロードを中断しました"
@@ -428,7 +431,7 @@ class Downloader
   #
   def create_cache_dir
     now = Time.now
-    name = now.strftime("%Y.%m.%d@%H;%M;%S")
+    name = now.strftime("%Y.%m.%d@%H.%M.%S")
     cache_dir = File.join(get_novel_data_dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME, name)
     FileUtils.mkdir_p(cache_dir)
     cache_dir
@@ -438,7 +441,7 @@ class Downloader
   # 差分用キャッシュ保存ディレクトリを削除
   #
   def remove_cache_dir
-    FileUtils.remove_entry_secure(@cache_dir) if @cache_dir
+    FileUtils.remove_entry_secure(@cache_dir, true) if @cache_dir
   end
 
   #
@@ -729,8 +732,13 @@ class Downloader
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
       if File.exists?(File.join(get_novel_data_dir, section_file_path))
-        if @force && different_section?(section_file_path, info)
-          print " (更新あり)"
+        if @force
+          if different_section?(section_file_path, info)
+            print " (更新あり)"
+            move_to_cache_dir(section_file_path)
+          end
+        else
+          move_to_cache_dir(section_file_path)
         end
       else
         if !@from_download || (@from_download && @force)
@@ -738,7 +746,6 @@ class Downloader
         end
         @new_arrivals = true
       end
-      move_to_cache_dir(section_file_path)
       save_novel_data(section_file_path, info)
       save_least_one = true
       puts
