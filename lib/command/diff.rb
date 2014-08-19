@@ -207,18 +207,28 @@ module Command
       end
 
       novel_info = Database.instance[id]
-
-      sections = latest_novel_sections
-      temp_new = Tempfile.open(["new", ".txt"])
-      temp_new.write(Template.get("diff.txt", binding))
-      temp_new.close
-
-      sections = cache_sections
-      temp_old = Tempfile.open(["old", ".txt"])
-      temp_old.write(Template.get("diff.txt", binding))
-      temp_old.close
+      temp_old = create_temp_by_sections("old", cache_sections, novel_info)
+      temp_new = create_temp_by_sections("new", latest_novel_sections, novel_info)
 
       [temp_old, temp_new]
+    end
+
+    def create_temp_by_sections(temp_prefix, sections, novel_info)
+      html = HTML.new
+      sections.each do |section|
+        element = section["element"]
+        data_type = element.delete("data_type") || "text"
+        element.each do |text_type, elm_text|
+          if data_type == "html"
+            html.string = elm_text
+            element[text_type] = html.to_aozora
+          end
+        end
+      end
+      temp = Tempfile.open([temp_prefix, ".txt"])
+      temp.write(Template.get("diff.txt", binding))
+      temp.close
+      temp
     end
 
     def display_diff_list(id)
