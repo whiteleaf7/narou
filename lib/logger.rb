@@ -85,7 +85,7 @@ class Logger < StringIO
     if str.encoding == Encoding::ASCII_8BIT
       str.force_encoding(Encoding::UTF_8)
     end
-    super(strip_color(str))
+    super(str)
     write_console(str, STDOUT)
   end
 end
@@ -103,7 +103,7 @@ class LoggerError < StringIO
     if str.encoding == Encoding::ASCII_8BIT
       str.force_encoding(Encoding::UTF_8)
     end
-    super(strip_color(str))
+    super(str)
     write_console(str, STDERR)
   end
 end

@@ -33,6 +33,15 @@ module Command
     narou list 10 -rl      # 古い順に10件表示
     narou list -f ss       # 短編小説だけ表示
 
+    # 小説家になろうの小説のみを表示
+    narou list --site --grep 小説家になろう
+    narou l -sg 小説家になろう    # 上記と同じ意味
+    # 作者“紫炎”を含む小説を表示
+    narou list --author --grep 紫炎
+    narou l -ag 紫炎              # 上記と同じ意味
+    # “紫炎”と“なろう”を含む小説を表示
+    narou l -asg "紫炎.*なろう"   # 並び順に注意
+
   Options:
       EOS
       @opt.on("-l", "--latest", "最近更新のあった順に小説を表示する") {
@@ -57,6 +66,10 @@ module Command
               "表示を絞るためのフィルターの種類(連載:series, 短編:ss)") { |filter|
         @options["filter"] = filter
       }
+      @opt.on("-g", "--grep VAL", String,
+              "指定された文字列でリストを検索します") { |search|
+        @options["grep"] = search
+      }
     end
 
     def output_list(novels)
@@ -65,9 +78,15 @@ module Command
       filter = @options["filter"]
       header = [" ID ", " 更新日 ",
                 @options["kind"] ? "種別" : nil,
+                @options["author"] ? "作者名" : nil,
                 @options["site"] ? "サイト名" : nil,
                 "     タイトル"].compact
       puts header.join(" | ")
+      if @options["grep"]
+        temp_silent = $stdout.silent
+        $stdout.silent = true
+        $stdout.string = ""   # すでに出力された文字列は検索の邪魔なので一旦クリア
+      end
       novels.each do |novel|
         novel_type = novel["novel_type"].to_i
         if filter
@@ -103,6 +122,10 @@ module Command
                            (flags["delete"] ? " <gray>(削除)</gray>".termcolor : ""),
           @options["url"] ? novel["toc_url"] : nil
         ].compact.join(" | ")
+      end
+      if @options["grep"]
+        $stdout.silent = temp_silent
+        STDOUT.puts $stdout.string.split("\n").grep(/#{@options["grep"]}/)
       end
     end
 
