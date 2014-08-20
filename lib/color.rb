@@ -108,7 +108,7 @@ if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i && RUBY_ENGINE != 
           foreground <<= 4
           background >>= 4
           # reverse では intensity 情報も文字と背景で入れ替わるでの、
-          # 1バイト目と2バイト目をスワップ
+          # 下位4bitと上位4bitをスワップ
           @decoration = @decoration & 0xff00 | @decoration >> 4 & 0xf | (@decoration & 0xf) << 4
         end
         loop do
