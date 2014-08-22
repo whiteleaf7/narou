@@ -583,6 +583,7 @@ class ConverterBase
   # 章見出しっぽい文字列を字下げする
   #
   def force_indent_special_chapter(data)
+    return if @text_type != "body"
     @@count_of_rebuild_container ||= 0
     data.gsub!(/^[ 　\t]*([－―<＜〈-]*)([0-9０-９#{KANJI_NUM}]+)([－―>＞〉-]*)$/) do
       top, chapter, bottom = $1, $2, $3
