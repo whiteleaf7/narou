@@ -944,8 +944,9 @@ class ConverterBase
   # 中黒(・)や句読点を並べて三点リーダーもどきにしているのを三点リーダーに変換
   #
   def convert_horizontal_ellipsis(data)
-    return if !@setting.enable_convert_horizontal_ellipsis || @text_type == "subtitle" || @text_type == "chapter"
-    %w(・ 。 、).each do |char|
+    return if !@setting.enable_convert_horizontal_ellipsis || \
+              @text_type == "subtitle" || @text_type == "chapter"
+    %w(・ 。 、 ．).each do |char|
       data.gsub!(/#{char}{3,}/) do |match|
         pre_char, post_char = $`[-1], $'[0]
         if pre_char == "―" || post_char == "―"
