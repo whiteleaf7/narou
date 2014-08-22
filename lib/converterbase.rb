@@ -538,7 +538,7 @@ class ConverterBase
     data
   end
   
-  HALF_INDENT_TARGET = /^[ 　\t]*([〔「『(（【〈《≪〝])/
+  HALF_INDENT_TARGET = /^[ 　\t]*((?:[〔「『(（【〈《≪〝])|(?:※［＃始め二重山括弧］))/
   FULL_INDENT_TARGET = /^[ 　\t]*(――)/
   AUTO_INDENT_IGNORE_INDENT_CHAR = Inspector::IGNORE_INDENT_CHAR.sub("・", "")
   #
@@ -548,7 +548,13 @@ class ConverterBase
   # kindle paperwhite で鍵括弧のインデントがおかしいことへの対応
   #
   def half_indent_bracket(data)
-    data.gsub!(HALF_INDENT_TARGET, "［＃二分アキ］\\1") if @setting.enable_half_indent_bracket
+    data.gsub!(HALF_INDENT_TARGET) do
+      if @setting.enable_half_indent_bracket
+        "［＃二分アキ］#{$1}"
+      else
+        $1
+      end
+    end
   end
 
   #
