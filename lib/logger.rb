@@ -58,7 +58,7 @@ module LoggerModule
   end
 
   def save(path)
-    File.write(path, string)
+    File.write(path, strip_color(string))
   end
 
   def write_console(str, target)
