@@ -42,10 +42,16 @@ module Command
         File.file?(path) && path.split("/", 2)[0] != BACKUP_DIR_NAME
       }
       FileUtils.mkdir(BACKUP_DIR_NAME) unless File.exists?(BACKUP_DIR_NAME)
-      Zip.unicode_names = true
+      Zip.unicode_names = true unless Helper.os_windows?
       Zip::File.open(File.join(BACKUP_DIR_NAME, zipfilename), Zip::File::CREATE) do |zip|
         paths.each do |path|
-          zip.add(path, path)
+          if Helper.os_windows?
+            zipped_filename = path.encode(Encoding::Windows_31J,
+                                          invalid: :replace, undef: :replace, replace: "_")
+          else
+            zipped_filename = path
+          end
+          zip.add(zipped_filename, path)
         end
       end
       Dir.chdir(pwd)
