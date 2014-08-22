@@ -4,6 +4,6 @@
 <% element[:help].split("\n").each do |help_line| -%>
 ; <%= help_line %>
 <% end -%>
-<%= element[:name] %> = <%= element[:value] %>
+<%= element[:name] %> = <%= element[:value].kind_of?(String) ? %!"#{element[:value]}"! : element[:value] %>
 
 <% end -%>
