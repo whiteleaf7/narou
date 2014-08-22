@@ -9,7 +9,8 @@
 <%= toc["story"] %>
 
 <% end -%>
-掲載ページ: <a href="<%= Helper.ampersand_to_entity(toc["toc_url"]) %>"><%= toc["toc_url"] %></a>
+掲載ページ:
+<a href="<%= Helper.ampersand_to_entity(toc["toc_url"]) %>"><%= toc["toc_url"] %></a>
 ［＃区切り線］
 
 <% sections.each_with_index do |section, i| -%>
