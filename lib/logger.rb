@@ -109,7 +109,7 @@ class LoggerError < StringIO
 end
 
 def error(str)
-  warn "<bold><red>[ERROR]</red></bold> #{str}".termcolor
+  warn "<bold><red>[ERROR]</red></bold> #{TermColor.escape(str)}".termcolor
 end
 
 $stdout = Logger.get
