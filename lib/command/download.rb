@@ -8,7 +8,7 @@ require_relative "../downloader"
 
 module Command
   class Download < CommandBase
-    SUPPORT_NOVEL_SITES = %w(小説家になろう（小説を読もう） Arcadia ハーメルン 暁)
+    SUPPORT_NOVEL_SITES = %w(小説家になろう(小説を読もう) ノクターンノベルズ ムーンライトノベルズ Arcadia ハーメルン 暁)
 
     def initialize
       super("[<target> <target2> ...] [options]")
@@ -16,7 +16,7 @@ module Command
 
   ・ダウンロードしたい小説のNコードもしくはURLを指定して下さい。
   ・対応サイトは#{SUPPORT_NOVEL_SITES.join("、")}です。
-  ・一度に複数の小説を指定する場合は空白で区切って下さい。
+  ・ArcadiaのURLを入力するときは" "で囲って下さい。
   ・ダウンロード終了後に変換処理を行います。ダウンロードのみする場合は-nオプションを指定して下さい。
   ・すでにダウンロード済みの小説の場合は何もしません。
   ・--remove オプションをつけてダウンロードすると、ダウンロード（とその後の変換、送信）が終わったあと削除します。データベースのインデックスを外すだけなので、変換した書籍データは残ったままになります。ファイルを全て消す場合は手動で削除する必要があります。
