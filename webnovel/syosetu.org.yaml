@@ -11,15 +11,6 @@ append_title_to_folder_name: yes
 title_strip_pattern: null
 
 # ------------------------------------------------------------
-# 書籍情報取得設定
-title: <font size=\+2>(<a href=.+?>)?(?<title>.+?)(</a>)?</font>
-author: \(作：(<a href=.+?>)?(?<author>.+?)(</a>)?\)
-story: |-
-  </div>
-  <div class="ss">(?<story>.+?)
-  <hr style="margin:20px 0px; border-width:1px 0 0 0;" color="#bbbbbb"></div>
-
-# ------------------------------------------------------------
 # 目次取得設定
 toc_url: \\k<top_url>/\\k<ncode>/
 subtitles: |-
@@ -46,6 +37,9 @@ illust_grep_pattern: <a href="(?<src>.+?)" alt="挿絵" name='img'>【挿絵表�
 # 小説情報からパースするための設定
 novel_info_url: http://syosetu.org/?mode=ss_detail&nid=\\k<ncode>&volume=1
 
+# タイトル
+t: タイトル</td><td bgcolor=#FFFFFF><a href=.+?>(?<title>.+?)</a>
+
 # novel_type 小説種別
 nt: 状態</td><td>.+?,(?<novel_type>.+?)</td>
 novel_type_string:
@@ -67,4 +61,4 @@ nu: 最終投稿日</td><td>(?<novelupdated_at>.+?)</td>
 gl: 最終投稿日</td><td>(?<novelupdated_at>.+?)</td>
 
 # writer 作者名
-w: 作者</td><td bgcolor=\#FFFFFF><a href=.+?>(?<writer>.+?)</a>
+w: 作者</td><td bgcolor=\#FFFFFF>(?:<a href=.+?>)?(?<writer>.+?)(?:</a>)?</td>

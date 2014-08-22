@@ -270,7 +270,9 @@ module Command
     def display_diff_on_oneself(id)
       require_relative "../diffviewer"
       temp_paths = create_temp_files(id) or return
-      puts DiffViewer.new(*temp_paths).to_s
+      title = Database.instance.get_data("id", id)["title"]
+      puts "#{title} の差分を表示します"
+      DiffViewer.new(*temp_paths).view
     ensure
       temp_paths.map(&:delete) if temp_paths
     end

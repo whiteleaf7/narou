@@ -11,12 +11,6 @@ append_title_to_folder_name: yes
 title_strip_pattern: null
 
 # ------------------------------------------------------------
-# 書籍情報取得設定
-title: <title>(?<title>.+?)</title>
-author: 作者：(?:<a href="http://xmypage.syosetu.com/.+?/">)?(?<author>.+?)(?:</a>)?$
-story: <div id="novel_ex">(?<story>.+?)</div>
-
-# ------------------------------------------------------------
 # 目次取得設定
 toc_url: \\k<top_url>/\\k<ncode>/
 subtitles: |-
@@ -41,6 +35,9 @@ narou_api_url: http://api.syosetu.com/novel18api/api/
 # ------------------------------------------------------------
 # 小説情報からパースするための設定
 novel_info_url: \\k<top_url>/novelview/infotop/ncode/\\k<ncode>/
+
+# タイトル
+t: <h1><a href=".+?">(?<title>.+?)</a></h1>
 
 # novel_type 小説種別
 nt: <span id="noveltype(?:.*?)">(?<novel_type>.+?)</span>

@@ -25,15 +25,16 @@ class NovelInfo
     info_url = @setting["novel_info_url"] or return nil
     result = @@novel_info_parameters[@setting["name"]][@ncode] ||= {}
     return result unless result.empty?
-    of = "nt-s-gf-nu-gl-w"
+    of = "t-nt-s-gf-nu-gl-w"
     request_output_parameters = of.split("-")
     info_source = ""
     open(info_url) do |fp|
       info_source = Helper.pretreatment_source(fp.read, @setting["encoding"])
     end
     @setting.multi_match(info_source, *request_output_parameters)
+    result["title"] = @setting["title"]
     result["novel_type"] = @setting["novel_type_string"][@setting["novel_type"]] || 1
-    result["story"] = @setting["story"]
+    result["story"] = HTML.new(@setting["story"]).to_aozora
     result["writer"] = @setting["writer"]
     %w(general_firstup novelupdated_at general_lastup).each do |elm|
       result[elm] = date_string_to_time(@setting[elm])
