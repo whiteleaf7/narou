@@ -40,18 +40,20 @@ class Downloader
   def self.start(target, force = false, from_download = false)
     setting = nil
     target = Narou.alias_to_id(target)
+    fail_status = OpenStruct.new(:id => nil, :new_arrivals => nil,
+                                 :status => false).freeze
     case type = get_target_type(target)
     when :url, :ncode
       setting = get_sitesetting_by_target(target)
       unless setting
         error "対応外の#{type}です(#{target})"
-        return false
+        return fail_status
       end
     when :id
       data = @@database[target.to_i]
       unless data
         error "指定のID(#{target})は存在しません"
-        return false
+        return fail_status
       end
       setting = get_sitesetting_by_sitename(data["sitename"])
       setting.multi_match(data["toc_url"], "url")
@@ -62,7 +64,7 @@ class Downloader
         setting.multi_match(data["toc_url"], "url")
       else
         error "指定の小説(#{target})は存在しません"
-        return false
+        return fail_status
       end
     end
     downloader = Downloader.new(setting, force, from_download)
