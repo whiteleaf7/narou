@@ -291,9 +291,9 @@ class Downloader
     @id = @@database.get_id("toc_url", @setting["toc_url"]) || @@database.get_new_id
 
     # ウェイト管理関係初期化
-    @@__run_once = false
-    unless @@__run_once
-      @@__run_once = true
+    @@__run_once ||= true
+    if @@__run_once
+      @@__run_once = false
       @@__wait_counter = 0
       @@__last_download_time = Time.now - 20
       @@interval_sleep_time = Inventory.load("local_setting", :local)["download.interval"] || 0
@@ -858,8 +858,12 @@ class Downloader
         puts
         warn "server message: #{e.message}"
         warn "リトライ待機中……"
-        warn "ヒント: narou s download.wait-steps=10 とすることで、" \
-             "10話ごとにウェイトをいれられます"
+        @@display_hint_once ||= true
+        if @@display_hint_once
+          warn "ヒント: narou s download.wait-steps=10 とすることで、" \
+               "10話ごとにウェイトをいれられます"
+          @@display_hint_once = false
+        end
         sleep(WAITING_TIME_FOR_503)
         retry
       else
