@@ -56,6 +56,7 @@
 	+ Windows = Windows-31J、その他OS = UTF-8
 - `flag` コマンドは非推奨になり、tagコマンドに統一されます。今後完結フラグを立てる場合、
   `narou tag -a end 0` として下さい。flagコマンドは1.7.0で廃止される予定です
+	+ flagデータをtagデータに移行する場合は `narou flag --convert-tag` を実行して下さい
 - このバージョンからセマンティックバージョニングに移行します
 	+ Major.Minor.Teen という形式で、特別なアップデートでMajor、追加機能を含むアップデートでMinor、
 	  バグ修正のみのアップデートでTeenの番号を増やします

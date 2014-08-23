@@ -20,7 +20,11 @@ module Command
       @opt.separator <<-EOS.termcolor
 
   <bold><red>非推奨のコマンドです。tagコマンドを使用して下さい
-  flagコマンドはv.1.7.0で廃止予定です</red></bold>
+  flagコマンドはv.1.7.0で廃止予定です
+  
+  flagデータをtagデータに移行するには、
+  narou flag --convert-tag
+  を実行して下さい</red></bold>
 
   ・指定した小説に各種フラグを設定します
   ・再実行で解除
@@ -40,6 +44,24 @@ module Command
       }
       @opt.on("--off", "強制的にフラグをはずす") {
         @options["off"] = true
+      }
+      @opt.on("--convert-tag", "flagデータをtagデータに移行します") {
+        modify = false
+        database = Database.instance
+        database.each do |id, data|
+          if data["flags"]
+            tags = data["flags"].keys
+            Tag.execute!([id, "--add", tags.join(" "), "--color", "white"])
+            puts "-" * 70
+            data.delete("flags")
+            modify = true
+          end
+        end
+        if modify
+          database.save_database
+          puts "移行が完了しました"
+        end
+        exit 0
       }
     end
 
