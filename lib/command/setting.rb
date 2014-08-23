@@ -221,10 +221,10 @@ module Command
       device.get_relative_variables.each do |name, value|
         if value.nil?
           settings.delete(name)
-          message.puts "  <red>← #{name} が削除されました</red>".termcolor
+          message.puts "  <bold><red>← #{name} が削除されました</red></bold>".termcolor
         elsif settings[name].nil? || settings[name] != value
           settings[name] = value
-          message.puts "  <green>→ #{name} が #{value} に変更されました</green>".termcolor
+          message.puts "  <bold><green>→ #{name} が #{value} に変更されました</green></bold>".termcolor
         end
       end
       if message.length > 0
