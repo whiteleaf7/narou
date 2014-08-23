@@ -144,6 +144,18 @@ module Helper
   end
 
   #
+  # 文章の中から挿絵注記を分離する
+  #
+  def extract_illust_chuki(str)
+    illust_chuki_array = []
+    extracted_str = str.gsub(/[ 　\t]*?(［＃挿絵（.+?）入る］)\n?/) do
+      illust_chuki_array << $1
+      ""
+    end
+    [extracted_str, illust_chuki_array]
+  end
+
+  #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #
   # response = Helper::AsyncCommand.exec("処理に時間がかかる外部コマンド") do

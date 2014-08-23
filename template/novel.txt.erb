@@ -29,16 +29,24 @@
 ［＃３字下げ］［＃ここから中見出し］<%= section["subtitle"].rstrip %>［＃ここで中見出し終わり］
 <% if section["element"]["introduction"] != "" -%>
 ［＃ここから前書き］
-<%= section["element"]["introduction"] %>
+<% introduction, illust_chuki_array = Helper.extract_illust_chuki(section["element"]["introduction"]) -%>
+<%= introduction %>
 ［＃ここで前書き終わり］
+<% if illust_chuki_array.count > 0 -%>
+<%= illust_chuki_array.join("\n") %>
+<% end -%>
 <% end -%>
 
 
 <%= section["element"]["body"] %>
 <% if section["element"]["postscript"] != "" -%>
 ［＃ここから後書き］
-<%= section["element"]["postscript"] %>
+<% postscript, illust_chuki_array = Helper.extract_illust_chuki(section["element"]["postscript"]) -%>
+<%= postscript %>
 ［＃ここで後書き終わり］
+<% if illust_chuki_array.count > 0 -%>
+<%= illust_chuki_array.join("\n") %>
+<% end -%>
 <% end -%>
 <% end -%>
 <% if setting.enable_display_end_of_book -%>
