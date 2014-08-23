@@ -70,6 +70,21 @@ module Command
               "指定された文字列でリストを検索します") { |search|
         @options["grep"] = search
       }
+      @opt.on("-t", "--tag TAGS", String,
+              "指定したタグのみ表示") { |tags|
+        @options["tags"] = tags.split
+      }
+      @opt.on("-a", "--all-tags", "タグをすべて表示する") {
+        @options["all-tags"] = true
+      }
+    end
+
+    def valid_tags?(novel, tags)
+      novel_tags = novel["tags"] or return false
+      tags.each do |tag|
+        return false unless novel_tags.include?(tag)
+      end
+      true
     end
 
     def output_list(novels)
@@ -96,32 +111,43 @@ module Command
             next
           end
         end
+        if @options["tags"]
+          next unless valid_tags?(novel, @options["tags"])
+        end
         id = novel["id"]
         frozen = Narou.novel_frozen?(id)
         disp_id = ((frozen ? "*" : "") + id.to_s).rjust(4)
         disp_id = disp_id.sub("*", "<bold><cyan>*</cyan></bold>").termcolor if frozen
-        flags = novel["flags"] || {}
+        flags = novel["flags"] || {}   # flagコマンドは1.6.0から非推奨
+        tags = novel["tags"] || []
+        flags["end"] ||= tags.include?("end")
+        flags["delete"] ||= tags.include?("delete")
         puts [
           disp_id,
           novel["last_update"].strftime("%y/%m/%d").tap { |s|
             if novel["new_arrivals_date"] && novel["new_arrivals_date"] + NEW_ARRIVALS_LIMIT >= now
               # 新着表示色
-              s.replace "<bold><magenta>#{s}</magenta></bold>".termcolor
+              s.replace "<bold><magenta>#{s}</magenta></bold>"
             elsif s == today
               # 更新だけあった色
-              s.replace "<bold><green>#{s}</green></bold>".termcolor
+              s.replace "<bold><green>#{s}</green></bold>"
             end
           },
           @options["kind"] ? NOVEL_TYPE_LABEL[novel_type] : nil,
           @options["author"] ? novel["author"] : nil,
           @options["site"] ? novel["sitename"] : nil,
           novel["title"] + (!@options["kind"] && novel_type == 2 ?
-                           "  <gray>(#{NOVEL_TYPE_LABEL[novel_type]})</gray>".termcolor :
+                           "  <bold><black>(#{NOVEL_TYPE_LABEL[novel_type]})</black></bold>" :
                            "") +
-                           (flags["end"] ? " <gray>(完結)</gray>".termcolor : "") +
-                           (flags["delete"] ? " <gray>(削除)</gray>".termcolor : ""),
-          @options["url"] ? novel["toc_url"] : nil
-        ].compact.join(" | ")
+                           (flags["end"] ? " <bold><black>(完結)</black></bold>" : "") +
+                           (flags["delete"] ? " <bold><black>(削除)</black></bold>" : ""),
+          @options["url"] ? novel["toc_url"] : nil,
+          @options["tags"] || @options["all-tags"] ?
+              tags.empty? ? nil : tags.map{ |tag|
+                color = Tag.get_color(tag)
+                "<bold><#{color}>#{tag}</#{color}></bold>"
+              }.join(",") : nil,
+        ].compact.join(" | ").termcolor
       end
       if @options["grep"]
         $stdout.silent = temp_silent

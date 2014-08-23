@@ -17,6 +17,7 @@ module Command
     COMMAND_LIST
   end
 
+  # この順番がヘルプに表示される順番
   COMMAND_LIST = {
     "download" => Download,
     "update" => Update,
@@ -31,6 +32,7 @@ module Command
     "browser" => Browser,
     "remove" => Remove,
     "freeze" => Freeze,
+    "tag" => Tag,
     "flag" => Flag,
     "mail" => Mail,
     "backup" => Backup,
