@@ -4,6 +4,9 @@
 
 (この差分データに含まれる話数一覧)
 <% sections.each_with_index do |section, i| -%>
+<% if section["chapter"] != "" -%>
+<%= section["chapter"] %>
+<% end -%>
 ・<%= section["subtitle"].rstrip %> <% if !section["subupdate"] || section["subupdate"] == "" -%>
 <%= section["subdate"] %>
 <% else -%>
