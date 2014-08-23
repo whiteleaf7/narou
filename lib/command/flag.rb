@@ -17,7 +17,10 @@ module Command
 
     def initialize
       super("<attribute> <target> [<target2> ...]")
-      @opt.separator <<-EOS
+      @opt.separator <<-EOS.termcolor
+
+  <bold><red>非推奨のコマンドです。tagコマンドを使用して下さい
+  flagコマンドはv.1.7.0で廃止予定です</red></bold>
 
   ・指定した小説に各種フラグを設定します
   ・再実行で解除

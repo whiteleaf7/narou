@@ -23,6 +23,9 @@ module Command
   ・小説にタグを設定します。設定個数の上限はありません
   ・タグ名にはスペース以外の文字が使えます(大文字小文字区別)
   ・タグには自動で色がつきます。自分で指定する場合は--colorを指定して下さい
+  ・一部特殊なタグがあります。設定することでlistコマンドに反映されます
+      - end: 小説が完結状態
+      - delete: 掲載サイトから削除された状態
 
   Examples:
     narou tag --add fav 0 2     # ID:0と1の小説にfavタグを設定(追加)
@@ -35,6 +38,7 @@ module Command
     narou tag fav               # favタグの付いている小説の一覧を表示
     narou tag fav later         # fav,laterタグ両方付いている小説を表示
     narou tag                   # 何も指定しない場合、存在するタグ一覧を表示
+    narou list -t "fav later" -rl   # listコマンドでもタグで検索出来ます
 
   Options:
       EOS
