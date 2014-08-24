@@ -39,7 +39,7 @@ require "termcolor"
 
 alias :warn :original_warn
 
-if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i && RUBY_ENGINE != "jruby"
+if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i
   require_relative "extensions/windows"
 
   $hStdOut = WinAPI.GetStdHandle(0xFFFFFFF5)
