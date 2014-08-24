@@ -486,7 +486,9 @@ class Downloader
 
   def get_novel_type
     return @novel_type if @novel_type
-    @novel_type = @@database[@id] ? @@database[@id]["novel_type"] : nil
+    unless @force
+      @novel_type = @@database[@id] ? @@database[@id]["novel_type"] : nil
+    end
     unless @novel_type
       if @setting["narou_api_url"]
         info = Narou::API.new(@setting, "nt")

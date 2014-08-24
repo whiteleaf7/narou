@@ -45,8 +45,11 @@ nt: 状態</td><td>.+?,(?<novel_type>.+?)</td>
 novel_type_string:
   連載(連載中): 1
   連載(未完): 1
-  連載(完結): 1
+  連載(完結): 3
   短編: 2
+
+# general_all_no 掲載話数
+ga: 話数</td><td>(?<general_all_no>\d+)話</td>
 
 # story あらすじ
 s: "あらすじ</td><td colspan=3 bgcolor=#FFFFFF>(?<story>.+?)</td>"

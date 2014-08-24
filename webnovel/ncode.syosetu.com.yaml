@@ -43,8 +43,11 @@ t: <h1><a href=".+?">(?<title>.+?)</a></h1>
 nt: <span id="noveltype(?:.*?)">(?<novel_type>.+?)</span>
 novel_type_string:
   連載中: 1
-  完結済: 1
+  完結済: 3
   短編: 2
+
+# general_all_no 掲載話数
+ga: </span>全(?<general_all_no>\d+)部
 
 # story あらすじ
 s: <td class="ex">(?<story>.+?)</td>
