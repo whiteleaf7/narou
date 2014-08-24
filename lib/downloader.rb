@@ -596,7 +596,7 @@ class Downloader
       if e.message =~ /^404/
         error "<red>[404]</red> 小説が削除されている可能性があります"
         $stdout.silence do
-          Command::Tag.execute!([@id, "--add", "delete", "--color", "white"])
+          Command::Tag.execute!([@id, "--add", "404", "--color", "white"])
         end
         Command::Freeze.execute!([@id])
       else

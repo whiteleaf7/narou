@@ -121,7 +121,7 @@ module Command
         flags = novel["flags"] || {}   # flagコマンドは1.6.0から非推奨
         tags = novel["tags"] || []
         flags["end"] ||= tags.include?("end")
-        flags["delete"] ||= tags.include?("delete")
+        flags["404"] ||= tags.include?("404")
         puts [
           disp_id,
           novel["last_update"].strftime("%y/%m/%d").tap { |s|
@@ -140,7 +140,7 @@ module Command
                            "  <bold><black>(#{NOVEL_TYPE_LABEL[novel_type]})</black></bold>" :
                            "") +
                            (flags["end"] ? " <bold><black>(完結)</black></bold>" : "") +
-                           (flags["delete"] ? " <bold><black>(削除)</black></bold>" : ""),
+                           (flags["404"] ? " <bold><black>(削除)</black></bold>" : ""),
           @options["url"] ? novel["toc_url"].escape : nil,
           @options["tags"] || @options["all-tags"] ?
               tags.empty? ? nil : tags.map{ |tag|

@@ -51,6 +51,7 @@ module Command
         database.each do |id, data|
           if data["flags"]
             tags = data["flags"].keys
+            tags << "404" if tags.delete("delete")
             Tag.execute!([id, "--add", tags.join(" "), "--color", "white"])
             puts "-" * 70
             data.delete("flags")
