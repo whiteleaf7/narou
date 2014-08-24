@@ -32,6 +32,12 @@ module Command
         output_freeze_list
         exit 0
       }
+      @opt.on("--on", "現在の状態にかかわらず凍結する") {
+        @options["on"] = true
+      }
+      @opt.on("--off", "現在の状態にかかわらず解除する") {
+        @options["off"] = true
+      }
     end
 
     def output_freeze_list
@@ -60,13 +66,16 @@ module Command
           next
         end
         id, title = data["id"], data["title"]
-        if frozen_list.include?(id)
+        flag = !frozen_list.include?(id)
+        flag = true if @options["on"]
+        flag = false if @options["off"]
+        if flag
+          frozen_list[id] = true
+          puts "#{title} を凍結しました"
+        else
           frozen_list.delete(id)
           puts "#{title} の凍結を解除しました"
           next
-        else
-          frozen_list[id] = true
-          puts "#{title} を凍結しました"
         end
       end
       frozen_list.save
