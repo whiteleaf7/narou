@@ -35,10 +35,10 @@ module Command
     narou tag --delete fav 2    # ID:2の小説のfavタグを外す
     narou t -d fav 2
 
-    narou tag fav               # favタグの付いている小説の一覧を表示
+    narou tag end               # endタグ(完結)の付いている小説の一覧を表示
     narou tag fav later         # fav,laterタグ両方付いている小説を表示
-    narou tag                   # 何も指定しない場合、存在するタグ一覧を表示
     narou list -t "fav later" -rl   # listコマンドでもタグで検索出来ます
+    narou tag                   # 何も指定しない場合、存在するタグ一覧を表示
 
   Options:
       EOS

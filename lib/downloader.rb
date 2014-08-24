@@ -286,8 +286,8 @@ class Downloader
     @from_download = from_download
     @cache_dir = nil
     @new_arrivals = false
-    @novel_type = nil
     @novel_data_dir = nil
+    @novel_status = nil
     @id = @@database.get_id("toc_url", @setting["toc_url"]) || @@database.get_new_id
 
     # ウェイト管理関係初期化
@@ -358,11 +358,12 @@ class Downloader
       @new_arrivals = true
     end
     init_raw_dir
-    if @force
+    if old_toc.empty? || @force
       update_subtitles = latest_toc["subtitles"]
     else
       update_subtitles = update_body_check(old_toc["subtitles"], latest_toc["subtitles"])
     end
+    return_status = nil
     if update_subtitles.count > 0
       unless @force
         if process_digest(old_toc, latest_toc)
@@ -382,10 +383,24 @@ class Downloader
       end
       update_database
       save_novel_data(TOC_FILE_NAME, latest_toc)
-      return :ok
+      return_status = :ok
     else
-      return :none
+      return_status = :none
     end
+    if novel_end?
+      if old_toc.empty? || !@@database[@id]["end"]
+        $stdout.silence do
+          Command::Tag.execute!([@id, "--add", "end", "--color", "white"])
+        end
+        if old_toc.empty?
+          puts "<bold><cyan>#{@title} は完結しているようです</cyan></bold>".termcolor
+        else
+          puts "<bold><cyan>#{@title} は完結したようです</cyan></bold>".termcolor
+          update_database if update_subtitles.count == 0
+        end
+      end
+    end
+    return_status
   ensure
     @setting.clear
   end
@@ -473,6 +488,7 @@ class Downloader
       "toc_url" => @setting["toc_url"],
       "sitename" => @setting["name"],
       "novel_type" => get_novel_type,
+      "end" => novel_end?,
       "last_update" => Time.now,
       "new_arrivals_date" => (@new_arrivals ? Time.now : @@database[@id]["new_arrivals_date"]),
     }
@@ -484,20 +500,41 @@ class Downloader
     @@database.save_database
   end
 
+  def get_novel_status
+    novel_status = if false # @setting["narou_api_url"]
+                     Narou::API.new(@setting, "nt-e")
+                   else
+                     NovelInfo.load(@setting)
+                   end
+    unless novel_status
+      novel_status = {
+        "novel_type" => NOVEL_TYPE_SERIES,
+        "end" => false
+      }
+    end
+    novel_status
+  end
+
+  #
+  # 小説の種別を取得（連載か短編）
+  #
   def get_novel_type
-    return @novel_type if @novel_type
-    unless @force
-      @novel_type = @@database[@id] ? @@database[@id]["novel_type"] : nil
+    if @novel_status
+      @novel_status["novel_type"]
     end
-    unless @novel_type
-      if @setting["narou_api_url"]
-        info = Narou::API.new(@setting, "nt")
-      else
-        info = NovelInfo.load(@setting)
-      end
-      @novel_type = info ? info["novel_type"] : NOVEL_TYPE_SERIES
+    @novel_status ||= get_novel_status
+    @novel_status["novel_type"]
+  end
+
+  #
+  # 小説が完結しているか調べる
+  #
+  def novel_end?
+    if @novel_status
+      @novel_status["end"]
     end
-    @novel_type
+    @novel_status ||= get_novel_status
+    @novel_status["end"]
   end
 
   #
@@ -618,7 +655,6 @@ class Downloader
   # 更新された subtitle だけまとまった配列を返す
   #
   def update_body_check(old_subtitles, latest_subtitles)
-    return latest_subtitles unless old_subtitles
     strong_update = Inventory.load("local_setting", :local)["update.strong"]
     latest_subtitles.dup.keep_if do |latest|
       index = latest["index"]

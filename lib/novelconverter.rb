@@ -272,6 +272,8 @@ class NovelConverter
     end
     # タイトルに完結したかどうかを付加する
     flags = data["flags"] || {}
+    tags = data["tags"] || []
+    flags["end"] ||= tags.include?("end")
     if flags["end"]
       processed_title += " (完結)"
     end

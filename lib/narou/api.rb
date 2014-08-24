@@ -41,6 +41,10 @@ module Narou
             @api_result["novel_type"] = @api_result["noveltype"]
             # なろうAPIが返すデータが数値の場合があるため強制変換
             @api_result["writer"] = @api_result["writer"].to_s
+            stat_end = @api_result["end"]
+            if stat_end
+              @api_result["end"] = stat_end == 0
+            end
           end
         else
           # なろうAPIからデータを取得出来なかった
