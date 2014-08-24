@@ -9,7 +9,9 @@ require_relative "helper"
 require_relative "inventory"
 
 module CommandLine
-  def self.run(argv)
+  extend self
+
+  def run(argv)
     if Helper.os_windows?
       argv.map! do |arg|
         arg.encode(Encoding::UTF_8)
@@ -39,7 +41,7 @@ module CommandLine
     Command.get_list[arg].new.execute(argv)
   end
 
-  def self.load_default_arguments(cmd)
+  def load_default_arguments(cmd)
     default_arguments_list = Inventory.load("local_setting", :local)
     (default_arguments_list["default_args.#{cmd}"] || "").split
   end
@@ -47,7 +49,7 @@ module CommandLine
   #
   # 引数をスペース以外による区切り文字で展開する
   #
-  def self.multiple_argument_extract(argv)
+  def multiple_argument_extract(argv)
     delimiter = Inventory.load("local_setting", :local)["multiple-delimiter"] || ","
     argv.map! { |arg|
       arg.split(delimiter)
