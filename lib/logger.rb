@@ -7,6 +7,12 @@ require "singleton"
 require "stringio"
 require_relative "color"
 
+class String
+  def escape
+    TermColor.escape(self)
+  end
+end
+
 if $disable_color
   class String
     def termcolor

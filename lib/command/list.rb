@@ -134,18 +134,18 @@ module Command
             end
           },
           @options["kind"] ? NOVEL_TYPE_LABEL[novel_type] : nil,
-          @options["author"] ? novel["author"] : nil,
-          @options["site"] ? novel["sitename"] : nil,
-          novel["title"] + (!@options["kind"] && novel_type == 2 ?
+          @options["author"] ? novel["author"].escape : nil,
+          @options["site"] ? novel["sitename"].escape : nil,
+          novel["title"].escape + (!@options["kind"] && novel_type == 2 ?
                            "  <bold><black>(#{NOVEL_TYPE_LABEL[novel_type]})</black></bold>" :
                            "") +
                            (flags["end"] ? " <bold><black>(完結)</black></bold>" : "") +
                            (flags["delete"] ? " <bold><black>(削除)</black></bold>" : ""),
-          @options["url"] ? novel["toc_url"] : nil,
+          @options["url"] ? novel["toc_url"].escape : nil,
           @options["tags"] || @options["all-tags"] ?
               tags.empty? ? nil : tags.map{ |tag|
                 color = Tag.get_color(tag)
-                "<bold><#{color}>#{tag}</#{color}></bold>"
+                "<bold><#{color}>#{tag.escape}</#{color}></bold>"
               }.join(",") : nil,
         ].compact.join(" | ").termcolor
       end

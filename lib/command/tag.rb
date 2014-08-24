@@ -106,7 +106,7 @@ module Command
       puts "タグ一覧"
       puts tags_list.map { |tag, count|
         color = Tag.get_color(tag)
-        "<bold><#{color}>#{tag}(#{count})</#{color}></bold>"
+        "<bold><#{color}>#{TermColor.escape(tag)}(#{count})</#{color}></bold>"
       }.join(" ").termcolor
     end
 
