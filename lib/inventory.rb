@@ -31,6 +31,7 @@ module Inventory
           else
             raise "Unknown scope"
           end
+    return nil unless dir
     @inventory_file_path = File.join(dir, name + ".yaml")
     if File.exists?(@inventory_file_path)
       self.merge!(YAML.load_file(@inventory_file_path))
@@ -38,6 +39,9 @@ module Inventory
   end
 
   def save
+    unless @inventory_file_path
+      raise "not initialized setting dir yet"
+    end
     File.write(@inventory_file_path, YAML.dump(self))
   end
 end
