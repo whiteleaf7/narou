@@ -640,10 +640,22 @@ class Downloader
       latest_subupdate = latest["subupdate"]
       # oldにsubupdateがなくても、latestのほうにsubupdateがある場合もある
       old_subupdate = old_subdate if latest_subupdate && !old_subupdate
+      different_check = nil
       if strong_update
         latest_section_timestamp_ymd = __strdate_to_ymd(get_section_file_timestamp(latest))
         section_file_name = "#{index} #{old["file_subtitle"]}.yaml"
         section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
+        different_check = -> {
+          latest["element"] = a_section_download(latest)
+          deffer = different_section?(section_file_relative_path, latest)
+          unless deffer
+            # 差分がある場合はこのあと保存されて更新されるので、差分がない場合のみ
+            # タイムスタンプを更新しておく
+            now = Time.now
+            File.utime(now, now, File.join(get_novel_data_dir, section_file_relative_path))
+          end
+          deffer
+        }
       end
       if old_subupdate && latest_subupdate
         if old_subupdate == ""
@@ -651,16 +663,14 @@ class Downloader
         end
         if strong_update
           if __strdate_to_ymd(old_subupdate) == latest_section_timestamp_ymd
-            latest["element"] = a_section_download(latest)
-            next different_section?(section_file_relative_path, latest)
+            next different_check.call
           end
         end
         latest_subupdate > old_subupdate
       else
         if strong_update
           if __strdate_to_ymd(old_subdate) == latest_section_timestamp_ymd
-            latest["element"] = a_section_download(latest)
-            next different_section?(section_file_relative_path, latest)
+            next different_check.call
           end
         end
         latest_subdate > old_subdate
