@@ -44,6 +44,7 @@ module Device::Ibooks
       warn "テキストファイル変換時はiBooksへの登録は行われません"
       return ebook_file_path
     end
+    @toc_url = @novel_data["toc_url"]
     epubdir_path = get_epubdir_path_in_ibooks_container
     if epubdir_path && File.exists?(epubdir_path)
       extract_epub(ebook_file_path, epubdir_path)
@@ -63,8 +64,8 @@ module Device::Ibooks
 
   def get_epubdir_path_in_ibooks_container
     list = Inventory.load("ibooks_epubdir_path_list", :local)
-    if list[@id]
-      list[@id]
+    if list[@toc_url]
+      list[@toc_url]
     else
       nil
     end
@@ -109,7 +110,7 @@ module Device::Ibooks
 
   def regist_epubdir_path_to_setting(path)
     list = Inventory.load("ibooks_epubdir_path_list", :local)
-    list[@id] = path
+    list[@toc_url] = path
     list.save
   end
 end

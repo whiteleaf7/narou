@@ -130,7 +130,7 @@ module Command
                   display_inspector: @options["inspect"],
                   ignore_force: @options["ignore-force"],
                 })
-          @id = Downloader.get_data_by_target(target)["id"]
+          @novel_data = Downloader.get_data_by_target(target)
         end
         next unless res
         @converted_txt_path = res[:converted_txt_path]
