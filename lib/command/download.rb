@@ -95,6 +95,7 @@ module Command
         return if targets.count == 0
         argv += targets
       end
+      tagname_to_ids(argv)
       argv.each.with_index(1) do |target, i|
         download_target ||= target
         Helper.print_horizontal_rule if i > 1

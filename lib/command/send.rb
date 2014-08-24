@@ -77,6 +77,7 @@ module Command
           titles[id] = data["title"]
         end
       end
+      tagname_to_ids(argv)
       argv.each do |target|
         ebook_path = Narou.get_ebook_file_path(target, device.ebook_file_ext)
         unless ebook_path

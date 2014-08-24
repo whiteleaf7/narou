@@ -58,6 +58,7 @@ module Command
         puts @opt.help
         return
       end
+      tagname_to_ids(argv)
       frozen_list = Inventory.load("freeze", :local)
       argv.each do |target|
         data = Downloader.get_data_by_target(target)

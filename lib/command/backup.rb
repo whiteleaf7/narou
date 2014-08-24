@@ -64,6 +64,7 @@ module Command
         puts @opt.help
         return
       end
+      tagname_to_ids(argv)
       require "zip"
       argv.each_with_index do |target, i|
         Helper.print_horizontal_rule if i > 0

@@ -25,7 +25,8 @@ module Command
   ・タグには自動で色がつきます。自分で指定する場合は--colorを指定して下さい
   ・一部特殊なタグがあります。設定することでlistコマンドに反映されます
       - end: 小説が完結状態
-      - delete: 掲載サイトから削除された状態
+      - 404: 掲載サイトから削除された状態
+  ・設定したタグは他のコマンドで指定することで、IDの指定の代わりにすることができます(一部タグを使えないコマンドも存在します)
 
   Examples:
     narou tag --add fav 0 2     # ID:0と1の小説にfavタグを設定(追加)
@@ -39,6 +40,9 @@ module Command
     narou tag fav later         # fav,laterタグ両方付いている小説を表示
     narou list -t "fav later" -rl   # listコマンドでもタグで検索出来ます
     narou tag                   # 何も指定しない場合、存在するタグ一覧を表示
+
+    # 他のコマンドでタグを使う
+    narou freeze --on end       # end(完結タグ)が付いた小説を一括して凍結
 
   Options:
       EOS

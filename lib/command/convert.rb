@@ -108,6 +108,7 @@ module Command
     end
 
     def convert_novels(argv)
+      tagname_to_ids(argv)
       argv.each.with_index(1) do |target, i|
         Helper.print_horizontal_rule if i > 1
         if @basename

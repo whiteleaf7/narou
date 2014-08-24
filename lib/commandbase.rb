@@ -58,6 +58,24 @@ module Command
     end
 
     #
+    # タグ情報をID情報に展開する
+    #
+    def tagname_to_ids(array)
+      database = Database.instance
+      tag_index = Hash.new { [] }
+      database.each do |id, data|
+        tags = data["tags"] || []
+        tags.each do |tag|
+          tag_index[tag] |= [id]
+        end
+      end
+      array.map! { |arg|
+        ids = tag_index[arg]
+        ids.empty? ? arg : ids
+      }.flatten!
+    end
+
+    #
     # 普通にコマンドを実行するけど、exit(2) を補足してexitstatus を返す
     # 正常終了なら0
     #

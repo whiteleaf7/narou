@@ -31,6 +31,7 @@ module Command
         puts @opt.help
         return
       end
+      tagname_to_ids(argv)
       argv.each do |target|
         dir = Downloader.get_novel_data_dir_by_target(target)
         if dir

@@ -18,9 +18,10 @@
 	  ![diff使用時のイメージ](https://raw.github.com/wiki/whiteleaf7/narou/images/diff_cap.png)
 - `tag` コマンドが追加されました
 	+ 小説に自由にタグを付けることができ、絞り込み等で使用出来ます
-		+ タグを追加: `narou tag -a narou 0`
-		+ タグを検索: `narou tag narou`
-		+ 詳細な説明は `narou tag -h` を参照して下さい
+		+ タグを追加: `narou tag -a akatsuki 0`
+		+ タグが付いた小説を表示: `narou tag akatsuki`
+		+ コマンドの対象小説をタグで指定: `narou update akatsuki`
+		+ その他詳細な説明は `narou tag -h` を参照して下さい
 - `list` コマンドが拡張されます
 	+ `--site` オプション(短縮: -s)が追加されました。掲載小説サイト名を合わせて表示します
 	+ `--author` オプション(短縮: -a)が追加されました。作者名を合わせて表示します
@@ -40,6 +41,7 @@
 - 空改行の削除処理を制御する `enable_pack_blank_line` オプションが追加されました
 	+ デフォルトでは有効です。無効にするには各小説の setting.ini に `enable_pack_blank_line=false`
 	  を追加するか、 `narou s force.enable_pack_blank_line=false` を実行して下さい
+- `freeze` コマンドに強制凍結及び解除する `--on` 及び `--off` オプションが追加されました
 
 #### 仕様変更
 - `update.strong` の挙動を、「当日分は必ずDLする」から

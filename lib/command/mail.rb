@@ -59,6 +59,7 @@ module Command
           argv << id
         end
       end
+      tagname_to_ids(argv)
       argv.each do |target|
         ebook_path = Narou.get_ebook_file_path(target, device ? device.ebook_file_ext : ".epub")
         unless ebook_path

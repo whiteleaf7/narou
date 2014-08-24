@@ -50,6 +50,7 @@ module Command
         end
         no_open = true
       end
+      tagname_to_ids(update_target_list)
       update_target_list.each_with_index do |target, i|
         display_message = nil
         data = Downloader.get_data_by_target(target)
