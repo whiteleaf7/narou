@@ -393,9 +393,9 @@ class Downloader
           Command::Tag.execute!([@id, "--add", "end", "--color", "white"])
         end
         if old_toc.empty?
-          puts "<bold><cyan>#{@title} は完結しているようです</cyan></bold>".termcolor
+          puts "<bold><cyan>ID:#{@id} #{@title} は完結しているようです</cyan></bold>".termcolor
         else
-          puts "<bold><cyan>#{@title} は完結したようです</cyan></bold>".termcolor
+          puts "<bold><cyan>ID:#{@id} #{@title} は完結したようです</cyan></bold>".termcolor
           update_database if update_subtitles.count == 0
         end
       end
