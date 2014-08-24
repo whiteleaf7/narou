@@ -9,10 +9,8 @@ if Helper.os_windows?
   module FileUtils
     # マルチバイト文字を含むパスを認識出来ないため
     def self.cp(src, dst, opt = nil)
-      open(src, "rb") do |rp|
-        open(dst, "wb") do |wp|
-          wp.write(rp.read)
-        end
+      open(src, "rb") do |fp|
+        File.binwrite(dst, fp.read)
       end
     end
   end
