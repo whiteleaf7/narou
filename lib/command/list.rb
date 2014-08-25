@@ -19,7 +19,7 @@ module Command
 
     def initialize
       super("[<limit>] [options]")
-      @opt.separator <<-EOS
+      @opt.separator <<-EOS.termcolor
 
   ・現在管理している小説の一覧を表示します。
   ・表示されるIDは各コマンドで指定することで小説名等を入力する手間を省けます。
@@ -39,8 +39,10 @@ module Command
     # 作者“紫炎”を含む小説を表示
     narou list --author --grep 紫炎
     narou l -ag 紫炎              # 上記と同じ意味
-    # “紫炎”と“なろう”を含む小説を表示
-    narou l -asg "紫炎.*なろう"   # 並び順に注意
+    # “紫炎”と“なろう”を含む小説を表示(AND検索)
+    narou l -asg "紫炎 なろう"
+    # “なろう”を含まない小説を表示(NOT検索)
+    narou l -sg "-なろう"
 
   Options:
       EOS
@@ -56,10 +58,10 @@ module Command
       @opt.on("-k", "--kind", "小説の種別（短編／連載）も表示する") {
         @options["kind"] = true
       }
-      @opt.on("-s", "--site", "掲載小説サイト名も表示") {
+      @opt.on("-s", "--site", "掲載小説サイト名も表示する") {
         @options["site"] = true
       }
-      @opt.on("-a", "--author", "作者名も表示") {
+      @opt.on("-a", "--author", "作者名も表示する") {
         @options["author"] = true
       }
       @opt.on("-f", "--filter VAL", String,
@@ -67,15 +69,16 @@ module Command
         @options["filter"] = filter
       }
       @opt.on("-g", "--grep VAL", String,
-              "指定された文字列でリストを検索します") { |search|
-        @options["grep"] = search
+              "指定された文字列でリストを検索する") { |search|
+        @options["grep"] = search.split
       }
-      @opt.on("-t", "--tag TAGS", String,
-              "指定したタグのみ表示") { |tags|
-        @options["tags"] = tags.split
-      }
-      @opt.on("-a", "--all-tags", "タグをすべて表示する") {
-        @options["all-tags"] = true
+      @opt.on("-t", "--tag [TAGS]", String,
+              "タグも表示。引数を指定した場合そのタグを含む小説を表示") { |tags|
+        if tags
+          @options["tags"] = tags.split
+        else
+          @options["all-tags"] = true
+        end
       }
     end
 
@@ -91,17 +94,15 @@ module Command
       now = Time.now
       today = now.strftime("%y/%m/%d")
       filter = @options["filter"]
-      header = [" ID ", " 更新日 ",
-                @options["kind"] ? "種別" : nil,
-                @options["author"] ? "作者名" : nil,
-                @options["site"] ? "サイト名" : nil,
-                "     タイトル"].compact
-      puts header.join(" | ")
-      if @options["grep"]
-        temp_silent = $stdout.silent
-        $stdout.silent = true
-        $stdout.string = ""   # すでに出力された文字列は検索の邪魔なので一旦クリア
+      if STDOUT.tty?
+        header = [" ID ", " 更新日 ",
+                  @options["kind"] ? "種別" : nil,
+                  @options["author"] ? "作者名" : nil,
+                  @options["site"] ? "サイト名" : nil,
+                  "     タイトル"].compact
+        puts header.join(" | ")
       end
+      selected_lines = {}
       novels.each do |novel|
         novel_type = novel["novel_type"].to_i
         if filter
@@ -122,7 +123,7 @@ module Command
         tags = novel["tags"] || []
         flags["end"] ||= tags.include?("end")
         flags["404"] ||= tags.include?("404")
-        puts [
+        selected_lines[id] = [
           disp_id,
           novel["last_update"].strftime("%y/%m/%d").tap { |s|
             if novel["new_arrivals_date"] && novel["new_arrivals_date"] + NEW_ARRIVALS_LIMIT >= now
@@ -150,8 +151,22 @@ module Command
         ].compact.join(" | ").termcolor
       end
       if @options["grep"]
-        $stdout.silent = temp_silent
-        STDOUT.puts $stdout.string.split("\n").grep(/#{@options["grep"]}/)
+        @options["grep"].each do |search_word|
+          selected_lines.keep_if { |id, line|
+            if search_word =~ /^-(.+)/
+              # NOT検索
+              not line.include?($1)
+            else
+              line.include?(search_word)
+            end
+          }
+        end
+      end
+      if STDOUT.tty?
+        puts selected_lines.values
+      else
+        # pipeで接続するときはIDを渡す
+        puts selected_lines.keys.join(" ")
       end
     end
 
