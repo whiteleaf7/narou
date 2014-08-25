@@ -40,10 +40,10 @@ module Command
       load_local_settings
       @opt.parse!(argv)
     rescue OptionParser::InvalidOption => e
-      error "不正なオプションです(#{e})"
+      error "不明なオプションです(#{e})"
       exit 1
     rescue OptionParser::MissingArgument => e
-      error "オプションの引数が不正です(#{e})"
+      error "オプションの引数が指定されていないか正しくありません(#{e})"
       exit 1
     end
 
