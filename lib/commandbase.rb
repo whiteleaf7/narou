@@ -12,7 +12,7 @@ module Command
       @opt = OptionParser.new(nil, 20)
       command_name = self.class.to_s.scan(/::(.+)$/)[0][0].downcase
       banner = postfixies.split("\n").map.with_index { |postfix, i|
-        (i == 0 ? "Usage: " : " " * 7) + "narou #{command_name} #{postfix}"
+        (i == 0 ? "Usage: " : "   or: ") + "narou #{command_name} #{postfix}"
       }.join("\n")
       @opt.banner = "<bold><green>#{TermColor.escape(banner)}</green></bold>".termcolor
       @options = {}
