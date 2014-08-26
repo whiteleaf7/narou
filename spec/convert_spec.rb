@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2014-08-27 01:09:07 +0900
+# auto generated at 2014-08-27 04:35:35 +0900
 
 require "termcolor"
 require_relative "../lib/commandline"
@@ -74,5 +74,25 @@ describe "convert" do
 
   it "nonokagi/test_nonokagi.txt" do
     check_answer("nonokagi/test_nonokagi.txt")
+  end
+
+  it "replace/test_replace.txt" do
+    check_answer("replace/test_replace.txt")
+  end
+
+  it "ruby/test_ruby.txt" do
+    check_answer("ruby/test_ruby.txt")
+  end
+
+  it "ruby_youon/test_ruby_youon.txt" do
+    check_answer("ruby_youon/test_ruby_youon.txt")
+  end
+
+  it "sesame/test_sesame.txt" do
+    check_answer("sesame/test_sesame.txt")
+  end
+
+  it "to_odd_leader/test_to_odd_leader.txt" do
+    check_answer("to_odd_leader/test_to_odd_leader.txt")
   end
 end
