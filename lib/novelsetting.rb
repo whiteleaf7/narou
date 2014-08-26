@@ -99,7 +99,7 @@ class NovelSetting
     if File.exists?(replace_txt_path)
       open(replace_txt_path, "r:BOM|UTF-8") do |fp|
         fp.each do |line|
-          line.sub!(/\n\z/, "")
+          line.sub!(/[\r\n]+\z/, "")
           next if line[0] == ";"    # コメント記号
           pattern = line.split("\t", 2)
           if pattern.length == 2 && pattern[0]
