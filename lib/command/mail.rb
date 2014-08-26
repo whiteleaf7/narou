@@ -115,9 +115,7 @@ module Command
       puts "created #{install_path}"
       puts "メールの設定用ファイルを作成しました。設定ファイルを書き換えることで mail コマンドが有効になります。"
       puts "注意：次回以降のupdateで新着があった場合に送信可能フラグが立ちます"
-      if Helper.confirm("設定ファイルがあるフォルダを開きますか")
-        Helper.open_directory(Narou.get_root_dir)
-      end
+      Helper.open_directory(Narou.get_root_dir, "設定ファイルがあるフォルダを開きますか")
     end
 
     def alter_database_add_column_last_mail_date

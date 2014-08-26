@@ -4,6 +4,7 @@
 #
 
 require "open3"
+require "io/console"
 
 #
 # 雑多なお助けメソッド群
@@ -42,16 +43,25 @@ module Helper
     @@engine_is_jruby ||= RUBY_ENGINE == "jruby"
   end
 
-  def confirm(message)
+  #
+  # キーボード入力による確認をする
+  #
+  # :default: エンターを押した場合に返ってくる値
+  # :nontty_default: pipe等から接続された場合に返ってくる値
+  #
+  def confirm(message, default = false, nontty_default = true)
+    return nontty_default unless STDIN.tty?
     confirm_msg = "#{message} (y/n)?: "
     STDOUT.print confirm_msg   # Logger でロギングされないように直接標準出力に表示
-    while input = $stdin.gets
-      case input[0].downcase
+    while input = $stdin.getch
+      puts input
+      case input.downcase
       when "y"
         return true
       when "n"
         return false
       else
+        return default if input.strip == ""
         STDOUT.print confirm_msg
       end
     end
@@ -67,7 +77,7 @@ module Helper
 
   def open_directory(path, confirm_message = nil)
     if confirm_message
-      return unless confirm(confirm_message)
+      return unless confirm(confirm_message, false, false)
     end
     case determine_os
     when :windows

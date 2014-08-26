@@ -120,6 +120,7 @@ module Command
 
     def edit_tags(argv)
       database = Database.instance
+      tagname_to_ids(argv)
       argv.each do |target|
         data = Downloader.get_data_by_target(target)
         unless data

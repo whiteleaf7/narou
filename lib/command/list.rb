@@ -21,10 +21,11 @@ module Command
       super("[<limit>] [options]")
       @opt.separator <<-EOS.termcolor
 
-  ・現在管理している小説の一覧を表示します。
-  ・表示されるIDは各コマンドで指定することで小説名等を入力する手間を省けます。
+  ・現在管理している小説の一覧を表示します
+  ・表示されるIDは各コマンドで指定することで小説名等を入力する手間を省けます
   ・個数を与えることで、最大表示数を制限できます(デフォルトは全て表示)
   ・narou listのデフォルト動作を narou s default_arg.list= で設定すると便利です
+  ・パイプで他のnarouコマンドに繋ぐとID入力の代わりにできます
 
   Examples:
     narou list             # IDの小さい順に全て表示
@@ -43,6 +44,11 @@ module Command
     narou l -asg "紫炎 なろう"
     # “なろう”を含まない小説を表示(NOT検索)
     narou l -sg "-なろう"
+
+    # ハーメルンを含む小説にhamelnタグを付ける
+    narou l -sg ハーメルン | narou t -a hameln
+    # 短編を全て凍結する
+    narou l -f ss | narou freeze --on
 
   Options:
       EOS
@@ -165,7 +171,7 @@ module Command
       if STDOUT.tty?
         puts selected_lines.values
       else
-        # pipeで接続するときはIDを渡す
+        # pipeに接続するときはIDを渡す
         puts selected_lines.keys.join(" ")
       end
     end

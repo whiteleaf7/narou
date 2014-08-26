@@ -6,6 +6,7 @@
 require "yaml"
 require "fileutils"
 require "ostruct"
+require "io/console"
 require_relative "narou"
 require_relative "sitesetting"
 require_relative "template"
@@ -408,6 +409,8 @@ class Downloader
   #
   # ダイジェスト化に関する処理
   #
+  # @return true = 更新をキャンセル、false = 更新する
+  #
   def process_digest(old_toc, latest_toc)
     return false unless old_toc["subtitles"]
     latest_subtitles_count = latest_toc["subtitles"].count
@@ -417,8 +420,13 @@ class Downloader
       STDOUT.puts "更新後の話数が保存されている話数より減少していることを検知しました"
       STDOUT.puts "ダイジェスト化されている可能性があるので、更新に関しての処理を選択して下さい"
       digest_output_interface(old_subtitles_count, latest_subtitles_count)
-      while input = $stdin.gets
-        case input[0]
+      unless STDIN.tty?
+        puts "2"
+        return true
+      end
+      while input = $stdin.getch
+        puts input
+        case input
         when "1"
           return false
         when "2"
