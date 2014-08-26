@@ -328,13 +328,17 @@ class ConverterBase
     data.replace(NKF.nkf("-wWX", data).tr("\u2014", "―"))
   end
 
+  # ミュート（ノノカギ）化する記号定義
+  SINGLE_MINUTE_FAMILY = %!‘’'!
+  DOUBLE_MINUTE_FAMILY = %!“”〝〟"!
+
   #
   # 半角記号を全角に変換
   #
   def symbols_to_zenkaku(data)
-    data.tr!("“”‘’〝〟", %!""''""!)
-    data.gsub!(/"([^"\n]+)"/, "〝\\1〟")
-    data.gsub!(/'([^'\n]+)'/, "〝\\1〟")   # MEMO: シングルミュート(ノノカギ)を表示出来るフォントはほとんど無い
+    data.gsub!(/[#{SINGLE_MINUTE_FAMILY}]([^"\n]+)[#{SINGLE_MINUTE_FAMILY}]/, "〝\\1〟")
+    # MEMO: シングルミュートを表示出来るフォントはほとんど無いためダブルにする
+    data.gsub!(/[#{DOUBLE_MINUTE_FAMILY}]([^"\n]+)[#{DOUBLE_MINUTE_FAMILY}]/, "〝\\1〟")
     data.tr!("-=+/*《》'\"%$#&!?<>＜＞()|‐,._;:[]",
              "－＝＋／＊≪≫’”％＄＃＆！？〈〉〈〉（）｜－，．＿；：［］")
     data.gsub!("\\", "￥")

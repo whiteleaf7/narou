@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2014-08-16 20:00:06 +0900
+# auto generated at 2014-08-27 01:09:07 +0900
 
 require "termcolor"
 require_relative "../lib/commandline"
@@ -48,6 +48,10 @@ describe "convert" do
     check_answer("auto_indent/test_auto_indent.txt")
   end
 
+  it "auto_join_bracket/test_auto_join_bracket.txt" do
+    check_answer("auto_join_bracket/test_auto_join_bracket.txt")
+  end
+
   it "auto_join_line/test_auto_join_line.txt" do
     check_answer("auto_join_line/test_auto_join_line.txt")
   end
@@ -58,5 +62,17 @@ describe "convert" do
 
   it "force_indent_special_chapter/test_force_indent_special_chapter.txt" do
     check_answer("force_indent_special_chapter/test_force_indent_special_chapter.txt")
+  end
+
+  it "horizontal_ellipsis/test_horizontal_ellipsis.txt" do
+    check_answer("horizontal_ellipsis/test_horizontal_ellipsis.txt")
+  end
+
+  it "kanji_num/test_kanji_num.txt" do
+    check_answer("kanji_num/test_kanji_num.txt")
+  end
+
+  it "nonokagi/test_nonokagi.txt" do
+    check_answer("nonokagi/test_nonokagi.txt")
   end
 end
