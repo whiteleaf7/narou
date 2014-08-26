@@ -11,6 +11,12 @@ class String
   def escape
     TermColor.escape(self)
   end
+
+  if RUBY_ENGINE == "jruby"
+    def termcolor
+      TermColor.parse(self.dup.force_encoding(Encoding::ASCII_8BIT))
+    end
+  end
 end
 
 if $disable_color
