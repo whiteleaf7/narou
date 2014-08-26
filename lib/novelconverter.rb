@@ -157,6 +157,15 @@ class NovelConverter
 
     stdout_capture = res[0]
 
+    # Javaの実行環境に由来するであろうエラー
+    if stdout_capture.scan(/Error occurred during initialization of VM/)
+      warn stdout_capture.strip
+      warn "=" * 70
+      error "Javaの実行エラーが発生しました。EPUBを作成出来ませんでした\n" \
+            "Hint: 複数のJava環境が混じっていると起きやすいエラーのようです"
+      return :error
+    end
+
     if verbose
       puts
       puts "==== AozoraEpub3 stdout capture " + "=" * 47
