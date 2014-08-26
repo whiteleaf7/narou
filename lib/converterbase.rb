@@ -835,7 +835,7 @@ class ConverterBase
         to_ruby(match, $1, $2, ["≪", "≫"])
       end
       # （）なルビの対処
-      data.gsub!(/(.+?)（([ぁ-んァ-ヶーゝゞ・Ａ-Ｚａ-ｚA-Za-z　]{,20})）/) do |match|
+      data.gsub!(/(.+?)（([ぁ-んァ-ヶーゝゞ・Ａ-Ｚａ-ｚA-Za-z 　]{,20})）/) do |match|
         to_ruby(match, $1, $2, ["（", "）"])
       end
     end
@@ -884,7 +884,8 @@ class ConverterBase
       "#{m1.sub(/｜([^｜]*)$/, "［＃ルビ用縦線］\\1")}《#{m2}》"
     when object_of_ruby?(last_char)
       # なろうのルビ対象文字を辿って｜を挿入する（青空文庫となろうのルビ仕様の差異吸収のため）
-      m1.sub(/([#{CHARACTER_OF_RUBY}　]+)$/) {
+      # 空白もルビ対象文字に含むのはなろうの仕様である
+      m1.sub(/([#{CHARACTER_OF_RUBY} 　]+)$/) {
         match_target = $1
         if match_target =~ /^(　+)/
           "#{$1}［＃ルビ用縦線］#{match_target[$1.length..-1]}"
