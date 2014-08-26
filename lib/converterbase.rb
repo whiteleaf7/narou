@@ -585,7 +585,7 @@ class ConverterBase
   def force_indent_special_chapter(data)
     return unless @text_type == "body" || @text_type == "textfile"
     @@count_of_rebuild_container ||= 0
-    data.gsub!(/^[ 　\t]*([－―<＜〈-]*)([0-9０-９#{KANJI_NUM}]+)([－―>＞〉-]*)$/) do
+    data.gsub!(/^[ 　\t]*([－―<＜〈-]*)([0-9０-９#{KANJI_NUM}]{1,3})([－―>＞〉-]*)$/) do
       top, chapter, bottom = $1, $2, $3
       pre, post = $`, $'
       if top != "" && "―－-".include?(top)   # include?は空文字("")だとtrueなのでチェック必須
