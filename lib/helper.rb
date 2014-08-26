@@ -4,7 +4,6 @@
 #
 
 require "open3"
-require "io/console"
 
 #
 # 雑多なお助けメソッド群
@@ -42,6 +41,15 @@ module Helper
   def engine_jruby?
     @@engine_is_jruby ||= RUBY_ENGINE == "jruby"
   end
+  
+  if engine_jruby? && os_windows?
+    require_relative "extensions/windows"
+    def $stdin.getch
+      WinAPI._getch.chr
+    end
+  else
+    require "io/console"
+  end
 
   #
   # キーボード入力による確認をする
@@ -54,7 +62,7 @@ module Helper
     confirm_msg = "#{message} (y/n)?: "
     STDOUT.print confirm_msg   # Logger でロギングされないように直接標準出力に表示
     while input = $stdin.getch
-      puts input
+      STDOUT.puts input
       case input.downcase
       when "y"
         return true

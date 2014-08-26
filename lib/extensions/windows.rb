@@ -13,16 +13,15 @@ module WinAPI
     extend DL::Importer
   end
 
-  class InvalidOS < StandardError; end
-
   begin
-    dlload "kernel32"
-    extern "long GetLogicalDrives()"
-    extern "unsigned long SetConsoleTextAttribute(unsigned long, unsigned long)"
-    extern "unsigned long GetConsoleScreenBufferInfo(unsigned long, void*)"
-    extern "unsigned long GetStdHandle(unsigned long)"
-    extern "long GetLastError()"
+    dlload "msvcrt", "kernel32"
   rescue DL::DLError
-    raise InvalidOS, "not Windows"
+    dlload "crtdll", "kernel32"
   end
+  extern "long GetLogicalDrives()"
+  extern "unsigned long SetConsoleTextAttribute(unsigned long, unsigned long)"
+  extern "unsigned long GetConsoleScreenBufferInfo(unsigned long, void*)"
+  extern "unsigned long GetStdHandle(unsigned long)"
+  extern "long GetLastError()"
+  extern "unsigned long _getch()"
 end
