@@ -1,6 +1,6 @@
 # ------------------------------------------------------------
 # 小説サイト定義
-name: 暁〜小説投稿サイト〜
+name: 暁
 scheme: http
 domain: www.akatsuki-novels.com
 top_url: \\k<scheme>://\\k<domain>
