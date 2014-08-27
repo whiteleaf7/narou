@@ -688,6 +688,7 @@ class Downloader
       # oldにsubupdateがなくても、latestのほうにsubupdateがある場合もある
       old_subupdate = old_subdate if latest_subupdate && !old_subupdate
       different_check = nil
+      latest["download_time"] = old["download_time"]
       if strong_update
         latest_section_timestamp_ymd = __strdate_to_ymd(get_section_file_timestamp(old, latest))
         section_file_name = "#{index} #{old["file_subtitle"]}.yaml"
