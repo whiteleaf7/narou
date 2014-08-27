@@ -603,7 +603,7 @@ class Downloader
       end
     rescue OpenURI::HTTPError => e
       if e.message =~ /^404/
-        error "<red>[404]</red> 小説が削除されている可能性があります"
+        error "<bold><red>[404]</red></bold> 小説が削除されている可能性があります".termcolor
         $stdout.silence do
           Command::Tag.execute!([@id, "--add", "404", "--color", "white"])
         end
