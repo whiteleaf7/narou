@@ -1,8 +1,10 @@
-# -*- Encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2014-08-27 04:35:35 +0900
+# auto generated at 2014-08-28 00:35:38 +0900
+
+Encoding.default_external = Encoding::UTF_8
 
 require "termcolor"
 require_relative "../lib/commandline"
@@ -21,7 +23,9 @@ describe "convert" do
   after :all do
     # 変換した際に出力される各ファイルを削除
     unless $debug
-      Dir.glob("*/\\[#{AUTHOR}\\]*.txt\0*/{見出しリスト,調査ログ}.txt") do |path|
+      glob_path = "*/\\[#{AUTHOR}\\]*.txt\0*/{見出しリスト,調査ログ}.txt"
+      glob_path.encode!("Windows-31J") if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i
+      Dir.glob(glob_path) do |path|
         File.delete(path)
       end
     end
