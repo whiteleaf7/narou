@@ -290,6 +290,7 @@ class Downloader
     @novel_data_dir = nil
     @novel_status = nil
     @id = @@database.get_id("toc_url", @setting["toc_url"]) || @@database.get_new_id
+    @section_download_cache = {}
 
     # ウェイト管理関係初期化
     @@__run_once ||= true
@@ -383,11 +384,11 @@ class Downloader
         exit 1
       end
       update_database
-      save_novel_data(TOC_FILE_NAME, latest_toc)
       return_status = :ok
     else
       return_status = :none
     end
+    save_novel_data(TOC_FILE_NAME, latest_toc)
     if novel_end?
       if old_toc.empty? || !@@database[@id]["end"]
         $stdout.silence do
@@ -664,7 +665,7 @@ class Downloader
   #
   def update_body_check(old_subtitles, latest_subtitles)
     strong_update = Inventory.load("local_setting", :local)["update.strong"]
-    latest_subtitles.dup.keep_if do |latest|
+    latest_subtitles.select do |latest|
       index = latest["index"]
       index_in_old_toc = __search_index_in_subtitles(old_subtitles, index)
       next true unless index_in_old_toc
@@ -688,12 +689,13 @@ class Downloader
       old_subupdate = old_subdate if latest_subupdate && !old_subupdate
       different_check = nil
       if strong_update
-        latest_section_timestamp_ymd = __strdate_to_ymd(get_section_file_timestamp(latest))
+        latest_section_timestamp_ymd = __strdate_to_ymd(get_section_file_timestamp(old, latest))
         section_file_name = "#{index} #{old["file_subtitle"]}.yaml"
         section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
         different_check = -> {
-          latest["element"] = a_section_download(latest)
-          deffer = different_section?(section_file_relative_path, latest)
+          latest_info_dummy = latest.dup
+          latest_info_dummy["element"] = a_section_download(latest)
+          deffer = different_section?(section_file_relative_path, latest_info_dummy)
           unless deffer
             # 差分がある場合はこのあと保存されて更新されるので、差分がない場合のみ
             # タイムスタンプを更新しておく
@@ -727,8 +729,13 @@ class Downloader
   #
   # 対象話数のタイムスタンプを取得
   #
-  def get_section_file_timestamp(subtitle_info)
-    File.mtime(create_section_file_path(subtitle_info))
+  def get_section_file_timestamp(old_subtitles_info, latest_subtitles_info)
+    download_time = old_subtitles_info["download_time"]
+    unless download_time
+      download_time = File.mtime(create_section_file_path(old_subtitles_info))
+    end
+    latest_subtitles_info["download_time"] = download_time
+    download_time
   end
 
   #
@@ -798,9 +805,7 @@ class Downloader
       end
       print "#{subtitle} (#{i+1}/#{max})"
       info = subtitle_info.dup
-      unless info["element"]
-        info["element"] = a_section_download(info)
-      end
+      info["element"] = a_section_download(subtitle_info)
       section_file_name = "#{info["index"]} #{info["file_subtitle"]}.yaml"
       section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
       if File.exists?(File.join(get_novel_data_dir, section_file_relative_path))
@@ -831,7 +836,7 @@ class Downloader
   def different_section?(old_relative_path, new_subtitle_info)
     path = File.join(get_novel_data_dir, old_relative_path)
     if File.exists?(path)
-      return YAML.load_file(path) != new_subtitle_info
+      return YAML.load_file(path)["element"] != new_subtitle_info["element"]
     else
       return true
     end
@@ -869,6 +874,8 @@ class Downloader
   # 指定された話数の本文をダウンロード
   #
   def a_section_download(subtitle_info)
+    index = subtitle_info["index"]
+    return @section_download_cache[index] if @section_download_cache[index]
     sleep_for_download
     href = subtitle_info["href"]
     if @setting["is_narou"]
@@ -891,6 +898,8 @@ class Downloader
         element[type] = @setting[type] || ""
       }
     end
+    subtitle_info["download_time"] = Time.now
+    @section_download_cache[index] = element
     element
   end
 
