@@ -188,6 +188,7 @@ class ConverterBase
   def convert_kanji_num_with_unit(data, lower_digit_zero = 0)
     data.gsub!(/([#{KANJI_NUM}十百千万億兆京]+)/) do |match|
       total = kanji_num_to_integer($1)
+      next match if total.to_s.length > KANJI_NUM_UNITS_DIGIT["京"] + 4
       m1 = total.to_s.tr("0-9", KANJI_NUM)
       if m1 =~ /〇{#{lower_digit_zero},}$/
         digits = m1.reverse.scan(/.{1,4}/).map(&:reverse).reverse   # 下の桁から4桁ずつ区切った配列を作成
