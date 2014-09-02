@@ -19,6 +19,7 @@ debug
 *.orig
 *.patch
 trash/
+.ruby-version
 
 \#*\#
 
