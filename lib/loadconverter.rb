@@ -65,7 +65,8 @@ def load_converter(title, archive_path)
     if Helper.os_windows?
       # TODO: RubyのバグでUTF-8なパスをrequireが見えてない。修正されたら消す
       unless $converter_load_once[archive_path]
-        eval(File.read(converter_path, encoding: Encoding::UTF_8))
+        eval(File.read(converter_path, encoding: Encoding::UTF_8),
+             binding, converter_path)
         $converter_load_once[archive_path] = true
       end
     else

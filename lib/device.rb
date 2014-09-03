@@ -31,8 +31,12 @@ class Device
       Dir.glob(File.join(dir, "device", "*.rb")).each do |path|
         name = File.basename(path, ".rb")
         unless h[name]
-          # パスにマルチバイト文字が使われる可能性があるのでrequireは使えない
-          eval(File.read(path, encoding: Encoding::UTF_8))
+          if Helper.os_windows?
+            # パスにマルチバイト文字が使われる可能性があるのでrequireは使えない
+            eval(File.read(path, encoding: Encoding::UTF_8), binding, path)
+          else
+            require path
+          end
           h[name] = Device.const_get(name.capitalize)
         end
       end
