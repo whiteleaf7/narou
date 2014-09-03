@@ -26,12 +26,15 @@ class Device
   attr_reader :name, :ebook_file_ext, :display_name
 
   DEVICES = {}.tap do |h|
-    [File.dirname(__FILE__), Narou.get_root_dir].each do |dir|
-      next unless dir
+    [Narou.get_root_dir, File.dirname(__FILE__)].each do |dir|
+      next unless dir   # narou init 前だと get_root_dir は nil
       Dir.glob(File.join(dir, "device", "*.rb")).each do |path|
-        eval(File.read(path, encoding: Encoding::UTF_8))
         name = File.basename(path, ".rb")
-        h[name] = eval(name.capitalize)
+        unless h[name]
+          # パスにマルチバイト文字が使われる可能性があるのでrequireは使えない
+          eval(File.read(path, encoding: Encoding::UTF_8))
+          h[name] = Device.const_get(name.capitalize)
+        end
       end
     end
   end
