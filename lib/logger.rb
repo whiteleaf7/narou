@@ -12,7 +12,7 @@ class String
     TermColor.escape(self)
   end
 
-  if RUBY_ENGINE == "jruby"
+  if RUBY_VERSION < "2.0.0"
     def termcolor
       TermColor.parse(self.dup.force_encoding(Encoding::ASCII_8BIT))
     end

@@ -52,7 +52,9 @@ module Command
           if data["flags"]
             tags = data["flags"].keys
             tags << "404" if tags.delete("delete")
-            Tag.execute!([id, "--add", tags.join(" "), "--color", "white"])
+            unless tags.empty?
+              Tag.execute!([id, "--add", tags.join(" "), "--color", "white"])
+            end
             puts "-" * 70
             data.delete("flags")
             modify = true
