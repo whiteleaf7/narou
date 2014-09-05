@@ -787,7 +787,7 @@ class Downloader
   def sections_download_and_save(subtitles)
     max = subtitles.count
     return if max == 0
-    puts ("<bold><green>" + TermColor.escape("ID:#{@id}　#{get_title} のDL開始") + "</green></bold>").termcolor
+    puts ("<bold><green>" + TermColorLight.escape("ID:#{@id}　#{get_title} のDL開始") + "</green></bold>").termcolor
     save_least_one = false
     subtitles.each_with_index do |subtitle_info, i|
       index, subtitle, file_subtitle, chapter = %w(index subtitle file_subtitle chapter).map { |k|

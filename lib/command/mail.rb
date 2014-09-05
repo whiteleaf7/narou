@@ -79,7 +79,7 @@ module Command
         end
         id = data["id"]
         title = data["title"]
-        puts "<bold><green>ID:#{id}　#{TermColor.escape(title)}</green></bold>".termcolor
+        puts "<bold><green>ID:#{id}　#{TermColorLight.escape(title)}</green></bold>".termcolor
         print "メールを送信しています"
         exit_mail = false
         mail_result = nil

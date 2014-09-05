@@ -7,14 +7,10 @@ require "singleton"
 require "stringio"
 require_relative "color"
 
-class String
-  def escape
-    TermColor.escape(self)
-  end
-
-  if RUBY_VERSION < "2.0.0"
+if RUBY_VERSION < "2.0.0"
+  class String
     def termcolor
-      TermColor.parse(self.dup.force_encoding(Encoding::ASCII_8BIT))
+      TermColorLight.parse(self.dup.force_encoding(Encoding::ASCII_8BIT))
     end
   end
 end
@@ -22,7 +18,7 @@ end
 if $disable_color
   class String
     def termcolor
-      self.gsub(/<\/?.+?>/, "").gsub("&lt;", "<").gsub("&gt;", ">")
+      TermColorLight.strip_tag(self)
     end
   end
 end
@@ -121,7 +117,7 @@ class LoggerError < StringIO
 end
 
 def error(str)
-  warn "<bold><red>[ERROR]</red></bold> #{TermColor.escape(str)}".termcolor
+  warn "<bold><red>[ERROR]</red></bold> #{str.escape}".termcolor
 end
 
 $stdout = Logger.get

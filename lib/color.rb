@@ -30,14 +30,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 =end
 
-alias :original_warn :warn
-unless $debug
-  def warn(*a); end
-end
-
-require "termcolor"
-
-alias :warn :original_warn
+require "termcolorlight"
 
 if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i
   require_relative "extensions/windows"

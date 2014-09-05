@@ -110,7 +110,7 @@ module Command
       puts "タグ一覧"
       puts tags_list.map { |tag, count|
         color = Tag.get_color(tag)
-        "<bold><#{color}>#{TermColor.escape(tag)}(#{count})</#{color}></bold>"
+        "<bold><#{color}>#{TermColorLight.escape(tag)}(#{count})</#{color}></bold>"
       }.join(" ").termcolor
     end
 
@@ -149,7 +149,7 @@ module Command
           print "現在のタグは "
           print tags.map { |tagname|
             color = Tag.get_color(tagname)
-            "<bold><#{color}>#{TermColor.escape(tagname)}</#{color}></bold>"
+            "<bold><#{color}>#{TermColorLight.escape(tagname)}</#{color}></bold>"
           }.join(" ").termcolor
           puts " です"
         end
