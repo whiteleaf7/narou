@@ -183,7 +183,7 @@ module Command
                 color = Tag.get_color(tag)
                 "<bold><#{color}>#{tag.escape}</#{color}></bold>"
               }.join(",") : nil,
-        ].compact.join(" | ").termcolor
+        ].compact.join(" | ")
       end
       if @options["grep"]
         @options["grep"].each do |search_word|
@@ -198,7 +198,7 @@ module Command
         end
       end
       if STDOUT.tty?
-        puts selected_lines.values
+        puts selected_lines.values.join("\n").termcolor
       else
         # pipeに接続するときはIDを渡す
         puts selected_lines.keys.join(" ")
