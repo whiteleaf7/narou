@@ -365,29 +365,41 @@ class Downloader
     else
       update_subtitles = update_body_check(old_toc["subtitles"], latest_toc["subtitles"])
     end
-    return_status = nil
-    if update_subtitles.count > 0
-      unless @force
-        if process_digest(old_toc, latest_toc)
-          return :canceled
-        end
+
+    unless @force
+      if process_digest(old_toc, latest_toc)
+        return :canceled
       end
-      @cache_dir = create_cache_dir if old_toc.length > 0
-      begin
-        sections_download_and_save(update_subtitles)
-        if @cache_dir && Dir.glob(File.join(@cache_dir, "*")).count == 0
-          remove_cache_dir
-        end
-      rescue Interrupt
-        remove_cache_dir
-        puts "ダウンロードを中断しました"
-        exit 1
-      end
-      update_database
-      return_status = :ok
-    else
-      return_status = :none
     end
+
+    id_and_title = "#{@id}　#{@title}"
+
+    return_status =
+      if update_subtitles.count > 0
+        @cache_dir = create_cache_dir if old_toc.length > 0
+        begin
+          sections_download_and_save(update_subtitles)
+          if @cache_dir && Dir.glob(File.join(@cache_dir, "*")).count == 0
+            remove_cache_dir
+          end
+        rescue Interrupt
+          remove_cache_dir
+          puts "ダウンロードを中断しました"
+          exit 1
+        end
+        update_database
+        :ok
+      elsif old_toc["subtitles"].count > latest_toc["subtitles"].count
+        # 削除された節がある（かつ更新がない）場合
+        puts "#{id_and_title} は一部の話が削除されています"
+        :ok
+      elsif old_toc["story"] != latest_toc["story"]
+        # あらすじだけ更新されている場合
+        puts "#{id_and_title} のあらすじが更新されています"
+        :ok
+      else
+        :none
+      end
     save_novel_data(TOC_FILE_NAME, latest_toc)
     tags = @@database[@id]["tags"] || []
     if novel_end?
@@ -397,7 +409,8 @@ class Downloader
           Command::Tag.execute!([@id, "--add", "end", "--color", "white"])
         end
         msg = old_toc.empty? ? "完結しているようです" : "完結したようです"
-        puts "<cyan>ID:#{@id}　#{@title.escape} は#{msg}</cyan>".termcolor
+        puts "<cyan>ID:#{id_and_title.escape} は#{msg}</cyan>".termcolor
+        return_status = :ok
       end
     else
       if tags.include?("end")
@@ -405,7 +418,8 @@ class Downloader
         $stdout.silence do
           Command::Tag.execute!([@id, "--delete", "end"])
         end
-        puts "<cyan>ID:#{@id}　#{@title.escape} は連載を再開したようです</cyan>".termcolor
+        puts "<cyan>ID:#{id_and_title.escape} は連載を再開したようです</cyan>".termcolor
+        return_status = :ok
       end
     end
     return_status
