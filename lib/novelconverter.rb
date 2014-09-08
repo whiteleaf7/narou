@@ -350,7 +350,7 @@ class NovelConverter
       site_setting = find_site_setting
       html.set_illust_setting({current_url: site_setting["illust_current_url"],
                                grep_pattern: site_setting["illust_grep_pattern"]})
-      progressbar = ProgressBar.new(@toc["subtitles"].count)
+      progressbar = ProgressBar.new(@toc["subtitles"].size)
       @toc["subtitles"].each_with_index do |subinfo, i|
         progressbar.output(i)
         section = load_novel_section(subinfo)

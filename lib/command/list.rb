@@ -182,7 +182,7 @@ module Command
       if !argv.empty? && argv.first =~ /^\d+$/
         num = argv.first.to_i
       else
-        num = database_values.count
+        num = database_values.size
       end
       if @options["latest"]
         database_values = Database.instance.sort_by_last_update

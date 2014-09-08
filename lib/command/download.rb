@@ -59,7 +59,7 @@ module Command
     end
 
     def print_prompt(targets)
-      print "#{targets.count}> "
+      print "#{targets.size}> "
     end
 
     def interactive_mode
@@ -92,7 +92,7 @@ module Command
       super
       if argv.empty?
         targets = interactive_mode
-        return if targets.count == 0
+        return if targets.size == 0
         argv += targets
       end
       tagname_to_ids(argv)

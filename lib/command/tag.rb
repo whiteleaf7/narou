@@ -145,7 +145,7 @@ module Command
             set_color(tag, @options["color"])
           end
         end
-        if tags.count > 0
+        if tags.size > 0
           print "現在のタグは "
           print tags.map { |tagname|
             color = Tag.get_color(tagname)
@@ -163,7 +163,7 @@ module Command
       color = @@tag_colors[tagname]
       return color if color
       last_color = @@tag_colors.values.last || COLORS.last
-      index = (COLORS.index(last_color) + 1) % COLORS.count
+      index = (COLORS.index(last_color) + 1) % COLORS.size
       color = COLORS[index]
       @@tag_colors[tagname] = color
       @@tag_colors.save

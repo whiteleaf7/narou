@@ -194,7 +194,7 @@ class Inspector
     target_line_count = 0
     dont_indent_line_count = 0
     data.scan(/^[^#{IGNORE_INDENT_CHAR}]/).tap { |a|
-      target_line_count = a.count
+      target_line_count = a.size
     }.each { |line|
       head = line[0]
       if head != " " && head != "　"

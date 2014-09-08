@@ -91,7 +91,7 @@ class DiffViewer
   # differ には Diff::LCS.sdiff で処理したものをそのまま渡す
   #
   def calc_levenshtein_distance(differ)
-    differ.reject { |e| e.unchanged? }.count
+    differ.reject { |e| e.unchanged? }.size
   end
 
   #

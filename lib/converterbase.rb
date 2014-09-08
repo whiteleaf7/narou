@@ -192,7 +192,7 @@ class ConverterBase
       m1 = total.to_s.tr("0-9", KANJI_NUM)
       if m1 =~ /〇{#{lower_digit_zero},}$/
         digits = m1.reverse.scan(/.{1,4}/).map(&:reverse).reverse   # 下の桁から4桁ずつ区切った配列を作成
-        keta = digits.count - 1
+        keta = digits.size - 1
         digits.map.with_index { |nums, keta_i|
           four_digit_num = nums.scan(/./).map.with_index { |d, di|
             next "" if d == "〇"
@@ -245,7 +245,7 @@ class ConverterBase
     target_num = "\d０-９#{KANJI_NUM}十百千万億兆京垓"
     data.gsub!(/[#{target_num}\/／]+/) do |match|
       numerics = match.split(/[\/／]/)
-      case numerics.count
+      case numerics.size
       when 2
         # 分数
         if @setting.enable_transform_fraction
@@ -478,9 +478,9 @@ class ConverterBase
       end
     else
       data.gsub!(/[\w.,!?' ]+/) do |match|
-        if match.split(" ").count > 1
+        if match.split(" ").size > 1
           @english_sentences << match
-          "［＃英文＝#{@english_sentences.count - 1}］"
+          "［＃英文＝#{@english_sentences.size - 1}］"
         else
           match.tr("a-zA-Z", "ａ-ｚＡ-Ｚ")
         end
@@ -923,7 +923,7 @@ class ConverterBase
   def replace_url(data)
     data.gsub!(URI.regexp) do |match|
       @url_list << match
-      "［＃ＵＲＬ＝#{@url_list.count - 1}］"
+      "［＃ＵＲＬ＝#{@url_list.size - 1}］"
     end
   end
 
@@ -942,7 +942,7 @@ class ConverterBase
     @illustration.scanner(data) do |chuki|
       next "" unless @setting.enable_illust
       @illust_chuki_list << chuki
-      "［＃挿絵＝#{@illust_chuki_list.count - 1}］\n"
+      "［＃挿絵＝#{@illust_chuki_list.size - 1}］\n"
     end
   end
 

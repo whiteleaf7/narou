@@ -364,7 +364,7 @@ class Downloader
       update_subtitles = update_body_check(old_toc["subtitles"], latest_toc["subtitles"])
     end
     return_status = nil
-    if update_subtitles.count > 0
+    if update_subtitles.size > 0
       unless @force
         if process_digest(old_toc, latest_toc)
           return :canceled
@@ -373,7 +373,7 @@ class Downloader
       @cache_dir = create_cache_dir if old_toc.length > 0
       begin
         sections_download_and_save(update_subtitles)
-        if @cache_dir && Dir.glob(File.join(@cache_dir, "*")).count == 0
+        if @cache_dir && Dir.glob(File.join(@cache_dir, "*")).size == 0
           remove_cache_dir
         end
       rescue Interrupt
@@ -396,7 +396,7 @@ class Downloader
           puts "<bold><cyan>ID:#{@id} #{@title} は完結しているようです</cyan></bold>".termcolor
         else
           puts "<bold><cyan>ID:#{@id} #{@title} は完結したようです</cyan></bold>".termcolor
-          update_database if update_subtitles.count == 0
+          update_database if update_subtitles.size == 0
         end
       end
     end
@@ -412,8 +412,8 @@ class Downloader
   #
   def process_digest(old_toc, latest_toc)
     return false unless old_toc["subtitles"]
-    latest_subtitles_count = latest_toc["subtitles"].count
-    old_subtitles_count = old_toc["subtitles"].count
+    latest_subtitles_count = latest_toc["subtitles"].size
+    old_subtitles_count = old_toc["subtitles"].size
     if latest_subtitles_count < old_subtitles_count
       STDOUT.puts "#{latest_toc["title"]}"
       STDOUT.puts "更新後の話数が保存されている話数より減少していることを検知しました"
@@ -783,7 +783,7 @@ class Downloader
   # subtitles にダウンロードしたいものをまとめた subtitle info を渡す
   #
   def sections_download_and_save(subtitles)
-    max = subtitles.count
+    max = subtitles.size
     return if max == 0
     puts "<bold><green>#{"ID:#{@id}　#{get_title}".escape} のDL開始</green></bold>".termcolor
     save_least_one = false

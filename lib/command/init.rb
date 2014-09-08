@@ -102,7 +102,7 @@ module Command
       src = ["AozoraEpub3.ini", "vertical_font.css", "DMincho.ttf"]
       dst = ["AozoraEpub3.ini", "template/OPS/css_custom/vertical_font.css", "template/OPS/fonts/DMincho.ttf"]
       puts "(次のファイルをコピーor上書きしました)"
-      src.count.times do |i|
+      src.size.times do |i|
         src_full_path = File.join(Narou.get_preset_dir, src[i])
         dst_full_path = File.join(aozora_path, dst[i])
         FileUtils.install(src_full_path, dst_full_path)

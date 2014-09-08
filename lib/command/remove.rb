@@ -53,7 +53,7 @@ module Command
       super
       if @options["all-ss"]
         novels = get_all_short_story
-        if novels.count == 0
+        if novels.size == 0
           puts "短編小説がひとつもありません"
           return
         end
