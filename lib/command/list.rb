@@ -11,7 +11,9 @@ module Command
 
     # MEMO: 0 は昔の小説を凍結したままな場合、novel_type が設定されていないので、
     #       nil.to_i → 0 という互換性維持のため
-    NOVEL_TYPE_LABEL = ["連載", "連載", "短編"]
+    NOVEL_TYPE_LABEL = %w(連載 連載 短編)
+
+    FILTERS_TYPE = Hash[*%w(series 連載 ss 短編 frozen 凍結 nonfrozen 非凍結)]
 
     def self.oneline_help
       "現在管理している小説の一覧を表示します"
@@ -33,6 +35,7 @@ module Command
     narou list 5 -l        # 最近更新のあった5件表示
     narou list 10 -rl      # 古い順に10件表示
     narou list -f ss       # 短編小説だけ表示
+    narou list -f "ss frozen"   # 凍結している短編だけ表示
 
     # 小説家になろうの小説のみを表示
     narou list --site --grep 小説家になろう
@@ -71,8 +74,9 @@ module Command
         @options["author"] = true
       }
       @opt.on("-f", "--filter VAL", String,
-              "表示を絞るためのフィルターの種類(連載:series, 短編:ss)") { |filter|
-        @options["filter"] = filter
+              "表示を絞るためのフィルター。スペース区切りで複数可\n" \
+              "#{' '*25}#{filter_type_help}") { |filter|
+        @options["filters"] = filter.downcase.split
       }
       @opt.on("-g", "--grep VAL", String,
               "指定された文字列でリストを検索する") { |search|
@@ -96,10 +100,37 @@ module Command
       true
     end
 
+    def filter_type_help
+      FILTERS_TYPE.map { |filter, info|
+        "#{filter}(#{info})"
+      }.join(",")
+    end
+
+    def test_filter(filters, novel_type, frozen)
+      apply_sum = filters.inject(0) do |sum, item|
+        apply = case item
+                when "series"
+                  novel_type == 0 && novel_type == 1
+                when "ss"
+                  novel_type == 2
+                when "frozen"
+                  frozen
+                when "nonfrozen"
+                  !frozen
+                else
+                  error "不明なフィルターです(#{item})"
+                  warn "filters = #{filter_type_help}"
+                  exit 1
+                end
+        sum + (apply ? 1 : 0)
+      end
+      apply_sum == filters.count
+    end
+
     def output_list(novels)
       now = Time.now
       today = now.strftime("%y/%m/%d")
-      filter = @options["filter"]
+      filters = @options["filters"] || []
       if STDOUT.tty?
         header = [" ID ", " 更新日 ",
                   @options["kind"] ? "種別" : nil,
@@ -111,18 +142,16 @@ module Command
       selected_lines = {}
       novels.each do |novel|
         novel_type = novel["novel_type"].to_i
-        if filter
-          if filter == "series" && novel_type != 0 && novel_type != 1
-            next
-          elsif filter == "ss" && novel_type != 2
-            next
-          end
+        id = novel["id"]
+        frozen = Narou.novel_frozen?(id)
+
+        unless filters.empty?
+          next unless test_filter(filters, novel_type, frozen)
         end
+
         if @options["tags"]
           next unless valid_tags?(novel, @options["tags"])
         end
-        id = novel["id"]
-        frozen = Narou.novel_frozen?(id)
         disp_id = ((frozen ? "*" : "") + id.to_s).rjust(4)
         disp_id = disp_id.sub("*", "<bold><cyan>*</cyan></bold>").termcolor if frozen
         flags = novel["flags"] || {}   # flagコマンドは1.6.0から非推奨

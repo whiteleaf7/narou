@@ -41,15 +41,7 @@ module Command
     end
 
     def output_freeze_list
-      database = Database.instance
-      puts "凍結中小説一覧"
-      puts " ID |     タイトル"
-      Inventory.load("freeze", :local).each do |id, _|
-        data = database.get_data("id", id)
-        if data
-          puts "#{id.to_s.rjust(3)} | #{data["title"]}"
-        end
-      end
+      List.execute!(%w(--filter frozen))
     end
 
     def execute(argv)
