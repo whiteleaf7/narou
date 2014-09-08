@@ -9,7 +9,7 @@ require "open3"
 # 雑多なお助けメソッド群
 #
 module Helper
-  extend self
+  module_function
 
   HOST_OS = RbConfig::CONFIG["host_os"]
 

@@ -9,7 +9,7 @@ require_relative "helper"
 require_relative "inventory"
 
 module CommandLine
-  extend self
+  module_function
 
   def run(argv)
     if Helper.os_windows?

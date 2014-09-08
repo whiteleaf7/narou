@@ -11,7 +11,7 @@ if Helper.engine_jruby?
 end
 
 module Narou
-  extend self
+  module_function
 
   LOCAL_SETTING_DIR = ".narou"
   GLOBAL_SETTING_DIR = ".narousetting"
