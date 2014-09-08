@@ -53,7 +53,7 @@ converter "n4259s 異世界迷宮で奴隷ハーレムを" do
     @in_parameter_block = false
     io.each do |line|
       line.rstrip!
-      if !comments_block?(line)
+      unless comments_block?(line)
         level_convert!(line)
         if in_parameter_block?(line)
           non_close_parameter = true

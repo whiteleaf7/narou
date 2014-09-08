@@ -477,7 +477,7 @@ class ConverterBase
         match.tr("a-zA-Z", "ａ-ｚＡ-Ｚ")
       end
     else
-     data.gsub!(/[\w.,!?' ]+/) do |match|
+      data.gsub!(/[\w.,!?' ]+/) do |match|
         if match.split(" ").count > 1
           @english_sentences << match
           "［＃英文＝#{@english_sentences.count - 1}］"
@@ -592,7 +592,6 @@ class ConverterBase
     @@count_of_rebuild_container ||= 0
     data.gsub!(/^[ 　\t]*([－―<＜〈-]*)([0-9０-９#{KANJI_NUM}]{1,3})([－―>＞〉-]*)$/) do
       top, chapter, bottom = $1, $2, $3
-      pre, post = $`, $'
       if top != "" && "―－-".include?(top)   # include?は空文字("")だとtrueなのでチェック必須
         top = "― "
         bottom = " ―"
@@ -854,7 +853,7 @@ class ConverterBase
     ten =~ /^[・、]+$/ && (str.include?("｜") || object_of_ruby?(last_char))
   end
 
-  def sesame(str, ten)
+  def sesame(str)
     if str.include?("｜")
       str.sub("｜", "［＃傍点］") + "［＃傍点終わり］"
     else
@@ -880,7 +879,7 @@ class ConverterBase
       # 直前に｜がある場合ルビ化は抑制される
       "#{m1[0...-1]}#{openclose_symbols[0]}#{m2}#{openclose_symbols[1]}"
     when is_sesame?(m1, m2, last_char)
-      sesame(m1, m2)
+      sesame(m1)
     when m1.include?("｜")
       "#{m1.sub(/｜([^｜]*)$/, "［＃ルビ用縦線］\\1")}《#{m2}》"
     when object_of_ruby?(last_char)

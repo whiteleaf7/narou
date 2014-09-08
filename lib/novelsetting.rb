@@ -96,7 +96,7 @@ class NovelSetting
   def load_replace_pattern
     @replace_pattern = []
     replace_txt_path = File.join(@archive_path, REPLACE_NAME)
-    if File.exists?(replace_txt_path)
+    if File.exist?(replace_txt_path)
       open(replace_txt_path, "r:BOM|UTF-8") do |fp|
         fp.each do |line|
           line.sub!(/[\r\n]+\z/, "")

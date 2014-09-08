@@ -41,7 +41,7 @@ module Command
       paths = Dir.glob("**/*").keep_if { |path|
         File.file?(path) && path.split("/", 2)[0] != BACKUP_DIR_NAME
       }
-      FileUtils.mkdir(BACKUP_DIR_NAME) unless File.exists?(BACKUP_DIR_NAME)
+      FileUtils.mkdir(BACKUP_DIR_NAME) unless File.exist?(BACKUP_DIR_NAME)
       Zip.unicode_names = true unless Helper.os_windows?
       Zip::File.open(File.join(BACKUP_DIR_NAME, zipfilename), Zip::File::CREATE) do |zip|
         paths.each do |path|

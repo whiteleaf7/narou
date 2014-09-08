@@ -21,7 +21,7 @@ class Mailer
     this = instance
     this.clear
     setting_file_path = File.join(Narou.get_root_dir, SETTING_FILE)
-    if File.exists?(setting_file_path)
+    if File.exist?(setting_file_path)
       options = YAML.load_file(setting_file_path)
       unless options.delete(:complete)
         raise SettingUncompleteError, "設定ファイルの書き換えが終了していないようです。\n" +

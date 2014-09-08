@@ -8,5 +8,5 @@ begin
     spec.pattern = 'spec/**/*_spec.rb'
     spec.rspec_opts = ['-cr spec_helper']
   end
-rescue LoadError => e
+rescue LoadError
 end

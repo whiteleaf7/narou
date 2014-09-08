@@ -11,7 +11,7 @@ module Narou
   end
 end
 at_exit do
-  if File.exists?("commitversion")
+  if File.exist?("commitversion")
     FileUtils.rm("commitversion")
   end
 end

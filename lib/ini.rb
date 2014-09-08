@@ -22,7 +22,6 @@ class Ini
   end
 
   def self.load_file(file)
-    text = ""
     case
     when file.kind_of?(String)
       text = open(file, "r:BOM|UTF-8") { |fp| fp.read }

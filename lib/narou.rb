@@ -55,7 +55,7 @@ module Narou
   def get_global_setting_dir
     return @@global_setting_dir if @@global_setting_dir
     @@global_setting_dir = File.expand_path(File.join("~", GLOBAL_SETTING_DIR))
-    unless File.exists?(@@global_setting_dir)
+    unless File.exist?(@@global_setting_dir)
       FileUtils.mkdir(@@global_setting_dir)
     end
     @@global_setting_dir
@@ -100,7 +100,7 @@ module Narou
   end
 
   def aozoraepub3_directory?(path)
-    File.exists?(create_aozoraepub3_jar_path(path))
+    File.exist?(create_aozoraepub3_jar_path(path))
   end
 
   #
@@ -115,14 +115,14 @@ module Narou
     global_setting_aozora_path = Inventory.load("global_setting", :global)["aozoraepub3dir"]
     if global_setting_aozora_path
       aozora_jar_path = create_aozoraepub3_jar_path(global_setting_aozora_path)
-      if File.exists?(aozora_jar_path)
+      if File.exist?(aozora_jar_path)
         @@aozora_jar_path = aozora_jar_path
         return aozora_jar_path
       end
     end
     [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
       aozora_jar_path = create_aozoraepub3_jar_path(dir, AOZORAEPUB3_DIR)
-      if File.exists?(aozora_jar_path)
+      if File.exist?(aozora_jar_path)
         @@aozora_jar_path = aozora_jar_path
         return aozora_jar_path
       end

@@ -61,7 +61,7 @@ end
 # end
 def load_converter(title, archive_path)
   converter_path = File.join(archive_path, "converter.rb")
-  if File.exists?(converter_path)
+  if File.exist?(converter_path)
     if Helper.os_windows?
       # TODO: RubyのバグでUTF-8なパスをrequireが見えてない。修正されたら消す
       unless $converter_load_once[archive_path]

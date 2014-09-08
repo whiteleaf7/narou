@@ -94,7 +94,7 @@ class Device
     documents_path = get_documents_path
     if documents_path
       dst_path = File.join(documents_path, File.basename(src_file))
-      if File.exists?(dst_path)
+      if File.exist?(dst_path)
         return File.mtime(src_file) > File.mtime(dst_path)
       end
     end

@@ -158,10 +158,10 @@ module Command
       end
       if @options["grep"]
         @options["grep"].each do |search_word|
-          selected_lines.keep_if { |id, line|
+          selected_lines.keep_if { |_, line|
             if search_word =~ /^-(.+)/
               # NOT検索
-              not line.include?($1)
+              !line.include?($1)
             else
               line.include?(search_word)
             end

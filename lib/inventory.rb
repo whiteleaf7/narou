@@ -33,7 +33,7 @@ module Inventory
           end
     return nil unless dir
     @inventory_file_path = File.join(dir, name + ".yaml")
-    if File.exists?(@inventory_file_path)
+    if File.exist?(@inventory_file_path)
       self.merge!(YAML.load_file(@inventory_file_path))
     end
   end

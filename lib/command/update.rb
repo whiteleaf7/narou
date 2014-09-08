@@ -71,8 +71,8 @@ module Command
         result = Downloader.start(target)
         case result.status
         when :ok
-          unless @options["no-convert"] or
-                 (@options["convert-only-new-arrival"] and not result.new_arrivals)
+          unless @options["no-convert"] ||
+                 (@options["convert-only-new-arrival"] && !result.new_arrivals)
             convert_argv = [target]
             convert_argv << "--no-open" if no_open
             Convert.execute!(convert_argv)

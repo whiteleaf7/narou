@@ -6,7 +6,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-$debug = File.exists?(File.join(File.expand_path(File.dirname($0)), "debug"))
+$debug = File.exist?(File.join(File.expand_path(File.dirname($0)), "debug"))
 Encoding.default_external = Encoding::UTF_8
 
 if ARGV.delete("--time")

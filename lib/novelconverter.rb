@@ -75,13 +75,13 @@ class NovelConverter
 
   def self.stash_aozora_fonts_directory
     fonts_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "template/OPS/fonts")
-    return unless File.exists?(fonts_path)
+    return unless File.exist?(fonts_path)
     FileUtils.mv(fonts_path, fonts_path + "_hide")
   end
 
   def self.visible_aozora_fonts_directory
     fonts_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "template/OPS/fonts")
-    return unless File.exists?(fonts_path + "_hide")
+    return unless File.exist?(fonts_path + "_hide")
     FileUtils.mv(fonts_path + "_hide", fonts_path)
   end
 
@@ -301,7 +301,7 @@ class NovelConverter
     [".jpg", ".png", ".jpeg"].each do |ext|
       filename = "cover#{ext}"
       cover_path = File.join(archive_path, filename)
-      if File.exists?(cover_path)
+      if File.exist?(cover_path)
         return filename
       end
     end

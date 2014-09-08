@@ -67,7 +67,7 @@ module Command
       end
       puts "<bold><green>AozoraEpub3の設定を行います</green></bold>".termcolor
       unless @global_setting["aozoraepub3dir"]
-        puts ("<bold><red>" + "!!!WARNING!!!".center(70) + "</red></bold>").termcolor
+        puts "<bold><red>#{"!!!WARNING!!!".center(70)}</red></bold>".termcolor
         puts "AozoraEpub3の構成ファイルを書き換えます。narouコマンド用に別途新規インストールしておくことをオススメします"
       end
       aozora_path = ask_aozoraepub3_path
@@ -131,8 +131,8 @@ module Command
         when input == ""
           break
         end
-        print ("\n<bold><green>入力されたフォルダにAozoraEpub3がありません。" +
-               "もう一度入力して下さい:</green></bold>\n&gt;").termcolor
+        print "\n<bold><green>入力されたフォルダにAozoraEpub3がありません。" \
+              "もう一度入力して下さい:</green></bold>\n&gt;".termcolor
       end
       nil
     end

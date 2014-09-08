@@ -127,7 +127,7 @@ module Command
     def clean_diff(id)
       cache_root_dir = Downloader.get_cache_root_dir(id)
       print Database.instance.get_data("id", id)["title"] + " の"
-      unless File.exists?(cache_root_dir)
+      unless File.exist?(cache_root_dir)
         puts "差分はひとつもありません"
         return
       end
@@ -179,7 +179,7 @@ module Command
         cache_root_dir = Downloader.get_cache_root_dir(id)
         if cache_root_dir
           cache_dir = File.join(cache_root_dir, @options["view_diff_version"])
-          cache_dir = nil unless File.exists?(cache_dir)
+          cache_dir = nil unless File.exist?(cache_dir)
         end
       else
         nth = @options["number"]
@@ -202,7 +202,7 @@ module Command
       cache_sections = []
       cache_section_list.each do |path|
         match_latest_path = File.join(novel_dir, File.basename(path))
-        latest_novel_sections << YAML.load_file(match_latest_path) if File.exists?(match_latest_path)
+        latest_novel_sections << YAML.load_file(match_latest_path) if File.exist?(match_latest_path)
         cache_sections << YAML.load_file(path)
       end
 
@@ -240,7 +240,7 @@ module Command
       end
       puts "差分一覧"
       cache_list.each.with_index(1) do |cache_path, i|
-        puts ("<bold><yellow>" + File.basename(cache_path) + "   -#{i}</yellow></bold>").termcolor
+        puts "<bold><yellow>#{File.basename(cache_path)}   -#{i}</yellow></bold>".termcolor
         cache_section_list = Dir.glob(File.join(cache_path, "*.yaml"))
         if cache_section_list.length > 0
           cache_section_list.map { |section_path|
@@ -258,7 +258,7 @@ module Command
       Database.instance.each do |id, data|
         next if Narou.novel_frozen?(id)
         cache_root_dir = Downloader.get_cache_root_dir(id)
-        next unless File.exists?(cache_root_dir)
+        next unless File.exist?(cache_root_dir)
         FileUtils.remove_entry_secure(cache_root_dir)
         puts "#{data["title"]} の差分を削除しました"
       end

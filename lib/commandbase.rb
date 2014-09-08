@@ -87,7 +87,7 @@ module Command
       0
     end
 
-    def self.oneline_help(msg)
+    def self.oneline_help
       ""
     end
 

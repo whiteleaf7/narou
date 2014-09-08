@@ -191,7 +191,7 @@ module Helper
           sleep(sleep_time)
         end
       }.tap { |th|
-        if Helper::engine_jruby?
+        if Helper.engine_jruby?
           # MEMO:
           #   Open3.capture3 - 全く動かない
           #   `` バッククウォート - 出力が文字化けする

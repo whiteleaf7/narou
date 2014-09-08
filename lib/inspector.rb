@@ -26,7 +26,7 @@ class Inspector
 
   def self.read_messages(setting)
     inspect_log = File.join(setting.archive_path, INSPECT_LOG_NAME)
-    if File.exists?(inspect_log)
+    if File.exist?(inspect_log)
       File.read(inspect_log)
     else
       nil

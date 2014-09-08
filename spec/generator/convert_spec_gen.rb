@@ -21,7 +21,7 @@ Dir.chdir(recipe_dir)
 convert_test_text_list = Dir.glob(File.join("*", "test_*.txt")).keep_if { |path|
   dir = File.dirname(path)
   basename = File.basename(path)
-  unless File.exists?(File.join(dir, "correct_#{basename}"))
+  unless File.exist?(File.join(dir, "correct_#{basename}"))
     puts <<-EOS
 [Warning]
 テストケース(#{path})は見つかりましたが、出力例のテキストデータが見つかりません。
@@ -51,7 +51,7 @@ require_relative "../lib/commandline"
 require_relative "../lib/logger"
 
 AUTHOR = "whiteleaf"
-$debug = File.exists?(File.expand_path(File.join(File.dirname(__FILE__), "../debug")))
+$debug = File.exist?(File.expand_path(File.join(File.dirname(__FILE__), "../debug")))
 
 describe "convert" do
   before :all do

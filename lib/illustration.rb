@@ -77,7 +77,7 @@ class Illustration
 
   def create_illust_path(basename)
     illust_abs_dir = File.join(@setting.archive_path, ILLUST_DIR)
-    Dir.mkdir(illust_abs_dir) unless File.exists?(illust_abs_dir)
+    Dir.mkdir(illust_abs_dir) unless File.exist?(illust_abs_dir)
     File.join(illust_abs_dir, basename)
   end
 

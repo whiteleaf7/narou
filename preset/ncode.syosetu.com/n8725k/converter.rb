@@ -16,7 +16,7 @@ converter "n8725k ログ・ホライズン" do
     if element_type == "body"
       if data =~ /[｜|]([^《]+)《(、+)》/
         if $1.length == $2.length
-          data.gsub!(/[｜|]([^《]+)《(、+)》/) do |match|
+          data.gsub!(/[｜|]([^《]+)《(、+)》/) do
             "［＃傍点］" + $1 + "［＃傍点終わり］"
           end
         end

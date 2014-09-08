@@ -45,7 +45,7 @@ module Command
       database = Database.instance
       begin
         mailer = Mailer.create
-      rescue Mailer::SettingNotFound => e
+      rescue Mailer::SettingNotFound
         install_mailer_setting
         return
       rescue Mailer::SettingUncompleteError => e
@@ -73,7 +73,7 @@ module Command
             next   # すでに送信済みなので送信しない
           end
         end
-        unless File.exists?(ebook_path)
+        unless File.exist?(ebook_path)
           error "まだファイル(#{File.basename(ebook_path)})が無いようです" unless send_all
           next
         end
@@ -120,7 +120,7 @@ module Command
 
     def alter_database_add_column_last_mail_date
       database = Database.instance
-      database.each do |id, data|
+      database.each do |_, data|
         data["last_mail_date"] ||= Time.now
       end
       database.save_database

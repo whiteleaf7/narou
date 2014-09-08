@@ -25,7 +25,7 @@ module Device::Ibooks
       "force.enable_half_indent_bracket" => false,
     })
     @@__ibooks_container_dir = File.expand_path(IBOOKS_CONTAINER_DIR)
-    unless File.exists?(@@__ibooks_container_dir)
+    unless File.exist?(@@__ibooks_container_dir)
       error "iBooksの管理フォルダが見つかりませんでした。" \
             "MacOSX Mavericks以降のiBooksのみ管理に対応しています"
       @@__ibooks_container_dir = nil
@@ -46,7 +46,7 @@ module Device::Ibooks
     end
     @toc_url = @novel_data["toc_url"]
     epubdir_path = get_epubdir_path_in_ibooks_container
-    if epubdir_path && File.exists?(epubdir_path)
+    if epubdir_path && File.exist?(epubdir_path)
       extract_epub(ebook_file_path, epubdir_path)
       puts "iBooksに登録してあるEPUBを更新しました"
     else

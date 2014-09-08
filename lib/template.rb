@@ -24,7 +24,7 @@ class Template
       dest_filepath = File.join(dest_filepath, src_filename)
     end
     unless overwrite
-      return if File.exists?(dest_filepath)
+      return if File.exist?(dest_filepath)
     end
     result = get(src_filename, _binding) or return nil
     if Helper.os_windows?
@@ -46,7 +46,7 @@ class Template
     @@src_filename = src_filename
     [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
       path = File.join(dir, TEMPLATE_DIR, src_filename + ".erb")
-      next unless File.exists?(path)
+      next unless File.exist?(path)
       src = open(path, "r:BOM|UTF-8") { |fp| fp.read }
       result = ERB.new(src, nil, "-").result(_binding)
       return result

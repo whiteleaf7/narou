@@ -51,7 +51,6 @@ module Command
 
     def execute(argv)
       super
-      novels = []
       if @options["all-ss"]
         novels = get_all_short_story
         if novels.count == 0

@@ -84,7 +84,7 @@ module Command
           error "#{target} は存在しません"
           next
         end
-        unless File.exists?(ebook_path)
+        unless File.exist?(ebook_path)
           error "まだファイル(#{File.basename(ebook_path)})が無いようです" unless send_all
           next
         end
@@ -114,7 +114,7 @@ module Command
           exit 1   # next しても次も失敗すると分かりきっているためここで終了する
         end
       end
-    rescue Interrupt => e
+    rescue Interrupt
       puts "送信を中断しました"
       exit 1
     end

@@ -55,7 +55,7 @@ class Database
   # データベース初期設定
   #
   def self.init
-    unless File.exists?(ARCHIVE_ROOT_DIR_PATH)
+    unless File.exist?(ARCHIVE_ROOT_DIR_PATH)
       FileUtils.mkdir(ARCHIVE_ROOT_DIR_PATH)
       puts ARCHIVE_ROOT_DIR_PATH + " を作成しました"
     end

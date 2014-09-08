@@ -11,7 +11,7 @@ require_relative "../lib/commandline"
 require_relative "../lib/logger"
 
 AUTHOR = "whiteleaf"
-$debug = File.exists?(File.expand_path(File.join(File.dirname(__FILE__), "../debug")))
+$debug = File.exist?(File.expand_path(File.join(File.dirname(__FILE__), "../debug")))
 
 describe "convert" do
   before :all do

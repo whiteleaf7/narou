@@ -118,7 +118,6 @@ class Downloader
     target = Narou.alias_to_id(target)
     type = get_target_type(target)
     data = nil
-    id = nil
     case type
     when :url, :ncode
       toc_url = get_toc_url(target)
@@ -132,7 +131,7 @@ class Downloader
     id = data["id"]
     file_title = data["file_title"] || data["title"]   # 互換性維持のための処理
     path = File.join(Database.archive_root_path, data["sitename"], file_title)
-    if File.exists?(path)
+    if File.exist?(path)
       return path
     else
       @@database.delete(id)
@@ -324,7 +323,6 @@ class Downloader
       return false
     end
   end
-
 
   #
   # ダウンロードを処理本体を起動
@@ -693,7 +691,7 @@ class Downloader
         latest_section_timestamp_ymd = __strdate_to_ymd(get_section_file_timestamp(old, latest))
         section_file_name = "#{index} #{old["file_subtitle"]}.yaml"
         section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
-        different_check = -> {
+        different_check = lambda do
           latest_info_dummy = latest.dup
           latest_info_dummy["element"] = a_section_download(latest)
           deffer = different_section?(section_file_relative_path, latest_info_dummy)
@@ -704,7 +702,7 @@ class Downloader
             File.utime(now, now, File.join(get_novel_data_dir, section_file_relative_path))
           end
           deffer
-        }
+        end
       end
       if old_subupdate && latest_subupdate
         if old_subupdate == ""
@@ -787,12 +785,12 @@ class Downloader
   def sections_download_and_save(subtitles)
     max = subtitles.count
     return if max == 0
-    puts ("<bold><green>" + TermColorLight.escape("ID:#{@id}　#{get_title} のDL開始") + "</green></bold>").termcolor
+    puts "<bold><green>#{"ID:#{@id}　#{get_title}".escape} のDL開始</green></bold>".termcolor
     save_least_one = false
     subtitles.each_with_index do |subtitle_info, i|
       index, subtitle, file_subtitle, chapter = %w(index subtitle file_subtitle chapter).map { |k|
-                                                  subtitle_info[k]
-                                                }
+        subtitle_info[k]
+      }
       unless chapter.empty?
         puts "#{chapter}"
       end
@@ -807,9 +805,9 @@ class Downloader
       print "#{subtitle} (#{i+1}/#{max})"
       info = subtitle_info.dup
       info["element"] = a_section_download(subtitle_info)
-      section_file_name = "#{info["index"]} #{info["file_subtitle"]}.yaml"
+      section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
-      if File.exists?(File.join(get_novel_data_dir, section_file_relative_path))
+      if File.exist?(File.join(get_novel_data_dir, section_file_relative_path))
         if @force
           if different_section?(section_file_relative_path, info)
             print " (更新あり)"
@@ -836,7 +834,7 @@ class Downloader
   #
   def different_section?(old_relative_path, new_subtitle_info)
     path = File.join(get_novel_data_dir, old_relative_path)
-    if File.exists?(path)
+    if File.exist?(path)
       return YAML.load_file(path)["element"] != new_subtitle_info["element"]
     else
       return true
@@ -848,7 +846,7 @@ class Downloader
   #
   def move_to_cache_dir(relative_path)
     path = File.join(get_novel_data_dir, relative_path)
-    if File.exists?(path) && @cache_dir
+    if File.exist?(path) && @cache_dir
       FileUtils.mv(path, @cache_dir)
     end
   end
@@ -945,7 +943,7 @@ class Downloader
 
   def init_raw_dir
     path = get_raw_dir
-    FileUtils.mkdir_p(path) unless File.exists?(path)
+    FileUtils.mkdir_p(path) unless File.exist?(path)
   end
 
   #
@@ -1025,7 +1023,7 @@ class Downloader
   def save_novel_data(filename, object)
     path = File.join(get_novel_data_dir, filename)
     dir_path = File.dirname(path)
-    unless File.exists?(dir_path)
+    unless File.exist?(dir_path)
       FileUtils.mkdir_p(dir_path)
     end
     File.write(path, YAML.dump(object))
@@ -1046,15 +1044,15 @@ class Downloader
   def init_novel_dir
     novel_dir_path = get_novel_data_dir
     file_title = File.basename(novel_dir_path)
-    FileUtils.mkdir_p(novel_dir_path) unless File.exists?(novel_dir_path)
+    FileUtils.mkdir_p(novel_dir_path) unless File.exist?(novel_dir_path)
     default_settings = NovelSetting::DEFAULT_SETTINGS
     special_preset_dir = File.join(Narou.get_preset_dir, @setting["domain"], @setting["ncode"])
-    exists_special_preset_dir = File.exists?(special_preset_dir)
+    exists_special_preset_dir = File.exist?(special_preset_dir)
     [NovelSetting::INI_NAME, "converter.rb", NovelSetting::REPLACE_NAME].each do |filename|
       if exists_special_preset_dir
         preset_file_path = File.join(special_preset_dir, filename)
-        if File.exists?(preset_file_path)
-          unless File.exists?(File.join(novel_dir_path, filename))
+        if File.exist?(preset_file_path)
+          unless File.exist?(File.join(novel_dir_path, filename))
             FileUtils.cp(preset_file_path, novel_dir_path)
           end
           next
