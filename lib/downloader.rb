@@ -389,17 +389,23 @@ class Downloader
       return_status = :none
     end
     save_novel_data(TOC_FILE_NAME, latest_toc)
+    tags = @@database[@id]["tags"] || []
     if novel_end?
-      if old_toc.empty? || !@@database[@id]["end"]
+      unless tags.include?("end")
+        update_database if update_subtitles.count == 0
         $stdout.silence do
           Command::Tag.execute!([@id, "--add", "end", "--color", "white"])
         end
-        if old_toc.empty?
-          puts "<bold><cyan>ID:#{@id} #{@title} は完結しているようです</cyan></bold>".termcolor
-        else
-          puts "<bold><cyan>ID:#{@id} #{@title} は完結したようです</cyan></bold>".termcolor
-          update_database if update_subtitles.count == 0
+        msg = old_toc.empty? ? "完結しているようです" : "完結したようです"
+        puts "<cyan>ID:#{@id}　#{@title.escape} は#{msg}</cyan>".termcolor
+      end
+    else
+      if tags.include?("end")
+        update_database if update_subtitles.count == 0
+        $stdout.silence do
+          Command::Tag.execute!([@id, "--delete", "end"])
         end
+        puts "<cyan>ID:#{@id}　#{@title.escape} は連載を再開したようです</cyan>".termcolor
       end
     end
     return_status
@@ -528,9 +534,6 @@ class Downloader
   # 小説の種別を取得（連載か短編）
   #
   def get_novel_type
-    if @novel_status
-      @novel_status["novel_type"]
-    end
     @novel_status ||= get_novel_status
     @novel_status["novel_type"]
   end
@@ -539,9 +542,6 @@ class Downloader
   # 小説が完結しているか調べる
   #
   def novel_end?
-    if @novel_status
-      @novel_status["end"]
-    end
     @novel_status ||= get_novel_status
     @novel_status["end"]
   end
