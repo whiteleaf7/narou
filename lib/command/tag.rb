@@ -56,7 +56,7 @@ module Command
       }
       @opt.on("-c", "--color COL", String,
               "タグの色を自分で指定する\n" \
-              "#{' '*25}COL=#{get_color_list}".termcolor) { |color|
+              "#{' '*25}COL=#{get_color_list}") { |color|
         color.downcase!
         unless COLORS.include?(color)
           error "#{color}という色は存在しません。色指定は無視されます"
@@ -72,7 +72,7 @@ module Command
     def get_color_list
       COLORS.map { |color|
         "<bold><#{color}>#{color}</#{color}></bold>"
-      }.join(",")
+      }.join(",").termcolor
     end
 
     def execute(argv)

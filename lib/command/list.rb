@@ -19,7 +19,7 @@ module Command
 
     def initialize
       super("[<limit>] [options]")
-      @opt.separator <<-EOS.termcolor
+      @opt.separator <<-EOS
 
   ・現在管理している小説の一覧を表示します
   ・表示されるIDは各コマンドで指定することで小説名等を入力する手間を省けます

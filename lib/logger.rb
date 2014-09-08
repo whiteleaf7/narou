@@ -7,14 +7,6 @@ require "singleton"
 require "stringio"
 require_relative "color"
 
-if RUBY_VERSION < "2.0.0"
-  class String
-    def termcolor
-      TermColorLight.parse(self.dup.force_encoding(Encoding::ASCII_8BIT))
-    end
-  end
-end
-
 if $disable_color
   class String
     def termcolor
