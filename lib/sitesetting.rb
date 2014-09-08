@@ -31,7 +31,7 @@ class SiteSetting
     match_data = nil
     keys.each do |key|
       setting_value = self[key] or next
-      (setting_value.kind_of?(Array) ? setting_value : [setting_value]).each do |value|
+      [*setting_value].each do |value|
         match_data = source.match(/#{value}/m)
         if match_data
           @match_values[key] = value       # yamlのキーでもmatch_valuesに設定しておくが、
