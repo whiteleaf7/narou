@@ -3,7 +3,6 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require "pony"
 require "yaml"
 require_relative "narou"
 
@@ -48,6 +47,7 @@ class Mailer
   end
 
   def send(message, attached_file_path = nil)
+    require "pony"
     @error_message = ""
     params = @options.dup
     params[:body] = message
