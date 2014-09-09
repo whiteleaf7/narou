@@ -2,11 +2,10 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2014-08-28 00:35:38 +0900
+# auto generated at 2014-09-09 18:27:07 +0900
 
 Encoding.default_external = Encoding::UTF_8
 
-require "termcolor"
 require_relative "../lib/commandline"
 require_relative "../lib/logger"
 

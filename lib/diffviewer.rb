@@ -4,7 +4,6 @@
 #
 
 require "diff/lcs"
-require "termcolor"
 
 #
 # 指定されたソースの差分を作成する

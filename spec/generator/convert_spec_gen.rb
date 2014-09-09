@@ -46,7 +46,6 @@ __END__
 
 Encoding.default_external = Encoding::UTF_8
 
-require "termcolor"
 require_relative "../lib/commandline"
 require_relative "../lib/logger"
 
