@@ -27,6 +27,10 @@ class SiteSetting
     @yaml_setting = YAML.load_file(path)
   end
 
+  def matched?(key)
+    @match_values[key]
+  end
+
   def multi_match(source, *keys)
     match_data = nil
     keys.each do |key|

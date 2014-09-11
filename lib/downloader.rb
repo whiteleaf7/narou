@@ -364,6 +364,11 @@ class Downloader
       update_subtitles = update_body_check(old_toc["subtitles"], latest_toc["subtitles"])
     end
 
+    if old_toc.empty? && update_subtitles.count == 0
+      error "#{@setting['title']} の目次がありません"
+      return :failed
+    end
+
     unless @force
       if process_digest(old_toc, latest_toc)
         return :canceled
@@ -594,6 +599,21 @@ class Downloader
     @title
   end
 
+  class DownloaderHTTP404Error < OpenURI::HTTPError
+    def initialize
+      super("404 not found", nil)
+    end
+  end
+
+  #
+  # HTMLの中から小説が削除されたことを示すメッセージを検出する
+  #
+  def detect_404_message(source)
+    message = @setting["404_message"]
+    return false unless message
+    source.include?(message)
+  end
+
   #
   # 目次データを取得する
   #
@@ -601,29 +621,17 @@ class Downloader
     toc_url = @setting["toc_url"]
     return nil unless toc_url
     toc_source = ""
-    begin
-      open(toc_url) do |toc_fp|
-        if toc_fp.base_uri.to_s != toc_url
-          # リダイレクトされた場合。
-          # ノクターン・ムーンライトのNコードを ncode.syosetu.com に渡すと、novel18.syosetu.com に飛ばされる
-          # 目次の定義が微妙に ncode.syosetu.com と違うので、設定を取得し直す
-          @setting.clear   # 今まで使っていたのは一旦クリア
-          @setting = Downloader.get_sitesetting_by_target(toc_fp.base_uri.to_s)
-          toc_url = @setting["toc_url"]
-        end
-        toc_source = Helper.pretreatment_source(toc_fp.read, @setting["encoding"])
+    open(toc_url) do |toc_fp|
+      if toc_fp.base_uri.to_s != toc_url
+        # リダイレクトされた場合。
+        # ノクターン・ムーンライトのNコードを ncode.syosetu.com に渡すと、novel18.syosetu.com に飛ばされる
+        # 目次の定義が微妙に ncode.syosetu.com と違うので、設定を取得し直す
+        @setting.clear   # 今まで使っていたのは一旦クリア
+        @setting = Downloader.get_sitesetting_by_target(toc_fp.base_uri.to_s)
+        toc_url = @setting["toc_url"]
       end
-    rescue OpenURI::HTTPError => e
-      if e.message =~ /^404/
-        error "<bold><red>[404]</red></bold> 小説が削除されている可能性があります".termcolor
-        $stdout.silence do
-          Command::Tag.execute!([@id, "--add", "404", "--color", "white"])
-        end
-        Command::Freeze.execute!([@id])
-      else
-        error "何らかの理由により目次が取得できませんでした(#{e.message})"
-      end
-      return false
+      toc_source = Helper.pretreatment_source(toc_fp.read, @setting["encoding"])
+      raise DownloaderHTTP404Error if detect_404_message(toc_source)
     end
     @setting.multi_match(toc_source, "tcode")
     #if @setting["narou_api_url"]
@@ -634,12 +642,14 @@ class Downloader
       info = NovelInfo.load(@setting)
     end
     if info
+      raise DownloaderHTTP404Error unless info["title"]
       @setting["title"] = info["title"]
       @setting["author"] = info["writer"]
       @setting["story"] = info["story"]
     else
       # 小説情報ページがないサイトの場合は目次ページから取得する
       @setting.multi_match(toc_source, "title", "author", "story")
+      raise DownloaderHTTP404Error unless @setting.matched?("title")
       @setting["story"] = HTML.new(@setting["story"]).to_aozora
     end
     @setting["title"] = get_title
@@ -658,6 +668,19 @@ class Downloader
       "subtitles" => subtitles
     }
     toc_objects
+  rescue OpenURI::HTTPError => e
+    if e.message.include?("404")
+      error "<bold><red>[404]</red></bold> 小説が削除されている可能性があります".termcolor
+      if @@database.novel_exists?(@id)
+        $stdout.silence do
+          Command::Tag.execute!(%W(#{@id} --add 404 --color white))
+        end
+        Command::Freeze.execute!([@id])
+      end
+    else
+      error "何らかの理由により目次が取得できませんでした(#{e.message})"
+    end
+    false
   end
 
   def __search_index_in_subtitles(subtitles, index)
