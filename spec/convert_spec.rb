@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2014-09-09 18:27:07 +0900
+# auto generated at 2014-09-13 04:26:31 +0900
 
 Encoding.default_external = Encoding::UTF_8
 
@@ -45,6 +45,10 @@ describe "convert" do
     output_file = File.join(dir, "[#{AUTHOR}] #{filename}")
     correct_file = File.join(dir, "correct_#{filename}")
     expect(load_file(output_file)).to eq load_file(correct_file)
+  end
+
+  it "alphabet_to_zenkaku/test_alphabet_to_zenkaku.txt" do
+    check_answer("alphabet_to_zenkaku/test_alphabet_to_zenkaku.txt")
   end
 
   it "auto_indent/test_auto_indent.txt" do

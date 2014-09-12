@@ -12,6 +12,8 @@ require_relative "inspector"
 
 class ConverterBase
   KANJI_NUM = "〇一二三四五六七八九"
+  ENGLISH_SENTENCES_CHARACTERS = /[\w.,!?'" &:;_-]+/
+  ENGLISH_SENTENCES_MIN_LENGTH = 8   # この文字数以上アルファベットが続くと半角のまま
 
   attr_reader :use_dakuten_font
 
@@ -470,6 +472,8 @@ class ConverterBase
   #
   # force : 強制的に全アルファベットを全角にするか？
   #         false の場合、英文章（半角スペースで区切られた2単語以上）を半角のままにする
+  #         英文の定義： 1. 半角スペースで区切られた２単語以上の文章、
+  #                      2. 一定以上の長さの一文字以上アルファベットを含む文章
   #
   def alphabet_to_zenkaku(data, force = false)
     if force
@@ -477,8 +481,9 @@ class ConverterBase
         match.tr("a-zA-Z", "ａ-ｚＡ-Ｚ")
       end
     else
-      data.gsub!(/[\w.,!?' ]+/) do |match|
-        if match.split(" ").size > 1
+      data.gsub!(ENGLISH_SENTENCES_CHARACTERS) do |match|
+        if match.split(" ").size >= 2 \
+           || (match.length >= ENGLISH_SENTENCES_MIN_LENGTH && match.match(/[a-z]/i))
           @english_sentences << match
           "［＃英文＝#{@english_sentences.size - 1}］"
         else
@@ -921,7 +926,7 @@ class ConverterBase
   # URL っぽい文字列を一旦別のIDに置き換えてあとで復元することで、変換処理の影響を受けさせない
   #
   def replace_url(data)
-    data.gsub!(URI.regexp) do |match|
+    data.gsub!(URI.regexp(%w(http https))) do |match|
       @url_list << match
       "［＃ＵＲＬ＝#{@url_list.size - 1}］"
     end

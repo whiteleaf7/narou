@@ -1,0 +1,25 @@
+test_alphabet_to_zenkaku
+whiteleaf
+
+［＃改ページ］
+アルファベット全角化テスト
+
+
+　■次の文中のアルファベットは全角化される
+　モンスターのHPが高すぎる。
+　MPが足りなくて魔法を使うことが出来ない。
+　Randomは全角になる。
+　ABC:DEF
+
+
+　■次の文中のアルファベットは全角化されない（英文判定）
+　This is a pen.
+　This novel was written by whiteleaf7.
+　What happen!?
+　Ken's delivery shopping.
+　幼女戦記Tuez-les tous, Dieu reconnaitra les siens.
+　He said: "I’m dead beat, but I have work after this."
+　maid by H&M
+　background-color: black;
+　Alphabetは長いので半角のまま。
+　ABC_DEF_GHI
