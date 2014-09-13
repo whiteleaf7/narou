@@ -6,7 +6,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-$debug = File.exist?(File.join(File.expand_path(File.dirname($0)), "debug"))
+$debug = File.exist?(File.join(File.expand_path(File.dirname(__FILE__)), "debug"))
 Encoding.default_external = Encoding::UTF_8
 
 if ARGV.delete("--time")
@@ -17,8 +17,8 @@ if ARGV.delete("--time")
 end
 
 require_relative "lib/inventory"
-display_backtrace = ARGV.delete("--backtrace")
-display_backtrace ||= $debug
+$display_backtrace = ARGV.delete("--backtrace")
+$display_backtrace ||= $debug
 $disable_color = ARGV.delete("--no-color")
 $disable_color ||= Inventory.load("global_setting", :global)["no-color"]
 
@@ -30,9 +30,11 @@ rescue_level = $debug ? Exception : StandardError
 
 begin
   CommandLine.run(ARGV.map { |v| v.dup })
+rescue SystemExit => e
+  raise
 rescue rescue_level => e
   warn $@.shift + ": #{e.message} (#{e.class})"
-  if display_backtrace
+  if $display_backtrace
     $@.each do |b|
       warn "  from #{b}"
     end

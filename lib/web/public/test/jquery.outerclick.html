@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="whiteleaf">
+    <meta name="robots" content="none">
+
+    <title>test jquery.outerclick.js</title>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+#container {
+  margin: 0 auto;
+  margin-top: 50px;
+}
+#menu {
+  border: 1px solid black;
+  background-color: orange;
+  font-size: 2em;
+  width: 300px;
+  height: 200px;
+}
+#menu2 {
+  border: 1px solid black;
+  background-color: pink;
+  font-size: 1.5em;
+  width: 300px;
+  height: 200px;
+  margin-top: 40px;
+}
+    </style>
+  </head>
+  <body>
+    
+    <div id="container">
+      <div id="menu">
+        このメニューの外側をクリックするとイベント発生
+      </div>
+
+      <div id="menu2">
+        <div class="item">
+          要素を内包したメニューの外側をクリックするとイベント発生
+        </div>
+        <div class="item">
+          アイテム２
+        </div>
+        <div class="item">
+          アイテム３
+        </div>
+      </div>
+    </div>
+
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="/resources/jquery.outerclick.js"></script>
+
+    <script type="text/javascript">
+$(document).ready(function() {
+  $("#menu, #menu2").outerClick(function() {
+    console.log($(this).attr("id") + "の外側がクリックされました")
+  });
+});
+    </script>
+  </body>
+</html>
+

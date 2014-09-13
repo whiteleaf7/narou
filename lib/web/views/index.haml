@@ -1,0 +1,190 @@
+.navbar.navbar-default.navbar-fixed-top(role="navigation")
+  .container
+    .navbar-header
+      %button.navbar-toggle(type="button")
+        %span.sr-only Toggle navigation
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      %a.navbar-brand(href="#" data-move-to="top") Narou.rb WEB UI
+    .navbar-collapse.collapse
+      %ul.nav.navbar-nav
+        %li.dropdown
+          %a.dropdown-toggle(data-toggle="dropdown" href="#")
+            表示
+            %span.caret
+          %ul.dropdown-menu(role="menu")
+            %li#action-view-all
+              %a(href="#") 全ての項目を表示
+            %li#action-view-setting
+              %a(href="#") 表示する項目を設定
+            %li.divider
+            %li#action-view-without-frozen.active
+              %a(href="#")
+                %span
+                  %span.active-ok.glyphicon.glyphicon-ok
+                  凍結中以外を表示
+            %li#action-view-frozen.active
+              %a(href="#")
+                %span
+                  %span.active-ok.glyphicon.glyphicon-ok
+                  凍結中を表示
+            %li.divider
+            %li#action-view-reset
+              %a(href="/") 表示設定を全てリセット
+        %li.dropdown
+          %a.dropdown-toggle(data-toggle="dropdown" href="#")
+            選択
+            %span#badge-number-of-selecting.badge 0
+            %span.caret
+          %ul#dropdown-menu-select.dropdown-menu(role="menu")
+            %li#action-select-all
+              %a(href="#")
+                %span 全ての小説を選択
+                %span.shortcut Ctrl+A
+            %li#action-select-view
+              %a(href="#")
+                %span 表示されている小説を選択
+                %span.shortcut Shift+A
+            %li#action-select-clear
+              %a(href="#")
+                %span 選択を全て解除
+                %span.shortcut Ctrl+Shift+A
+            %li.divider
+            %li#action-select-mode-single
+              %a(href="#")
+                %span
+                  %span.active-ok.glyphicon.glyphicon-ok
+                  シングル選択モード
+                %span.shortcut S
+            %li#action-select-mode-rect
+              %a(href="#")
+                %span
+                  %span.active-ok.glyphicon.glyphicon-ok
+                  範囲選択モード
+                %span.shortcut R
+      %ul.nav.navbar-nav.navbar-right
+        %li.dropdown
+          %a.dropdown-toggle(data-toggle="dropdown" href="#")
+            %span.glyphicon.glyphicon-cog.hidden-xs
+            %span.visible-xs-inline
+              オプション
+              %span.caret
+          %ul.dropdown-menu(role="menu")
+            %li#action-option-settings
+              %a(href="/settings")
+                %span
+                  %span.glyphicon.glyphicon-wrench
+                  環境設定
+            %li.divider
+            %li#action-option-help
+              %a(href="/help")
+                %span
+                  %span.glyphicon.glyphicon-question-sign
+                  ヘルプ
+            %li#action-option-about
+              %a(href="#")
+                %span
+                  %span.glyphicon.glyphicon-info-sign
+                  Narou.rb について
+            %li.divider
+            %li#action-option-server-shutdown
+              %a(href="#")
+                %span
+                  %span.glyphicon.glyphicon-off
+                  サーバをシャットダウン
+      .navbar-form.navbar-right(role="search")
+        .form-group
+          .input-group
+            %span#myFilter-search-icon.glyphicon.glyphicon-search
+            %input#myFilter.form-control(placeholder="Filter" type="text")/
+            %span#myFilter-clear.glyphicon.glyphicon-remove-circle
+
+.container.container-main.theme-showcase(role="main")
+  -# 初めて表示した時のメッセージ
+  - if @is_first_access
+    .alert.alert-info.fade.in(role="alert")
+      %button.close(type="button" data-dismiss="alert")
+        %span(aria-hidden="true") &times;
+        %span.sr-only Close
+      %h2 ようこそ！
+      %p Narou.rb WEB UI を初めて表示されましたね！　ここでは簡単な操作方法を説明します。
+      %p(style="margin-top:20px")
+        %a.btn.btn-primary(href="/help" role="button") Learn more &raquo;
+
+  -# コンソール
+  #console-container
+    #console
+    #console-control-buttons
+      %span#console-refresh.glyphicon.glyphicon-refresh
+      %span#console-expand
+        %span.glyphicon.glyphicon-resize-full
+        %span.glyphicon.glyphicon-resize-small.hide
+
+  -# 操作パネル
+  #control-panel
+    .btn-group
+      %button.btn.btn-primary(type="button" data-toggle="tooltip" |
+                              title="新規ダウンロード") Download |
+      %button.btn.btn-primary.dropdown-toggle(type="button" data-toggle="dropdown")
+        %span.caret
+        %span.sr-only Toggle Dropdown
+      %ul.dropdown-menu(role="menu")
+        %li
+          %a(href="#") 選択した小説を強制再ダウンロード
+    .btn-group
+      %button.btn.btn-success(type="button" data-toggle="tooltip" |
+                              title="全てアップデート") Update |
+      %button.btn.btn-success.dropdown-toggle(type="button" data-toggle="dropdown")
+        %span.caret
+        %span.sr-only Toggle Dropdown
+      %ul.dropdown-menu(role="menu")
+        %li
+          %a(href="#") 選択した小説のみアップデート
+    .btn-group
+      %button.btn.btn-info.dropdown-toggle(type="button" data-toggle="dropdown")
+        Freeze
+        %span.caret
+        %span.sr-only Toggle Dropdown
+      %ul.dropdown-menu(role="menu")
+        %li
+          %a(href="#") 選択した小説を凍結
+        %li
+          %a(href="#") 選択した小説の凍結を解除
+    .btn-group
+      %button.btn.btn-warning(type="button" data-toggle="tooltip" |
+                              title="更新された小説を送信") Send |
+      %button.btn.btn-warning.dropdown-toggle(type="button" data-toggle="dropdown")
+        %span.caret
+        %span.sr-only Toggle Dropdown
+      %ul.dropdown-menu(role="menu")
+        %li
+          %a(href="#") 選択した小説のみ送信
+    .btn-group
+      %button.btn.btn-danger.dropdown-toggle(type="button" data-toggle="dropdown")
+        Remove
+        %span.caret
+        %span.sr-only Toggle Dropdown
+      %ul.dropdown-menu(role="menu")
+        %li
+          %a(href="#") 選択した小説を削除
+        %li
+          %a(href="#") 選択した小説をファイルも全て削除
+    %button.btn.btn-default(type="button" data-toggle="tooltip" |
+                            title="選択した小説を変換") Convert |
+
+  -# 小説の一覧テーブル
+  %div
+    %table#novel-list.dataTable.table.table-bordered(cellspacing="0" width="100%")
+      %thead
+-# 範囲選択後に表示するメニュー
+%ul#rect-select-menu.dropdown-menu(role="menu")
+  %li#rect-select-menu-select
+    %a(href="#") 選択
+  %li#rect-select-menu-clear
+    %a(href="#") 解除
+  %li#rect-select-menu-reverse
+    %a(href="#") 反転
+  %li#rect-select-menu-cancel
+    %a(href="#") キャンセル
+

@@ -1,0 +1,453 @@
+/*! -*- coding: utf-8 -*-
+ *
+ * Copyright 2013 whiteleaf. All rights reserved.
+ */
+
+@mixin opacity($opacity) {
+     opacity: $opacity;
+     $opacityIE: $opacity * 100;
+     filter: alpha(opacity=$opacityIE);
+}
+
+@mixin css3($property, $value) {
+     @each $prefix in -webkit-, -moz-, -ms-, -o-, '' {
+          #{$prefix}#{$property}: $value;
+     }
+}
+
+@mixin clearfix {
+  zoom: 1;
+  &:before,
+  &:after {
+    display: block;
+    height: 0;
+    visibility: hidden;
+    content: "\0020";
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+$default-color: #333;
+
+/*
+ * 全体
+ */
+body {
+  padding-top: 70px;
+  padding-bottom: 300px;
+}
+
+@media (max-width:767px) {
+  .container-main {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+/*
+ * テーブル関連
+ */
+table#novel-list {
+  $thead-background-color: #605555;
+  $odd-color: #f8f3e5;
+  $even-color: #fffcef;
+  $novel-list-border-color: mix($odd-color, $thead-background-color, 80%);
+
+  font-size: 0.8em;
+  color: $default-color;
+  //border-color: darken($odd-color, 20%);
+  border-color: $novel-list-border-color;
+
+  @mixin dataTableSortingHeader($arrow_img_url) {
+    background: url($arrow_img_url) no-repeat center right !important;
+    background-color: #403535 !important;
+  }
+
+  thead {
+    background-color: $thead-background-color;
+    color: #ddd0cc;
+  }
+  td {
+    padding: 4px !important;
+    vertical-align: middle;
+    //border-color: darken($odd-color, 20%);
+    border-color: $novel-list-border-color;
+  }
+  tr {
+    td.text-center {
+      text-align: center;
+    }
+  }
+  tr.odd {
+    background-color: $odd-color;
+    td.sorting_1 {
+      background-color: #f0ecde;
+    }
+  }
+  tr.even {
+    background-color: $even-color;
+    td.sorting_1 {
+      background-color: #f8f3e5;
+    }
+  }
+  $selected-color: #90cebc;
+  //$selected-color: #83c8b5;
+  $selected-hover-color: #ded;
+  tr.selected {
+    td {
+      background-color: $selected-color !important;
+      font-weight: bold;
+      color: $default-color !important;
+      overflow: hidden;
+      &.sorting_1 {
+        background-color: mix($selected-color, black, 96%) !important;
+      }
+    }
+    td > div {
+      position: relative;
+    }
+
+    td:first-child > div:after {
+      position: absolute;
+      top: -5px;
+      left: 1px;
+      color: white !important;
+      font-family: 'Glyphicons Halflings';
+      font-style: normal;
+      font-weight: bold;
+      font-size: 2em;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      content: "\e013";
+      @include opacity(0.5);
+    }
+  }
+  @media (min-width:768px) {
+    tr:hover td {
+      background-color: $selected-hover-color !important;
+      &.sorting_1 {
+        background-color: mix($selected-hover-color, black, 97%) !important;
+      }
+    }
+    tr:hover.selected td {
+      background-color: $selected-color !important;
+      &.sorting_1 {
+        background-color: mix($selected-color, black, 96%) !important;
+      }
+    }
+  }
+  $frozen-color: #6caddd;
+  tr.frozen td {
+    $frozen-background-color: mix($even-color, $frozen-color, 88%);
+    color: lighten($default-color, 25%);
+    background-color: $frozen-background-color;
+    &.sorting_1 {
+      //background-color: darken($frozen-background-color, 3%);
+      background-color: mix($frozen-background-color, black, 97%);
+    }
+    &.column-id > div:before {
+      content: "＊";
+      color: $frozen-color;
+      font-weight: bold;
+    }
+  }
+  tr.frozen.selected td.column-id > div:before {
+    color: lighten($frozen-color, 30%);
+  }
+  thead {
+    .sorting_asc {
+      @include dataTableSortingHeader("/resources/sort_asc.png");
+    }
+    .sorting_desc {
+      @include dataTableSortingHeader("/resources/sort_desc.png");
+    }
+  }
+  a {
+    display: block;
+  }
+}
+
+// DataTables 共通設定
+table.dataTable {
+  th {
+    text-align: center;
+  }
+  thead {
+    /* ソート中の列以外は矢印アイコンは表示しない */
+    .sorting,
+    .sorting_asc_disabled,
+    .sorting_desc_disabled {
+      background: inherit;
+    }
+  }
+}
+
+/*
+ * ナビバー
+ */
+.navbar {
+  $navbar-background-color: rgba(248,248,248,0.93);
+  background-color: $navbar-background-color;
+
+  @media (max-width:767px) {
+    .navbar-collapse {
+      position: absolute;
+      right: -270px;
+      background-color: $navbar-background-color;
+      width: 270px;
+      border-left: 1px solid #aaa !important;
+      border-bottom: 1px solid #aaa !important;
+      border-width: 1px 0 2px 2px;
+      border-bottom-left-radius: 10px;
+      /* max-heightが有効なときにメニューがはみ出した場合スクロールバーを表示する */
+      /* margin-right: 0 !important; */
+    }
+  }
+  .active-ok {
+    display: none;
+  }
+  li.dropdown.open > .dropdown-toggle {
+    background-color: darken($navbar-background-color, 15%) !important;
+  }
+  ul.dropdown-menu {
+    li.with-icon a {
+      padding-left: 8px !important;
+    }
+    li.active {
+      a {
+        padding-left: 4px !important;
+        background-color: inherit !important;
+        color: inherit !important;
+      }
+      a:hover {
+        background-color: #f5f5f5 !important;
+        color: inherit !important;
+      }
+      @media (max-width:767px) {
+        a:hover {
+          background-color: inherit !important;
+        }
+      }
+      span.active-ok {
+        display: inline;
+      }
+    }
+  }
+}
+
+/*
+ * フォーム関係
+ */
+#myFilter {
+  width: 200px;
+  border-radius: 18px;
+  padding-left: 29px;
+  padding-right: 23px;
+  margin-left: 10px;
+}
+@mixin placeholder { color: #bbb !important }
+::-moz-placeholder { @include placeholder }
+::-webkit-input-placeholder { @include placeholder }
+:-moz-placeholder { @include placeholder }
+:-ms-input-placeholder { @include placeholder }
+@media (min-width:992px){
+  #myFilter {
+    width: 250px !important;
+  }
+}
+input::-ms-clear {
+  visibility: hidden;
+}
+#myFilter-clear, #myFilter-search-icon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  height: 14px;
+  margin: auto;
+  font-size: 14px;
+  color: #ccc;
+  z-index: 100;
+}
+#myFilter-clear {
+  right: 7px;
+  cursor: pointer;
+}
+#myFilter-search-icon {
+  left: 19px;
+}
+
+/*
+ * タグ
+ */
+.dataTable {
+  .label {
+    font-size: 0.8em;
+    line-height: 2em;
+  }
+  .label-green {
+    background-color: #5cb85c;
+  }
+  .label-yellow {
+    background-color: #f7d71e;
+    color: #666;
+  }
+  .label-blue {
+    background-color: #428bca;
+  }
+  .label-magenta {
+    background-color: #d37bca;
+  }
+  .label-cyan {
+    background-color: #5bc0de;
+  }
+  .label-red {
+    background-color: #d9534f;
+  }
+  .label-white {
+    background-color: #e3e3e3;
+    color: #666;
+  }
+}
+
+/*
+ * ダイアログ
+ */
+@media (min-width:768px) {
+  .modal-content {
+    margin-top: 160px;
+  }
+}
+@media (max-width:767px) {
+  .modal-content {
+    margin-top: 80px;
+  }
+}
+
+/*
+ * 選択メニュー
+ */
+#rect-select-menu {
+  position: absolute;
+  display: none;
+  z-index: 101;
+}
+
+/*
+ * コントロールパネル
+ */
+#control-panel {
+  @media (min-width:768px) {
+    width: 100%;
+  }
+  @media (max-width:767px) {
+    width: 97%;
+    margin: 0 auto;
+  }
+  margin-bottom: 15px !important;
+
+  button {
+    margin-bottom: 5px;
+  }
+}
+
+/*
+ * コンソール
+ */
+$console-color: #ddd;
+
+#console-container {
+  position: relative;
+  @media (min-width:768px) {
+    width: 100%;
+  }
+  @media (max-width:767px) {
+    width: 97%;
+    margin: 0 auto;
+  }
+  margin-bottom: 20px !important;
+}
+#console {
+  position: relative;
+  overflow: hidden;
+  padding: 5px 15px 5px 15px;
+  border-width: 0;
+  border-radius: 4px;
+  background-color: #333;
+  color: $console-color;
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+  word-wrap:break-word;
+
+  @media (min-width:768px) {
+    font-size: 13px;
+    line-height: 120%;
+    height: 150px;
+    .console-line {
+      min-height: 15px;
+    }
+  }
+
+  @media (max-width:767px) {
+    height: 100px;
+    font-size: 11px;
+    line-height: 110%;
+    .console-line {
+      min-height: 12px;
+    }
+  }
+}
+#console-control-buttons {
+  position: absolute;
+  top: 3px;
+  right: 15px;
+  color: $console-color;
+  cursor: pointer;
+
+  span:hover {
+    color: mix($console-color, red, 80%);
+  }
+}
+#console-refresh {
+  @include css3(transform, rotate(103deg));
+}
+
+/*
+ * ツールチップ
+ */
+.tooltip-inner {
+  max-width: 300px;
+}
+
+/*
+ * ショートカットキー
+ */
+@media (min-width:768px) {
+  #dropdown-menu-select {
+    width: 300px;
+  }
+  .shortcut {
+    float: right !important;
+    right: 0;
+    left: auto;
+  }
+  /* Freifox で表示が崩れる対策 */
+  ul.dropdown-menu {
+    & > li {
+      a > span:first-child {
+        float: left;
+      }
+      a:after {
+        content: "　";
+      }
+    }
+  }
+}
+@media (max-width:767px) {
+  .shortcut {
+    display: none !important;
+  }
+}
+
