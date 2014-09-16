@@ -4,10 +4,3 @@
 #
 
 Version = "1.6.4"
-
-cv_path = File.expand_path(File.join(File.dirname(__FILE__), "../commitversion"))
-if File.exists?(cv_path)
-  CommitVersion = File.read(cv_path)
-else
-  CommitVersion = `git describe --always`.strip + "(develop)"
-end
