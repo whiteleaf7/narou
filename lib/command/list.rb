@@ -161,7 +161,7 @@ module Command
           next unless valid_tags?(novel, @options["tags"])
         end
         disp_id = ((frozen ? "*" : "") + id.to_s).rjust(4)
-        disp_id = disp_id.sub("*", "<bold><cyan>*</cyan></bold>").termcolor if frozen
+        disp_id = disp_id.sub("*", "<bold><cyan>*</cyan></bold>") if frozen
         flags = novel["flags"] || {}   # flagコマンドは1.6.0から非推奨
         tags = novel["tags"] || []
         flags["end"] ||= tags.include?("end")
