@@ -53,6 +53,9 @@ module Command
     # 短編を全て凍結する
     narou l -f ss | narou freeze --on
 
+    # リストをそのまま保存したい時(echoオプション)
+    narou l -e > list.txt
+
   Options:
       EOS
       @opt.on("-l", "--latest", "最近更新のあった順に小説を表示する") {
@@ -89,6 +92,9 @@ module Command
         else
           @options["all-tags"] = true
         end
+      }
+      @opt.on("-e", "--echo", "パイプやリダイレクトでもそのまま出力する") {
+        @options["echo"] = true
       }
     end
 
@@ -127,18 +133,20 @@ module Command
       apply_sum == filters.count
     end
 
+    def header
+      [
+         " ID ", " 更新日 ",
+         @options["kind"] ? "種別" : nil,
+         @options["author"] ? "作者名" : nil,
+         @options["site"] ? "サイト名" : nil,
+         "     タイトル"
+      ].compact.join(" | ")
+    end
+
     def output_list(novels)
       now = Time.now
       today = now.strftime("%y/%m/%d")
       filters = @options["filters"] || []
-      if STDOUT.tty?
-        header = [" ID ", " 更新日 ",
-                  @options["kind"] ? "種別" : nil,
-                  @options["author"] ? "作者名" : nil,
-                  @options["site"] ? "サイト名" : nil,
-                  "     タイトル"].compact
-        puts header.join(" | ")
-      end
       selected_lines = {}
       novels.each do |novel|
         novel_type = novel["novel_type"].to_i
@@ -198,10 +206,17 @@ module Command
         end
       end
       if STDOUT.tty?
+        puts header
         puts selected_lines.values.join("\n").termcolor
       else
-        # pipeに接続するときはIDを渡す
-        puts selected_lines.keys.join(" ")
+        if @options["echo"]
+          # pipeにそのまま出力するときはansicolorコードが邪魔なので削除
+          puts header
+          puts TermColorLight.strip_tag(selected_lines.values.join("\n"))
+        else
+          # pipeに接続するときはIDを渡す
+          puts selected_lines.keys.join(" ")
+        end
       end
     end
 
