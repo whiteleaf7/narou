@@ -30,6 +30,8 @@ rescue_level = $debug ? Exception : StandardError
 
 begin
   CommandLine.run(ARGV.map { |v| v.dup })
+rescue SystemExit => e
+  exit e.status
 rescue rescue_level => e
   warn $@.shift + ": #{e.message} (#{e.class})"
   if display_backtrace
@@ -40,6 +42,6 @@ rescue rescue_level => e
     warn "  エラーが発生したため終了しました。"
     warn "  詳細なエラーは --backtrace オプションを付けて再度実行して下さい。"
   end
-  exit 1
+  exit Narou::EXIT_ERROR_CODE
 end
 
