@@ -1093,10 +1093,6 @@ class ConverterBase
     convert_special_characters(data)
     convert_fraction_and_date(data)
     modify_kana_ni_to_kanji_ni(data)
-    if @text_type == "body" || @text_type == "textfile"
-      half_indent_bracket(data)
-      auto_indent(data)
-    end
     convert_dakuten_char_to_font(data)
   end
 
@@ -1132,8 +1128,10 @@ class ConverterBase
     when "postscript"
       return @write_fp if @setting.enable_erase_postscript
     end
+    title_and_author = nil
     if @text_type == "textfile"
-      @write_fp.puts(io.gets + io.gets)   # タイトル・著者名スキップ
+      # タイトル・著者名スキップ
+      title_and_author = io.gets + io.gets
       data = io.read
     else
       data = io.read
@@ -1192,6 +1190,10 @@ class ConverterBase
     rebuild_hankaku_num_and_comma(data)
     rebuild_kome_to_gaiji(data)
     rebuild_force_indent_special_chapter(data)
+    if @text_type == "body" || @text_type == "textfile"
+      half_indent_bracket(data)
+      auto_indent(data)
+    end
     # 再構築された文章にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
@@ -1200,7 +1202,11 @@ class ConverterBase
     # ルビ化されなくて残ったギュメを二重山括弧（の外字）に変換
     convert_double_angle_quotation_to_gaiji(data)
     delete_dust_char(data)
-    data.strip!
+    if title_and_author
+      puts title_and_author
+      data.replace(title_and_author + data)
+    end
+    data.rstrip!
     progressbar.clear if @text_type == "textfile"
     @write_fp
   end

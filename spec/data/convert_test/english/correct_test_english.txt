@@ -1,8 +1,8 @@
-test_alphabet_to_zenkaku
+test_english
 whiteleaf
 
 ［＃改ページ］
-［＃３字下げ］［＃ここから中見出し］アルファベット全角化テスト［＃ここで中見出し終わり］
+［＃３字下げ］［＃ここから中見出し］アルファベット全角化＆英文テスト［＃ここで中見出し終わり］
 
 
 　■次の文中のアルファベットは全角化される
@@ -22,3 +22,5 @@ whiteleaf
 　background-color: black;
 　Alphabetは長いので半角のまま。
 　ABC_DEF_GHI
+［＃二分アキ］「Deus ex machina!」
+［＃二分アキ］「Deus ex machina！」

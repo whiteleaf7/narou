@@ -19,3 +19,7 @@ whiteleaf
 
 ・提案２
 どうしろ、さあしろ
+
+
+・英文のインデント
+Deus ex machina
