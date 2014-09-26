@@ -52,7 +52,7 @@ module Narou
           result = NovelInfo.load(@setting)
           unless result
             error "小説家になろうからデータを取得出来ませんでした"
-            exit
+            exit Narou::EXIT_ERROR_CODE
           end
           @api_result = result
         end

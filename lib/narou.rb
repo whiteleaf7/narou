@@ -18,6 +18,7 @@ module Narou
   AOZORAEPUB3_JAR_NAME = "AozoraEpub3.jar"
   AOZORAEPUB3_DIR = "./AozoraEpub3"
   PRESET_DIR = "./preset"
+  EXIT_ERROR_CODE = 127
 
   @@root_dir = nil
   @@local_setting_dir = nil

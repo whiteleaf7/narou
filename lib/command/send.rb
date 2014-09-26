@@ -57,15 +57,15 @@ module Command
         error "デバイス名が指定されていないか、間違っています。\n" +
               "narou setting device=デバイス名 で指定出来ます。\n" +
               "指定出来るデバイス名：" + Device::DEVICES.keys.join(", ")
-        exit 1
+        exit Narou::EXIT_ERROR_CODE
       end
       unless device.physical_support?
         error "#{device.display_name} への直接送信は対応していません"
-        exit 1
+        exit Narou::EXIT_ERROR_CODE
       end
       unless device.connecting?
         error "#{device.display_name} が接続されていません"
-        exit 1
+        exit Narou::EXIT_ERROR_CODE
       end
       send_all = false
       titles = {}
@@ -111,12 +111,12 @@ module Command
           puts copy_to_path + " へコピーしました"
         else
           error "#{device.name}が見つからなかったためコピー出来ませんでした"
-          exit 1   # next しても次も失敗すると分かりきっているためここで終了する
+          exit Narou::EXIT_ERROR_CODE   # next しても次も失敗すると分かりきっているためここで終了する
         end
       end
     rescue Interrupt
       puts "送信を中断しました"
-      exit 1
+      exit Narou::EXIT_ERROR_CODE
     end
   end
 end

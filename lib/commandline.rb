@@ -45,6 +45,17 @@ module CommandLine
     Command.get_list[arg].new.execute(argv)
   end
 
+  #
+  # exit を捕捉して終了コードを返す
+  #
+  def run!(argv)
+    run(argv)
+  rescue SystemExit => e
+    e.status
+  else
+    0
+  end
+
   def load_default_arguments(cmd)
     default_arguments_list = Inventory.load("local_setting", :local)
     (default_arguments_list["default_args.#{cmd}"] || "").split

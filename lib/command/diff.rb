@@ -148,7 +148,7 @@ module Command
         res = Helper::AsyncCommand.exec(diff_cmd)
       rescue Errno::ENOENT => e
         error e.message
-        exit 1
+        exit Narou::EXIT_ERROR_CODE
       ensure
         temp_paths.map(&:delete)
       end

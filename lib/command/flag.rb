@@ -77,11 +77,11 @@ module Command
       attribute = (argv.shift || "").downcase
       unless ATTRIBUTES.include?(attribute)
         error "有効なフラグを指定して下さい\n指定可能なフラグ：#{ATTRIBUTES.join(', ')}"
-        exit 1
+        exit Narou::EXIT_ERROR_CODE
       end
       if argv.length < 1
         error "対象小説を指定して下さい"
-        exit 1
+        exit Narou::EXIT_ERROR_CODE
       end
       database = Database.instance
       argv.each do |target|

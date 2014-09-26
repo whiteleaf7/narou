@@ -231,7 +231,7 @@ if __FILE__ == $0
     puts "Usage:"
     puts "    %s <infile> <outfile> <strippeddatafile>" % File.basename(__FILE__)
     puts "<strippeddatafile> is optional."
-    exit 1
+    exit Narou::EXIT_ERROR_CODE
   else
     infile = ARGV[0]
     outfile = ARGV[1]
@@ -243,7 +243,7 @@ if __FILE__ == $0
       end
     rescue StripException => e
       warn "Error: #{e.message}"
-      exit 1
+      exit Narou::EXIT_ERROR_CODE
     end
   end
 end

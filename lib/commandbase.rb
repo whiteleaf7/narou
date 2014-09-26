@@ -41,10 +41,10 @@ module Command
       @opt.parse!(argv)
     rescue OptionParser::InvalidOption => e
       error "不明なオプションです(#{e})"
-      exit 1
+      exit Narou::EXIT_ERROR_CODE
     rescue OptionParser::MissingArgument => e
       error "オプションの引数が指定されていないか正しくありません(#{e})"
-      exit 1
+      exit Narou::EXIT_ERROR_CODE
     end
 
     def load_local_settings

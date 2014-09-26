@@ -90,6 +90,7 @@ module Command
 
     def execute(argv)
       super
+      mistook_count = 0
       if argv.empty?
         targets = interactive_mode
         return if targets.size == 0
@@ -102,6 +103,7 @@ module Command
         data = Downloader.get_data_by_target(download_target)
         if Narou.novel_frozen?(download_target)
           puts "#{data["title"]} は凍結中です\nダウンロードを中止しました"
+          mistook_count += 1
           next
         end
         if !@options["force"] && data
@@ -109,15 +111,19 @@ module Command
             puts "#{download_target} はダウンロード済みです。"
             puts "ID: #{data["id"]}"
             puts "title: #{data["title"]}"
+            mistook_count += 1
           else
             if Helper.confirm("再ダウンロードしますか")
               download_target = data["toc_url"]
               redo
+            else
+              mistook_count += 1
             end
           end
           next
         end
         if Downloader.start(download_target, @options["force"], true).status != :ok
+          mistook_count += 1
           next
         end
         unless @options["no-convert"]
@@ -130,6 +136,7 @@ module Command
           Remove.execute!([download_target, "-y"])
         end
       end
+      exit mistook_count if mistook_count > 0
     end
 
     def self.oneline_help

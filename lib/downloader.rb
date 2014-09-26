@@ -221,7 +221,7 @@ class Downloader
     setting = @@settings.find { |s| s["name"] == sitename }
     return setting if setting
     error "#{sitename} の設定ファイルが見つかりません"
-    exit 1
+    exit Narou::EXIT_ERROR_CODE
   end
 
   #
@@ -239,11 +239,11 @@ class Downloader
     end
     if settings.empty?
       error "小説サイトの定義ファイルがひとつもありません"
-      exit 1
+      exit Narou::EXIT_ERROR_CODE
     end
     unless @@narou
       error "小説家になろうの定義ファイルが見つかりませんでした"
-      exit 1
+      exit Narou::EXIT_ERROR_CODE
     end
     settings
   end
@@ -388,7 +388,7 @@ class Downloader
         rescue Interrupt
           remove_cache_dir
           puts "ダウンロードを中断しました"
-          exit 1
+          exit Narou::EXIT_ERROR_CODE
         end
         update_database
         :ok
@@ -953,7 +953,7 @@ class Downloader
       if e.message =~ /^503/
         if retry_count == 0
           error "上限までリトライしましたがファイルがダウンロード出来ませんでした"
-          exit 1
+          exit Narou::EXIT_ERROR_CODE
         end
         retry_count -= 1
         puts

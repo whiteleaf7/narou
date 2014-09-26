@@ -126,7 +126,7 @@ module Command
                 else
                   error "不明なフィルターです(#{item})"
                   warn "filters = #{filter_type_help}"
-                  exit 1
+                  exit Narou::EXIT_ERROR_CODE
                 end
         sum + (apply ? 1 : 0)
       end

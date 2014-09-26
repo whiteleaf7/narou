@@ -129,7 +129,7 @@ class Device
   rescue Exception => e
     puts
     error $@.shift + ": #{e.message} (#{e.class})"
-    exit 1
+    exit Narou::EXIT_ERROR_CODE
   end
 
   def physical_support?

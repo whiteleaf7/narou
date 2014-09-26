@@ -42,6 +42,7 @@ module Command
 
     def execute(argv)
       super
+      mistook_count = 0
       update_target_list = argv.dup
       no_open = false
       if update_target_list.empty?
@@ -66,6 +67,7 @@ module Command
         Helper.print_horizontal_rule if i > 0
         if display_message
           puts display_message
+          mistook_count += 1
           next
         end
         result = Downloader.start(target)
@@ -79,15 +81,18 @@ module Command
           end
         when :failed
           puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
+          mistook_count += 1
         when :canceled
           puts "ID:#{data["id"]}　#{data["title"]} の更新はキャンセルされました"
+          mistook_count += 1
         when :none
           puts "#{data["title"]} に更新はありません"
         end
       end
+      exit mistook_count if mistook_count > 0
     rescue Interrupt
       puts "アップデートを中断しました"
-      exit 1
+      exit Narou::EXIT_ERROR_CODE
     end
   end
 end

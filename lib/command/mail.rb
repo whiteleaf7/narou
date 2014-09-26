@@ -50,7 +50,7 @@ module Command
         return
       rescue Mailer::SettingUncompleteError => e
         error e.message
-        exit 1
+        exit Narou::EXIT_ERROR_CODE
       end
       if argv.empty?
         send_all = true
@@ -97,12 +97,12 @@ module Command
           database[id]["last_mail_date"] = Time.now
         else
           error "#{mailer.error_message}"
-          exit 1   # next しても次も失敗する可能性が高いのでここで終了
+          exit Narou::EXIT_ERROR_CODE   # next しても次も失敗する可能性が高いのでここで終了
         end
       end
     rescue Interrupt
       puts "メール送信を中断しました"
-      exit 1
+      exit Narou::EXIT_ERROR_CODE
     ensure
       database.save_database if database
     end

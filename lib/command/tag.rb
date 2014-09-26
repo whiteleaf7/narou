@@ -84,7 +84,7 @@ module Command
           return
         end
         error "対象の小説を指定して下さい"
-        exit 1
+        exit Narou::EXIT_ERROR_CODE
       else
         if @options["mode"] == :list
           search_novel_by_tag(argv)
