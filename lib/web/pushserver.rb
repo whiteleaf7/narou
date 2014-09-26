@@ -76,7 +76,7 @@ class Narou::PushServer
       queue_of_connection.push(json)
     end
     # echo 以外のイベントは履歴に保存しない
-    message = data["echo"]
+    message = data[:echo]
     if message
       @history.push(message)
       @history.shift

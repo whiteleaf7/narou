@@ -70,13 +70,6 @@ module Command
       push_server
     end
 
-    def display_message(params)
-      address = "http://#{params[:host]}:#{params[:port]}/"
-      puts address
-      puts "サーバを止めるには Ctrl+C を入力"
-      puts
-    end
-
     def execute(argv)
       super
       require_relative "../web/all"
@@ -86,7 +79,11 @@ module Command
       push_server = create_push_server(Narou::AppServer)
       Thread.abort_on_exception = true
 
-      display_message(params)
+      address = "http://#{params[:host]}:#{params[:port]}/"
+      puts address
+      puts "サーバを止めるには Ctrl+C を入力"
+      puts
+
       push_server.run
       unless @options["no-browser"]
         Thread.new do

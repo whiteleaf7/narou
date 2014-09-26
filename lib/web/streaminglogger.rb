@@ -13,7 +13,6 @@ class Narou::StreamingLogger < StringIO
 
   def initialize(push_server)
     super()
-    STDOUT.puts @is_silent
     @push_server = push_server
   end
 
@@ -23,7 +22,7 @@ class Narou::StreamingLogger < StringIO
 
   def push_streaming(str)
     unless @is_silent
-      STDOUT.write(str) if $debug
+      STDOUT.write(str)
       @push_server.send_all(echo: str)
     end
   end
