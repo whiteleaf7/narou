@@ -37,7 +37,7 @@ describe "exit code" do
           @ids = `narou l -f frozen`.split
         end
 
-        it "got 3" do
+        it "got 2" do
           expect(CommandLine.run!(["download"] + @ids[0,2])).to eq 2
         end
       end
@@ -57,7 +57,7 @@ describe "exit code" do
           @ids = `narou l -f frozen`.split
         end
 
-        it "got 3" do
+        it "got 2" do
           expect(CommandLine.run!(["update"] + @ids[0,2])).to eq 2
         end
       end
