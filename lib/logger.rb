@@ -4,6 +4,7 @@
 #
 
 require "stringio"
+require "termcolorlight"
 require_relative "color"
 
 if $disable_color

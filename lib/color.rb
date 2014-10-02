@@ -30,8 +30,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 =end
 
-require "termcolorlight"
-
 if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i
   require_relative "extensions/windows"
 

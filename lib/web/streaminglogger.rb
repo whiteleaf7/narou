@@ -3,6 +3,20 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+class String
+  if $disable_color
+    def termcolor
+      TermColorLight.strip_tag(self, false)
+    end
+  else
+    require "termcolorlight/html"
+
+    def termcolor
+      TermColorLight.to_html(self)
+    end
+  end
+end
+
 #
 # 標準出力をフックする
 #
@@ -22,7 +36,6 @@ class Narou::StreamingLogger < StringIO
 
   def push_streaming(str)
     unless @is_silent
-      STDOUT.write(str)
       @push_server.send_all(echo: str)
     end
   end
@@ -34,19 +47,6 @@ class Narou::StreamingLogger < StringIO
     end
     super(str)
     push_streaming(str)
-  end
-end
-
-class String
-  if $disable_color
-    def termcolor
-      TermColorLight.strip_tag(self)
-    end
-  else
-    def termcolor
-      #TermColorLight.to_html(self)
-      TermColorLight.strip_tag(self)
-    end
   end
 end
 
