@@ -621,7 +621,8 @@ class Downloader
     toc_url = @setting["toc_url"]
     return nil unless toc_url
     toc_source = ""
-    open(toc_url) do |toc_fp|
+    cookie = @setting["cookie"] || ""
+    open(toc_url, "Cookie" => cookie) do |toc_fp|
       if toc_fp.base_uri.to_s != toc_url
         # リダイレクトされた場合。
         # ノクターン・ムーンライトのNコードを ncode.syosetu.com に渡すと、novel18.syosetu.com に飛ばされる

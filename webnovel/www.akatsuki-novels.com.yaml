@@ -9,6 +9,7 @@ encoding: UTF-8
 confirm_over18: no
 append_title_to_folder_name: yes
 title_strip_pattern: null
+cookie: CakeCookie[ALLOWED_ADULT_NOVEL]=on
 
 # ------------------------------------------------------------
 # 書籍情報取得設定
