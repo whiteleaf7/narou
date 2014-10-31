@@ -52,9 +52,7 @@ class Narou::AppServer < Sinatra::Base
     enable :protection
 
     set(:version) do
-      $stdout.capture do
-        CommandLine.run(["version"])
-      end
+      Command::Version.create_version_string
     end
   end
 

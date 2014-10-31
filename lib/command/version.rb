@@ -10,9 +10,13 @@ module Command
     end
 
     def execute(argv)
+      puts self.class.create_version_string
+    end
+
+    def self.create_version_string
       cv_path = File.expand_path("commitversion", Narou.get_script_dir)
       commitversion = File.exist?(cv_path) ? File.read(cv_path) : `git describe --always`.strip + "(develop)"
-      puts ::Version + " build " + commitversion
+      "#{::Version} build #{commitversion}"
     end
   end
 end
