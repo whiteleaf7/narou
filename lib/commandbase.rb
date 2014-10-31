@@ -42,6 +42,9 @@ module Command
     rescue OptionParser::InvalidOption => e
       error "不明なオプションです(#{e})"
       exit Narou::EXIT_ERROR_CODE
+    rescue OptionParser::InvalidArgument => e
+      error "オプションの引数が正しくありません(#{e})"
+      exit Narou::EXIT_ERROR_CODE
     rescue OptionParser::MissingArgument => e
       error "オプションの引数が指定されていないか正しくありません(#{e})"
       exit Narou::EXIT_ERROR_CODE

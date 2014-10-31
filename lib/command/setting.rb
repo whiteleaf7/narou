@@ -31,8 +31,8 @@ module Command
       @opt.separator <<-EOS
 
   ・各コマンドの設定の変更が出来ます。
-  ・Global な設定はユーザープロファイルに保存され、すべての narou コマンドで使われます。
-  ・下の一覧は一部です。すべてを確認するには -a オプションを付けて確認して下さい。
+  ・Global な設定はユーザープロファイルに保存され、すべての narou コマンドで使われます
+  ・下の一覧は一部です。すべてを確認するには -a オプションを付けて確認して下さい
 
   Local Variable List:
         <name>           <value>              説明
@@ -287,6 +287,8 @@ module Command
         "difftool" => [:string, "Diffで使うツールのパスを指定する"],
         "difftool.arg" => [:string, "difftoolで使う引数を設定(オプション)"],
         "no-color" => [:boolean, "カラー表示を無効にする"],
+        "server-port" => [:integer, "WEBサーバ起動時のポート"],
+        "server-bind" => [:string, "WEBサーバのホスト制限(デフォ:localhost)", INVISIBLE],
         "over18" => [:boolean, "", INVISIBLE],
       }
     }

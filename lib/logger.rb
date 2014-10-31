@@ -3,8 +3,8 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require "singleton"
 require "stringio"
+require "termcolorlight"
 require_relative "color"
 
 if $disable_color
@@ -15,7 +15,9 @@ if $disable_color
   end
 end
 
-module LoggerModule
+module Narou end unless defined?(Narou)
+
+module Narou::LoggerModule
   def initialize
     super
     @is_silent = false
@@ -72,14 +74,9 @@ module LoggerModule
   end
 end
 
-class Logger < StringIO
-  include Singleton
-  include LoggerModule
+class Narou::Logger < StringIO
+  include Narou::LoggerModule
   
-  def self.get
-    instance
-  end
-
   def write(str)
     str = str.to_s
     if str.encoding == Encoding::ASCII_8BIT
@@ -88,15 +85,32 @@ class Logger < StringIO
     super(str)
     write_console(str, STDOUT)
   end
+
+  #
+  # 標準出力($stdout)のバッファリング＋取得
+  #
+  # キャプチャー用途なので標準エラーには実装しない
+  # ansicolor_strip :: エスケープシーケンスを除去するか
+  #
+  def capture(ansicolor_strip = true, &block)
+    raise "#capture block given" unless block
+    temp_stream = $stdout
+    $stdout = self.class.new
+    $stdout.silence do
+      block.call
+    end
+    buffer = $stdout.string
+    $stdout = temp_stream
+    ansicolor_strip ? strip_color(buffer) : buffer
+  end
+
+  def tty?
+    STDOUT.tty?
+  end
 end
 
-class LoggerError < StringIO
-  include Singleton
-  include LoggerModule
-  
-  def self.get
-    instance
-  end
+class Narou::LoggerError < StringIO
+  include Narou::LoggerModule
 
   def write(str)
     str = str.to_s
@@ -106,11 +120,19 @@ class LoggerError < StringIO
     super(str)
     write_console(str, STDERR)
   end
+
+  def tty?
+    STDERR.tty?
+  end
+end
+
+def warn(str)
+  puts str
 end
 
 def error(str)
-  warn "<bold><red>[ERROR]</red></bold> #{str.escape}".termcolor
+  puts "<bold><red>[ERROR]</red></bold> #{str.escape}".termcolor
 end
 
-$stdout = Logger.get
-$stderr = LoggerError.get
+$stdout = Narou::Logger.new
+$stderr = Narou::LoggerError.new

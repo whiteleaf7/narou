@@ -33,6 +33,7 @@ module Command
     "remove" => Remove,
     "freeze" => Freeze,
     "tag" => Tag,
+    "web" => Web,
     "flag" => Flag,
     "mail" => Mail,
     "backup" => Backup,
