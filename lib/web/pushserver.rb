@@ -51,7 +51,7 @@ class Narou::PushServer
           while data = ws.receive
             send_all(data)
           end
-
+        rescue Errno::ECONNRESET
         ensure
           @connections.delete(que)
           thread.terminate if thread

@@ -398,6 +398,18 @@ $console-color: white;
       min-height: 12px;
     }
   }
+
+  .progress {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    height: 8px;
+    @media (min-width:768px) {
+      //width: 70%;
+    }
+    @media (max-width:767px) {
+      width: 100%;
+    }
+  }
 }
 #console-control-buttons {
   position: absolute;

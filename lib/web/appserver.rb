@@ -150,6 +150,7 @@ class Narou::AppServer < Sinatra::Base
           end
           # 内部データ用なのでそのまま
           this[:frozen] = Narou.novel_frozen?(data["id"])
+          this[:_id] = data["id"].to_s
         }
       end
     json json_objects
@@ -176,12 +177,15 @@ class Narou::AppServer < Sinatra::Base
     "シャットダウンしました。再起動するまで操作は出来ません"
   end
 
-  get "/pagination" do
-    erb :pagination, layout: false
-  end
-
-  get "/get_database.php" do
-    "#{params[:n]}"
+  post "/api/convert" do
+    return unless params["ids"].kind_of?(Array)
+    ids = params["ids"].select do |id|
+      id =~ /^\d+$/
+    end
+    return if ids.empty?
+    Narou::Worker.push do
+      CommandLine.run(["convert", ids])
+    end
   end
 end
 
