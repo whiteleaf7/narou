@@ -176,11 +176,11 @@ class Narou::AppServer < Sinatra::Base
   end
 
   post "/api/convert" do
-    return unless params["ids"].kind_of?(Array)
+    pass unless params["ids"].kind_of?(Array)
     ids = params["ids"].select do |id|
       id =~ /^\d+$/
     end
-    return if ids.empty?
+    pass if ids.empty?
     Narou::Worker.push do
       CommandLine.run(["convert", ids])
     end
