@@ -39,6 +39,18 @@ module Narou::ServerHelpers
       "ruby #{RUBY_VERSION}p#{config["PATCHLEVEL"]} [#{RUBY_PLATFORM}]"
     end
   end
+
+  #
+  # 有効な novel ID だけの配列を生成する
+  # ID が指定されなかったか、１件も存在しない場合は nil を返す
+  #
+  def select_valid_novel_ids(ids)
+    return nil unless ids.kind_of?(Array)
+    result = ids.select do |id|
+      id =~ /^\d+$/
+    end
+    result.empty? ? nil : result
+  end
 end
 
 class Narou::AppServer < Sinatra::Base
@@ -94,9 +106,6 @@ class Narou::AppServer < Sinatra::Base
     adrs
   end
 
-  before do
-  end
-
   # ===================================================================
   # ルーティング
   # ===================================================================
@@ -114,6 +123,31 @@ class Narou::AppServer < Sinatra::Base
   get "/style.css" do
     scss :style
   end
+
+  get "/settings" do
+    @title = "環境設定"
+    haml :settings
+  end
+
+  get "/help" do
+    @title = "ヘルプ"
+    haml :help
+  end
+
+  get "/about" do
+    @narourb_version = settings.version
+    @ruby_version = build_ruby_version
+    haml :about, layout: false
+  end
+
+  post "/shutdown" do
+    self.class.quit!
+    "シャットダウンしました。再起動するまで操作は出来ません"
+  end
+
+  # -------------------------------------------------------------------------------
+  # API's
+  # -------------------------------------------------------------------------------
 
   get "/api/list" do
     database_values = Database.instance.get_object.values
@@ -153,34 +187,9 @@ class Narou::AppServer < Sinatra::Base
       end
     json json_objects
   end
-  
-  get "/settings" do
-    @title = "環境設定"
-    haml :settings
-  end
-
-  get "/help" do
-    @title = "ヘルプ"
-    haml :help
-  end
-
-  get "/about" do
-    @narourb_version = settings.version
-    @ruby_version = build_ruby_version
-    haml :about, layout: false
-  end
-
-  post "/shutdown" do
-    self.class.quit!
-    "シャットダウンしました。再起動するまで操作は出来ません"
-  end
 
   post "/api/convert" do
-    pass unless params["ids"].kind_of?(Array)
-    ids = params["ids"].select do |id|
-      id =~ /^\d+$/
-    end
-    pass if ids.empty?
+    ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run(["convert", ids])
     end
