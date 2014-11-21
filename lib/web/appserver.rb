@@ -194,5 +194,19 @@ class Narou::AppServer < Sinatra::Base
       CommandLine.run(["convert", ids])
     end
   end
+
+  post "/api/download_new" do
+    target = params["target"] or pass
+    Narou::Worker.push do
+      CommandLine.run(["download", target])
+    end
+  end
+
+  post "/api/download_force" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      CommandLine.run(["download", "--force", ids])
+    end
+  end
 end
 

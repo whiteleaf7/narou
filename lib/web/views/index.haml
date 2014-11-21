@@ -124,14 +124,14 @@
   -# 操作パネル
   #control-panel
     .btn-group
-      %button.btn.btn-primary(type="button" data-toggle="tooltip" |
+      %button#button-download-new.btn.btn-primary(type="button" data-toggle="tooltip" |
                               title="新規ダウンロード") Download |
       %button.btn.btn-primary.dropdown-toggle(type="button" data-toggle="dropdown")
         %span.caret
         %span.sr-only Toggle Dropdown
       %ul.dropdown-menu(role="menu")
         %li
-          %a(href="#") 選択した小説を強制再ダウンロード
+          %a#button-download-force(href="#") 選択した小説を強制再ダウンロード
     .btn-group
       %button.btn.btn-success(type="button" data-toggle="tooltip" |
                               title="全てアップデート") Update |

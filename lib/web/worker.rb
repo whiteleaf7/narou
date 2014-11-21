@@ -22,7 +22,10 @@ class Narou::Worker
     Thread.abort_on_exception = true
     @worker_thread = Thread.new do
       loop do
-        @queue.pop.call
+        begin
+          @queue.pop.call
+        rescue SystemExit
+        end
       end
     end
   end
