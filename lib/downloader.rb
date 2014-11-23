@@ -136,16 +136,8 @@ class Downloader
     else
       use_subdirectory = data["use_subdirectory"]
     end
-    path = File.join(Database.archive_root_path, data["sitename"], file_title)
-    if use_subdirectory
-      subdirectory = ""
-      if file_title.start_with?("n")
-        subdirectory = file_title[1..2]
-      else
-        subdirectory = file_title[0..1]
-      end
-      path = File.join(Database.archive_root_path, data["sitename"], subdirectory, file_title)
-    end
+    subdirectory = use_subdirectory ? create_subdirecotry_name(file_title) : ""
+    path = File.join(Database.archive_root_path, data["sitename"], subdirectory, file_title)
     if File.exist?(path)
       return path
     else
@@ -285,6 +277,13 @@ class Downloader
     nil
   end
 
+  #
+  # サブディレクトリ名を生成
+  #
+  def self.create_subdirecotry_name(title)
+    title.start_with?("n") ? title[1..2] : title[0..1]
+  end
+
   if Narou.already_init?
     @@settings = load_settings
     @@database = Database.instance
@@ -317,9 +316,22 @@ class Downloader
       @@max_steps_wait_time = [STEPS_WAIT_TIME, @@interval_sleep_time].max
     end
     @download_wait_steps = Inventory.load("local_setting", :local)["download.wait-steps"] || 0
-    @download_use_subdirectory = Inventory.load("local_setting", :local)["download.use-subdirectory"] || false
+    @download_use_subdirectory = use_subdirectory?
     if @setting["is_narou"] && (@download_wait_steps > 10 || @download_wait_steps == 0)
       @download_wait_steps = 10
+    end
+  end
+
+  #
+  # サブディレクトリに保存してあるかどうか
+  #
+  def use_subdirectory?
+    if @@database[@id]
+      # すでにDL済みの小説
+      @@database[@id]["use_subdirectory"] || false
+    else
+      # 新規DLする小説
+      Inventory.load("local_setting", :local)["download.use-subdirectory"] || false
     end
   end
 
@@ -1059,20 +1071,8 @@ class Downloader
   def get_novel_data_dir
     return @novel_data_dir if @novel_data_dir
     raise "小説名がまだ設定されていません" unless get_file_title
-    if @download_use_subdirectory
-      subdirectory = ""
-      if get_file_title.start_with?("n")
-        subdirectory = get_file_title[1..2]
-      else
-        subdirectory = get_file_title[0..1]
-      end
-      @novel_data_dir = File.join(Database.archive_root_path,
-                                  @setting["name"],
-                                  subdirectory,
-                                  get_file_title)
-    else
-      @novel_data_dir = File.join(Database.archive_root_path, @setting["name"], get_file_title)
-    end
+    subdirectory = @download_use_subdirectory ? Downloader.create_subdirecotry_name(get_file_title) : ""
+    @novel_data_dir = File.join(Database.archive_root_path, @setting["name"], subdirectory, get_file_title)
     @novel_data_dir
   end
 
