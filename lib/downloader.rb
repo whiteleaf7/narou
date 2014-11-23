@@ -130,7 +130,22 @@ class Downloader
     return nil unless data
     id = data["id"]
     file_title = data["file_title"] || data["title"]   # 互換性維持のための処理
+    use_subdirectory = false
+    if data["use_subdirectory"].nil?
+      use_subdirectory = Inventory.load("local_setting", :local)["download.use-subdirectory"]
+    else
+      use_subdirectory = data["use_subdirectory"]
+    end
     path = File.join(Database.archive_root_path, data["sitename"], file_title)
+    if use_subdirectory
+      subdirectory = ""
+      if file_title.start_with?("n")
+        subdirectory = file_title[1..2]
+      else
+        subdirectory = file_title[0..1]
+      end
+      path = File.join(Database.archive_root_path, data["sitename"], subdirectory, file_title)
+    end
     if File.exist?(path)
       return path
     else
@@ -302,6 +317,7 @@ class Downloader
       @@max_steps_wait_time = [STEPS_WAIT_TIME, @@interval_sleep_time].max
     end
     @download_wait_steps = Inventory.load("local_setting", :local)["download.wait-steps"] || 0
+    @download_use_subdirectory = Inventory.load("local_setting", :local)["download.use-subdirectory"] || false
     if @setting["is_narou"] && (@download_wait_steps > 10 || @download_wait_steps == 0)
       @download_wait_steps = 10
     end
@@ -523,6 +539,7 @@ class Downloader
       "end" => novel_end?,
       "last_update" => Time.now,
       "new_arrivals_date" => (@new_arrivals ? Time.now : @@database[@id]["new_arrivals_date"]),
+      "use_subdirectory" => @download_use_subdirectory,
     }
     if @@database[@id]
       @@database[@id].merge!(data)
@@ -1042,7 +1059,20 @@ class Downloader
   def get_novel_data_dir
     return @novel_data_dir if @novel_data_dir
     raise "小説名がまだ設定されていません" unless get_file_title
-    @novel_data_dir = File.join(Database.archive_root_path, @setting["name"], get_file_title)
+    if @download_use_subdirectory
+      subdirectory = ""
+      if get_file_title.start_with?("n")
+        subdirectory = get_file_title[1..2]
+      else
+        subdirectory = get_file_title[0..1]
+      end
+      @novel_data_dir = File.join(Database.archive_root_path,
+                                  @setting["name"],
+                                  subdirectory,
+                                  get_file_title)
+    else
+      @novel_data_dir = File.join(Database.archive_root_path, @setting["name"], get_file_title)
+    end
     @novel_data_dir
   end
 

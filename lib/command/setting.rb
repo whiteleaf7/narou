@@ -277,6 +277,8 @@ module Command
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
         "download.wait-steps" => [:integer, "この値で指定した話数ごとにウェイトを入れる\n" +
                                        " " * 6 + "※注意：11以上を設定してもなろうの場合は10話ごとにウェイトが入ります"],
+        "download.use-subdirectory" => [:boolean, "小説を一定数ごとにサブフォルダへ分けて保存するか\n" +
+                                                  " " * 6 + "※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策"],
         "send.without-freeze" => [:boolean, "`全話'送信時に凍結された小説は対象外に"],
         "update.strong" => [:boolean, "更新漏れが無いように改稿日の分は必ずDLする"],
         "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
