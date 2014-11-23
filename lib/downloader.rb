@@ -130,7 +130,14 @@ class Downloader
     return nil unless data
     id = data["id"]
     file_title = data["file_title"] || data["title"]   # 互換性維持のための処理
-    path = File.join(Database.archive_root_path, data["sitename"], file_title)
+    use_subdirectory = false
+    if data["use_subdirectory"].nil?
+      use_subdirectory = Inventory.load("local_setting", :local)["download.use-subdirectory"]
+    else
+      use_subdirectory = data["use_subdirectory"]
+    end
+    subdirectory = use_subdirectory ? create_subdirecotry_name(file_title) : ""
+    path = File.join(Database.archive_root_path, data["sitename"], subdirectory, file_title)
     if File.exist?(path)
       return path
     else
@@ -270,6 +277,13 @@ class Downloader
     nil
   end
 
+  #
+  # サブディレクトリ名を生成
+  #
+  def self.create_subdirecotry_name(title)
+    title.start_with?("n") ? title[1..2] : title[0..1]
+  end
+
   if Narou.already_init?
     @@settings = load_settings
     @@database = Database.instance
@@ -302,8 +316,22 @@ class Downloader
       @@max_steps_wait_time = [STEPS_WAIT_TIME, @@interval_sleep_time].max
     end
     @download_wait_steps = Inventory.load("local_setting", :local)["download.wait-steps"] || 0
+    @download_use_subdirectory = use_subdirectory?
     if @setting["is_narou"] && (@download_wait_steps > 10 || @download_wait_steps == 0)
       @download_wait_steps = 10
+    end
+  end
+
+  #
+  # サブディレクトリに保存してあるかどうか
+  #
+  def use_subdirectory?
+    if @@database[@id]
+      # すでにDL済みの小説
+      @@database[@id]["use_subdirectory"] || false
+    else
+      # 新規DLする小説
+      Inventory.load("local_setting", :local)["download.use-subdirectory"] || false
     end
   end
 
@@ -523,6 +551,7 @@ class Downloader
       "end" => novel_end?,
       "last_update" => Time.now,
       "new_arrivals_date" => (@new_arrivals ? Time.now : @@database[@id]["new_arrivals_date"]),
+      "use_subdirectory" => @download_use_subdirectory,
     }
     if @@database[@id]
       @@database[@id].merge!(data)
@@ -1042,7 +1071,8 @@ class Downloader
   def get_novel_data_dir
     return @novel_data_dir if @novel_data_dir
     raise "小説名がまだ設定されていません" unless get_file_title
-    @novel_data_dir = File.join(Database.archive_root_path, @setting["name"], get_file_title)
+    subdirectory = @download_use_subdirectory ? Downloader.create_subdirecotry_name(get_file_title) : ""
+    @novel_data_dir = File.join(Database.archive_root_path, @setting["name"], subdirectory, get_file_title)
     @novel_data_dir
   end
 
