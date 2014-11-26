@@ -105,22 +105,17 @@ class Device
     documents_path = get_documents_path
     if documents_path
       dst_path = File.join(documents_path, File.basename(src_file))
+      # Rubyでコピーするのは遅いのでOSのコマンドを叩く
       case Helper.determine_os
       when :windows
-        begin
-          # Rubyでコピーするのは遅いのでOSのコマンドを叩く
-          cmd = "copy /B " + %!"#{src_file}" "#{dst_path}"!.gsub("/", "\\").encode(Encoding::Windows_31J)
-          capture = `#{cmd}`
-          unless $?.success?
-            raise capture.force_encoding(Encoding::Windows_31J).rstrip
-          end
-        rescue StandardError
-          # コマンドで送信出来ないものはRubyで直接コピーする
-          FileUtils.cp(src_file, dst_path)
+        cmd = "copy /B " + %!"#{src_file}" "#{dst_path}"!.gsub("/", "\\").encode(Encoding::Windows_31J)
+        res = Helper::AsyncCommand.exec(cmd)
+        unless res[2].success?
+          raise res[1].force_encoding(Encoding::Windows_31J).encode(Encoding::UTF_8).rstrip
         end
       else
-        status = system(%!cp "#{src_file}" "#{dst_path}"!)
-        raise "コピーできませんでした" unless status
+        res = Helper::AsyncCommand.exec(%!cp "#{src_file}" "#{dst_path}"!)
+        raise res[1].rstrip unless res[2].success?
       end
       dst_path
     else
