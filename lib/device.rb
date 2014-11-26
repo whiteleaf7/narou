@@ -115,7 +115,12 @@ class Device
         end
       else
         res = Helper::AsyncCommand.exec(%!cp "#{src_file}" "#{dst_path}"!)
-        raise res[1].rstrip unless res[2].success?
+        unless res[2].success?
+          # cp コマンドで送信失敗するとファイルがぶっ壊れたり０バイトのファイルが作られる
+          # ので一旦削除しておく
+          File.delete(dst_path) if File.exist?(dst_path)
+          raise res[1].rstrip
+        end
       end
       dst_path
     else
