@@ -3,5 +3,5 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-Version = "1.7.2"
+Version = "1.8.0"
 
