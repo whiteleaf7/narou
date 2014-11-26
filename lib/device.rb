@@ -44,6 +44,7 @@ class Device
   end
 
   class UnknownDevice < StandardError; end
+  class SendFailure < StandardError; end
 
   def self.exists?(device)
     DEVICES.include?(device.downcase)
@@ -111,7 +112,7 @@ class Device
         cmd = "copy /B " + %!"#{src_file}" "#{dst_path}"!.gsub("/", "\\").encode(Encoding::Windows_31J)
         res = Helper::AsyncCommand.exec(cmd)
         unless res[2].success?
-          raise res[1].force_encoding(Encoding::Windows_31J).encode(Encoding::UTF_8).rstrip
+          raise SendFailure, res[1].force_encoding(Encoding::Windows_31J).encode(Encoding::UTF_8).rstrip
         end
       else
         res = Helper::AsyncCommand.exec(%!cp "#{src_file}" "#{dst_path}"!)
@@ -119,17 +120,17 @@ class Device
           # cp コマンドで送信失敗するとファイルがぶっ壊れたり０バイトのファイルが作られる
           # ので一旦削除しておく
           File.delete(dst_path) if File.exist?(dst_path)
-          raise res[1].rstrip
+          raise SendFailure, res[1].rstrip
         end
       end
       dst_path
     else
       nil
     end
-  rescue Exception => e
+  rescue SendFailure => e
     puts
-    error $@.shift + ": #{e.message} (#{e.class})"
-    exit 1
+    error "#{e.message}"
+    raise
   end
 
   def physical_support?
