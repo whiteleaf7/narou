@@ -248,5 +248,19 @@ class Narou::AppServer < Sinatra::Base
       CommandLine.run(["freeze", "--off", ids])
     end
   end
+
+  post "/api/remove" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      CommandLine.run(["remove", "--yes", ids])
+    end
+  end
+
+  post "/api/remove_with_file" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      CommandLine.run(["remove", "--yes", "--with-file", ids])
+    end
+  end
 end
 
