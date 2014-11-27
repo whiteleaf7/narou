@@ -195,7 +195,7 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
-  post "/api/download_new" do
+  post "/api/download" do
     target = params["target"] or pass
     Narou::Worker.push do
       CommandLine.run(["download", target])
