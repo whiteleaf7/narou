@@ -130,12 +130,7 @@ class Downloader
     return nil unless data
     id = data["id"]
     file_title = data["file_title"] || data["title"]   # 互換性維持のための処理
-    use_subdirectory = false
-    if data["use_subdirectory"].nil?
-      use_subdirectory = Inventory.load("local_setting", :local)["download.use-subdirectory"]
-    else
-      use_subdirectory = data["use_subdirectory"]
-    end
+    use_subdirectory = data["use_subdirectory"] || false
     subdirectory = use_subdirectory ? create_subdirecotry_name(file_title) : ""
     path = File.join(Database.archive_root_path, data["sitename"], subdirectory, file_title)
     if File.exist?(path)
