@@ -428,7 +428,8 @@ $console-color: white;
   }
 }
 #console-refresh {
-  @include css3(transform, rotate(103deg));
+  //@include css3(transform, rotate(103deg));
+  display: none;
 }
 
 /*
