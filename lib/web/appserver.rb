@@ -262,5 +262,43 @@ class Narou::AppServer < Sinatra::Base
       CommandLine.run(["remove", "--yes", "--with-file", ids])
     end
   end
+
+  post "/api/display_text_list" do
+    Narou::Worker.push do
+      CommandLine.run(["list"])
+    end
+  end
+
+  post "/api/diff" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      # diff コマンドは１度に一つのIDしか受け取らないので
+      ids.each do |id|
+        CommandLine.run(["diff", id])
+        print "<hr>"
+      end
+    end
+  end
+
+  post "/api/inspect" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      CommandLine.run(["inspect", ids])
+    end
+  end
+
+  post "/api/folder" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      CommandLine.run(["folder", ids])
+    end
+  end
+
+  post "/api/backup" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      CommandLine.run(["backup", ids])
+    end
+  end
 end
 

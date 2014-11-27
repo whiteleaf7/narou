@@ -172,6 +172,22 @@
           %a#button-remove-with-file(href="#") 選択した小説をファイルも含めて削除
     %button#button-convert.btn.btn-default(type="button" data-toggle="tooltip" |
                             title="選択した小説を変換") Convert |
+    .btn-group
+      %button.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown")
+        Other
+        %span.caret
+        %span.sr-only Toggle Dropdown
+      %ul.dropdown-menu(role="menu")
+        %li
+          %a#button-list(href="#") テキストでリスト表示(list)
+        %li
+          %a#button-diff(href="#") 選択した小説の最新の差分を表示(diff)
+        %li
+          %a#button-inspect(href="#") 選択した小説の調査状況ログを表示(inspect)
+        %li
+          %a#button-folder(href="#") 選択した小説の保存フォルダを開く(folder)
+        %li
+          %a#button-backup(href="#") 選択した小説のバックアップを作成(backup)
 
   -# 小説の一覧テーブル
   %div
