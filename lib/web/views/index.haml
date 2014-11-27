@@ -142,6 +142,15 @@
         %li
           %a#button-update-select(href="#") 選択した小説のみアップデート
     .btn-group
+      %button.btn.btn-warning(type="button" data-toggle="tooltip" |
+                              title="更新された小説を送信") Send |
+      %button.btn.btn-warning.dropdown-toggle(type="button" data-toggle="dropdown")
+        %span.caret
+        %span.sr-only Toggle Dropdown
+      %ul.dropdown-menu(role="menu")
+        %li
+          %a(href="#") 選択した小説のみ送信
+    .btn-group
       %button.btn.btn-info.dropdown-toggle(type="button" data-toggle="dropdown")
         Freeze
         %span.caret
@@ -151,15 +160,6 @@
           %a(href="#") 選択した小説を凍結
         %li
           %a(href="#") 選択した小説の凍結を解除
-    .btn-group
-      %button.btn.btn-warning(type="button" data-toggle="tooltip" |
-                              title="更新された小説を送信") Send |
-      %button.btn.btn-warning.dropdown-toggle(type="button" data-toggle="dropdown")
-        %span.caret
-        %span.sr-only Toggle Dropdown
-      %ul.dropdown-menu(role="menu")
-        %li
-          %a(href="#") 選択した小説のみ送信
     .btn-group
       %button.btn.btn-danger.dropdown-toggle(type="button" data-toggle="dropdown")
         Remove
