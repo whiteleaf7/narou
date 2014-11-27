@@ -12,6 +12,7 @@ module CommandLine
   module_function
 
   def run(argv)
+    argv.flatten!
     if Helper.os_windows?
       argv.map! do |arg|
         arg.encode(Encoding::UTF_8)

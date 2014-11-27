@@ -221,5 +221,18 @@ class Narou::AppServer < Sinatra::Base
       CommandLine.run(["update", ids])
     end
   end
+
+  post "/api/send" do
+    Narou::Worker.push do
+      CommandLine.run(["send"])
+    end
+  end
+
+  post "/api/send_select" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      CommandLine.run(["send", ids])
+    end
+  end
 end
 
