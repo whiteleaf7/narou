@@ -133,14 +133,14 @@
         %li
           %a#button-download-force(href="#") 選択した小説を強制再ダウンロード
     .btn-group
-      %button.btn.btn-success(type="button" data-toggle="tooltip" |
+      %button#button-update.btn.btn-success(type="button" data-toggle="tooltip" |
                               title="全てアップデート") Update |
       %button.btn.btn-success.dropdown-toggle(type="button" data-toggle="dropdown")
         %span.caret
         %span.sr-only Toggle Dropdown
       %ul.dropdown-menu(role="menu")
         %li
-          %a(href="#") 選択した小説のみアップデート
+          %a#button-update-select(href="#") 選択した小説のみアップデート
     .btn-group
       %button.btn.btn-info.dropdown-toggle(type="button" data-toggle="dropdown")
         Freeze

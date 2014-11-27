@@ -208,5 +208,18 @@ class Narou::AppServer < Sinatra::Base
       CommandLine.run(["download", "--force", ids])
     end
   end
+
+  post "/api/update" do
+    Narou::Worker.push do
+      CommandLine.run(["update"])
+    end
+  end
+
+  post "/api/update_select" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      CommandLine.run(["update", ids])
+    end
+  end
 end
 
