@@ -298,6 +298,7 @@ class Downloader
     @novel_data_dir = nil
     @novel_status = nil
     @id = @@database.get_id("toc_url", @setting["toc_url"]) || @@database.get_new_id
+    @new_novel = @@database[@id].!
     @section_download_cache = {}
 
     # ウェイト管理関係初期化
@@ -321,12 +322,12 @@ class Downloader
   # サブディレクトリに保存してあるかどうか
   #
   def use_subdirectory?
-    if @@database[@id]
-      # すでにDL済みの小説
-      @@database[@id]["use_subdirectory"] || false
-    else
+    if @new_novel
       # 新規DLする小説
       Inventory.load("local_setting", :local)["download.use-subdirectory"] || false
+    else
+      # すでにDL済みの小説
+      @@database[@id]["use_subdirectory"] || false
     end
   end
 
@@ -374,7 +375,7 @@ class Downloader
         return :canceled
       end
     end
-    old_toc = load_novel_data(TOC_FILE_NAME)
+    old_toc = @new_novel ? nil : load_novel_data(TOC_FILE_NAME)
     unless old_toc
       init_novel_dir
       old_toc = {}
@@ -427,7 +428,7 @@ class Downloader
         :none
       end
     save_novel_data(TOC_FILE_NAME, latest_toc)
-    tags = @@database[@id]["tags"] || []
+    tags = @new_novel ? [] : @@database[@id]["tags"] || []
     if novel_end?
       unless tags.include?("end")
         update_database if update_subtitles.count == 0
