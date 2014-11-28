@@ -306,5 +306,7 @@ module Command
       cmd_name = File.basename(path, ".rb")
       SETTING_VARIABLES[:local]["default_args." + cmd_name] = [:string, "", INVISIBLE]
     end
+
+    SETTING_VARIABLES.freeze
   end
 end
