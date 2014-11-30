@@ -5,9 +5,12 @@
 
 require_relative "../inventory"
 require_relative "../novelsetting"
+require_relative "../eventable"
 
 module Command
   class Setting < CommandBase
+    include Narou::Eventable
+
     def self.oneline_help
       "各コマンドの設定を変更します"
     end
@@ -159,6 +162,12 @@ module Command
       end
     end
 
+    def output_error(msg, name = nil)
+      @error_count += 1
+      error msg
+      trigger_event(:error, msg, name)
+    end
+
     def execute(argv)
       super
       if argv.empty?
@@ -170,20 +179,21 @@ module Command
         global: Inventory.load("global_setting", :global)
       }
       device = Narou.get_device
+      @error_count = 0
       self.extend(device.get_hook_module) if device
       argv.each do |arg|
         name, value = arg.split("=", 2).map(&:strip)
         if name == ""
-          error "書式が間違っています。変数名=値 のように書いて下さい"
+          output_error("書式が間違っています。変数名=値 のように書いて下さい")
           next
         end
         scope = get_scope_of_variable_name(name)
         unless scope
-          error "#{name} という変数は存在しません"
+          output_error("#{name} という変数は存在しません", name)
           next
         end
         if value.nil?
-          error "書式が間違っています。#{name}=値 のように書いて下さい"
+          output_error("書式が間違っています。#{name}=値 のように書いて下さい", name)
           next
         end
         if value == ""
@@ -193,13 +203,14 @@ module Command
         begin
           scope, casted_value = casting_variable(name, value)
         rescue InvalidVariableName, InvalidVariableType => e
-          error e.message
+          output_error(e.message, name)
           next
         end
         hook_call(:modify_settings, settings[scope], name, casted_value)
       end
       settings[:local].save
       settings[:global].save
+      exit @error_count if @error_count > 0
     end
 
     def modify_settings(scoped_settings, name, value)
@@ -232,8 +243,7 @@ module Command
         puts message.string
       end
     rescue Device::UnknownDevice => e
-      error e.message
-      puts "設定できるのは #{Device::DEVICES.keys.join(", ")} です"
+      output_error("#{e.message}\n設定できるのは #{Device::DEVICES.keys.join(", ")} です")
     end
 
     def get_variable_list_strings(scope)
@@ -255,6 +265,10 @@ module Command
       puts get_variable_list_strings(:global).gsub(/^ {4}/, "")
     end
 
+    def self.get_setting_variables
+      SETTING_VARIABLES
+    end
+
     TYPE_OF_VALUE = {
       TrueClass => :boolean, FalseClass => :boolean, Fixnum => :integer,
       Float => :float, String => :string
@@ -269,8 +283,8 @@ module Command
         "convert.no-mobi" => [:boolean, "MOBI変換を無効にするか"],
         "convert.no-strip" => [:boolean, "MOBIのstripを無効にするか\n" +
                                          " " * 6 + "※注意：KDP用のMOBIはstripしないでください"],
-        "convert.no-zip" => [:boolean, "i文庫用のzipファイルを作らない"],
-        "convert.no-open" => [:boolean, "変換終了時に保存フォルダを開かない"],
+        "convert.no-zip" => [:boolean, "i文庫用のzipファイル作成を無効にするか"],
+        "convert.no-open" => [:boolean, "変換時に保存フォルダを開かないようにするか"],
         "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
@@ -280,7 +294,7 @@ module Command
         "download.use-subdirectory" => [:boolean, "小説を一定数ごとにサブフォルダへ分けて保存するか\n" +
                                                   " " * 6 + "※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策"],
         "send.without-freeze" => [:boolean, "`全話'送信時に凍結された小説は対象外に"],
-        "update.strong" => [:boolean, "更新漏れが無いように改稿日の分は必ずDLする"],
+        "update.strong" => [:boolean, "更新漏れが無い様に改稿日の分は必ずDLするか"],
         "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
         "multiple-delimiter" => [:string, "--multiple指定時の区切り文字"],
       },
@@ -288,23 +302,23 @@ module Command
         "aozoraepub3dir" => [:directory, "AozoraEpub3のあるフォルダを指定", INVISIBLE],
         "difftool" => [:string, "Diffで使うツールのパスを指定する"],
         "difftool.arg" => [:string, "difftoolで使う引数を設定(オプション)"],
-        "no-color" => [:boolean, "カラー表示を無効にする"],
+        "no-color" => [:boolean, "カラー表示を無効にするか"],
         "server-port" => [:integer, "WEBサーバ起動時のポート"],
         "server-bind" => [:string, "WEBサーバのホスト制限(デフォ:localhost)", INVISIBLE],
-        "over18" => [:boolean, "", INVISIBLE],
+        "over18" => [:boolean, "18歳以上かどうか", INVISIBLE],
       }
     }
 
     NovelSetting::DEFAULT_SETTINGS.each do |default|
       SETTING_VARIABLES[:local]["force." + default[:name]] = [
-        #TYPE_OF_VALUE[default[:value].class], "\n      " + default[:help], INVISIBLE
-        TYPE_OF_VALUE[default[:value].class], "", INVISIBLE
+        TYPE_OF_VALUE[default[:value].class], "\n      " + default[:help], INVISIBLE
       ]
     end
 
     Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), "*.rb"))) do |path|
       cmd_name = File.basename(path, ".rb")
-      SETTING_VARIABLES[:local]["default_args." + cmd_name] = [:string, "", INVISIBLE]
+      SETTING_VARIABLES[:local]["default_args." + cmd_name] =
+        [:string, "#{cmd_name} コマンドのデフォルトオプション", INVISIBLE]
     end
 
     SETTING_VARIABLES.freeze

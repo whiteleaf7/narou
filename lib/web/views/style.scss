@@ -46,6 +46,26 @@ body {
   }
 }
 
+.centering {
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.clear {
+  clear: both;
+  display: none;
+}
+
+#fadeout-alert {
+  position: fixed;
+  z-index: 1000;
+  width: 350px;
+  text-align: center;
+  @extend .centering;
+}
+
 /*
  * テーブル関連
  */
@@ -467,5 +487,47 @@ $console-color: white;
   .shortcut {
     display: none !important;
   }
+}
+
+/*
+ * 環境設定画面
+ */
+.panel-settings-link {
+  @media (min-width: 768px) {
+    width: 750px;
+  }
+}
+
+.panel-settings {
+  @media (min-width: 768px) {
+    width: 750px;
+  }
+
+  input {
+    float: right;
+    width: 150px;
+  }
+
+  input[type=text] {
+    height: 27px;
+  }
+}
+
+/* switch-toggle.css のカスタマイズ */
+.switch-light, .switch-toggle {
+  width: 150px;
+  cursor: pointer;
+  margin-top: 0;
+  margin-left: 0;
+  float: right;
+}
+/*
+.switch-light { width: 150px }
+.switch-toggle { width: 180px }
+*/
+
+.switch-toggle * {
+  cursor: pointer;
+  font-size: 80%;
 }
 

@@ -1,39 +1,107 @@
+-# このページ内専用のjavascriptでjQueryオブジェクトを参照したい場合この関数に記述
 :javascript
   var local_initialize_function = function($) {
-    $.moveTo();
   };
-.navbar.navbar-default.navbar-fixed-top(role="navigation")
-  .container
-    .navbar-header
-      %button.navbar-toggle(type="button")
-        %span.sr-only Toggle navigation
-        %span.icon-bar
-        %span.icon-bar
-        %span.icon-bar
-      %a.navbar-brand(href="#" data-move-to="top") Narou.rb WEB UI
-    #bs-navbar-collapse-1.collapse.navbar-collapse
-      %ul.nav.navbar-nav
-        %li.active
-          %a(href="#") 環境設定
-        %li
-          %a(href="/help") ヘルプ
-        %li
-          %a(href="/") 戻る
-.container.container-main.theme-showcase(role="main")
-  .panel.panel-primary
-    .panel-heading Local Variables
-    .panel-body.list-group-item-info Panel Body
-    .list-group
-      .list-group-item
-        %h4.list-group-item-heading heading
-        %p.list-group-item-text text
-      .list-group-item
-        %h4.list-group-item-heading heading
-        %p.list-group-item-text text
-      .list-group-item
-        %h4.list-group-item-heading heading
-        %p.list-group-item-text text
-      .list-group-item
-        %h4.list-group-item-heading heading
-        %p.list-group-item-text text
+
+%form(action="/settings" method="POST")
+  %input(type="hidden" name="view_invisible" value="#{@view_invisible ? 1 : 0}")
+  .navbar.navbar-default.navbar-fixed-top(role="navigation")
+    .container
+      .navbar-header
+        %button.navbar-toggle(type="button")
+          %span.sr-only Toggle navigation
+          %span.icon-bar
+          %span.icon-bar
+          %span.icon-bar
+        %a.navbar-brand(href="#" data-move-to="top") Narou.rb WEB UI
+      .collapse.navbar-collapse
+        %ul.nav.navbar-nav
+          %li.active
+            %a(href="/settings") 環境設定
+          %li
+            %a(href="/help") ヘルプ
+          %li
+            %a(href="/") 戻る
+        .navbar-form.navbar-lefj
+          %input(type="submit" value="設定を保存" class="btn btn-info" style="margin-left: 50px")
+
+  .container.container-main.theme-showcase(role="main")
+    - @setting_variables.each do |scope, variables|
+      - inventory = Inventory.load("#{scope}_setting", scope)
+
+      .panel-settings-link
+        - if scope == :local
+          goto <a href="#global" data-move-to="#global">Global Variables</a>
+        - else
+          goto <a href="#local" data-move-to="#local">Local Variables</a>
+
+      .panel.panel-primary.panel-settings
+        .panel-heading{id: scope} #{scope.capitalize} Variables
+        .panel-body.list-group-item-info
+          ・各コマンドの設定の変更が出来ます<br>
+          - if scope == :local
+            - if @view_invisible
+              ・force.* 系の設定は setting.ini の設定を無視して反映されるようになります<br>
+              ・default_args.* 系の設定は、各種コマンドのオプションを省略した場合に使用されるオプションを指定出来ます<br>
+          - else
+            ・Global な設定はユーザープロファイルに保存され、すべての narou コマンドで使われます<br>
+          - if @view_invisible
+            ・隠しオプションを非表示にするには<a href="?"><u>ここをクリック</u></a><br>
+          - else
+            ・隠しオプションを表示するには<a href="?view_invisible=1"><u>ここをクリック</u></a><br>
+        .list-group
+          - variables.each do |name, value|
+            - item = inventory[name]
+            - unless @view_invisible
+              - if value[2]
+                - if value[0] == :boolean
+                  - hidden_value = case item when NilClass then "nil" when TrueClass then "on" else "off" end
+                - else
+                  - hidden_value = item
+                %input{type:"hidden", name:name, value:hidden_value}
+                - next
+            - message = value[1].strip.gsub("\n", "<br>")
+            - error_style = {class: "has-error", style: "background-color:#f2dede"}
+            .list-group-item.form-group{@error_list[name] ? error_style : {}}
+              %h4.list-group-item-heading #{name}
+              %p.list-group-item-text
+                - case value[0]
+                - when :boolean
+                  - if name.start_with?("force.")
+                    .switch-toggle.well.switch-3
+                      <input id="#{name}-nil" type="radio" name="#{name}" value="nil" #{item.nil? ? "checked" : ""}>
+                      %label(for="#{name}-nil")
+                        未設定
+                      <input id="#{name}-false" type="radio" name="#{name}" value="off" #{item == false ? "checked" : ""}>
+                      %label(for="#{name}-false")
+                        しない
+                      <input id="#{name}-true" type="radio" name="#{name}" value="on" #{item ? "checked" : ""}>
+                      %label(for="#{name}-true")
+                        する
+                      %a(class="btn btn-primary")
+                  - else
+                    %label(class="switch-light well")
+                      <input type="checkbox" name="#{name}" #{item ? "checked" : ""}>
+                      - if name == "over18"
+                        %span
+                          %span いいえ
+                          %span はい
+                      - else
+                        %span
+                          %span しない
+                          %span する
+                      %a(class="btn btn-primary")
+                - else
+                  %input{type:"text", name:name, value:item, class:"form-control",
+                         placeholder:Command::Setting.variable_type_to_description(value[0]).strip }
+                %p
+                  = message != "" ? message : "&nbsp;"
+                - if @error_list[name]
+                  %p.alert-danger
+                    = @error_list[name]
+                .clear
+          .panel-footer
+            %input(type="submit" value="設定を保存" class="btn btn-info" style="float:none")
+            %span(style="color:gray")
+              （Local、Globalどちらも保存されます）
 

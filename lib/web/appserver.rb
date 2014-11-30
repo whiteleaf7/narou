@@ -51,6 +51,20 @@ module Narou::ServerHelpers
     end
     result.empty? ? nil : result
   end
+
+  #
+  # フォーム情報の真偽値データを実際のデータに変換
+  #
+  def convert_on_off_to_boolean(str)
+    case str
+    when "on"
+      true
+    when "off"
+      false
+    else
+      nil
+    end
+  end
 end
 
 class Narou::AppServer < Sinatra::Base
@@ -60,8 +74,8 @@ class Narou::AppServer < Sinatra::Base
   configure do
     set :app_file, __FILE__
     set :erb, trim: "-"
-    set :haml, format: :html5
     enable :protection
+    enable :sessions
 
     set(:version) do
       Command::Version.create_version_string
@@ -124,8 +138,62 @@ class Narou::AppServer < Sinatra::Base
     scss :style
   end
 
-  get "/settings" do
+  before "/settings" do
     @title = "環境設定"
+    @view_invisible = params["view_invisible"] == "1"
+    @setting_variables = Command::Setting.get_setting_variables
+    @error_list = {}
+  end
+
+  post "/settings" do
+    built_arguments = []
+    output = ""
+    is_error = false
+    [:local, :global].each do |scope|
+      @setting_variables[scope].each do |name, info|
+        param_data = params[name]
+        argument = ""
+        if info[0] == :boolean
+          # :boolean 用のフォームデータは on, off, nil で渡される。
+          # ただしチェックボックスはチェックした時だけ on が渡されるので、
+          # 何もデータが無い＝off を選択したと判断する。
+          # 隠しデータの場合は hidden として on, off, nil が必ず送信されるので、
+          # それで判断できる。
+          if param_data
+            argument = convert_on_off_to_boolean(param_data).to_s
+          else
+            argument = "false"
+          end
+        else
+          argument = param_data
+        end
+        built_arguments << "#{name}=#{argument}"
+      end
+    end
+    unless built_arguments.empty?
+      $stdout.silence do
+        setting = Command::Setting.new
+        setting.add_event_listener(:error) do |msg, name|
+          if name
+            @error_list[name] = msg
+          end
+        end
+        begin
+          setting.execute(built_arguments)
+        rescue SystemExit => e
+          is_error = e.status
+        end
+      end
+    end
+    if is_error
+      session[:alert] = [ "#{is_error}個の設定にエラーがありました", "danger" ]
+    else
+      session[:alert] = [ "保存が完了しました", "success" ]
+    end
+    haml :settings
+  end
+
+  get "/settings" do
     haml :settings
   end
 
@@ -191,81 +259,81 @@ class Narou::AppServer < Sinatra::Base
   post "/api/convert" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["convert", ids])
+      CommandLine.run!(["convert", ids])
     end
   end
 
   post "/api/download" do
     target = params["target"] or pass
     Narou::Worker.push do
-      CommandLine.run(["download", target])
+      CommandLine.run!(["download", target])
     end
   end
 
   post "/api/download_force" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["download", "--force", ids])
+      CommandLine.run!(["download", "--force", ids])
     end
   end
 
   post "/api/update" do
     Narou::Worker.push do
-      CommandLine.run(["update"])
+      CommandLine.run!(["update"])
     end
   end
 
   post "/api/update_select" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["update", ids])
+      CommandLine.run!(["update", ids])
     end
   end
 
   post "/api/send" do
     Narou::Worker.push do
-      CommandLine.run(["send"])
+      CommandLine.run!(["send"])
     end
   end
 
   post "/api/send_select" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["send", ids])
+      CommandLine.run!(["send", ids])
     end
   end
 
   post "/api/freeze_on" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["freeze", "--on", ids])
+      CommandLine.run!(["freeze", "--on", ids])
     end
   end
 
   post "/api/freeze_off" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["freeze", "--off", ids])
+      CommandLine.run!(["freeze", "--off", ids])
     end
   end
 
   post "/api/remove" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["remove", "--yes", ids])
+      CommandLine.run!(["remove", "--yes", ids])
     end
   end
 
   post "/api/remove_with_file" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["remove", "--yes", "--with-file", ids])
+      CommandLine.run!(["remove", "--yes", "--with-file", ids])
     end
   end
 
   post "/api/display_text_list" do
     Narou::Worker.push do
-      CommandLine.run(["list"])
+      CommandLine.run!(["list"])
     end
   end
 
@@ -274,7 +342,7 @@ class Narou::AppServer < Sinatra::Base
     Narou::Worker.push do
       # diff コマンドは１度に一つのIDしか受け取らないので
       ids.each do |id|
-        CommandLine.run(["diff", id])
+        CommandLine.run!(["diff", id])
         print "<hr>"
       end
     end
@@ -283,21 +351,21 @@ class Narou::AppServer < Sinatra::Base
   post "/api/inspect" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["inspect", ids])
+      CommandLine.run!(["inspect", ids])
     end
   end
 
   post "/api/folder" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["folder", ids])
+      CommandLine.run!(["folder", ids])
     end
   end
 
   post "/api/backup" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run(["backup", ids])
+      CommandLine.run!(["backup", ids])
     end
   end
 end

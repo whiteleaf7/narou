@@ -25,7 +25,7 @@ end
 class Narou::StreamingLogger < StringIO
   include Narou::LoggerModule
 
-  def initialize(push_server)
+  def initialize(push_server = nil)
     super()
     @push_server = push_server
   end
@@ -36,7 +36,7 @@ class Narou::StreamingLogger < StringIO
 
   def push_streaming(str)
     unless @is_silent
-      @push_server.send_all(echo: str)
+      @push_server.send_all(echo: str) if @push_server
     end
   end
 

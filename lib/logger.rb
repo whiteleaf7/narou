@@ -51,6 +51,24 @@ module Narou::LoggerModule
     self.silent = tmp
   end
 
+  #
+  # 標準出力($stdout)のバッファリング＋取得
+  #
+  # キャプチャー用途なので標準エラーはキャプチャーしない
+  # ansicolor_strip :: エスケープシーケンスを除去するか
+  #
+  def capture(ansicolor_strip = true, &block)
+    raise "#capture block given" unless block
+    temp_stream = $stdout
+    $stdout = self.class.new
+    $stdout.silence do
+      block.call
+    end
+    buffer = $stdout.string
+    $stdout = temp_stream
+    ansicolor_strip ? strip_color(buffer) : buffer
+  end
+
   def strip_color(str)
     if $disable_color
       str
@@ -84,24 +102,6 @@ class Narou::Logger < StringIO
     end
     super(str)
     write_console(str, STDOUT)
-  end
-
-  #
-  # 標準出力($stdout)のバッファリング＋取得
-  #
-  # キャプチャー用途なので標準エラーには実装しない
-  # ansicolor_strip :: エスケープシーケンスを除去するか
-  #
-  def capture(ansicolor_strip = true, &block)
-    raise "#capture block given" unless block
-    temp_stream = $stdout
-    $stdout = self.class.new
-    $stdout.silence do
-      block.call
-    end
-    buffer = $stdout.string
-    $stdout = temp_stream
-    ansicolor_strip ? strip_color(buffer) : buffer
   end
 
   def tty?
