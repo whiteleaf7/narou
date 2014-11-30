@@ -71,32 +71,26 @@ describe Narou::Eventable do
     end
   end
 
-  context "when call #add_event_listener" do
+  context "when call #add_event_listener and .add_event_listener" do
     before do
+      @anser = nil
       @dummy = Dummy.new
-      @dummy.add_event_listener(:instance_method) do |arg|
-        expect(arg).to eq 1
+      @dummy.add_event_listener(:instance_or_class) do
+        @anser = :instance
+      end
+      Dummy.add_event_listener(:instance_or_class) do
+        @anser = :class
       end
     end
 
-    it "is possible to trigger by class method" do
-      Dummy.trigger_event(:instance_method, 1)
+    it "instance method is called" do
+      @dummy.trigger_event(:instance_or_class)
+      expect(@anser).to eq :instance
     end
 
-    it "is possible to trigger by instance method" do
-      @dummy.trigger_event(:instance_method, 1)
-    end
-  end
-
-  context "when call .add_event_listener" do
-    before do
-      Dummy.add_event_listener(:instance_method) do |arg|
-        expect(arg).to eq 1
-      end
-    end
-
-    it "is possible to trigger by instance method" do
-      Dummy.new.trigger_event(:instance_method, 1)
+    it "class method is called" do
+      Dummy.trigger_event(:instance_or_class)
+      expect(@anser).to eq :class
     end
   end
 end
