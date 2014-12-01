@@ -61,6 +61,9 @@ module Command
       @opt.on("--all-clean", "凍結済を除く全小説の差分データを削除する") {
         @options["all-clean"] = true
       }
+      @opt.on("--no-tool", "外部差分ツールを使用しない") {
+        @options["no-tool"] = true
+      }
     end
 
     # 引数の中の -数字 オプション(-n 数字の省略形)を -n 数字 に変換する
@@ -111,11 +114,9 @@ module Command
         return
       end
       @difftool = Inventory.load("global_setting", :global)["difftool"]
-      unless @difftool
+      if @difftool.! || @options["no-tool"]
         display_diff_on_oneself(id)
         return
-        #error "difftool が設定されていません。narou setting で difftool を設定して下さい"
-        #return
       end
       exec_difftool(id)
     end
