@@ -65,6 +65,20 @@ module Narou::ServerHelpers
       nil
     end
   end
+
+  #
+  # nil true false を nil on off という文字列に変換
+  #
+  def convert_boolean_to_on_off(bool)
+    case bool
+    when NilClass
+      "nil"
+    when TrueClass
+      "on"
+    else
+      "off"
+    end
+  end
 end
 
 class Narou::AppServer < Sinatra::Base

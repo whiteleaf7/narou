@@ -55,7 +55,7 @@
             - unless @view_invisible
               - if value[2]
                 - if value[0] == :boolean
-                  - hidden_value = case item when NilClass then "nil" when TrueClass then "on" else "off" end
+                  - hidden_value = convert_boolean_to_on_off(item)
                 - else
                   - hidden_value = item
                 %input{type:"hidden", name:name, value:hidden_value}
