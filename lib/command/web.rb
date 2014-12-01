@@ -93,6 +93,7 @@ module Command
       end
       $stdout = Narou::StreamingLogger.new(push_server)
       ProgressBar.push_server = push_server
+      Narou::AppServer.push_server = push_server
       Narou::Worker.instance.start
       Narou::AppServer.run!
       push_server.quit

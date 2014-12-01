@@ -96,6 +96,10 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  def self.push_server=(server)
+    @@push_server = server
+  end
+
   #
   # サーバのアドレスを生成
   #
@@ -281,6 +285,7 @@ class Narou::AppServer < Sinatra::Base
     target = params["target"] or pass
     Narou::Worker.push do
       CommandLine.run!(["download", target])
+      @@push_server.send_all("table.reload" => true)
     end
   end
 
@@ -288,12 +293,14 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["download", "--force", ids])
+      @@push_server.send_all("table.reload" => true)
     end
   end
 
   post "/api/update" do
     Narou::Worker.push do
       CommandLine.run!(["update"])
+      @@push_server.send_all("table.reload" => true)
     end
   end
 
@@ -301,6 +308,7 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["update", ids])
+      @@push_server.send_all("table.reload" => true)
     end
   end
 
@@ -321,6 +329,7 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["freeze", "--on", ids])
+      @@push_server.send_all("table.reload" => true)
     end
   end
 
@@ -328,6 +337,7 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["freeze", "--off", ids])
+      @@push_server.send_all("table.reload" => true)
     end
   end
 
@@ -335,6 +345,7 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["remove", "--yes", ids])
+      @@push_server.send_all("table.reload" => true)
     end
   end
 
@@ -342,6 +353,7 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["remove", "--yes", "--with-file", ids])
+      @@push_server.send_all("table.reload" => true)
     end
   end
 
