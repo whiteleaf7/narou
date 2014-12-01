@@ -368,7 +368,8 @@ class Narou::AppServer < Sinatra::Base
     Narou::Worker.push do
       # diff コマンドは１度に一つのIDしか受け取らないので
       ids.each do |id|
-        CommandLine.run!(["diff", id])
+        # セキュリティ的にWEB UIでは独自の差分表示のみ使う
+        CommandLine.run!(["diff", "--no-tool", id])
         print "<hr>"
       end
     end
