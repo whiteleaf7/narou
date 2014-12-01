@@ -521,13 +521,18 @@ $console-color: white;
   margin-left: 0;
   float: right;
 }
-/*
-.switch-light { width: 150px }
-.switch-toggle { width: 180px }
-*/
 
 .switch-toggle * {
   cursor: pointer;
   font-size: 80%;
+}
+
+/*
+ * 個別メニュー
+ */
+#context-menu {
+  position: absolute;
+  display: none;
+  z-index: 102;
 }
 
