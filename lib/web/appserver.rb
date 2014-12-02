@@ -165,6 +165,10 @@ class Narou::AppServer < Sinatra::Base
   # ルーティング
   # ===================================================================
 
+  before do
+    Inventory.clear
+  end
+
   get "/" do
     setting = Inventory.load("server_setting", :global)
     @is_first_access = !setting["already-accessed"]

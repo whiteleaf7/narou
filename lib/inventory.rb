@@ -22,6 +22,10 @@ module Inventory
     }
   end
 
+  def self.clear
+    @@cache = {}
+  end
+
   def init(name, scope)
     dir = case scope
           when :local
