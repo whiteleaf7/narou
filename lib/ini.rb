@@ -106,7 +106,8 @@ class Ini
           fp.puts("[#{section}]")
         end
         values.each do |key, value|
-          fp.puts(key + DELIMITER + value)
+          value = "\"#{value}\"" if value.kind_of?(String)
+          fp.puts("#{key} #{DELIMITER} #{value}")
         end
       end
     end
