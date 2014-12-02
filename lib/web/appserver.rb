@@ -194,6 +194,7 @@ class Narou::AppServer < Sinatra::Base
     built_arguments = []
     output = ""
     is_error = false
+    device = params.delete("device")
     [:local, :global].each do |scope|
       @setting_variables[scope].each do |name, info|
         param_data = params[name]
@@ -215,6 +216,9 @@ class Narou::AppServer < Sinatra::Base
         built_arguments << "#{name}=#{argument}"
       end
     end
+    # device の項目だけ関連項目を変更するという挙動をするため、変更を上書き
+    # されないように最後にまわす
+    built_arguments << "device=#{device}" if device
     unless built_arguments.empty?
       $stdout.silence do
         setting = Command::Setting.new
