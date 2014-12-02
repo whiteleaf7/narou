@@ -172,7 +172,7 @@ module Command
         puts message.string
       end
     rescue Device::UnknownDevice => e
-      output_error("#{e.message}\n設定できるのは #{Device::DEVICES.keys.join(", ")} です")
+      output_error("#{e.message}\n設定できるのは #{Device::DEVICES.keys.join(", ")} です", "device")
     end
 
     def get_variable_list_strings(scope)
