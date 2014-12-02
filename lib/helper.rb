@@ -216,24 +216,24 @@ module Helper
     result = nil
     case type
     when :boolean
-      case value
-      when /true/i
+      case value.strip.downcase
+      when "true"
         result = true
-      when /false/i
+      when "false"
         result = false
       else
         raise InvalidVariableType, type
       end
     when :integer
-      if value =~ /^[+-]?\d+$/
-        result = value.to_i
-      else
+      begin
+        result = Integer(value)
+      rescue
         raise InvalidVariableType, type
       end
     when :float
-      if value =~ /^[+-]?\d+\.?\d*$/
-        result = value.to_f
-      else
+      begin
+        result = Float(value)
+      rescue
         raise InvalidVariableType, type
       end
     when :directory, :file
