@@ -271,21 +271,17 @@ class Narou::AppServer < Sinatra::Base
       name, type = info[:name], info[:type]
       param_data = params[name]
       value = nil
-      case type
-      when :boolean
-        if param_data
-          value = convert_on_off_to_boolean(param_data)
-        else
-          value = false
-        end
-      when :integer
-        value = Integer(param_data) rescue param_data
-      when :float
-        value = Float(param_data) rescue param_data
-      else
-        value = param_data
-      end
       begin
+        case type
+        when :boolean
+          if param_data
+            value = convert_on_off_to_boolean(param_data)
+          else
+            value = false
+          end
+        else
+          value = Helper.string_cast_to_type(param_data, type)
+        end
         @novel_setting[name] = value
       rescue Helper::InvalidVariableType => e
         @error_list[name] = e.message
