@@ -173,6 +173,95 @@ module Helper
     [extracted_str, illust_chuki_array]
   end
 
+  class InvalidVariableType < StandardError
+    def initialize(type)
+      super("値が #{Helper.variable_type_to_description(type).rstrip} ではありません")
+    end
+  end
+
+  class UnknownVariableType < StandardError
+    def initialize(type)
+      super("unknwon variable type (:#{type})")
+    end
+  end
+
+  class InvalidVariableName < StandardError; end
+
+  #
+  # 与えられた型情報の意味文字列を取得
+  #
+  def variable_type_to_description(type)
+    case type
+    when :boolean
+      "true/false  "
+    when :integer
+      "整数        "
+    when :float
+      "小数点数    "
+    when :string
+      "文字列      "
+    when :directory
+      "フォルダパス"
+    when :file
+      "ファイルパス"
+    else
+      raise UnknownVariableType, type
+    end
+  end
+
+  #
+  # 文字列データを指定された型にキャストする
+  #
+  def string_cast_to_type(value, type)
+    result = nil
+    case type
+    when :boolean
+      case value
+      when /true/i
+        result = true
+      when /false/i
+        result = false
+      else
+        raise InvalidVariableType, type
+      end
+    when :integer
+      if value =~ /^[+-]?\d+$/
+        result = value.to_i
+      else
+        raise InvalidVariableType, type
+      end
+    when :float
+      if value =~ /^[+-]?\d+\.?\d*$/
+        result = value.to_f
+      else
+        raise InvalidVariableType, type
+      end
+    when :directory, :file
+      if File.method("#{type}?").call(value)
+        result = File.expand_path(value)
+      else
+        raise InvalidVariableType, type
+      end
+    when :string
+      result = value
+    else
+      raise UnknownVariableType, type
+    end
+    result
+  end
+
+  TYPE_OF_VALUE = {
+    TrueClass => :boolean, FalseClass => :boolean, Fixnum => :integer,
+    Float => :float, String => :string
+  }
+
+  #
+  # Rubyの変数がなんの型かシンボルで取得
+  #
+  def type_of_value(value)
+    TYPE_OF_VALUE[value.class]
+  end
+
   #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #

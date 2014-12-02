@@ -15,20 +15,6 @@ module Command
       "各コマンドの設定を変更します"
     end
 
-    class InvalidVariableType < StandardError
-      def initialize(type)
-        super("値が #{Setting.variable_type_to_description(type).rstrip} ではありません")
-      end
-    end
-
-    class UnknownVariableType < StandardError
-      def initialize(type)
-        super("unknwon variable type (:#{type})")
-      end
-    end
-
-    class InvalidVariableName < StandardError; end
-
     def initialize
       super("[<name>=<value> ...] [options]")
       @opt.separator <<-EOS
@@ -67,25 +53,6 @@ module Command
       }
     end
 
-    def self.variable_type_to_description(type)
-      case type
-      when :boolean
-        "true/false  "
-      when :integer
-        "整数        "
-      when :float
-        "小数点数    "
-      when :string
-        "文字列      "
-      when :directory
-        "フォルダパス"
-      when :file
-        "ファイルパス"
-      else
-        raise UnknownVariableType, type
-      end
-    end
-
     def get_scope_of_variable_name(name)
       [:local, :global].each do |scope|
         if SETTING_VARIABLES[scope].include?(name)
@@ -102,48 +69,10 @@ module Command
     def casting_variable(name, value)
       scope = get_scope_of_variable_name(name)
       unless scope
-        raise InvalidVariableName, "#{name} は不明な名前です"
+        raise Helper::InvalidVariableName, "#{name} は不明な名前です"
       end
-      casted_value = string_cast_to_type(value, SETTING_VARIABLES[scope][name][0])
+      casted_value = Helper.string_cast_to_type(value, SETTING_VARIABLES[scope][name][0])
       [scope, casted_value]
-    end
-
-    def string_cast_to_type(value, type)
-      result = nil
-      case type
-      when :boolean
-        case value
-        when /true/i
-          result = true
-        when /false/i
-          result = false
-        else
-          raise InvalidVariableType, type
-        end
-      when :integer
-        if value =~ /^[+-]?\d+$/
-          result = value.to_i
-        else
-          raise InvalidVariableType, type
-        end
-      when :float
-        if value =~ /^[+-]?\d+\.?\d*$/
-          result = value.to_f
-        else
-          raise InvalidVariableType, type
-        end
-      when :directory, :file
-        if File.method("#{type}?").call(value)
-          result = File.expand_path(value)
-        else
-          raise InvalidVariableType, type
-        end
-      when :string
-        result = value
-      else
-        raise UnknownVariableType, type
-      end
-      result
     end
 
     def output_setting_list
@@ -202,7 +131,7 @@ module Command
         end
         begin
           scope, casted_value = casting_variable(name, value)
-        rescue InvalidVariableName, InvalidVariableType => e
+        rescue Helper::InvalidVariableName, Helper::InvalidVariableType => e
           output_error(e.message, name)
           next
         end
@@ -250,7 +179,7 @@ module Command
       result = ""
       SETTING_VARIABLES[scope].each do |name, info|
         if @options["all"] || info[2] != INVISIBLE
-          type_description = self.class.variable_type_to_description(info[0])
+          type_description = Helper.variable_type_to_description(info[0])
           result << "    <bold><green>#{name.ljust(18)}</green></bold> #{type_description} #{info[1]}\n".termcolor
         end
       end
@@ -268,11 +197,6 @@ module Command
     def self.get_setting_variables
       SETTING_VARIABLES
     end
-
-    TYPE_OF_VALUE = {
-      TrueClass => :boolean, FalseClass => :boolean, Fixnum => :integer,
-      Float => :float, String => :string
-    }
 
     INVISIBLE = true
 
@@ -311,7 +235,7 @@ module Command
 
     NovelSetting::DEFAULT_SETTINGS.each do |default|
       SETTING_VARIABLES[:local]["force." + default[:name]] = [
-        TYPE_OF_VALUE[default[:value].class], "\n      " + default[:help], INVISIBLE
+        Helper.type_of_value(default[:value]), "\n      " + default[:help], INVISIBLE
       ]
     end
 

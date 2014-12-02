@@ -17,6 +17,7 @@ require_relative "../CommandLine"
 require_relative "../inventory"
 require_relative "worker"
 require_relative "pushserver"
+require_relative "settingmessages"
 
 module Narou::ServerHelpers
   #
@@ -71,12 +72,34 @@ module Narou::ServerHelpers
   #
   def convert_boolean_to_on_off(bool)
     case bool
-    when NilClass
-      "nil"
     when TrueClass
       "on"
-    else
+    when FalseClass
       "off"
+    else
+      "nil"
+    end
+  end
+
+  #
+  # HTMLエスケープヘルパー
+  #
+  def h(text)
+    Rack::Utils.escape_html(text)
+  end
+
+  #
+  # 与えられたデータが真偽値だった場合、設定画面用に「する」「しない」に変換する
+  # 真偽値ではなかった場合、そのまま返す
+  #
+  def value_to_msg(value)
+    case value
+    when TrueClass
+      "する"
+    when FalseClass
+      "しない"
+    else
+      value
     end
   end
 end
@@ -229,6 +252,62 @@ class Narou::AppServer < Sinatra::Base
   post "/shutdown" do
     self.class.quit!
     "シャットダウンしました。再起動するまで操作は出来ません"
+  end
+
+  get "/novels/:id" do
+    haml :"novels/index"
+  end
+
+  before "/novels/:id/setting" do
+    @title = "小説の変換設定"
+    @id = params[:id]
+    data = Downloader.get_data_by_target(@id)
+    @novel_title = data["title"]
+    @setting_variables = []
+    @error_list = {}
+    @novel_setting = NovelSetting.load(@id, true)
+    @default_settings = NovelSetting::DEFAULT_SETTINGS
+    @force_settings = Inventory.load("local_setting", :local).select { |n| n.start_with?("force.") }
+  end
+
+  post "/novels/:id/setting" do
+    @default_settings.each do |info|
+      name, type = info[:name], info[:type]
+      param_data = params[name]
+      value = nil
+      case type
+      when :boolean
+        if param_data
+          value = convert_on_off_to_boolean(param_data)
+        else
+          value = false
+        end
+      when :integer
+        value = Integer(param_data) rescue param_data
+      when :float
+        value = Float(param_data) rescue param_data
+      else
+        value = param_data
+      end
+      begin
+        @novel_setting[name] = value
+      rescue Helper::InvalidVariableType => e
+        @error_list[name] = e.message
+      end
+    end
+    @novel_setting.save_settings
+
+    if @error_list.empty?
+      session[:alert] = [ "保存が完了しました", "success" ]
+    else
+      session[:alert] = [ "#{@error_list.size}個の設定にエラーがありました", "danger" ]
+    end
+
+    haml :"novels/setting"
+  end
+
+  get "/novels/:id/setting" do
+    haml :"novels/setting"
   end
 
   # -------------------------------------------------------------------------------
