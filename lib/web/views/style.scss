@@ -188,6 +188,27 @@ table#novel-list {
   a {
     display: block;
   }
+  // 個別メニューをクリックした小説を目立たせる
+  @-webkit-keyframes bg-color {
+    0% { background-color: inherit; }
+    50% { background-color: mix($even-color, red, 80%); }
+    100% { background-color: inherit; }
+  }
+  @keyframes bg-color {
+    0% { background-color: inherit; }
+    50% { background-color: mix($even-color, red, 80%); }
+    100% { background-color: inherit; }
+  }
+  tr.context-menu-target {
+    &.odd td {
+      animation: bg-color 3s infinite;
+      -webkit-animation: bg-color 3s infinite;
+    }
+    &.even td {
+      animation: bg-color 3s infinite;
+      -webkit-animation: bg-color 3s infinite;
+    }
+  }
 }
 
 // DataTables 共通設定
