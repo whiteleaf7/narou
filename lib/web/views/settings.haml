@@ -60,7 +60,8 @@
                   - hidden_value = item
                 %input{type:"hidden", name:name, value:hidden_value}
                 - next
-            - message = value[1].strip.gsub("\n", "<br>")
+            - message = Narou::SETTING_VARIABLES_WEBUI_MESSAGES[name] || value[1]
+            - message = message.strip.gsub("\n", "<br>")
             - error_style = {class: "has-error", style: "background-color:#f2dede"}
             .list-group-item.form-group{@error_list[name] ? error_style : {}}
               %h4.list-group-item-heading #{name}
@@ -93,7 +94,7 @@
                       %a(class="btn btn-primary")
                 - else
                   %input{type:"text", name:name, value:item, class:"form-control",
-                         placeholder:Command::Setting.variable_type_to_description(value[0]).strip }
+                         placeholder:Helper.variable_type_to_description(value[0]).strip }
                 %p
                   = message != "" ? message : "&nbsp;"
                 - if @error_list[name]
