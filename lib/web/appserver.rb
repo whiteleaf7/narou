@@ -254,10 +254,6 @@ class Narou::AppServer < Sinatra::Base
     "シャットダウンしました。再起動するまで操作は出来ません"
   end
 
-  get "/novels/:id" do
-    haml :"novels/index"
-  end
-
   before "/novels/:id/setting" do
     @title = "小説の変換設定"
     @id = params[:id]
