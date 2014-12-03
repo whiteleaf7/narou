@@ -23,7 +23,7 @@
           %li
             %a(href="/") 戻る
         .navbar-form.navbar-lefj
-          %input(type="submit" value="設定を保存" class="btn btn-info" style="margin-left: 50px")
+          %input.btn.btn-info(type="submit" value="設定を保存" style="margin-left: 50px")
 
   .container.container-main.theme-showcase(role="main")
     - @setting_variables.each do |scope, variables|
@@ -79,9 +79,9 @@
                       <input id="#{name}-true" type="radio" name="#{name}" value="on" #{item ? "checked" : ""}>
                       %label(for="#{name}-true")
                         する
-                      %a(class="btn btn-primary")
+                      %a.btn.btn-primary
                   - else
-                    %label(class="switch-light well")
+                    %label.switch-light.well
                       <input type="checkbox" name="#{name}" #{item ? "checked" : ""}>
                       - if name == "over18"
                         %span
@@ -91,7 +91,7 @@
                         %span
                           %span しない
                           %span する
-                      %a(class="btn btn-primary")
+                      %a.btn.btn-primary
                 - else
                   %input{type:"text", name:name, value:item, class:"form-control",
                          placeholder:Helper.variable_type_to_description(value[0]).strip }
@@ -102,7 +102,7 @@
                     = @error_list[name]
                 .clear
           .panel-footer
-            %input(type="submit" value="設定を保存" class="btn btn-info" style="float:none")
+            %input.btn.btn-info(type="submit" value="設定を保存" style="float:none")
             %span(style="color:gray")
               （Local、Globalどちらも保存されます）
 
