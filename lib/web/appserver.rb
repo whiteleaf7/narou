@@ -193,7 +193,6 @@ class Narou::AppServer < Sinatra::Base
   post "/settings" do
     built_arguments = []
     output = ""
-    is_error = false
     device = params.delete("device")
     [:local, :global].each do |scope|
       @setting_variables[scope].each do |name, info|
@@ -229,15 +228,14 @@ class Narou::AppServer < Sinatra::Base
         end
         begin
           setting.execute(built_arguments)
-        rescue SystemExit => e
-          is_error = e.status
+        rescue SystemExit
         end
       end
     end
-    if is_error
-      session[:alert] = [ "#{is_error}個の設定にエラーがありました", "danger" ]
-    else
+    if @error_list.empty?
       session[:alert] = [ "保存が完了しました", "success" ]
+    else
+      session[:alert] = [ "#{@error_list.size}個の設定にエラーがありました", "danger" ]
     end
     haml :settings
   end
