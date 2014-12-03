@@ -1,10 +1,18 @@
 -# このページ内専用のjavascriptでjQueryオブジェクトを参照したい場合この関数に記述
 :javascript
   var local_initialize_function = function($) {
+    var notification = new Narou.Notification();
+    var stream_console = new Narou.Console(notification, {
+      restore: false, buttons: false
+    });
     var action = new Narou.Action(null);
+    $("#dialog-console").on("shown.bs.modal", function() {
+      action.convert("#{h @id}");
+    });
     $("#btn-convert").on("click", function(e) {
       e.preventDefault();
-      action.convert("#{h @id}");
+      stream_console.clear();
+      $("#dialog-console").modal();
     });
   };
 
@@ -25,8 +33,8 @@
           %li
             %a(href="/") 戻る
         .navbar-form.navbar-lefj
-          %input(type="submit" value="設定を保存" class="btn btn-info" style="margin-left: 50px")
-          %button#btn-convert(class="btn btn-default") この小説を変換
+          %input.btn.btn-info(type="submit" value="設定を保存" style="margin-left: 50px")
+          %button#btn-convert.btn.btn-default この小説を変換
 
   .container.container-main.theme-showcase(role="main")
     -# inventory = Inventory.load("#{scope}_setting", scope)
@@ -76,3 +84,15 @@
         .panel-footer
           %input(type="submit" value="設定を保存" class="btn btn-info" style="float:none")
 
+#dialog-console.modal.fade(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true")
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button(type="button" class="close" data-dismiss="modal")
+          %span(aria-hidden="true") &times;
+          %span.sr-only Close
+        %h4#myModalLabel.modal-title コンソール
+      .modal-body
+        #console
+      .modal-footer
+        %button.btn.btn-primary(type="button" data-dismiss="modal") 閉じる
