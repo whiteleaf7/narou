@@ -263,15 +263,9 @@ class Narou::AppServer < Sinatra::Base
   before "/novels/:id/setting" do
     @title = "小説の変換設定"
     @id = params[:id]
-    unless @id =~ /^\d+$/
-      session[:alert] = ["不正なIDです", "danger"]
-      redirect to("/")
-    end
+    not_found unless @id =~ /^\d+$/
     data = Downloader.get_data_by_target(@id)
-    unless data
-      session[:alert] = ["指定された小説は見つかりませんでした", "danger"]
-      redirect to("/")
-    end
+    not_found unless data
     @novel_title = data["title"]
     @setting_variables = []
     @error_list = {}
@@ -314,6 +308,10 @@ class Narou::AppServer < Sinatra::Base
 
   get "/novels/:id/setting" do
     haml :"novels/setting"
+  end
+
+  get "/download/:id" do
+
   end
 
   # -------------------------------------------------------------------------------
