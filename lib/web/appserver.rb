@@ -166,7 +166,9 @@ class Narou::AppServer < Sinatra::Base
   # ===================================================================
 
   before do
-    Inventory.clear
+    Narou::Worker.push do
+      Inventory.clear
+    end
   end
 
   get "/" do
