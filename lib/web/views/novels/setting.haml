@@ -53,7 +53,7 @@
           - force_value = @force_settings["force.#{name}"]
           - if @error_list[name]
             - list_group_item_style = {class: "has-error", style: "background-color:#f2dede"}
-          - elsif force_value
+          - elsif force_value.nil?.!
             - list_group_item_style = {style: "background-color: #fcf8e3"}
           .list-group-item.form-group{list_group_item_style}
             %h4.list-group-item-heading #{name}
@@ -72,7 +72,7 @@
               %p #{help}
               .help-extra-messages
                 %p デフォルト：#{h value_to_msg(info[:value])}
-                - if force_value
+                - unless force_value.nil?
                   %p
                     %b force.#{name} が有効になっています（設定値：#{h value_to_msg(force_value)}）
               - if @error_list[name]
