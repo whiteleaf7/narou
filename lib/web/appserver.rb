@@ -480,5 +480,9 @@ class Narou::AppServer < Sinatra::Base
       CommandLine.run!(["backup", ids])
     end
   end
+
+  post "/api/clear_history" do
+    Narou::PushServer.instance.clear_history
+  end
 end
 

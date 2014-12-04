@@ -22,7 +22,7 @@ class Narou::PushServer
     @accepted_domains = "localhost"
     @port = 31000
     @connections = []
-    @history = [nil] * HISTORY_SAVED_COUNT
+    clear_history
   end
 
   def run
@@ -65,6 +65,13 @@ class Narou::PushServer
   #
   def quit
     @server.quit
+  end
+
+  def clear_history
+    @history = [nil] * HISTORY_SAVED_COUNT
+    # Sinatra で get "/" { clear_history } とかやった場合に [nil,nil...] な配列データが
+    # 渡されないようにするため（配列は Sinatra にとって特別なデータ）
+    true
   end
 
   #
