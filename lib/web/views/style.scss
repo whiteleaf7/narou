@@ -469,10 +469,6 @@ $console-color: white;
     color: mix($console-color, red, 80%);
   }
 }
-.console-refresh {
-  //@include css3(transform, rotate(103deg));
-  display: none;
-}
 
 /*
  * ツールチップ
