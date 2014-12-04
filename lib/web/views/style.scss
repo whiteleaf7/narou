@@ -410,7 +410,7 @@ $console-color: white;
   }
   margin-bottom: 20px !important;
 }
-#console {
+.console {
   position: relative;
   overflow: hidden;
   padding: 5px 15px 5px 15px;
@@ -458,7 +458,7 @@ $console-color: white;
     margin-bottom: 7px;
   }
 }
-#console-control-buttons {
+.console-control-buttons {
   position: absolute;
   top: 3px;
   right: 15px;
@@ -469,7 +469,7 @@ $console-color: white;
     color: mix($console-color, red, 80%);
   }
 }
-#console-refresh {
+.console-refresh {
   //@include css3(transform, rotate(103deg));
   display: none;
 }

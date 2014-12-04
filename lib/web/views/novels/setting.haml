@@ -6,13 +6,13 @@
       restore: false, buttons: false
     });
     var action = new Narou.Action(null);
-    $("#dialog-console").on("shown.bs.modal", function() {
+    $("#console-dialog").on("shown.bs.modal", function() {
       action.convert("#{h @id}");
     });
     $("#btn-convert").on("click", function(e) {
       e.preventDefault();
       stream_console.clear();
-      $("#dialog-console").modal();
+      $("#console-dialog").modal();
     });
   };
 
@@ -82,15 +82,15 @@
         .panel-footer
           %input(type="submit" value="設定を保存" class="btn btn-info" style="float:none")
 
-#dialog-console.modal.fade(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true")
+#console-dialog.modal.fade(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true")
   .modal-dialog
     .modal-content
       .modal-header
         %button(type="button" class="close" data-dismiss="modal")
           %span(aria-hidden="true") &times;
           %span.sr-only Close
-        %h4#myModalLabel.modal-title コンソール
+        %h4.modal-title コンソール
       .modal-body
-        #console
+        #console.console
       .modal-footer
         %button.btn.btn-primary(type="button" data-dismiss="modal") 閉じる
