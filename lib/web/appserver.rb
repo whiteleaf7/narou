@@ -348,7 +348,7 @@ class Narou::AppServer < Sinatra::Base
           toc_url: %!<a href="#{escape_html(data["toc_url"])}" target="_blank" ! +
                    %!data-toggle="tooltip" data-placement="top" title="#{data["toc_url"]}">! +
                    %!<span class="glyphicon glyphicon-link"></span></a>!,
-          novel_type: data["novel_type"] == 2 ? "短編" : "連載中",
+          novel_type: data["novel_type"] == 2 ? "短編" : "連載",
           tags: decorate_tags(tags),
           status: [
             Narou.novel_frozen?(id) ? "凍結" : nil,
