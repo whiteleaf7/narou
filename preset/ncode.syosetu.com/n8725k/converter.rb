@@ -9,6 +9,8 @@
 converter "n8725k ログ・ホライズン" do
   def before(io, element_type)
     super
+    io.string.gsub!("ルビ：", "")
+    io
   end
 
   def after(io, element_type)
@@ -21,7 +23,6 @@ converter "n8725k ログ・ホライズン" do
           end
         end
       end
-      data.gsub!("ルビ：", "")
       data.gsub!("ロエ二", "ロエ２")
     end
     io
