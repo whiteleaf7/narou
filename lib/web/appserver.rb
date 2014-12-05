@@ -262,13 +262,16 @@ class Narou::AppServer < Sinatra::Base
     "シャットダウンしました。再起動するまで操作は出来ません"
   end
 
-  before "/novels/:id/setting" do
-    @title = "小説の変換設定"
+  before "/novels/:id/*" do
     @id = params[:id]
     not_found unless @id =~ /^\d+$/
-    data = Downloader.get_data_by_target(@id)
-    not_found unless data
-    @novel_title = data["title"]
+    @data = Downloader.get_data_by_target(@id)
+    not_found unless @data
+  end
+
+  before "/novels/:id/setting" do
+    @title = "小説の変換設定"
+    @novel_title = @data["title"]
     @setting_variables = []
     @error_list = {}
     @novel_setting = NovelSetting.load(@id, true)
@@ -312,8 +315,15 @@ class Narou::AppServer < Sinatra::Base
     haml :"novels/setting"
   end
 
-  get "/download/:id" do
-
+  get "/novels/:id/download" do
+    device = Narou.get_device
+    ext = device ? device.ebook_file_ext : ".epub"
+    path = Narou.get_ebook_file_path(@id, ext)
+    if File.exist?(path)
+      send_file(path, filename: File.basename(path))
+    else
+      not_found
+    end
   end
 
   # -------------------------------------------------------------------------------
@@ -328,8 +338,9 @@ class Narou::AppServer < Sinatra::Base
     json_objects[:data] =
       database_values.map do |data|
         tags = data["tags"] || []
+        id = data["id"]
         {
-          id: data["id"].to_s,
+          id: id.to_s,
           last_update: data["last_update"].strftime("%Y/%m/%d %R"),
           title: escape_html(data["title"]),
           author: escape_html(data["author"]),
@@ -340,11 +351,11 @@ class Narou::AppServer < Sinatra::Base
           novel_type: data["novel_type"] == 2 ? "短編" : "連載中",
           tags: decorate_tags(tags),
           status: [
-            Narou.novel_frozen?(data["id"]) ? "凍結" : nil,
+            Narou.novel_frozen?(id) ? "凍結" : nil,
             tags.include?("end") ? "完結" : nil,
             tags.include?("404") ? "削除" : nil,
           ].compact.join(", "),
-          download: %!<a href="#"><span class="glyphicon glyphicon-book"></span></a>!,
+          download: %!<a href="/novels/#{id}/download"><span class="glyphicon glyphicon-book"></span></a>!,
         }.tap { |this|
           # table-cell 内で position: abosolute を使うために div をかます
           # 参考： http://no1026.com/archives/406
@@ -352,8 +363,8 @@ class Narou::AppServer < Sinatra::Base
             this[key] = "<div>#{value}</div>"
           end
           # 内部データ用なのでそのまま
-          this[:frozen] = Narou.novel_frozen?(data["id"])
-          this[:_id] = data["id"].to_s
+          this[:frozen] = Narou.novel_frozen?(id)
+          this[:_id] = id.to_s
         }
       end
     json json_objects
