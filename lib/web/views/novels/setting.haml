@@ -143,7 +143,7 @@
                   %td &nbsp;
               %tbody
                 -# 末尾に新規入力用の空要素を追加
-                - (@replace_pattern + [["",""]]).each_with_index do |pattern, index|
+                - (@replace_pattern + [["",""]]).each do |pattern|
                   %tr.replace-pattern-tr
                     %td
                       %input{type:"text", name:"replace_pattern[][left]", value:pattern[0], class:"form-control"}
