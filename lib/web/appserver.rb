@@ -387,7 +387,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/convert" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["convert", ids])
+      CommandLine.run!(["convert", "--no-open", ids])
     end
   end
 
