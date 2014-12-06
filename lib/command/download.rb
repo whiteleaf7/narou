@@ -5,6 +5,7 @@
 
 require_relative "../narou"
 require_relative "../downloader"
+require_relative "../input"
 
 module Command
   class Download < CommandBase
@@ -113,7 +114,7 @@ module Command
             puts "title: #{data["title"]}"
             mistook_count += 1
           else
-            if Helper.confirm("再ダウンロードしますか")
+            if Narou::Input.confirm("再ダウンロードしますか")
               download_target = data["toc_url"]
               redo
             else

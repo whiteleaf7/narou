@@ -51,30 +51,6 @@ module Helper
     require "io/console"
   end
 
-  #
-  # キーボード入力による確認をする
-  #
-  # :default: エンターを押した場合に返ってくる値
-  # :nontty_default: pipe等から接続された場合に返ってくる値
-  #
-  def confirm(message, default = false, nontty_default = true)
-    return nontty_default unless STDIN.tty?
-    confirm_msg = "#{message} (y/n)?: "
-    STDOUT.print confirm_msg   # Logger でロギングされないように直接標準出力に表示
-    while input = $stdin.getch
-      STDOUT.puts input
-      case input.downcase
-      when "y"
-        return true
-      when "n"
-        return false
-      else
-        return default if input.strip == ""
-        STDOUT.print confirm_msg
-      end
-    end
-  end
-
   def open_browser_linux(address, error_message)
     %w(xdg-open firefox w3m).each do |browser|
       system(%!#{browser} "#{address}"!)
@@ -85,7 +61,7 @@ module Helper
 
   def open_directory(path, confirm_message = nil)
     if confirm_message
-      return unless confirm(confirm_message, false, false)
+      return unless Narou::Input.confirm(confirm_message, false, false)
     end
     case determine_os
     when :windows

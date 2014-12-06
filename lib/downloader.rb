@@ -14,6 +14,7 @@ require_relative "database"
 require_relative "inventory"
 require_relative "narou/api"
 require_relative "html"
+require_relative "input"
 
 #
 # 小説サイトからのダウンロード
@@ -339,7 +340,7 @@ class Downloader
     if global_setting.include?("over18")
       return global_setting["over18"]
     end
-    if Helper.confirm("年齢認証：あなたは18歳以上ですか")
+    if Narou::Input.confirm("年齢認証：あなたは18歳以上ですか")
       global_setting["over18"] = true
       global_setting.save
       return true
@@ -464,17 +465,28 @@ class Downloader
     latest_subtitles_count = latest_toc["subtitles"].size
     old_subtitles_count = old_toc["subtitles"].size
     if latest_subtitles_count < old_subtitles_count
-      STDOUT.puts "#{latest_toc["title"]}"
-      STDOUT.puts "更新後の話数が保存されている話数より減少していることを検知しました"
-      STDOUT.puts "ダイジェスト化されている可能性があるので、更新に関しての処理を選択して下さい"
-      digest_output_interface(old_subtitles_count, latest_subtitles_count)
-      unless STDIN.tty?
-        puts "2"
-        return true
-      end
-      while input = $stdin.getch
-        puts input
-        case input
+      message = <<-EOS
+#{latest_toc["title"]}
+更新後の話数が保存されている話数より減少していることを検知しました。
+ダイジェスト化されている可能性があるので、更新に関しての処理を選択して下さい。
+
+保存済み話数: #{old_subtitles_count}
+更新後の話数: #{latest_subtitles_count}
+
+      EOS
+      choices = {
+        "1" => "このまま更新する",
+        "2" => "更新をキャンセル",
+        "3" => "更新をキャンセルして小説を凍結する",
+        "4" => "バックアップを作成する",
+        "5" => "最新のあらすじを表示する",
+        "6" => "小説ページをブラウザで開く",
+        "7" => "保存フォルダを開く",
+        default: "2"
+      }
+      loop do
+        choice = Narou::Input.choose(message, choices)
+        case choice
         when "1"
           return false
         when "2"
@@ -485,33 +497,20 @@ class Downloader
         when "4"
           Command::Backup.execute!([latest_toc["toc_url"]])
         when "5"
-          STDOUT.puts "あらすじ"
-          STDOUT.puts latest_toc["story"]
+          puts "あらすじ"
+          puts latest_toc["story"]
         when "6"
           Helper.open_browser(latest_toc["toc_url"])
         when "7"
           Helper.open_directory(Downloader.get_novel_data_dir_by_target(latest_toc["toc_url"]))
         end
-        digest_output_interface(old_subtitles_count, latest_subtitles_count)
+        if $stdout.tty?
+          message = ""   # 長いので二度は表示しない
+        end
       end
     else
       return false
     end
-  end
-
-  def digest_output_interface(old_subtitles_count, latest_subtitles_count)
-    STDOUT.puts
-    STDOUT.puts "保存済み話数: #{old_subtitles_count}"
-    STDOUT.puts "更新後の話数: #{latest_subtitles_count}"
-    STDOUT.puts
-    STDOUT.puts "1: このまま更新する"
-    STDOUT.puts "2: 更新をキャンセル"
-    STDOUT.puts "3: 更新をキャンセルして小説を凍結する"
-    STDOUT.puts "4: バックアップを作成する"
-    STDOUT.puts "5: 最新のあらすじを表示する"
-    STDOUT.puts "6: 小説ページをブラウザで開く"
-    STDOUT.puts "7: 保存フォルダを開く"
-    STDOUT.print "選択する処理の番号を入力: "
   end
 
   #

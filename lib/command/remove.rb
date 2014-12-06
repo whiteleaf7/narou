@@ -5,6 +5,7 @@
 
 require_relative "../narou"
 require_relative "../helper"
+require_relative "../input"
 
 module Command
   class Remove < CommandBase
@@ -77,7 +78,7 @@ module Command
           next
         end
         unless @options["yes"]
-          next unless Helper.confirm("#{title} を#{(@options["with-file"] ? "“完全に”" : "")}削除しますか")
+          next unless Narou::Input.confirm("#{title} を#{(@options["with-file"] ? "“完全に”" : "")}削除しますか")
         end
         Downloader.remove_novel(target, @options["with-file"])
         puts "<bold><green>#{TermColorLight.escape(title)} を削除しました</green></bold>".termcolor
