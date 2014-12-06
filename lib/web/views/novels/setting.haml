@@ -6,6 +6,8 @@
       restore: false, buttons: false
     });
     var action = new Narou.Action(null);
+
+    // 小説変換ボタン
     $("#console-dialog").on("shown.bs.modal", function() {
       action.convert("#{h @id}");
     });
@@ -13,6 +15,12 @@
       e.preventDefault();
       stream_console.clear();
       $("#console-dialog").modal();
+    });
+
+    // フォルダを開くボタン
+    $("#btn-folder").on("click", function(e) {
+      e.preventDefault();
+      action.folder("#{h @id}");
     });
 
     var tooltip_opt = {
@@ -61,6 +69,7 @@
         .navbar-form.navbar-lefj
           %input.btn.btn-info(type="submit" value="設定を保存" style="margin-left: 50px")
           %button#btn-convert.btn.btn-default この小説を変換
+          %button#btn-folder.btn.btn-default フォルダを開く
 
   .container.container-main.theme-showcase(role="main")
     %p.small-screen-only
