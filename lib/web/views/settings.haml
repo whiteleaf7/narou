@@ -29,7 +29,7 @@
     - @setting_variables.each do |scope, variables|
       - inventory = Inventory.load("#{scope}_setting", scope)
 
-      .panel-settings-link
+      %p.panel-settings-link
         - if scope == :local
           goto <a href="#global" data-move-to="#global">Global Variables</a>
         - else
@@ -65,7 +65,7 @@
             - error_style = {class: "has-error", style: "background-color:#f2dede"}
             .list-group-item.form-group{@error_list[name] ? error_style : {}}
               %h4.list-group-item-heading #{name}
-              %p.list-group-item-text
+              .list-group-item-text
                 - case value[0]
                 - when :boolean
                   - if name.start_with?("force.")

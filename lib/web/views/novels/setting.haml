@@ -75,7 +75,7 @@
     %p.small-screen-only
       %input(type="submit" value="設定を保存" class="btn btn-info" style="float:none")
 
-    .panel-settings-link
+    %p.panel-settings-link
       goto <a href="#replace-panel" data-move-to="#replace-panel">置換設定</a>
 
     #setting-panel.panel.panel-info.panel-settings
@@ -98,7 +98,7 @@
             - list_group_item_style = {style: "background-color: #fcf8e3"}
           .list-group-item.form-group{list_group_item_style}
             %h4.list-group-item-heading #{name}
-            %p.list-group-item-text
+            .list-group-item-text
               - case info[:type]
               - when :boolean
                 %label(class="switch-light well")
@@ -121,7 +121,7 @@
                   &= @error_list[name]
               .clear
 
-    .panel-settings-link
+    %p.panel-settings-link
       goto <a href="#setting-panel" data-move-to="#setting-panel">変換設定</a>
 
     #replace-panel.panel.panel-info.panel-settings
@@ -133,7 +133,7 @@
         ・replace.txt による置換が行われるタイミングは、全てのテキスト処理が行われた後の、整形済みテキスト全文です。つまり見出しやストーリー等も置換対象です。
       .list-group
         .list-group-item.form-group
-          %p.list-group-item-text
+          .list-group-item-text
             %table#replace-txt-table
               %thead
                 %tr
