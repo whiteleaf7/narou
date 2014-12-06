@@ -50,6 +50,7 @@ module Narou
       return default unless $stdin.tty?
       puts message
       choices.each do |name, help|
+        next if name == :default
         puts "<bold>#{name}</bold>: #{help}".termcolor
       end
       loop do
