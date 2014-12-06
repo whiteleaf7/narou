@@ -39,22 +39,10 @@ body {
   padding-bottom: 300px;
 }
 
-@media (min-width:768px) {
-  .big-screen-only {
-  }
-  .small-screen-only {
-    display: none;
-  }
-}
 @media (max-width:767px) {
   .container-main {
     padding-left: 0 !important;
     padding-right: 0 !important;
-  }
-  .big-screen-only {
-    display: none;
-  }
-  .small-screen-only {
   }
 }
 
