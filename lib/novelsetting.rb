@@ -29,6 +29,7 @@ class NovelSetting
   def initialize(archive_path, ignore_force)
     @archive_path = File.expand_path(archive_path)
     @ignore_force = ignore_force
+    @replace_pattern = []
     load_settings
     set_attribute
     load_replace_pattern
@@ -129,7 +130,7 @@ class NovelSetting
   # replace.txt による置換定義を読み込む
   #
   def load_replace_pattern
-    @replace_pattern = []
+    @replace_pattern.clear
     replace_txt_path = File.join(@archive_path, REPLACE_NAME)
     if File.exist?(replace_txt_path)
       open(replace_txt_path, "r:BOM|UTF-8") do |fp|
@@ -143,6 +144,16 @@ class NovelSetting
         end
       end
     end
+    @replace_pattern
+  end
+
+  #
+  # replace.txt に設定を書き戻す
+  #
+  def save_replace_pattern
+    replace_txt_path = File.join(@archive_path, REPLACE_NAME)
+    buff = @replace_pattern.each_with_object("\t").map(&:join).join("\n")
+    File.write(replace_txt_path, buff)
   end
 
   DEFAULT_SETTINGS = [

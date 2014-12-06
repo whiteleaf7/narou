@@ -277,9 +277,11 @@ class Narou::AppServer < Sinatra::Base
     @novel_setting = NovelSetting.load(@id, true)
     @default_settings = NovelSetting::DEFAULT_SETTINGS
     @force_settings = Inventory.load("local_setting", :local).select { |n| n.start_with?("force.") }
+    @replace_pattern = @novel_setting.load_replace_pattern
   end
 
   post "/novels/:id/setting" do
+    # 変換設定保存
     @default_settings.each do |info|
       name, type = info[:name], info[:type]
       param_data = params[name]
@@ -301,6 +303,18 @@ class Narou::AppServer < Sinatra::Base
       end
     end
     @novel_setting.save_settings
+
+    # 置換設定保存
+    params_replace_pattern = params["replace_pattern"]
+    @novel_setting.replace_pattern.clear
+    if params_replace_pattern.kind_of?(Array)
+      params_replace_pattern.each do |pattern|
+        left, right = pattern["left"].strip, pattern["right"].strip
+        next if left == ""
+        @novel_setting.replace_pattern << [left, right]
+      end
+    end
+    @novel_setting.save_replace_pattern
 
     if @error_list.empty?
       session[:alert] = [ "保存が完了しました", "success" ]
