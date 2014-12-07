@@ -5,88 +5,106 @@
 
 require "json"
 require_relative "web-socket-ruby/lib/web_socket"
+require_relative "../eventable"
 
-class Narou::PushServer
-  include Singleton
+module Narou
+  class PushServer
+    include Singleton
+    include Eventable
 
-  HISTORY_SAVED_COUNT = 30   # 保存する履歴の数
+    HISTORY_SAVED_COUNT = 30   # 保存する履歴の数
 
-  attr_accessor :port
-  attr_reader :accepted_domains, :connections
+    attr_accessor :port
+    attr_reader :accepted_domains, :connections
 
-  def accepted_domains=(domains)
-    @accepted_domains = domains.kind_of?(Array) ? domains : [domains]
-  end
+    def accepted_domains=(domains)
+      @accepted_domains = domains.kind_of?(Array) ? domains : [domains]
+    end
 
-  def initialize
-    @accepted_domains = "localhost"
-    @port = 31000
-    @connections = []
-    clear_history
-  end
+    def initialize
+      @accepted_domains = "localhost"
+      @port = 31000
+      @connections = []
+      clear_history
+    end
 
-  def run
-    @server = WebSocketServer.new({
-      accepted_domains: @accepted_domains,
-      port: @port
-    })
-    Thread.new do
-      @server.run do |ws|
-        begin
-          ws.handshake
-          que = Queue.new
-          @connections.push(que)
+    def run
+      @server = WebSocketServer.new({
+        accepted_domains: @accepted_domains,
+        port: @port
+      })
+      Thread.new do
+        @server.run do |ws|
+          begin
+            ws.handshake
+            que = Queue.new
+            @connections.push(que)
 
-          @history.compact.each do |message|
-            ws.send(JSON.generate(echo: message))
-          end
-
-          thread = Thread.new do
-            while true
-              data = que.pop
-              ws.send(data)
+            @history.compact.each do |message|
+              ws.send(JSON.generate(echo: message))
             end
-          end
 
-          while data = ws.receive
-            send_all(data)
+            thread = Thread.new do
+              while true
+                data = que.pop
+                ws.send(data)
+              end
+            end
+
+            begin
+              while data = ws.receive
+                JSON.parse(data).each do |name, value|
+                  trigger(name, value, ws)
+                end
+              end
+            rescue JSON::ParserError => e
+              logger.info(e.message)
+              ws.send(JSON.generate(echo: e.message))
+            end
+          rescue Errno::ECONNRESET => e
+          ensure
+            @connections.delete(que)
+            thread.terminate if thread
           end
-        rescue Errno::ECONNRESET
-        ensure
-          @connections.delete(que)
-          thread.terminate if thread
         end
       end
     end
-  end
 
-  #
-  # PushServer を停止させる
-  #
-  def quit
-    @server.quit
-  end
-
-  def clear_history
-    @history = [nil] * HISTORY_SAVED_COUNT
-    # Sinatra で get "/" { clear_history } とかやった場合に [nil,nil...] な配列データが
-    # 渡されないようにするため（配列は Sinatra にとって特別なデータ）
-    true
-  end
-
-  #
-  # 接続している全てのクライアントに対してメッセージを送信
-  #
-  def send_all(data)
-    json = JSON.generate(data)
-    @connections.each do |queue_of_connection|
-      queue_of_connection.push(json)
+    #
+    # PushServer を停止させる
+    #
+    def quit
+      @server.quit
     end
-    # echo 以外のイベントは履歴に保存しない
-    message = data[:echo]
-    if message
-      @history.push(message)
-      @history.shift
+
+    def clear_history
+      @history = [nil] * HISTORY_SAVED_COUNT
+      # Sinatra で get "/" { clear_history } とかやった場合に [nil,nil...] な配列データが
+      # 渡されないようにするため（配列は Sinatra にとって特別なデータ）
+      true
+    end
+
+    #
+    # 接続している全てのクライアントに対してメッセージを送信
+    #
+    def send_all(data)
+      if data.kind_of?(Symbol)
+        # send_all(:"events.name") としてイベント名だけで送りたい場合の対応
+        json = { data => true }
+      else
+        json = JSON.generate(data)
+      end
+      @connections.each do |queue_of_connection|
+        queue_of_connection.push(json)
+      end
+      # echo 以外のイベントは履歴に保存しない
+      message = data[:echo]
+      if message
+        @history.push(message)
+        @history.shift
+      end
+    rescue JSON::GeneratorError => e
+      logger.info(e.message)
     end
   end
 end
