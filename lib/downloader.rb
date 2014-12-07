@@ -504,7 +504,7 @@ class Downloader
         when "7"
           Helper.open_directory(Downloader.get_novel_data_dir_by_target(latest_toc["toc_url"]))
         end
-        if $stdout.tty?
+        unless Narou.web?
           message = ""   # 長いので二度は表示しない
         end
       end

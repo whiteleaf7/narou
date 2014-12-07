@@ -25,6 +25,7 @@ module Narou
   @@global_setting_dir = nil
   @@aozora_jar_path = nil
   @@preset_dir = nil
+  @@is_web = false
 
   def get_root_dir
     return @@root_dir if @@root_dir
@@ -157,5 +158,13 @@ module Narou
       return Device.create(device_name)
     end
     nil
+  end
+
+  def web=(bool)
+    @@is_web = bool
+  end
+
+  def web?
+    @@web
   end
 end

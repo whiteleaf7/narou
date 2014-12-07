@@ -77,6 +77,7 @@ module Command
       $stderr = EatLogger.new unless $display_backtrace
       params = Narou::AppServer.create_address(@options["port"])
       push_server = create_push_server(Narou::AppServer)
+      Narou.web = true
       Thread.abort_on_exception = true
 
       address = "http://#{params[:host]}:#{params[:port]}/"
