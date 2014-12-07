@@ -94,7 +94,7 @@ module Command
     def output_error(msg, name = nil)
       @error_count += 1
       error msg
-      trigger_event(:error, msg, name)
+      trigger(:error, msg, name)
     end
 
     def execute(argv)

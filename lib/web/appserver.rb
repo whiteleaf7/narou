@@ -223,7 +223,7 @@ class Narou::AppServer < Sinatra::Base
     unless built_arguments.empty?
       $stdout.silence do
         setting = Command::Setting.new
-        setting.add_event_listener(:error) do |msg, name|
+        setting.on(:error) do |msg, name|
           if name
             @error_list[name] = msg
           end
