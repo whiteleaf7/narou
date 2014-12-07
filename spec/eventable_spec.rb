@@ -93,5 +93,80 @@ describe Narou::Eventable do
       expect(@anser).to eq :class
     end
   end
+
+  context "multi call" do
+    before do
+      @state = 0
+      @dummy = Dummy.new
+      @dummy.add_event_listener(:multi) do
+        @state += 1
+      end
+    end
+
+    it do
+      @dummy.trigger_event(:multi)
+      expect(@state).to eq 1
+      @dummy.trigger_event(:multi)
+      expect(@state).to eq 2
+      @dummy.trigger_event(:multi)
+      expect(@state).to eq 3
+    end
+  end
+
+  context "#remove_event_listener" do
+    before do
+      @state = 100
+      @dummy = Dummy.new
+    end
+
+    context "remove all events" do
+      before do
+        @dummy.add_event_listener(:inc_state) do
+          @state += 200
+        end
+        @dummy.add_event_listener(:inc_state) do
+          @state += 200
+        end
+      end
+
+      it "@state should be 100" do
+        @dummy.remove_event_listener(:inc_state)
+        @dummy.trigger_event(:inc_state)
+        expect(@state).to eq 100
+      end
+    end
+
+    context "remove specify event" do
+      before do
+        @inc_100 = -> { @state += 100 }
+        @inc_200 = -> { @state += 200 }
+        @dummy.add_event_listener(:inc_state2, &@inc_100)
+        @dummy.add_event_listener(:inc_state2, &@inc_200)
+      end
+
+      it "@state should be 300" do
+        @dummy.remove_event_listener(:inc_state2, &@inc_100)
+        @dummy.trigger_event(:inc_state2)
+        expect(@state).to eq 300
+      end
+    end
+  end
+
+  context "#one" do
+    before do
+      @state = 0
+      @dummy = Dummy.new
+      @dummy.one(:one_event) do
+        @state += 1
+      end
+    end
+
+    it "@state should be 1" do
+      @dummy.trigger(:one_event)
+      expect(@state).to eq 1
+      @dummy.trigger(:one_event)
+      expect(@state).to eq 1
+    end
+  end
 end
 

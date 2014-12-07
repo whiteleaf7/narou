@@ -29,20 +29,47 @@ module Narou::Eventable
     end
   end
 
-  def add_event_listener(event_name, &block)
+  alias :original_initialize :initialize
+
+  def initialize(*args)
+    @__events_container = {}
+    original_initialize(*args)
+  end
+
+  def add_event_listener(event_name, once = false, &block)
     raise NonBlockError unless block_given?
-    @__events_container ||= {}
     stack = @__events_container[event_name] ||= []
-    stack.push(block)
+    stack.push([block, once])
+  end
+
+  def remove_event_listener(event_name, &block)
+    if block_given?
+      events = @__events_container[event_name]
+      if events
+        events.reject! do |values|
+          values[0] == block
+        end
+      end
+    else
+      @__events_container.delete(event_name)
+    end
   end
 
   def trigger_event(event_name, *argv)
-    @__events_container ||= {}
     stack = @__events_container[event_name]
     return unless stack
-    stack.each do |block|
+    stack.reject! do |block, once|
       block.call(*argv)
+      once
     end
+  end
+
+  alias :on :add_event_listener
+  alias :off :remove_event_listener
+  alias :trigger :trigger_event
+
+  def one(event_name, &block)
+    add_event_listener(event_name, true, &block)
   end
 end
 
