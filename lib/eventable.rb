@@ -7,6 +7,7 @@ module Narou::Eventable
   EVENTS_CONTAINER = {}
 
   def self.included(base)
+    super
     base.extend(ClassMethods)
     EVENTS_CONTAINER[base] = {}
   end
