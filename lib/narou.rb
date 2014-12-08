@@ -165,6 +165,6 @@ module Narou
   end
 
   def web?
-    @@web
+    @@is_web
   end
 end
