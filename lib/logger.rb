@@ -131,7 +131,7 @@ def warn(str)
 end
 
 def error(str)
-  puts "<bold><red>[ERROR]</red></bold> #{str.escape}".termcolor
+  puts "<bold><red>[ERROR]</red></bold> ".termcolor + str
 end
 
 $stdout = Narou::Logger.new
