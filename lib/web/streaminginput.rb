@@ -16,7 +16,6 @@ module Narou
 
     @@modal_id = 0
     @@mutex = Mutex.new
-    @@pong_handler = {}
 
     def create_modal_id
       id = nil
