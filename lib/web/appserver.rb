@@ -359,7 +359,7 @@ class Narou::AppServer < Sinatra::Base
           title: escape_html(data["title"]),
           author: escape_html(data["author"]),
           sitename: data["sitename"],
-          toc_url: %!<a href="#{escape_html(data["toc_url"])}" class="novel-page-link" target="_blank" ! +
+          toc_url: %!<a href="#{escape_html(data["toc_url"])}" target="_blank" ! +
                    %!data-toggle="tooltip" data-placement="top" title="#{data["toc_url"]}">! +
                    %!<span class="glyphicon glyphicon-link"></span></a>!,
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
