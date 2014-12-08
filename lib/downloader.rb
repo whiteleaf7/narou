@@ -465,8 +465,8 @@ class Downloader
     latest_subtitles_count = latest_toc["subtitles"].size
     old_subtitles_count = old_toc["subtitles"].size
     if latest_subtitles_count < old_subtitles_count
+      title = latest_toc["title"]
       message = <<-EOS
-#{latest_toc["title"]}
 更新後の話数が保存されている話数より減少していることを検知しました。
 ダイジェスト化されている可能性があるので、更新に関しての処理を選択して下さい。
 
@@ -485,7 +485,7 @@ class Downloader
         default: "2"
       }
       loop do
-        choice = Narou::Input.choose(message, choices)
+        choice = Narou::Input.choose(title, message, choices)
         case choice
         when "1"
           return false
@@ -497,8 +497,12 @@ class Downloader
         when "4"
           Command::Backup.execute!([latest_toc["toc_url"]])
         when "5"
-          puts "あらすじ"
-          puts latest_toc["story"]
+          if Narou.web?
+            message = "あらすじ\n#{latest_toc["story"]}\n"
+          else
+            puts "あらすじ"
+            puts latest_toc["story"]
+          end
         when "6"
           Helper.open_browser(latest_toc["toc_url"])
         when "7"

@@ -51,15 +51,14 @@ module Narou
               end
             end
 
-            begin
-              while data = ws.receive
+            while data = ws.receive
+              begin
                 JSON.parse(data).each do |name, value|
                   trigger(name, value, ws)
                 end
+              rescue JSON::ParserError => e
+                ws.send(JSON.generate(echo: e.message))
               end
-            rescue JSON::ParserError => e
-              logger.info(e.message)
-              ws.send(JSON.generate(echo: e.message))
             end
           rescue Errno::ECONNRESET => e
           ensure
@@ -104,7 +103,7 @@ module Narou
         @history.shift
       end
     rescue JSON::GeneratorError => e
-      logger.info(e.message)
+      STDERR.puts $@.shift + ": #{e.message} (#{e.class})"
     end
   end
 end

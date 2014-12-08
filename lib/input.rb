@@ -45,9 +45,10 @@ module Narou
     #   choices = { "ja" => "日本語", "en" => "English", default: "ja" }
     #   Narou::Input.choose("select a language?", choices)
     #
-    def choose(message, choices)
+    def choose(title, message, choices)
       default = choices[:default] || choices.first[0]
       return default unless $stdin.tty?
+      puts title
       puts message
       choices.each do |name, help|
         next if name == :default
