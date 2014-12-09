@@ -355,7 +355,7 @@ class Narou::AppServer < Sinatra::Base
         id = data["id"]
         {
           id: id.to_s,
-          last_update: data["last_update"].strftime("%Y/%m/%d %R"),
+          last_update: data["last_update"].strftime("%Y/%m/%d %R:%S"),
           title: escape_html(data["title"]),
           author: escape_html(data["author"]),
           sitename: data["sitename"],
