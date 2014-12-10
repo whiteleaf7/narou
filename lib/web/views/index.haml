@@ -136,7 +136,7 @@
       %button#button-update.btn.btn-success(type="button") Update
     .btn-group
       %button#button-send.btn.btn-warning(type="button") Send
-    .btn-group
+    .btn-group.visible-selected
       %button.btn.btn-info.dropdown-toggle(type="button" data-toggle="dropdown")
         Freeze
         %span.caret
@@ -146,7 +146,7 @@
           %a#button-freeze-on(href="#") 選択した小説を凍結
         %li
           %a#button-freeze-off(href="#") 選択した小説の凍結を解除
-    .btn-group
+    .btn-group.visible-selected
       %button.btn.btn-danger.dropdown-toggle(type="button" data-toggle="dropdown")
         Remove
         %span.caret
@@ -156,9 +156,9 @@
           %a#button-remove(href="#") 選択した小説を削除
         %li
           %a#button-remove-with-file(href="#") 選択した小説をファイルも含めて削除
-    %button#button-convert.btn.btn-default(type="button" data-toggle="tooltip" |
+    %button#button-convert.btn.btn-default.visible-selected(type="button" data-toggle="tooltip" |
                             title="選択した小説を変換") Convert |
-    .btn-group
+    .btn-group.visible-selected
       %button.btn.btn-default.dropdown-toggle(type="button" data-toggle="dropdown")
         Other
         %span.caret
