@@ -467,12 +467,6 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
-  post "/api/display_text_list" do
-    Narou::Worker.push do
-      CommandLine.run!(["list"])
-    end
-  end
-
   post "/api/diff" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
