@@ -63,6 +63,18 @@
                   %span.active-ok.glyphicon.glyphicon-ok
                   範囲選択モード
                 %span.shortcut R
+        %li
+          %a.dropdown-toggle(data-toggle="dropdown" href="#")
+            タグ
+            %span.caret
+          %ul.dropdown-menu(role="menu")
+            %li
+              #tag-list-canvas
+            %li.divider.visible-selected
+            %li#action-tag-edit.visible-selected
+              %a(href="#")
+                %span
+                  タグを編集
       %ul.nav.navbar-nav.navbar-right
         %li.dropdown
           %a.dropdown-toggle(data-toggle="dropdown" href="#")

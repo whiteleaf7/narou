@@ -315,33 +315,56 @@ input::-ms-clear {
 /*
  * タグ
  */
+.label {
+  cursor: pointer;
+}
+.label-green {
+  background-color: #5cb85c;
+}
+.label-yellow {
+  background-color: #f7d71e;
+  color: #666;
+}
+.label-blue {
+  background-color: #428bca;
+}
+.label-magenta {
+  background-color: #d37bca;
+}
+.label-cyan {
+  background-color: #5bc0de;
+}
+.label-red {
+  background-color: #d9534f;
+}
+.label-white {
+  background-color: #e3e3e3;
+  color: #666;
+}
+
 .dataTable {
   .label {
     font-size: 0.8em;
     line-height: 2em;
   }
-  .label-green {
-    background-color: #5cb85c;
+}
+
+#tag-list-canvas {
+  padding: 3px 20px;
+  overflow: auto;
+
+  @media (min-width:768px) {
+    max-height: 300px;
   }
-  .label-yellow {
-    background-color: #f7d71e;
-    color: #666;
+  @media (max-width:767px) {
+    max-height: 160px;
+    width: 94%;   /* 埋まってるスクロールバーを見えるように */
   }
-  .label-blue {
-    background-color: #428bca;
-  }
-  .label-magenta {
-    background-color: #d37bca;
-  }
-  .label-cyan {
-    background-color: #5bc0de;
-  }
-  .label-red {
-    background-color: #d9534f;
-  }
-  .label-white {
-    background-color: #e3e3e3;
-    color: #666;
+
+  .label {
+    font-size: 0.9em;
+    padding: 2px 8px;
+    line-height: 1.9em;
   }
 }
 

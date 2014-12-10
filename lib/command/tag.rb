@@ -69,6 +69,27 @@ module Command
       }
     end
 
+    #
+    # タグ一覧取得
+    #
+    # @return: { "タグの名前" => タグが付けられた小説の数, ... }
+    #
+    def self.get_tag_list
+      database = Database.instance
+      tag_list = {}
+      database.each do |_, data|
+        tags = data["tags"] || []
+        tags.each do |tag|
+          if tag_list[tag]
+            tag_list[tag] += 1
+          else
+            tag_list[tag] = 1
+          end
+        end
+      end
+      tag_list
+    end
+
     def get_color_list
       COLORS.map { |color|
         "<bold><#{color}>#{color}</#{color}></bold>"
@@ -96,19 +117,9 @@ module Command
 
     def display_taglist
       database = Database.instance
-      tags_list = {}
-      database.each do |_, data|
-        tags = data["tags"] || []
-        tags.each do |tag|
-          if tags_list[tag]
-            tags_list[tag] += 1
-          else
-            tags_list[tag] = 1
-          end
-        end
-      end
+      tag_list = Tag.get_tag_list
       puts "タグ一覧"
-      puts tags_list.map { |tag, count|
+      puts tag_list.map { |tag, count|
         color = Tag.get_color(tag)
         "<bold><#{color}>#{TermColorLight.escape(tag)}(#{count})</#{color}></bold>"
       }.join(" ").termcolor

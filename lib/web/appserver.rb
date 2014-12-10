@@ -25,7 +25,7 @@ module Narou::ServerHelpers
   #
   def decorate_tags(tags)
     tags.map do |tag|
-      %!<span class="label label-#{Command::Tag.get_color(tag)}">#{escape_html(tag)}</span>!
+      %!<span class="tag label label-#{Command::Tag.get_color(tag)}" data-tag="#{escape_html(tag)}">#{escape_html(tag)}</span>!
     end.join(" ")
   end
 
@@ -508,6 +508,15 @@ class Narou::AppServer < Sinatra::Base
 
   post "/api/clear_history" do
     Narou::PushServer.instance.clear_history
+  end
+
+  get "/api/tag_list" do
+    result = '<div><span class="tag label label-default" data-tag="">全て表示</span></div>'
+    tagname_list = Command::Tag.get_tag_list.keys
+    tagname_list.each do |tagname|
+      result << "<div>#{decorate_tags([tagname])}</div>"
+    end
+    result
   end
 end
 
