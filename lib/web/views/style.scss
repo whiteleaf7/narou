@@ -368,6 +368,20 @@ input::-ms-clear {
   }
 }
 
+#tag-editor-field {
+  .label {
+    font-size: 0.9em;
+    padding: 2px 8px;
+    line-height: 1.9em;
+  }
+
+  #new-tag {
+    @media (min-width:768px) {
+      width: 300px;
+    }
+  }
+}
+
 /*
  * ダイアログ
  */

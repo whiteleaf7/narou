@@ -363,7 +363,7 @@ class Narou::AppServer < Sinatra::Base
                    %!data-toggle="tooltip" data-placement="top" title="#{data["toc_url"]}">! +
                    %!<span class="glyphicon glyphicon-link"></span></a>!,
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
-          tags: decorate_tags(tags),
+          tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag label label-white" data-tag="">&nbsp;</span>'),
           status: [
             Narou.novel_frozen?(id) ? "凍結" : nil,
             tags.include?("end") ? "完結" : nil,
@@ -505,12 +505,56 @@ class Narou::AppServer < Sinatra::Base
   end
 
   get "/api/tag_list" do
-    result = '<div><span class="tag label label-default" data-tag="">全て表示</span></div>'
+    result = '<div><span class="tag label label-default" data-tag="">タグ検索を解除</span></div>'
     tagname_list = Command::Tag.get_tag_list.keys
     tagname_list.each do |tagname|
       result << "<div>#{decorate_tags([tagname])}</div>"
     end
     result
+  end
+
+  post "/api/taginfo.json" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    ids.map!(&:to_i)
+    database = Database.instance
+    tag_info = {}
+    database.each do |_, data|
+      tags = data["tags"] || []
+      tags.each do |tag|
+        tag_info[tag] ||= {
+          count: 0,
+          html: decorate_tags([tag])
+        }
+        if ids.include?(data["id"])
+          tag_info[tag][:count] += 1
+        end
+      end
+    end
+    json tag_info
+  end
+
+  post "/api/edit_tag" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    # key と value を重複を維持したまま反転
+    invert_states = params["states"].inject({}) { |h,(k,v)| (h[v] ||= []) << k; h }
+    Narou::Worker.push do
+      $stdout.silence do
+        invert_states.each do |state, tags|
+          case state.to_i
+          when 0
+            # タグを削除
+            CommandLine.run!(["tag", "--delete", tags.join(" "), ids])
+          when 1
+            # 現状を維持(何もしない)
+          when 2
+            # タグを追加
+            CommandLine.run!(["tag", "--add", tags.join(" "), ids])
+          end
+        end
+      end
+      @@push_server.send_all(:"table.reload")
+      @@push_server.send_all(:"tag.updateCanvas")
+    end
   end
 end
 

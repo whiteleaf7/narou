@@ -72,21 +72,22 @@ module Command
     #
     # タグ一覧取得
     #
+    # ids: 特定の小説のタグだけ取得するためのIDの配列を指定
     # @return: { "タグの名前" => タグが付けられた小説の数, ... }
     #
-    def self.get_tag_list
+    def self.get_tag_list(ids = nil)
       database = Database.instance
-      tag_list = {}
+      tag_list = Hash.new(0)
       database.each do |_, data|
+        if ids.kind_of?(Array)
+          next unless ids.include?(data["id"])
+        end
         tags = data["tags"] || []
         tags.each do |tag|
-          if tag_list[tag]
-            tag_list[tag] += 1
-          else
-            tag_list[tag] = 1
-          end
+          tag_list[tag] += 1
         end
       end
+      tag_list.default = nil
       tag_list
     end
 

@@ -89,10 +89,9 @@ module Narou
     def send_all(data)
       if data.kind_of?(Symbol)
         # send_all(:"events.name") としてイベント名だけで送りたい場合の対応
-        json = { data => true }
-      else
-        json = JSON.generate(data)
+        data = { data => true }
       end
+      json = JSON.generate(data)
       @connections.each do |queue_of_connection|
         queue_of_connection.push(json)
       end
