@@ -14,7 +14,7 @@ module Narou
 
     HISTORY_SAVED_COUNT = 30   # 保存する履歴の数
 
-    attr_accessor :port
+    attr_accessor :port, :host
     attr_reader :accepted_domains, :connections
 
     def accepted_domains=(domains)
@@ -31,7 +31,8 @@ module Narou
     def run
       @server = WebSocketServer.new({
         accepted_domains: @accepted_domains,
-        port: @port
+        port: @port,
+        host: @host
       })
       Thread.new do
         @server.run do |ws|

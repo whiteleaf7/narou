@@ -67,6 +67,7 @@ module Command
       push_server = Narou::PushServer.instance
       push_server.accepted_domains = app.bind
       push_server.port = app.port + 1
+      push_server.host = app.bind
       push_server
     end
 
