@@ -435,6 +435,14 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  post "/api/freeze" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      CommandLine.run!(["freeze", ids])
+      @@push_server.send_all("table.reload" => true)
+    end
+  end
+
   post "/api/freeze_on" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
