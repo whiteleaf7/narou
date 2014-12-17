@@ -22,7 +22,7 @@ module Narou
     end
 
     def initialize
-      @accepted_domains = "localhost"
+      @accepted_domains = ["*"]
       @port = 31000
       @connections = []
       clear_history
