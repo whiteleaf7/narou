@@ -228,7 +228,7 @@ module Command
         "difftool.arg" => [:string, "difftoolで使う引数を設定(オプション)"],
         "no-color" => [:boolean, "カラー表示を無効にするか"],
         "server-port" => [:integer, "WEBサーバ起動時のポート"],
-        "server-bind" => [:string, "WEBサーバのホスト制限(デフォ:localhost)", INVISIBLE],
+        "server-bind" => [:string, "WEBサーバのホスト制限(未設定時:起動PCのIP)", INVISIBLE],
         "over18" => [:boolean, "18歳以上かどうか", INVISIBLE],
       }
     }

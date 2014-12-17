@@ -63,11 +63,12 @@ module Command
       def write(*a) end
     end
 
-    def create_push_server(app)
+    def create_push_server(params)
+      host, port = params[:host], params[:port]
       push_server = Narou::PushServer.instance
-      push_server.accepted_domains = app.bind
-      push_server.port = app.port + 1
-      push_server.host = app.bind
+      push_server.accepted_domains = (host == "0.0.0.0" ? "*" : host)
+      push_server.port = port + 1
+      push_server.host = host
       push_server
     end
 
@@ -77,7 +78,7 @@ module Command
       confirm_of_first
       $stderr = EatLogger.new unless $display_backtrace
       params = Narou::AppServer.create_address(@options["port"])
-      push_server = create_push_server(Narou::AppServer)
+      push_server = create_push_server(params)
       Narou.web = true
       Thread.abort_on_exception = true
 

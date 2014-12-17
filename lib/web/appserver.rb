@@ -127,7 +127,13 @@ class Narou::AppServer < Sinatra::Base
   # サーバのアドレスを生成
   #
   # portは初回起動時にランダムで設定する。次回からは同じ設定を引き継ぐ。
-  # bindは自分で設定する場合は narou s server-bind=localhost で行う
+  # bindは自分で設定する場合は narou s server-bind=address で行う。
+  # bindは設定しなかった場合は起動したPCのプライベートIPアドレスが設定される。
+  # この場合はLAN内からアクセス出来る。
+  # bindがlocalhostの場合は実際には127.0.0.1で処理される。(起動したPCでしか
+  # アクセス出来ない)
+  # 0.0.0.0 を指定した場合はアクセスに制限がかからない（外部からアクセス可能）
+  # セキュリティ上オススメ出来ない。
   #
   def self.create_address(user_port = nil)
     global_setting = Inventory.load("global_setting", :global)
@@ -139,11 +145,12 @@ class Narou::AppServer < Sinatra::Base
       global_setting["server-port"] = port
       global_setting.save
     end
+    bind = "127.0.0.1" if bind == "localhost"
     host = bind ? bind : ipaddress
     set :port, port
     set :bind, host
     {
-      host: host == "localhost" ? host : ipaddress,
+      host: host,
       port: port
     }
   end
@@ -154,11 +161,13 @@ class Narou::AppServer < Sinatra::Base
   # 参考：http://qiita.com/saltheads/items/cc49fcf2af37cb277c4f
   #
   def self.my_ipaddress
-    udp = UDPSocket.new
-    udp.connect("128.0.0.0", 7)
-    adrs = Socket.unpack_sockaddr_in(udp.getsockname)[1]
-    udp.close
-    adrs
+    @@__ipaddress ||= -> {
+      udp = UDPSocket.new
+      udp.connect("128.0.0.0", 7)
+      adrs = Socket.unpack_sockaddr_in(udp.getsockname)[1]
+      udp.close
+      adrs
+    }.call
   end
 
   # ===================================================================
