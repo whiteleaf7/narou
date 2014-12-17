@@ -113,8 +113,8 @@ table#novel-list {
       background-color: #f8f3e5;
     }
   }
-  $selected-color: #90cebc;
-  //$selected-color: #83c8b5;
+  $selected-color: mix($odd-color, rgba(255,212,0,0.5));
+  //$selected-color: #90cebc;
   $selected-hover-color: #ded;
   tr.selected {
     td {
@@ -174,8 +174,11 @@ table#novel-list {
       font-weight: bold;
     }
   }
+  tr.frozen.selected td {
+    color: lighten($default-color, 30%) !important;
+  }
   tr.frozen.selected td.column-id > div:before {
-    color: lighten($frozen-color, 30%);
+    color: darken($frozen-color, 20%);
   }
   thead {
     .sorting_asc {
