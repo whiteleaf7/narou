@@ -370,7 +370,8 @@ class Narou::AppServer < Sinatra::Base
             tags.include?("404") ? "削除" : nil,
           ].compact.join(", "),
           download: %!<a href="/novels/#{id}/download"><span class="glyphicon glyphicon-book"></span></a>!,
-          frozen: Narou.novel_frozen?(id)
+          frozen: Narou.novel_frozen?(id),
+          new_arrivals_date: data["new_arrivals_date"] ? data["new_arrivals_date"].to_i : nil
         }
       end
     json json_objects

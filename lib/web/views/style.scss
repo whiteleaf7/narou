@@ -191,6 +191,16 @@ table#novel-list {
   a {
     display: block;
   }
+
+  span.new-arrivals:after {
+    color: magenta;
+    content: " 新着";
+  }
+
+  span.today-update:after {
+    color: green;
+    content: " 更新";
+  }
 }
 
 .context-menu-target-cover {
