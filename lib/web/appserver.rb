@@ -355,7 +355,7 @@ class Narou::AppServer < Sinatra::Base
         id = data["id"]
         {
           id: id.to_s,
-          last_update: data["last_update"].strftime("%Y/%m/%d %R:%S"),
+          last_update: data["last_update"].to_i,
           title: escape_html(data["title"]),
           author: escape_html(data["author"]),
           sitename: data["sitename"],
@@ -370,15 +370,7 @@ class Narou::AppServer < Sinatra::Base
             tags.include?("404") ? "削除" : nil,
           ].compact.join(", "),
           download: %!<a href="/novels/#{id}/download"><span class="glyphicon glyphicon-book"></span></a>!,
-        }.tap { |this|
-          # table-cell 内で position: abosolute を使うために div をかます
-          # 参考： http://no1026.com/archives/406
-          this.each do |key, value|
-            this[key] = "<div>#{value}</div>"
-          end
-          # 内部データ用なのでそのまま
-          this[:frozen] = Narou.novel_frozen?(id)
-          this[:_id] = id.to_s
+          frozen: Narou.novel_frozen?(id)
         }
       end
     json json_objects
