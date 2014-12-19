@@ -24,15 +24,22 @@ class Narou::Worker
 
   def start
     return if running?
-    Thread.abort_on_exception = true
     @worker_thread = Thread.new do
       loop do
         begin
           q = @queue.pop
           q[:block].call
-          countdown if q[:counting]
-          notification_queue
+          if q[:counting]
+            countdown
+            notification_queue
+          end
         rescue SystemExit
+        rescue Exception => e
+          # Workerスレッド内での例外は表示するだけしてスレッドは生かしたままにする
+          STDOUT.puts $@.shift + ": #{e.message} (#{e.class})"
+          $@.each do |b|
+            STDOUT.puts "  from #{b}"
+          end
         end
       end
     end
