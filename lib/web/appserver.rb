@@ -372,7 +372,7 @@ class Narou::AppServer < Sinatra::Base
                    %!data-toggle="tooltip" data-placement="top" title="#{data["toc_url"]}">! +
                    %!<span class="glyphicon glyphicon-link"></span></a>!,
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
-          tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag label label-white" data-tag="">&nbsp;</span>'),
+          tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'),
           status: [
             Narou.novel_frozen?(id) ? "凍結" : nil,
             tags.include?("end") ? "完結" : nil,
