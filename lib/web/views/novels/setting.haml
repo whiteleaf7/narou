@@ -26,7 +26,6 @@
     var tooltip_opt = {
       animation: false,
       container: "body",
-      placement: "right",
     };
 
     // replace.txt 設定パネル
@@ -66,10 +65,13 @@
             %a(href="/novels/#{@id}/setting") 小説設定
           %li
             %a(href="/") 戻る
-        .navbar-form.navbar-lefj
+        .navbar-form.navbar-left
           %input.btn.btn-info(type="submit" value="設定を保存" style="margin-left: 50px")
           %button#btn-convert.btn.btn-default この小説を変換
           %button#btn-folder.btn.btn-default フォルダを開く
+        %p#queue-text.navbar-text.navbar-right(data-toggle="tooltip" title="キューに積まれた処理の数" data-placement="bottom")
+          %span.glyphicon.glyphicon-inbox
+          %span#queue 0
 
   .container.container-main.theme-showcase(role="main")
     %p.visible-xs-inline
@@ -152,11 +154,11 @@
                     %td
                       %input{type:"text", name:"replace_pattern[][right]", value:pattern[1], class:"form-control"}
                     %td
-                      %button.btn-replace-remove.btn.btn-default(data-toggle="tooltip" title="削除")
+                      %button.btn-replace-remove.btn.btn-default(data-toggle="tooltip" title="削除" data-placement="right")
                         %span.glyphicon.glyphicon-remove
                 %tr
                   %td(colspan=4)
-                    %button#btn-replace-add.btn.btn-default(data-toggle="tooltip" title="１行追加")
+                    %button#btn-replace-add.btn.btn-default(data-toggle="tooltip" title="１行追加" data-placement="right")
                       %span.glyphicon.glyphicon-plus
 
     %input(type="submit" value="設定を保存" class="btn btn-info" style="float:none")

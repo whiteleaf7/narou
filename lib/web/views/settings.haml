@@ -1,6 +1,10 @@
 -# このページ内専用のjavascriptでjQueryオブジェクトを参照したい場合この関数に記述
 :javascript
   var local_initialize_function = function($) {
+    $("[data-toggle=tooltip]").tooltip({
+      animation: false,
+      container: "body",
+    });
   };
 
 %form(action="/settings" method="POST")
@@ -22,8 +26,11 @@
             %a(href="/help") ヘルプ
           %li
             %a(href="/") 戻る
-        .navbar-form.navbar-lefj
+        .navbar-form.navbar-left
           %input.btn.btn-info(type="submit" value="設定を保存" style="margin-left: 50px")
+        %p#queue-text.navbar-text.navbar-right(data-toggle="tooltip" title="キューに積まれた処理の数" data-placement="bottom")
+          %span.glyphicon.glyphicon-inbox
+          %span#queue 0
 
   .container.container-main.theme-showcase(role="main")
     - @setting_variables.each do |scope, variables|

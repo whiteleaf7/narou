@@ -175,7 +175,7 @@ class Narou::AppServer < Sinatra::Base
   # ===================================================================
 
   before do
-    Narou::Worker.push do
+    Narou::Worker.push_as_system_worker do
       Inventory.clear
     end
   end
@@ -565,6 +565,13 @@ class Narou::AppServer < Sinatra::Base
       @@push_server.send_all(:"table.reload")
       @@push_server.send_all(:"tag.updateCanvas")
     end
+  end
+
+  get "/api/get_queue_size" do
+    res = {
+      size: Narou::Worker.instance.size
+    }
+    json res
   end
 end
 

@@ -293,17 +293,21 @@ table.dataTable {
   padding-left: 29px;
   padding-right: 23px;
   margin-left: 10px;
+  @media (max-width:767px) {
+    width: 200px;
+  }
+  @media (min-width:768px) {
+    width: 150px;
+  }
+  @media (min-width:992px){
+    width: 250px;
+  }
 }
 @mixin placeholder { color: #bbb !important }
 ::-moz-placeholder { @include placeholder }
 ::-webkit-input-placeholder { @include placeholder }
 :-moz-placeholder { @include placeholder }
 :-ms-input-placeholder { @include placeholder }
-@media (min-width:992px){
-  #myFilter {
-    width: 250px !important;
-  }
-}
 input::-ms-clear {
   visibility: hidden;
 }
@@ -634,5 +638,30 @@ $console-color: white;
   position: absolute;
   display: none;
   z-index: 102;
+}
+
+/*
+ * キュー
+ */
+#queue-text {
+  position: relative;
+  margin-right: 0;
+  cursor: default;
+}
+#queue {
+  position: relative;
+  font-size: 0.8em;
+  vertical-align: top;
+  display: inline-block;
+  padding: 3px 4px;
+  font-weight: bold;
+  line-height: 0.8em;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  background-color: #777;
+  border-radius: 14px;
+  left: -3px;
+  top: -3px;
 }
 

@@ -1,5 +1,9 @@
 :javascript
   var local_initialize_function = function($) {
+    $("[data-toggle=tooltip]").tooltip({
+      animation: false,
+      container: "body",
+    });
   };
 
 .navbar.navbar-default.navbar-fixed-top(role="navigation")
@@ -19,6 +23,9 @@
           %a(href="/help") ヘルプ
         %li
           %a(href="/") 戻る
+      %p#queue-text.navbar-text.navbar-right(data-toggle="tooltip" title="キューに積まれた処理の数" data-placement="bottom")
+        %span.glyphicon.glyphicon-inbox
+        %span#queue 0
 .container.theme-showcase(role="main")
   %div
     へるぷ　なんて　なかった
