@@ -547,24 +547,22 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     # key と value を重複を維持したまま反転
     invert_states = params["states"].inject({}) { |h,(k,v)| (h[v] ||= []) << k; h }
-    Narou::Worker.push do
-      $stdout.silence do
-        invert_states.each do |state, tags|
-          case state.to_i
-          when 0
-            # タグを削除
-            CommandLine.run!(["tag", "--delete", tags.join(" "), ids])
-          when 1
-            # 現状を維持(何もしない)
-          when 2
-            # タグを追加
-            CommandLine.run!(["tag", "--add", tags.join(" "), ids])
-          end
+    $stdout.silence do
+      invert_states.each do |state, tags|
+        case state.to_i
+        when 0
+          # タグを削除
+          CommandLine.run!(["tag", "--delete", tags.join(" "), ids])
+        when 1
+          # 現状を維持(何もしない)
+        when 2
+          # タグを追加
+          CommandLine.run!(["tag", "--add", tags.join(" "), ids])
         end
       end
-      @@push_server.send_all(:"table.reload")
-      @@push_server.send_all(:"tag.updateCanvas")
     end
+    @@push_server.send_all(:"table.reload")
+    @@push_server.send_all(:"tag.updateCanvas")
   end
 
   get "/api/get_queue_size" do
