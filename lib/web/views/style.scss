@@ -647,6 +647,13 @@ $console-color: white;
   position: relative;
   margin-right: 0;
   cursor: default;
+
+  &.active {
+    color: #4bb0ce !important;
+    #queue {
+      background-color: #4bb0ce !important;
+    }
+  }
 }
 #queue {
   position: relative;

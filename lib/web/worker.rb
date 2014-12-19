@@ -62,9 +62,9 @@ class Narou::Worker
   end
 
   def push(counting = true, &block)
-    @queue.push(block: block, counting: counting)
     countup if counting
     notification_queue
+    @queue.push(block: block, counting: counting)
   end
 
   def notification_queue
