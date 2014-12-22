@@ -424,6 +424,19 @@ input::-ms-clear {
 }
 
 /*
+ * 範囲選択時の半透明範囲
+ */
+#rect-select-area {
+  $rect_select_area_color: rgb(80, 200, 255);
+
+  border: 1px solid $rect_select_area_color;
+  position: absolute;
+  display: block;
+  background-color: rgba($rect_select_area_color, 0.2);
+  z-index: 100;
+}
+
+/*
  * コントロールパネル
  */
 #control-panel {
