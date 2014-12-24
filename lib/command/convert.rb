@@ -15,6 +15,28 @@ module Command
       "小説を変換します。管理小説以外にテキストファイルも変換可能"
     end
 
+    @@sending_error_list = []
+
+    def self.display_sending_error_list
+      puts
+      puts "-" * 79
+      puts "・送信失敗リスト"
+      puts @@sending_error_list
+      puts
+      puts "<red><bold>上記のファイルの送信に失敗しました。</bold></red>".termcolor
+      puts "送信出来なかった原因を解消し、send コマンドを実行して下さい。"
+      @@sending_error_list.clear
+      if $stdin.tty?
+        puts
+        puts "（何かキーを押して下さい）"
+        $stdin.getch
+      end
+    end
+
+    def self.exists_sending_error_list?
+      @@sending_error_list.empty?.!
+    end
+
     def initialize
       super("<target> [<target2> ...] [options]")
       @opt.separator <<-EOS
@@ -146,14 +168,21 @@ module Command
           if @device && @device.physical_support? &&
              @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
             if @argument_target_type == :novel
-              Send.execute!([@device.name, target])
+              if Send.execute!([@device.name, target]) > 0
+                @@sending_error_list << ebook_file
+              end
             else
               puts @device.name + "へ送信しています"
-              copy_to_path = @device.copy_to_documents(ebook_file)
+              copy_to_path = nil
+              begin
+                copy_to_path = @device.copy_to_documents(ebook_file)
+              rescue Device::SendFailure
+              end
               if copy_to_path
                 puts copy_to_path.encode(Encoding::UTF_8) + " へコピーしました"
               else
                 error "送信に失敗しました"
+                @@sending_error_list << ebook_file
               end
             end
           end

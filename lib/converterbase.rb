@@ -830,6 +830,9 @@ class ConverterBase
     data.gsub!(/([^、])、\n　([^「『(（【<＜〈《≪…‥―])/, "\\1、\\2")
   end
 
+  CHARACTER_OF_RUBY = "一-龠Ａ-Ｚａ-ｚA-Za-z"
+  AUTO_RUBY_CHARACTERS = "([ぁ-んァ-ヶーゝゞ・Ａ-Ｚａ-ｚA-Za-z 　]{,20})"
+
   #
   # 小説家になろうのルビ対策
   #
@@ -840,15 +843,13 @@ class ConverterBase
         to_ruby(match, $1, $2, ["≪", "≫"])
       end
       # （）なルビの対処
-      data.gsub!(/(.+?)（([ぁ-んァ-ヶーゝゞ・Ａ-Ｚａ-ｚA-Za-z 　]{,20})）/) do |match|
+      data.gsub!(/(.+?)（#{AUTO_RUBY_CHARACTERS}）/) do |match|
         to_ruby(match, $1, $2, ["（", "）"])
       end
     end
     data.replace(replace_tatesen(data))
     data.gsub!("［＃ルビ用縦線］", "｜")
   end
-
-  CHARACTER_OF_RUBY = "一-龠Ａ-Ｚａ-ｚA-Za-z"
 
   def object_of_ruby?(char)
     char =~ /[#{CHARACTER_OF_RUBY}]/
@@ -888,16 +889,21 @@ class ConverterBase
     when m1.include?("｜")
       "#{m1.sub(/｜([^｜]*)$/, "［＃ルビ用縦線］\\1")}《#{m2}》"
     when object_of_ruby?(last_char)
-      # なろうのルビ対象文字を辿って｜を挿入する（青空文庫となろうのルビ仕様の差異吸収のため）
-      # 空白もルビ対象文字に含むのはなろうの仕様である
-      m1.sub(/([#{CHARACTER_OF_RUBY} 　]+)$/) {
-        match_target = $1
-        if match_target =~ /^(　+)/
-          "#{$1}［＃ルビ用縦線］#{match_target[$1.length..-1]}"
-        else
-          "［＃ルビ用縦線］#{match_target}"
-        end
-      } + "《#{ruby_youon_to_big(m2)}》"
+      if openclose_symbols[0] == "≪" && m2 !~ /^#{AUTO_RUBY_CHARACTERS}$/
+        # 《 》タイプのルビであっても、｜が存在しない場合の自動ルビ化対象はひらがな等だけである
+        match
+      else
+        # なろうのルビ対象文字を辿って｜を挿入する（青空文庫となろうのルビ仕様の差異吸収のため）
+        # 空白もルビ対象文字に含むのはなろうの仕様である
+        m1.sub(/([#{CHARACTER_OF_RUBY} 　]+)$/) {
+          match_target = $1
+          if match_target =~ /^(　+)/
+            "#{$1}［＃ルビ用縦線］#{match_target[$1.length..-1]}"
+          else
+            "［＃ルビ用縦線］#{match_target}"
+          end
+        } + "《#{ruby_youon_to_big(m2)}》"
+      end
     else
       match
     end

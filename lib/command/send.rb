@@ -98,6 +98,7 @@ module Command
         print "#{device.name}へ送信しています"
         exit_copy = false
         copy_to_path = nil
+        Thread.abort_on_exception = true
         Thread.new do
           copy_to_path = device.copy_to_documents(ebook_path)
           exit_copy = true
@@ -114,7 +115,7 @@ module Command
           exit Narou::EXIT_ERROR_CODE   # next しても次も失敗すると分かりきっているためここで終了する
         end
       end
-    rescue Interrupt
+    rescue Device::SendFailure, Interrupt
       puts "送信を中断しました"
       exit Narou::EXIT_ERROR_CODE
     end

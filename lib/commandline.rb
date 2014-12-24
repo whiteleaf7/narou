@@ -44,6 +44,10 @@ module CommandLine
       argv += STDIN.gets.split
     end
     Command.get_list[arg].new.execute(argv)
+  ensure
+    if Command::Convert.exists_sending_error_list?
+      Command::Convert.display_sending_error_list
+    end
   end
 
   #
