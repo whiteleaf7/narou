@@ -256,19 +256,22 @@ module Helper
           sleep(sleep_time)
         end
       }.tap { |th|
-        if Helper.engine_jruby?
-          # MEMO:
-          #   Open3.capture3 - 全く動かない
-          #   `` バッククウォート - 出力が文字化けする
-          res = Open3.popen3(command) { |i, o, e|
-            i.close
-            `cd`   # create dummy Process::Status object to $?
-            [o.read, e.read, $?]
-          }
-        else
-          res = Open3.capture3(command)
+        begin
+          if Helper.engine_jruby?
+            # MEMO:
+            #   Open3.capture3 - 全く動かない
+            #   `` バッククウォート - 出力が文字化けする
+            res = Open3.popen3(command) { |i, o, e|
+              i.close
+              `cd`   # create dummy Process::Status object to $?
+              [o.read, e.read, $?]
+            }
+          else
+            res = Open3.capture3(command)
+          end
+        ensure
+          th.kill
         end
-        th.kill
         return res
       }
     end
