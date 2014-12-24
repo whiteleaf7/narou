@@ -117,6 +117,8 @@ class Narou::AppServer < Sinatra::Base
     set(:version) do
       Command::Version.create_version_string
     end
+
+    set :environment, :production unless $debug
   end
 
   def self.push_server=(server)
