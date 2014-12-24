@@ -59,10 +59,6 @@ module Command
       is_first
     end
 
-    class EatLogger < StringIO
-      def write(*a) end
-    end
-
     def create_push_server(params)
       host, port = params[:host], params[:port]
       push_server = Narou::PushServer.instance
@@ -76,7 +72,6 @@ module Command
       super
       require_relative "../web/all"
       confirm_of_first
-      $stderr = EatLogger.new unless $display_backtrace
       params = Narou::AppServer.create_address(@options["port"])
       push_server = create_push_server(params)
       Narou.web = true
