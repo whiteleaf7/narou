@@ -991,7 +991,7 @@ class ConverterBase
     def midashi(str)
       midashi_title = str.gsub("［＃半字下げ］", "").gsub(/^[　\s]+/, "").gsub(/[　\s]+$/, "")
       @inspector.subtitle = midashi_title
-      "［＃３字下げ］［＃ここから中見出し］#{midashi_title}［＃ここで中見出し終わり］"
+      "［＃３字下げ］［＃中見出し］#{midashi_title}［＃中見出し終わり］"
     end
 
     def calc_cr_count(str)
