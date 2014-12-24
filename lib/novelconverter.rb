@@ -377,7 +377,6 @@ class NovelConverter
     @use_dakuten_font = conv.use_dakuten_font
     conv.replace_by_replace_txt(result)
 
-    midashi_save(result)
     inspect_novel(result)
 
     if @output_filename
@@ -410,12 +409,6 @@ class NovelConverter
     { "title" => title, "author" => author }
   end
 
-  def midashi_save(text)
-    midashi_list = listup_midashi(text)
-    path = File.join(@setting.archive_path, "見出しリスト.txt")
-    File.write(path, midashi_list)
-  end
-
   def inspect_novel(text)
     # 行末読点の現在状況を調査する
     @inspector.inspect_end_touten_conditions(text)
@@ -442,20 +435,6 @@ class NovelConverter
     end
 
     @inspector.save
-  end
-
-  #
-  # 見出しのリストを取得する
-  #
-  def listup_midashi(data)
-    list = ""
-    data.each_line.with_index(1) do |line, no|
-      if line =~ /［＃ここから(?<scale>[大中小])見出し］(?<title>.+?)［＃ここで\g<scale>見出し終わり］/ ||
-        line =~ /［＃「(?<title>.+?)は(?<scale>[大中小])見出し］/
-        list << "#{$~[:scale]}:#{no}:#{$~[:title]}\n"
-      end
-    end
-    list
   end
 
   #
