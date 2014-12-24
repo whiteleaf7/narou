@@ -159,7 +159,7 @@ module Command
           end
         end
 
-        unless @options["no-open"]
+        if @options["no-open"].! && Narou.web?.!
           Helper.open_directory(File.dirname(@converted_txt_path), "小説の保存フォルダを開きますか")
         end
       end
