@@ -155,6 +155,14 @@ class NovelConverter
       Dir.chdir(pwd)
     end
 
+    # AozoraEpub3はエラーだとしてもexitコードは0なので、
+    # 失敗した場合はjavaが実行できない場合と確定できる
+    unless res[2].success?
+      puts
+      error "Javaがインストールされていない可能性があります。EPUBを作成出来ませんでした"
+      return :error
+    end
+
     stdout_capture = res[0]
 
     # Javaの実行環境に由来するであろうエラー
