@@ -29,16 +29,17 @@ class Narou::Worker
         begin
           q = @queue.pop
           q[:block].call
-          if q[:counting]
-            countdown
-            notification_queue
-          end
         rescue SystemExit
         rescue Exception => e
           # Workerスレッド内での例外は表示するだけしてスレッドは生かしたままにする
           STDOUT.puts $@.shift + ": #{e.message} (#{e.class})"
           $@.each do |b|
             STDOUT.puts "  from #{b}"
+          end
+        ensure
+          if q[:counting]
+            countdown
+            notification_queue
           end
         end
       end
