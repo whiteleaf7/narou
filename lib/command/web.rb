@@ -100,6 +100,16 @@ module Command
       Narou::Worker.instance.start
       Narou::AppServer.run!
       push_server.quit
+    rescue Errno::EADDRINUSE => e
+      STDOUT.puts <<-EOS
+#{e}
+ポートが使われています。サーバがすでに立ち上がっているかどうか確認して下さい。
+他のアプリケーションが使っているポートだった場合、ポートを変更して下さい。
+
+ポートの変更方法
+  $ narou s server-port=5678
+      EOS
+      exit Narou::EXIT_ERROR_CODE
     end
   end
 end
