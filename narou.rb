@@ -33,7 +33,7 @@ begin
 rescue SystemExit => e
   exit e.status
 rescue rescue_level => e
-  warn $@.shift + ": #{e.message} (#{e.class})"
+  warn $@.shift + ": #{e.message.encode(Encoding::UTF_8)} (#{e.class})"
   if $display_backtrace
     $@.each do |b|
       warn "  from #{b}"
