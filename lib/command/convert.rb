@@ -26,7 +26,7 @@ module Command
       puts "<red><bold>上記のファイルの送信に失敗しました。</bold></red>".termcolor
       puts "送信出来なかった原因を解消し、send コマンドを実行して下さい。"
       @@sending_error_list.clear
-      if $stdin.tty?
+      if $stdin.tty? && Narou.web?.!
         puts
         puts "（何かキーを押して下さい）"
         $stdin.getch
