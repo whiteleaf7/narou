@@ -686,3 +686,52 @@ $console-color: white;
   top: -3px;
 }
 
+/*
+ * ヘルプ画面
+ */
+#help-container {
+  #ss-main {
+    @media (min-width: 768px) {
+      width: 70%;
+      float: left;
+      margin-right: 10px;
+    }
+    @media (max-width: 767px) {
+      width: 100%;
+    }
+    margin-bottom: 10px;
+  }
+  #ss-tag {
+    float: right;
+    width: 200px;
+  }
+  #ss-rect-select {
+    @media (min-width: 601px) {
+      float: right;
+      width: 350px;
+    }
+    @media (max-width: 600px) {
+      width: 100%;
+    }
+  }
+
+  h4 {
+    margin-top: 25px;
+    font-weight: bold;
+
+    .number {
+      background-color: lighten(purple, 10%);
+      vertical-align: top;
+    }
+  }
+  img + h4 {
+    margin-top: 10px;
+  }
+  div > p{
+    text-indent: 1em;
+  }
+  p {
+    margin-bottom: 4px;
+  }
+}
+
