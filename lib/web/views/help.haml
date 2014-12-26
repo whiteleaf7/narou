@@ -4,6 +4,21 @@
       animation: false,
       container: "body",
     });
+
+    var bookmarklet = function(d,e,u) {
+      u='#{request.scheme}://#{env["SERVER_NAME"]}:#{env["SERVER_PORT"]}'+
+        '/js/widget.js?mode=download&t='+Date.now();
+      e=d.createElement('script');
+      e.charset='utf-8';
+      e.src=u;
+      d.body.appendChild(e);
+    };
+
+    function createBookmarkletStrings(proc) {
+      return ("javascript:(" + proc + ")(document)").replace(/ {2,}|\n/g, "");
+    }
+
+    $("#bookmarklet").attr("href", createBookmarkletStrings(bookmarklet));
   };
 
 .navbar.navbar-default.navbar-fixed-top(role="navigation")
@@ -27,6 +42,20 @@
         %span.glyphicon.glyphicon-inbox
         %span#queue 0
 #help-container.container.theme-showcase(role="main")
+  %h2 ブックマークレット
+  %p 小説掲載サイトを表示したまま直接ダウンロード出来るブックマークレットです。<br> |
+     下記のリンクをブックマークに登録して、ダウンロードしたい小説のページで実行して下さい。（WEB UI起動中に限ります）<br> |
+    ブックマークバーにドラッグ＆ドロップしたり、右クリックからブックマークにいれると簡単です。 |
+  %p
+    %a#bookmarklet(onclick="return false")
+      %big
+        %u Narou.rbでダウンロード
+
+  %p
+    %small 基本的に小説ページ内にダウンロード中の表示が出ますが、IEを使っていてかつ小説家になろうの小説をダウンロードしようとした場合のみ、技術的制約から別ウィンドウが開きます。
+
+  %hr
+
   %h2 画面の簡単な説明
   %img#ss-main(src="/resources/help/ssmain.png" class="img-thumbnail")
   %h4

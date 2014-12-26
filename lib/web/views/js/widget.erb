@@ -1,0 +1,74 @@
+<%# vim: set ft=javascript : -%>
+(function() {
+  function merge(target, object) {
+    for (var key in object) {
+      target[key] = object[key];
+    }
+  }
+
+  var ALLOW_HOSTS = <%= ALLOW_HOSTS.to_s %>;
+  var guard = true;
+  if (typeof ALLOW_HOSTS.typeOf === "function") {
+    guard = ALLOW_HOSTS.indexOf(location.hostname) === -1;
+  }
+  else {
+    for (var i in ALLOW_HOSTS) {
+      if (ALLOW_HOSTS[i] === location.hostname) {
+        guard = false;
+        break;
+      }
+    }
+  }
+  if (guard) {
+    alert("対応サイトではありません");
+    return;
+  }
+  if (document.getElementById("narourb-console")) return;
+
+  var url, div, iframe, btn_close;
+
+  url = '<%= "#{request.scheme}://#{env["SERVER_NAME"]}:#{env["SERVER_PORT"]}" %>' +
+        "/widget/<%= params['mode'] %>?from=" + location.hostname + "&target=" +
+        encodeURIComponent(location.href) + "&t=" + Date.now();
+
+  // IE の場合、iframe は親のドキュメントモードが汚染して動かない可能性があるので対処
+  var docmode = document.documentMode || 10;
+  if (docmode < 10) {
+    window.open(url, "widget_window", "width=400,height=250,menubar=no,toolbar=no,scrollbars=no,resizable=yes");
+    return;
+  }
+
+  div = document.createElement("div");
+  merge(div.style, {
+    position: "fixed",
+    top: 0, left: 0,
+    opacity: 0.85,
+    zIndex: 9999
+  });
+
+  iframe = document.createElement("iframe");
+  iframe.src = url;
+  iframe.id = "narourb-console";
+  iframe.width = 400;
+  iframe.height = 250;
+
+  btn_close = document.createElement("span");
+  btn_close.textContent = "×";
+  merge(btn_close.style, {
+    position: "absolute",
+    fontSize: "20px",
+    fontWeight: "bold",
+    background: "black",
+    top: 0,
+    color: "white",
+    cursor: "pointer",
+    opacity: 0.85
+  });
+  btn_close.onclick = function() {
+    div.parentNode.removeChild(div);
+  };
+
+  div.appendChild(iframe);
+  div.appendChild(btn_close);
+  document.body.appendChild(div);
+})();

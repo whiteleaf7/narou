@@ -573,5 +573,40 @@ class Narou::AppServer < Sinatra::Base
     }
     json res
   end
+
+  get "/js/widget.js" do
+    if %w(download).include?(params["mode"])
+      content_type :js
+      erb :"js/widget"
+    else
+      error("invaid mode")
+    end
+  end
+
+  ALLOW_HOSTS = [].tap do |hosts|
+    Downloader.load_settings.each do |s|
+      hosts << s["domain"]
+    end
+    hosts.freeze
+  end
+
+  before "/widget/*" do
+    from = params["from"]
+    if ALLOW_HOSTS.include?(from)
+      headers "X-Frame-Options" => "ALLOW-FROM http://#{from}/"
+    else
+      headers "X-Frame-Options" => "DENY"
+      halt
+    end
+  end
+
+  get "/widget/download" do
+    target = params["target"] or error("targetを指定して下さい")
+    Narou::Worker.push do
+      CommandLine.run!(["download", target])
+      @@push_server.send_all(:"table.reload")
+    end
+    haml :widget, :layout => nil
+  end
 end
 
