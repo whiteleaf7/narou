@@ -627,19 +627,19 @@ class Downloader
     @title
   end
 
-  class DownloaderHTTP404Error < OpenURI::HTTPError
+  class DownloaderNotFoundError < OpenURI::HTTPError
     def initialize
       super("404 not found", nil)
     end
   end
 
   #
-  # HTMLの中から小説が削除されたことを示すメッセージを検出する
+  # HTMLの中から小説が削除されたか非公開なことを示すメッセージを検出する
   #
-  def detect_404_message(source)
-    message = @setting["404_message"]
+  def detect_error_message(source)
+    message = @setting["error_message"]
     return false unless message
-    source.include?(message)
+    source.match(message)
   end
 
   #
@@ -660,7 +660,7 @@ class Downloader
         toc_url = @setting["toc_url"]
       end
       toc_source = Helper.pretreatment_source(toc_fp.read, @setting["encoding"])
-      raise DownloaderHTTP404Error if detect_404_message(toc_source)
+      raise DownloaderNotFoundError if detect_error_message(toc_source)
     end
     @setting.multi_match(toc_source, "tcode")
     #if @setting["narou_api_url"]
@@ -699,7 +699,7 @@ class Downloader
     toc_objects
   rescue OpenURI::HTTPError => e
     if e.message.include?("404")
-      error "<bold><red>[404]</red></bold> 小説が削除されている可能性があります".termcolor
+      error "小説が削除されているか非公開な可能性があります"
       if @@database.novel_exists?(@id)
         $stdout.silence do
           Command::Tag.execute!(%W(#{@id} --add 404 --color white))
