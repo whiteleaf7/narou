@@ -84,6 +84,7 @@ narou コマンドのインストール or アップデートが完了しまし�
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.add_runtime_dependency 'termcolorlight', '~> 1.0', '>= 1.1.1'
   gem.add_runtime_dependency 'rubyzip', '~> 1.1', '>= 1.1.0'
+  gem.add_runtime_dependency 'mail', '2.5.4'
   gem.add_runtime_dependency 'pony', '~> 1.8'
   gem.add_runtime_dependency 'diff-lcs', '~> 1.2', '>= 1.2.5'
   gem.add_runtime_dependency 'sinatra', '~> 1.4', '>= 1.4.5'
