@@ -96,6 +96,7 @@ module Command
       Narou::AppServer.run!
       push_server.quit
     rescue Errno::EADDRINUSE => e
+      Helper.open_browser(address) unless @options["no-browser"]
       STDOUT.puts <<-EOS
 #{e}
 ポートが使われています。サーバがすでに立ち上がっているかどうか確認して下さい。
