@@ -520,7 +520,7 @@ class ConverterBase
   #
   def erase_comments_block(data)
     if @text_type == "textfile"
-      data.gsub!(/^-{50,}\n.*^-{50,}\n/m, "")
+      data.gsub!(/^-{50,}\n.*?^-{50,}\n/m, "")
     end
     data
   end

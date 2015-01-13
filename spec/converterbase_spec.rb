@@ -30,6 +30,18 @@ opqrstu
         EOS
       end
 
+      context "複数のコメントブロックが存在した場合" do
+        it "それぞれのブロックの中だけ削除する" do
+          text = @text * 2
+          expect(@converter.erase_comments_block(text)).to eq <<-EOS
+abcdefg
+opqrstu
+abcdefg
+opqrstu
+          EOS
+        end
+      end
+
       context "@text_file が \"textfile\" ではなかった場合" do
         it "削除しない" do
           @converter.instance_variable_set(:@text_type, "body")
