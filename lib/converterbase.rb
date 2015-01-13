@@ -519,7 +519,10 @@ class ConverterBase
   # コメントブロックを削除する
   #
   def erase_comments_block(data)
-    data.gsub!(/^-{50,}\n.*^-{50,}\n/m, "")
+    if @text_type == "textfile"
+      data.gsub!(/^-{50,}\n.*^-{50,}\n/m, "")
+    end
+    data
   end
 
   #
