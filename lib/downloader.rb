@@ -857,6 +857,9 @@ class Downloader
       index, subtitle, file_subtitle, chapter = %w(index subtitle file_subtitle chapter).map { |k|
         subtitle_info[k]
       }
+      info = subtitle_info.dup
+      info["element"] = a_section_download(subtitle_info)
+
       unless chapter.empty?
         puts "#{chapter}"
       end
@@ -869,8 +872,7 @@ class Downloader
         print "短編　"
       end
       print "#{subtitle} (#{i+1}/#{max})"
-      info = subtitle_info.dup
-      info["element"] = a_section_download(subtitle_info)
+
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
       if File.exist?(File.join(get_novel_data_dir, section_file_relative_path))
