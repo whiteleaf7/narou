@@ -271,7 +271,9 @@ module Command
     # convert.copy_to で指定されたディレクトリに書籍データをコピーする
     #
     def copy_to_converted_file(src_path)
-      copy_to_dir = @options["copy_to"]
+      # 2.1.0 から convert.copy_to から convert.copy-to へ名称が変更された
+      # (互換性維持のための処理)
+      copy_to_dir = @options["copy-to"] || @options["copy_to"]
       return nil unless copy_to_dir
       if File.directory?(copy_to_dir)
         copy_files = [src_path]

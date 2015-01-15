@@ -9,6 +9,11 @@
 	+ `convert.copy_to` でMOBIファイルコピー時に同時にEPUBもコピーします
 	+ `narou s convert.copy-epub=true` で設定出来ます
 
+#### 仕様変更
+- `convert.copy_to` を `convert.copy-to` へ変更しました(表記ゆれの統一の為)
+	+ copy_to も後方互換維持のため残されますが、今後は非推奨になります
+
+
 2.0.2 : master
 ------------------
 #### 仕様変更

@@ -37,8 +37,8 @@ module Command
     narou setting --list
     narou setting convert.no-open=true
     narou setting convert.no-epub=   # 右辺に何も書かないとその設定を削除できる
-    narou setting convert.copy_to=C:/dropbox/mobi
-    narou s convert.copy_to="C:\\Documents and Settings\\user\\epub"
+    narou setting convert.copy-to=C:/dropbox/mobi
+    narou s convert.copy-to="C:\\Documents and Settings\\user\\epub"
 
   Options:
       EOS
@@ -209,9 +209,10 @@ module Command
                                          " " * 6 + "※注意：KDP用のMOBIはstripしないでください"],
         "convert.no-zip" => [:boolean, "i文庫用のzipファイル作成を無効にするか"],
         "convert.no-open" => [:boolean, "変換時に保存フォルダを開かないようにするか"],
-        "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
+        "convert.copy-to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
-        "convert.copy-epub" => [:boolean, "copy_toでMOBIコピー時にEPUBも同時にコピーする"],
+        "convert.copy_to" => [:directory, "copy-toの昔の書き方(非推奨)", INVISIBLE],
+        "convert.copy-epub" => [:boolean, "copy-toでMOBIコピー時にEPUBも同時にコピーする"],
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
         "download.wait-steps" => [:integer, "この値で指定した話数ごとにウェイトを入れる\n" +
