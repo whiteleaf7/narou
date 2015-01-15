@@ -8,6 +8,13 @@
 - `convert.copy-epub` オプションが追加されました
 	+ `convert.copy_to` でMOBIファイルコピー時に同時にEPUBもコピーします
 	+ `narou s convert.copy-epub=true` で設定出来ます
+- `update.logging` オプションが追加されました
+	+ `update` コマンド使用時にログを保存するようになります
+	+ `narou s update.logging=true` で設定出来ます
+	+ ログはテキストファイルとして `log/` フォルダに保存されます(最新30件まで)。
+	  また、 `narou u --log N` コマンドでも確認出来ます(N=1以上の整数)。
+		Nを省略した場合は最新のログが表示されます
+
 
 #### 仕様変更
 - `convert.copy_to` を `convert.copy-to` へ変更しました(表記ゆれの統一の為)

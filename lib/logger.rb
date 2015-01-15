@@ -18,9 +18,12 @@ end
 module Narou end unless defined?(Narou)
 
 module Narou::LoggerModule
+  attr_accessor :capturing
+
   def initialize
     super
     @is_silent = false
+    @capturing = false
   end
 
   def copy_instance
@@ -71,11 +74,13 @@ module Narou::LoggerModule
     raise "#capture block given" unless block
     temp_stream = $stdout
     $stdout = (self == $stdout ? copy_instance : self)
+    $stdout.capturing = true
     if options[:quiet]
       $stdout.silence { block.call }
     else
       block.call
     end
+    $stdout.capturing = false
     buffer = $stdout.string
     $stdout = temp_stream
     options[:ansicolor_strip] ? strip_color(buffer) : buffer

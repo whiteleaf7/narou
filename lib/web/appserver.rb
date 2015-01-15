@@ -486,7 +486,7 @@ class Narou::AppServer < Sinatra::Base
       ids.each do |id|
         # セキュリティ的にWEB UIでは独自の差分表示のみ使う
         CommandLine.run!(["diff", "--no-tool", id])
-        print "<hr>"
+        Helper.print_horizontal_rule
       end
     end
   end

@@ -64,5 +64,24 @@ describe Narou::Logger do
         end
       end
     end
+
+    context "多段 capture" do
+      it do
+        expect($stdout.capture {
+          print "foo"
+          expect($stdout.capture { print "bar" }).to eq "bar"
+        }).to eq "foo"
+      end
+    end
+
+    context "現在の状態を取得" do
+      it "キャプチャ中でなければ偽" do
+        expect($stdout.capturing).to eq false
+      end
+
+      it "キャプチャ中なら真" do
+        $stdout.capture { expect($stdout.capturing).to eq true }
+      end
+    end
   end
 end

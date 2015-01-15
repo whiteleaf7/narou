@@ -221,6 +221,7 @@ module Command
                                                   " " * 6 + "※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策"],
         "send.without-freeze" => [:boolean, "`全話'送信時に凍結された小説は対象外に"],
         "update.strong" => [:boolean, "更新漏れが無い様に改稿日の分は必ずDLするか"],
+        "update.logging" => [:boolean, "更新時のログを保存するかどうか"],
         "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
         "multiple-delimiter" => [:string, "--multiple指定時の区切り文字"],
       },
