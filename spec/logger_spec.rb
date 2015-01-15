@@ -46,7 +46,22 @@ describe Narou::Logger do
 
     context "with ansicolor NON strip option" do
       it do
-        expect($stdout.capture(false) { puts "\e[31mhello\e[0m" }).to eq "\e[31mhello\e[0m\n"
+        expect($stdout.capture(ansicolor_strip: false) { puts "\e[31mhello\e[0m" }).to eq "\e[31mhello\e[0m\n"
+      end
+    end
+
+    context "インスタンスを作成してキャプチャ" do
+      it do
+        logger = Narou::Logger.new
+        expect(logger.capture { print "world" }).to eq "world"
+      end
+    end
+
+    context "quiet=falseでもsilenceで囲めば出力されないか" do
+      it do
+        $stdout.silence do
+          expect($stdout.capture(quiet: false) { print "hello world" }).to eq "hello world"
+        end
       end
     end
   end

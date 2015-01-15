@@ -34,6 +34,12 @@ class Narou::StreamingLogger < StringIO
     false
   end
 
+  def copy_instance
+    self.class.new(@push_server).tap do |obj|
+      obj.silent = silent
+    end
+  end
+
   def push_streaming(str)
     unless @is_silent
       @push_server.send_all(echo: str) if @push_server

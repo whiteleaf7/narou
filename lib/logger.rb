@@ -23,6 +23,12 @@ module Narou::LoggerModule
     @is_silent = false
   end
 
+  def copy_instance
+    self.class.new.tap { |obj|
+      obj.silent = silent
+    }
+  end
+
   def silent=(enable)
     @is_silent = !!enable
   end
@@ -55,18 +61,24 @@ module Narou::LoggerModule
   # 標準出力($stdout)のバッファリング＋取得
   #
   # キャプチャー用途なので標準エラーはキャプチャーしない
+  # quiet :: 標準出力に出力をしないかどうか
   # ansicolor_strip :: エスケープシーケンスを除去するか
   #
-  def capture(ansicolor_strip = true, &block)
+  def capture(options = {}, &block)
+    options = {
+      quiet: true, ansicolor_strip: true
+    }.merge(options)
     raise "#capture block given" unless block
     temp_stream = $stdout
-    $stdout = self.class.new
-    $stdout.silence do
+    $stdout = (self == $stdout ? copy_instance : self)
+    if options[:quiet]
+      $stdout.silence { block.call }
+    else
       block.call
     end
     buffer = $stdout.string
     $stdout = temp_stream
-    ansicolor_strip ? strip_color(buffer) : buffer
+    options[:ansicolor_strip] ? strip_color(buffer) : buffer
   end
 
   def strip_color(str)
