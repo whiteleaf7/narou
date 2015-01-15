@@ -211,6 +211,7 @@ module Command
         "convert.no-open" => [:boolean, "変換時に保存フォルダを開かないようにするか"],
         "convert.copy_to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
+        "convert.copy-epub" => [:boolean, "copy_toでMOBIコピー時にEPUBも同時にコピーする"],
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
         "download.wait-steps" => [:integer, "この値で指定した話数ごとにウェイトを入れる\n" +

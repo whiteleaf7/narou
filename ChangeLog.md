@@ -2,6 +2,13 @@
 更新履歴 - ChangeLog
 ====================
 
+2.1.0 : feature
+------------------
+#### 追加機能
+- `convert.copy-epub` オプションが追加されました
+	+ `convert.copy_to` でMOBIファイルコピー時に同時にEPUBもコピーします
+	+ `narou s convert.copy-epub=true` で設定出来ます
+
 2.0.2 : master
 ------------------
 #### 仕様変更
