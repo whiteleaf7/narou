@@ -268,7 +268,7 @@ module Command
     end
 
     #
-    # convert.copy_to で指定されたディレクトリに書籍データをコピーする
+    # convert.copy-to で指定されたディレクトリに書籍データをコピーする
     #
     def copy_to_converted_file(src_path)
       # 2.1.0 から convert.copy_to から convert.copy-to へ名称が変更された
