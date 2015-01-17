@@ -91,5 +91,6 @@ narou コマンドのインストール or アップデートが完了しまし�
   gem.add_runtime_dependency 'sinatra-contrib', '~> 1.4', '>= 1.4.2'
   gem.add_runtime_dependency 'sass', '~> 3.4', '>= 3.4.4'
   gem.add_runtime_dependency 'haml', '~> 4.0', '>= 4.0.5'
+  gem.add_runtime_dependency 'memoist', '~> 0.11.0'
 end
 

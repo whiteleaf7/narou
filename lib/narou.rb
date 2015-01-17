@@ -4,6 +4,7 @@
 #
 
 require "fileutils"
+require "memoist"
 require_relative "helper"
 require_relative "inventory"
 if Helper.engine_jruby?
@@ -11,24 +12,22 @@ if Helper.engine_jruby?
 end
 
 module Narou
+  extend Memoist
+
   module_function
 
   LOCAL_SETTING_DIR = ".narou"
   GLOBAL_SETTING_DIR = ".narousetting"
   AOZORAEPUB3_JAR_NAME = "AozoraEpub3.jar"
-  AOZORAEPUB3_DIR = "./AozoraEpub3"
-  PRESET_DIR = "./preset"
+  AOZORAEPUB3_DIR = "AozoraEpub3"
+  PRESET_DIR = "preset"
+  MISC_DIR = "misc"
   EXIT_ERROR_CODE = 127
 
-  @@root_dir = nil
-  @@local_setting_dir = nil
-  @@global_setting_dir = nil
-  @@aozora_jar_path = nil
-  @@preset_dir = nil
   @@is_web = false
 
   def get_root_dir
-    return @@root_dir if @@root_dir
+    root_dir = nil
     path = File.expand_path(File.dirname("."))
     drive_letter = ""
     if Helper.os_windows?
@@ -37,35 +36,38 @@ module Narou
     end
     while path != ""
       if File.directory?("#{drive_letter}#{path}/#{LOCAL_SETTING_DIR}")
-        @@root_dir = drive_letter + path
+        root_dir = drive_letter + path
         break
       end
       path.gsub!(%r!/[^/]*$!, "")
     end
-    @@root_dir
+    root_dir
   end
+  memoize :get_root_dir
 
   def get_local_setting_dir
-    return @@local_setting_dir if @@local_setting_dir
+    local_setting_dir = nil
     root_dir = get_root_dir
     if root_dir
-      @@local_setting_dir = File.join(root_dir, LOCAL_SETTING_DIR)
+      local_setting_dir = File.join(root_dir, LOCAL_SETTING_DIR)
     end
-    @@local_setting_dir
+    local_setting_dir
   end
+  memoize :get_local_setting_dir
 
   def get_global_setting_dir
-    return @@global_setting_dir if @@global_setting_dir
-    @@global_setting_dir = File.expand_path(File.join("~", GLOBAL_SETTING_DIR))
-    unless File.exist?(@@global_setting_dir)
-      FileUtils.mkdir(@@global_setting_dir)
+    global_setting_dir = File.expand_path(File.join("~", GLOBAL_SETTING_DIR))
+    unless File.exist?(global_setting_dir)
+      FileUtils.mkdir(global_setting_dir)
     end
-    @@global_setting_dir
+    global_setting_dir
   end
+  memoize :get_global_setting_dir
 
   def get_script_dir
-    @@script_dir ||= File.expand_path(File.join(File.dirname(__FILE__), ".."))
+    File.expand_path(File.join(File.dirname(__FILE__), ".."))
   end
+  memoize :get_script_dir
 
   def already_init?
     !!get_root_dir
@@ -92,10 +94,9 @@ module Narou
   end
 
   def get_preset_dir
-    return @@preset_dir if @@preset_dir
-    @@preset_dir = File.expand_path(File.join(get_script_dir, PRESET_DIR))
-    @@preset_dir
+    File.expand_path(File.join(get_script_dir, PRESET_DIR))
   end
+  memoize :get_preset_dir
 
   def create_aozoraepub3_jar_path(*paths)
     File.expand_path(File.join(*paths, AOZORAEPUB3_JAR_NAME))
@@ -113,24 +114,22 @@ module Narou
   # 3. スクリプト保存ディレクトリ(Narou.get_script_dir) 直下の AozoraEpub3
   #
   def get_aozoraepub3_path
-    return @@aozora_jar_path if @@aozora_jar_path
     global_setting_aozora_path = Inventory.load("global_setting", :global)["aozoraepub3dir"]
     if global_setting_aozora_path
       aozora_jar_path = create_aozoraepub3_jar_path(global_setting_aozora_path)
       if File.exist?(aozora_jar_path)
-        @@aozora_jar_path = aozora_jar_path
         return aozora_jar_path
       end
     end
     [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
       aozora_jar_path = create_aozoraepub3_jar_path(dir, AOZORAEPUB3_DIR)
       if File.exist?(aozora_jar_path)
-        @@aozora_jar_path = aozora_jar_path
         return aozora_jar_path
       end
     end
     nil
   end
+  memoize :get_aozoraepub3_path
 
   def create_novel_filename(novel_data, ext = "")
     author, title = %w(author title).map { |k|
@@ -149,6 +148,11 @@ module Narou
     dir = Downloader.get_novel_data_dir_by_target(target)
     File.join(dir, create_novel_filename(data, ext))
   end
+
+  def get_misc_dir
+    File.join(get_root_dir, MISC_DIR)
+  end
+  memoize :get_misc_dir
 
   require_relative "device"
 

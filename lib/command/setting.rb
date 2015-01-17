@@ -219,7 +219,8 @@ module Command
                                        " " * 6 + "※注意：11以上を設定してもなろうの場合は10話ごとにウェイトが入ります"],
         "download.use-subdirectory" => [:boolean, "小説を一定数ごとにサブフォルダへ分けて保存するか\n" +
                                                   " " * 6 + "※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策"],
-        "send.without-freeze" => [:boolean, "`全話'送信時に凍結された小説は対象外に"],
+        "send.without-freeze" => [:boolean, "一括送信時に凍結された小説は対象外に"],
+        "send.backup-bookmark" => [:boolean, "一括送信時に栞データを自動でバックアップするか(KindlePW系用)"],
         "update.strong" => [:boolean, "更新漏れが無い様に改稿日の分は必ずDLするか"],
         "update.logging" => [:boolean, "更新時のログを保存するかどうか"],
         "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],

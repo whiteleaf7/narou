@@ -239,6 +239,25 @@ module Helper
   end
 
   #
+  # ファイルを指定したディレクトリにまとめてコピーする
+  # 指定したディレクトリが存在しなければ作成する
+  #
+  # from: ファイルパスをまとめた Array
+  # dest_dir: コピー先のディレクトリ
+  #
+  def copy_files(from, dest_dir)
+    from.each do |path|
+      basename = File.basename(path)
+      dirname = File.basename(File.dirname(path))
+      save_dir = File.join(dest_dir, dirname)
+      unless File.directory?(save_dir)
+        FileUtils.mkdir_p(save_dir)
+      end
+      FileUtils.copy(path, File.join(save_dir, basename))
+    end
+  end
+
+  #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #
   # response = Helper::AsyncCommand.exec("処理に時間がかかる外部コマンド") do

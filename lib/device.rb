@@ -4,10 +4,24 @@
 #
 
 require "fileutils"
+require "memoist"
 require_relative "narou"
 require_relative "helper"
 
 class Device
+  #
+  # デバイスの栞をバックアップするときに使う時に include する
+  #
+  module BackupBookmarkUtility
+    extend Memoist
+
+    # 栞データを管理するディレクトリのパスを取得
+    def get_storage_path
+      File.join(Narou.get_misc_dir, "bookmark", @name)
+    end
+    memoize :get_storage_path
+  end
+
   case Helper.determine_os
   when :windows
     require_relative "device/library/windows"
@@ -45,6 +59,7 @@ class Device
 
   class UnknownDevice < StandardError; end
   class SendFailure < StandardError; end
+  class DontConneting < StandardError; end
 
   def self.exists?(device)
     DEVICES.include?(device.downcase)
@@ -149,8 +164,6 @@ class Device
     end
   end
 
-  private
-
   def create_device_check_methods
     DEVICES.keys.each do |name|
       instance_eval <<-EOS
@@ -160,4 +173,5 @@ class Device
       EOS
     end
   end
+  private :create_device_check_methods
 end

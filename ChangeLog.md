@@ -14,7 +14,15 @@
 	+ ログはテキストファイルとして `log/` フォルダに保存されます(最新30件まで)。
 	  また、 `narou u --log N` コマンドでも確認出来ます(N=1以上の整数)。
 		Nを省略した場合は最新のログが表示されます
-
+- `send.backup-bookmark` オプションが追加されました
+	+ `send` コマンド使用時に端末の栞データを自動でバックアップします(KindlePW系
+	  専用。他の端末も栞データの仕様が分かれば対応可能)
+	+ `narou s send.backup-bookmark=true` で設定出来ます
+	+ 一括送信時(`narou send` とだけコマンドを打った時)のみバックアップします
+	+ 上記設定をせずに手動でバックアップする場合は `narou send --backup-bookmark`
+	  もしくは `narou send -b` で行います
+	+ バックアップした栞データを復元（端末にコピー）するには
+	  `narou send --restore-bookmark` もしくは `narou send -r` で行います
 
 #### 仕様変更
 - `convert.copy_to` を `convert.copy-to` へ変更しました(表記ゆれの統一の為)
