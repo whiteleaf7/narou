@@ -5,6 +5,13 @@
 2.1.0 : feature
 ------------------
 #### 追加機能
+- `convert.multi-device` オプションが追加されました
+	+ `convert` コマンド使用時に複数のフォーマットへ同時に変換することが出来ます
+	+ `narou s convert.multi-device=kindle,kobo,reader` のようにカンマ区切りで
+	  設定します。この設定を有効にした場合、変換時に `device` 設定は無視されます
+	+ `send` コマンド時には通常通り `device` の設定が使用されます
+	+ 普通のEPUBが出力したい場合、端末名として `epub` を指定して下さい
+
 - `update.logging` オプションが追加されました
 	+ `update` コマンド使用時にログを保存するようになります
 	+ `narou s update.logging=true` で設定出来ます

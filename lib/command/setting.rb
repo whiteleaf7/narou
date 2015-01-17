@@ -213,6 +213,7 @@ module Command
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
         "convert.copy_to" => [:directory, "copy-toの昔の書き方(非推奨)", INVISIBLE],
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
+        "convert.multi-device" => [:string, "複数の端末用に同時に変換する。deviceよりも優先される。端末名をカンマ区切りで入力。ただのEPUBを出力したい場合はepubを指定"],
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
         "download.wait-steps" => [:integer, "この値で指定した話数ごとにウェイトを入れる\n" +
                                        " " * 6 + "※注意：11以上を設定してもなろうの場合は10話ごとにウェイトが入ります"],

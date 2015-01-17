@@ -14,14 +14,14 @@ module Command
     end
 
     def initialize
-      super("<device> [<target1> ...] [options]")
+      super("[<device>] [<target> ...] [options]")
       @opt.separator <<-EOS
 
-  ・<target>で指定した小説の電子書籍データ(#{Device::DEVICES.map{|_,d| d::EBOOK_FILE_EXT}.join(", ")})を<device>で指定した端末に送信します。
-    <device>には現在 #{Device::DEVICES.keys.join(", ")} が指定出来ます。
-  ・narou setting device=<device>としておけば、<device>の入力を省略できます。
-    また、convertコマンドで変換時に(端末がPCに接続されていれば)自動でデータを送信するようになります。
-  ・<target>を省略した場合、管理している小説全てのファイルのタイムスタンプを端末のものと比べて新しければ送信します。
+  ・<target>で指定した小説の電子書籍データを<device>で指定した端末に送信します
+  ・<device>には現在 #{Device::DEVICES.keys.join(", ")} が指定出来ます
+  ・narou setting device=<device>としておけば、<device>の入力を省略できます
+    また、convertコマンドで変換時に(端末がPCに接続されていれば)自動でデータを送信するようになります
+  ・<target>を省略した場合、管理している小説全てのファイルのタイムスタンプを端末のものと比べて新しければ送信します
 
   Examples:
     narou send kindle 6
