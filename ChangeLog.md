@@ -2,6 +2,37 @@
 更新履歴 - ChangeLog
 ====================
 
+2.1.0 : master
+------------------
+#### 追加機能
+- `convert.multi-device` オプションが追加されました
+	+ `convert` コマンド使用時に複数のフォーマットへ同時に変換することが出来ます
+	+ `narou s convert.multi-device=kindle,kobo,reader` のようにカンマ区切りで
+	  設定します。この設定を有効にした場合、変換時に `device` 設定は無視されます
+	+ `send` コマンド時には通常通り `device` の設定が使用されます
+	+ 普通のEPUBが出力したい場合、端末名として `epub` を指定して下さい
+
+- `update.logging` オプションが追加されました
+	+ `update` コマンド使用時にログを保存するようになります
+	+ `narou s update.logging=true` で設定出来ます
+	+ ログはテキストファイルとして `log/` フォルダに保存されます(最新30件まで)。
+	  また、 `narou u --log N` コマンドでも確認出来ます(N=1以上の整数)。
+		Nを省略した場合は最新のログが表示されます。短縮する場合は `narou u -l N`
+- `send.backup-bookmark` オプションが追加されました
+	+ `send` コマンド使用時に端末の栞データを自動でバックアップします(KindlePW系
+	  専用。他の端末も栞データの仕様が分かれば対応可能)
+	+ `narou s send.backup-bookmark=true` で設定出来ます
+	+ 一括送信時(`narou send` とだけコマンドを打った時)のみバックアップします
+	+ 上記設定をせずに手動でバックアップする場合は `narou send --backup-bookmark`
+	  もしくは `narou send -b` で行います
+	+ バックアップした栞データを復元（端末にコピー）するには
+	  `narou send --restore-bookmark` もしくは `narou send -r` で行います
+
+#### 仕様変更
+- `convert.copy_to` を `convert.copy-to` へ変更しました(表記ゆれの統一の為)
+	+ copy_to も後方互換維持のため残されますが、今後は非推奨になります
+
+
 2.0.2 : 2015/01/16
 ------------------
 #### 仕様変更

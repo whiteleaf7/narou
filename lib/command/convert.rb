@@ -97,7 +97,7 @@ module Command
 
   Configuration:
     --no-epub, --no-mobi, --no-strip, --no-open , --inspect は narou setting コマンドで恒常的な設定にすることが可能です。
-    convert.copy_to を設定すれば変換したEPUB/MOBIを指定のフォルダに自動でコピー出来ます。
+    convert.copy-to を設定すれば変換したEPUB/MOBIを指定のフォルダに自動でコピー出来ます。
     device で設定した端末が接続されていた場合、対応するデータを自動送信します。
     詳しくは narou setting --help を参照して下さい。
       EOS
@@ -123,10 +123,50 @@ module Command
           return
         end
       end
-      @device = Narou.get_device
-      self.extend(@device.get_hook_module) if @device
-      hook_call(:change_settings)
-      convert_novels(argv)
+
+      @multi_device = @options["multi-device"]
+      device_names = if @multi_device
+                       @multi_device.split(",").map(&:strip).map(&:downcase).select { |name|
+                         Device.exists?(name).tap { |this|
+                           unless this
+                             error "[convert.multi-device] #{name} は有効な端末名ではありません"
+                           end
+                         }
+                       }
+                     else
+                       [nil]   # nil で device 設定が読まれる
+                     end
+      # kindle用のmobiを作る過程でepubが作成され、上書きされてしまうので、最初に作るようにする
+      kindle = device_names.delete("kindle")
+      device_names.unshift(kindle) if kindle
+
+      if @multi_device && device_names.empty?
+        error "有効な端末名がひとつもありませんでした"
+        exit Narou::EXIT_ERROR_CODE
+      end
+
+      device_names.each do |name|
+        @device = Narou.get_device(name)
+        if name
+          puts "<bold><magenta>&gt;&gt; #{@device.display_name}用に変換します</magenta></bold>".termcolor
+        end
+        self.extend(@device.get_hook_module) if @device
+        hook_call(:change_settings)
+        convert_novels(argv)
+      end
+
+      # device の設定に戻す
+      if @multi_device
+        device = Narou.get_device
+        force_change_settings_function(device.get_relative_variables) if device
+      end
+    end
+
+    def change_settings
+      return unless @device
+      if @multi_device
+        force_change_settings_function(@device.get_relative_variables)
+      end
     end
 
     def convert_novels(argv)
@@ -266,10 +306,12 @@ module Command
     end
 
     #
-    # convert.copy_to で指定されたディレクトリに書籍データをコピーする
+    # convert.copy-to で指定されたディレクトリに書籍データをコピーする
     #
     def copy_to_converted_file(src_path)
-      copy_to_dir = @options["copy_to"]
+      # 2.1.0 から convert.copy_to から convert.copy-to へ名称が変更された
+      # (互換性維持のための処理)
+      copy_to_dir = @options["copy-to"] || @options["copy_to"]
       return nil unless copy_to_dir
       if File.directory?(copy_to_dir)
         FileUtils.copy(src_path, copy_to_dir)

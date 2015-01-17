@@ -25,6 +25,8 @@ end
 class Narou::StreamingLogger < StringIO
   include Narou::LoggerModule
 
+  attr_reader :push_server
+
   def initialize(push_server = nil)
     super()
     @push_server = push_server
@@ -32,6 +34,20 @@ class Narou::StreamingLogger < StringIO
 
   def tty?
     false
+  end
+
+  def copy_instance
+    self.class.new(@push_server).tap do |obj|
+      obj.silent = silent
+    end
+  end
+
+  def strip_color(str)
+    if $disable_color
+      str
+    else
+      str.gsub(%r!</?span.*?>!, "")
+    end
   end
 
   def push_streaming(str)

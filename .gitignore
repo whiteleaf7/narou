@@ -22,6 +22,8 @@ debug
 trash/
 .ruby-version
 .sass-cache/
+log/
+misc/
 
 \#*\#
 

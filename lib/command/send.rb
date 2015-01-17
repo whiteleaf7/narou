@@ -14,14 +14,14 @@ module Command
     end
 
     def initialize
-      super("<device> [<target1> ...] [options]")
+      super("[<device>] [<target> ...] [options]")
       @opt.separator <<-EOS
 
-  ・<target>で指定した小説の電子書籍データ(#{Device::DEVICES.map{|_,d| d::EBOOK_FILE_EXT}.join(", ")})を<device>で指定した端末に送信します。
-    <device>には現在 #{Device::DEVICES.keys.join(", ")} が指定出来ます。
-  ・narou setting device=<device>としておけば、<device>の入力を省略できます。
-    また、convertコマンドで変換時に(端末がPCに接続されていれば)自動でデータを送信するようになります。
-  ・<target>を省略した場合、管理している小説全てのファイルのタイムスタンプを端末のものと比べて新しければ送信します。
+  ・<target>で指定した小説の電子書籍データを<device>で指定した端末に送信します
+  ・<device>には現在 #{Device::DEVICES.keys.join(", ")} が指定出来ます
+  ・narou setting device=<device>としておけば、<device>の入力を省略できます
+    また、convertコマンドで変換時に(端末がPCに接続されていれば)自動でデータを送信するようになります
+  ・<target>を省略した場合、管理している小説全てのファイルのタイムスタンプを端末のものと比べて新しければ送信します
 
   Examples:
     narou send kindle 6
@@ -40,6 +40,12 @@ module Command
 
       @opt.on("--without-freeze", "一括送信時に凍結された小説は対象外にする") {
         @options["without-freeze"] = true
+      }
+      @opt.on("-b", "--backup-bookmark", "端末の栞データを手動でバックアップする(KindlePW系用)") {
+        @options["command-backup-bookmark"] = true
+      }
+      @opt.on("-r", "--restore-bookmark", "栞データのバックアップを端末にコピーする(KindlePW系用)") {
+        @options["command-restore-bookmark"] = true
       }
     end
 
@@ -77,6 +83,16 @@ module Command
           titles[id] = data["title"]
         end
       end
+
+      case
+      when @options["command-backup-bookmark"]
+        process_backup_bookmark(device)
+        exit
+      when @options["command-restore-bookmark"]
+        process_restore_bookmark(device)
+        exit
+      end
+
       tagname_to_ids(argv)
       argv.each do |target|
         ebook_path = Narou.get_ebook_file_path(target, device.ebook_file_ext)
@@ -115,9 +131,36 @@ module Command
           exit Narou::EXIT_ERROR_CODE   # next しても次も失敗すると分かりきっているためここで終了する
         end
       end
+      if send_all && @options["backup-bookmark"]
+        process_backup_bookmark(device)
+      end
     rescue Device::SendFailure, Interrupt
       puts "送信を中断しました"
       exit Narou::EXIT_ERROR_CODE
+    end
+
+    def process_backup_bookmark(device)
+      device.extend(device.get_hook_module)
+      unless device.respond_to?(:backup_bookmark)
+        error "ご利用の端末での栞データのバックアップは対応していません"
+        return
+      end
+      if device.backup_bookmark > 0
+        puts "端末の栞データをバックアップしました"
+      end
+    end
+
+    def process_restore_bookmark(device)
+      device.extend(device.get_hook_module)
+      unless device.respond_to?(:restore_bookmark)
+        error "ご利用の端末での栞データのバックアップは対応していません"
+        return
+      end
+      if device.restore_bookmark > 0
+        puts "栞データを端末にコピーしました"
+      else
+        puts "栞データが無いようです"
+      end
     end
   end
 end
