@@ -5,9 +5,6 @@
 2.1.0 : feature
 ------------------
 #### 追加機能
-- `convert.copy-epub` オプションが追加されました
-	+ `convert.copy-to` 使用時にMOBIファイルコピーと同時にEPUBもコピーします
-	+ `narou s convert.copy-epub=true` で設定出来ます
 - `update.logging` オプションが追加されました
 	+ `update` コマンド使用時にログを保存するようになります
 	+ `narou s update.logging=true` で設定出来ます

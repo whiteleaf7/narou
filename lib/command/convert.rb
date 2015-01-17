@@ -163,9 +163,7 @@ module Command
         if ebook_file
           copied_file_path = copy_to_converted_file(ebook_file)
           if copied_file_path
-            copied_file_path.each do |copied_path|
-              puts copied_path.encode(Encoding::UTF_8) + " へコピーしました"
-            end
+            puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
           end
           if @device && @device.physical_support? &&
              @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
@@ -276,16 +274,8 @@ module Command
       copy_to_dir = @options["copy-to"] || @options["copy_to"]
       return nil unless copy_to_dir
       if File.directory?(copy_to_dir)
-        copy_files = [src_path]
-        if @options["copy-epub"] && File.extname(src_path) == ".mobi"
-          copy_files << src_path.sub(/mobi$/, "epub")
-        end
-        result = []
-        copy_files.each do |path|
-          FileUtils.copy(path, copy_to_dir)
-          result << File.join(copy_to_dir, File.basename(path))
-        end
-        return result
+        FileUtils.copy(src_path, copy_to_dir)
+        return File.join(copy_to_dir, File.basename(src_path))
       else
         error "#{copy_to_dir} はフォルダではないかすでに削除されています。コピー出来ませんでした"
         return nil
