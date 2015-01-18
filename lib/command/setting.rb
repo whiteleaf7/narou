@@ -234,6 +234,7 @@ module Command
         "server-port" => [:integer, "WEBサーバ起動時のポート"],
         "server-bind" => [:string, "WEBサーバのホスト制限(未設定時:起動PCのIP)", INVISIBLE],
         "over18" => [:boolean, "18歳以上かどうか", INVISIBLE],
+        "dismiss-notice" => [:boolean, "お知らせを消すかどうか", INVISIBLE],
       }
     }
 

@@ -17,16 +17,25 @@ if ARGV.delete("--time")
 end
 
 require_relative "lib/inventory"
+global = Inventory.load("global_setting", :global)
 $display_backtrace = ARGV.delete("--backtrace")
 $display_backtrace ||= $debug
 $disable_color = ARGV.delete("--no-color")
-$disable_color ||= Inventory.load("global_setting", :global)["no-color"]
+$disable_color ||= global["no-color"]
 
 require_relative "lib/logger"
 require_relative "lib/version"
 require_relative "lib/commandline"
 
 rescue_level = $debug ? Exception : StandardError
+
+if !global["dismiss-notice"] && RUBY_VERSION < "2.1.0"
+  puts <<-EOS.termcolor
+<cyan><bold>[Notice]
+ご使用のRubyのバージョンが#{RUBY_VERSION}と古いままです。近い将来Ruby2.1.0以上を必須とする予定なので準備をお願いします
+このお知らせを消すには narou s dismiss-notice=true を実行して下さい</bold></cyan>
+  EOS
+end
 
 begin
   CommandLine.run(ARGV.map { |v| v.dup })
