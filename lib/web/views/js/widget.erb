@@ -6,6 +6,10 @@
     }
   }
 
+  // オフライン表記を先に消しておく
+  var offline = document.getElementById("narourb-offline");
+  offline.parentNode.removeChild(offline);
+
   var ALLOW_HOSTS = <%= ALLOW_HOSTS.to_s %>;
   var guard = true;
   if (typeof ALLOW_HOSTS.typeOf === "function") {

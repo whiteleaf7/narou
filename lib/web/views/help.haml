@@ -5,13 +5,29 @@
       container: "body",
     });
 
-    var bookmarklet = function(d,e,u) {
+    var bookmarklet = function(d,e,u,o,s) {
+      o=d.createElement("div");
+      o.textContent="WEB UI Server: OFFLINE";
+      o.id="narourb-offline";
+      s=o.style;
+      s.position="fixed";
+      s.top=0;
+      s.left=0;
+      s.zIndex=9998;
+      s.color="white";
+      s.background="red";
+      s.opacity=0;
+      d.body.appendChild(o);
+      setTimeout(function(){
+        o.style.opacity=1
+      },1000);
+
       u='#{request.scheme}://#{env["SERVER_NAME"]}:#{env["SERVER_PORT"]}'+
         '/js/widget.js?mode=download&t='+Date.now();
       e=d.createElement('script');
       e.charset='utf-8';
       e.src=u;
-      d.body.appendChild(e);
+      d.body.appendChild(e)
     };
 
     function createBookmarkletStrings(proc) {
@@ -44,7 +60,7 @@
 #help-container.container.theme-showcase(role="main")
   %h2 ブックマークレット
   %p 小説掲載サイトを表示したまま直接ダウンロード出来るブックマークレットです。<br> |
-     下記のリンクをブックマークに登録して、ダウンロードしたい小説のページで実行して下さい。（WEB UI起動中に限ります）<br> |
+     下記のリンクをブックマークに登録して、ダウンロードしたい小説のページで実行して下さい。（WEB UIサーバ起動中に限ります）<br> |
     ブックマークバーにドラッグ＆ドロップしたり、右クリックからブックマークにいれると簡単です。 |
   %p
     %a#bookmarklet(onclick="return false")
