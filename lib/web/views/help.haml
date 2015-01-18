@@ -7,19 +7,18 @@
 
     var bookmarklet = function(d,e,u,o,s) {
       o=d.createElement("div");
-      o.textContent="WEB UI Server: OFFLINE";
+      o.innerHTML="WEB UI Server: OFFLINE";
       o.id="narourb-offline";
       s=o.style;
       s.position="fixed";
-      s.top=0;
+      s.top=-1000;
       s.left=0;
       s.zIndex=9998;
       s.color="white";
       s.background="red";
-      s.opacity=0;
       d.body.appendChild(o);
       setTimeout(function(){
-        o.style.opacity=1
+        s.top=0
       },1000);
 
       u='#{request.scheme}://#{env["SERVER_NAME"]}:#{env["SERVER_PORT"]}'+
