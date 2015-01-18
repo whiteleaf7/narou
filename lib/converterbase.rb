@@ -575,10 +575,11 @@ class ConverterBase
   #
   # 必ず下げなければいけないところは強制的に字下げ
   # 他の部分は全体的に判断して字下げ
+  # enable_force_indent が有効なら強制字下げ
   #
   def auto_indent(data)
     data.gsub!(FULL_INDENT_TARGET, "　\\1")
-    if @setting.enable_auto_indent && @inspector.inspect_indent(data)
+    if @setting.enable_force_indent || (@setting.enable_auto_indent && @inspector.inspect_indent(data))
       data.gsub!(/^([^#{AUTO_INDENT_IGNORE_INDENT_CHAR}])/) do
         # 行頭に三点リーダーの代わりに連続中黒（・・・）が来た場合の対策
         # https://github.com/whiteleaf7/narou/issues/35

@@ -26,6 +26,10 @@
 	  もしくは `narou send -b` で行います
 	+ バックアップした栞データを復元（端末にコピー）するには
 	  `narou send --restore-bookmark` もしくは `narou send -r` で行います
+- 変換設定に行頭字下げを強制的に行う `enable_force_indent` を追加しました
+	+ enable_auto_indent は作者の意図的な字下げ無しを考慮して、全体的に字下げが
+	  行われていない時にのみ字下げをするのに対して、今回のオプションは強制的に
+	  字下げを行います。作者の字下げ忘れが多い場合に有効です
 
 #### 仕様変更
 - `convert.copy_to` を `convert.copy-to` へ変更しました(表記ゆれの統一の為)

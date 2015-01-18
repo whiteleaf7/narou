@@ -198,6 +198,12 @@ class NovelSetting
       help: "自動行頭字下げ機能。行頭字下げが行われているかを判断し、適切に行頭字下げをする"
     },
     {
+      name: "enable_force_indent",
+      type: :boolean,
+      value: false,
+      help: "行頭字下げを必ず行う。enable_auto_indent の設定は無視される"
+    },
+    {
       name: "enable_auto_join_in_brackets",
       type: :boolean,
       value: true,
