@@ -12,7 +12,7 @@
 
   var ALLOW_HOSTS = <%= ALLOW_HOSTS.to_s %>;
   var guard = true;
-  if (typeof ALLOW_HOSTS.typeOf === "function") {
+  if (typeof ALLOW_HOSTS.indexOf === "function") {
     guard = ALLOW_HOSTS.indexOf(location.hostname) === -1;
   }
   else {
