@@ -162,10 +162,7 @@ module Command
         end
         disp_id = ((frozen ? "*" : "") + id.to_s).rjust(4)
         disp_id = disp_id.sub("*", "<bold><cyan>*</cyan></bold>") if frozen
-        flags = novel["flags"] || {}   # flagコマンドは1.6.0から非推奨
         tags = novel["tags"] || []
-        flags["end"] ||= tags.include?("end")
-        flags["404"] ||= tags.include?("404")
         selected_lines[id] = [
           disp_id,
           novel["last_update"].strftime("%y/%m/%d").tap { |s|
@@ -183,8 +180,8 @@ module Command
           novel["title"].escape + (!@options["kind"] && novel_type == 2 ?
                            "  <bold><black>(#{NOVEL_TYPE_LABEL[novel_type]})</black></bold>" :
                            "") +
-                           (flags["end"] ? " <bold><black>(完結)</black></bold>" : "") +
-                           (flags["404"] ? " <bold><black>(削除)</black></bold>" : ""),
+                           (tags.include?("end") ? " <bold><black>(完結)</black></bold>" : "") +
+                           (tags.include?("404") ? " <bold><black>(削除)</black></bold>" : ""),
           @options["url"] ? novel["toc_url"].escape : nil,
           @options["tags"] || @options["all-tags"] ?
               tags.empty? ? nil : tags.map{ |tag|

@@ -34,7 +34,6 @@ module Command
     "freeze" => Freeze,
     "tag" => Tag,
     "web" => Web,
-    "flag" => Flag,
     "mail" => Mail,
     "backup" => Backup,
     "help" => Help,

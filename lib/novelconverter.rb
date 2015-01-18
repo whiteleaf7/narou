@@ -289,10 +289,8 @@ class NovelConverter
       end
     end
     # タイトルに完結したかどうかを付加する
-    flags = data["flags"] || {}
     tags = data["tags"] || []
-    flags["end"] ||= tags.include?("end")
-    if flags["end"]
+    if tags.include?("end")
       processed_title += " (完結)"
     end
     # タイトルがルビ化されてしまうのを抑制
