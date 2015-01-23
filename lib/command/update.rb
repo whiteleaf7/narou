@@ -117,7 +117,7 @@ module Command
       list = get_log_paths
       n = @options["log"]
       if list[n]
-        puts File.read(list[n])
+        puts File.read(list[n], encoding: Encoding::UTF_8)
       else
         error "#{n+1}番目のログはありません"
       end
@@ -128,7 +128,7 @@ module Command
       create_log_dir
       now = Time.now
       logname = File.join(log_dirname, LOG_FILENAME_FORMAT % now.strftime("%Y%m%d_%H%M%S"))
-      File.open(logname, "w") do |fp|
+      File.open(logname, "w:UTF-8") do |fp|
         fp.puts "--- ログ出力日時 #{now.strftime("%Y/%m/%d %H:%M:%S")} ---"
         fp.puts log
       end
