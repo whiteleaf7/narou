@@ -13,7 +13,7 @@ end
 require "haml"
 require "sass"
 require_relative "../logger"
-require_relative "../CommandLine"
+require_relative "../commandline"
 require_relative "../inventory"
 require_relative "worker"
 require_relative "pushserver"
