@@ -335,5 +335,11 @@ class NovelSetting
       value: true,
       help: "縦書きで読みやすいように空行を減らすかどうか"
     },
+    {
+      name: "enable_kana_ni_to_kanji_ni",
+      type: :boolean,
+      value: true,
+      help: "漢字の二と間違えてカタカナのニを使っていそうなのを、漢字に直すかどうか"
+    },
   ]
 end
