@@ -995,6 +995,14 @@ class ConverterBase
   def modify_kana_ni_to_kanji_ni(data)
     if @setting.enable_kana_ni_to_kanji_ni
       data.gsub!(/([^#{KANA}]{2})ニ([^#{KANA}]{2})/) do
+        prefix = $`.tap { |it|
+          break it[-10, 10] if it.length > 10
+        }
+        @inspector.info(<<-EOS % (prefix + $1 + "ニ" + $2 + $'[0, 10]))
+カタカナのニを漢字の二に修正しました
+≫≫≫ 該当箇所
+...%s...
+        EOS
         "#{$1}二#{$2}"
       end
     end

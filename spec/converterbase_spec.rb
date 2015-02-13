@@ -3,13 +3,15 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "../lib/inspector"
 require_relative "../lib/novelsetting"
 require_relative "../lib/converterbase"
 
 describe ConverterBase do
   before do
     novelsetting = NovelSetting.new("", true)
-    @converter = ConverterBase.new(novelsetting, nil, nil)
+    inspector = Inspector.new(novelsetting)
+    @converter = ConverterBase.new(novelsetting, inspector, nil)
     @converter.instance_variable_set(:@text_type, "textfile")
   end
 
