@@ -223,6 +223,7 @@ module Command
         "send.backup-bookmark" => [:boolean, "一括送信時に栞データを自動でバックアップするか(KindlePW系用)"],
         "update.strong" => [:boolean, "更新漏れが無い様に改稿日の分は必ずDLするか"],
         "update.logging" => [:boolean, "更新時のログを保存するかどうか"],
+        "update.convert-only-new-arrival" => [:boolean, "更新時に新着のみ変換を実行するかどうか"],
         "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
         "multiple-delimiter" => [:string, "--multiple指定時の区切り文字"],
       },

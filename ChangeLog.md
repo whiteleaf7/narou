@@ -9,6 +9,10 @@
   でON/OFF出来るようにしました
 	+ setting.ini の enable_kana_ni_to_kanji_ni を設定することで変更が可能です
 	+ また、変換した場合は調査結果に記録されるようになります
+- `update.convert-only-new-arrival` オプションが追加されました
+	+ 新着時のみ変換を実行する `update` コマンドの `--convert-only-new-arrival`
+	  を `setting` コマンドでも設定出来るようにするためのものです
+	+ `narou s update.convert-only-new-arrival=true` で設定出来ます
 
 #### Bug Fix
 - アップデートのログ保存時に文字エンコーディングを指定するようにした
