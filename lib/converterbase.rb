@@ -987,13 +987,18 @@ class ConverterBase
     data.gsub!("、、", "、")
   end
 
+  KANA = "ァ-ヶー"
+
   #
   # 漢字の二じゃなくて間違えてカタカナのニを使ってるのを校正する
   #
   def modify_kana_ni_to_kanji_ni(data)
     if @setting.enable_kana_ni_to_kanji_ni
-      data.gsub!(/([^ァ-ヶー])ニ([^ァ-ヶー])/, "\\1二\\2")
+      data.gsub!(/([^#{KANA}]{2})ニ([^#{KANA}]{2})/) do
+        "#{$1}二#{$2}"
+      end
     end
+    data
   end
 
   #
