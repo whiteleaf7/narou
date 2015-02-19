@@ -28,7 +28,7 @@ describe NovelSetting do
       @novel_setting["original"] = "hoge"
       @novel_setting.save_settings
       lines = File.read(@inipath).split("\n")
-      expect(lines.last).to eq "original = hoge"
+      expect(lines.last).to eq 'original = "hoge"'
     end
   end
 end

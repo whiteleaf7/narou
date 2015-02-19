@@ -54,22 +54,22 @@ describe Narou::Input do
 
     it "japanese を入力された時 japanese を返すべき" do
       $stdin = double("$stdin japanese", gets: "japanese\n", tty?: true)
-      expect(Narou::Input.choose("", @choices)).to eq "japanese"
+      expect(Narou::Input.choose("", "", @choices)).to eq "japanese"
     end
 
     it "JAPANESE を入力された時 japanese を返すべき" do
       $stdin = double("$stdin JAPANESE", gets: "JAPANESE\n", tty?: true)
-      expect(Narou::Input.choose("", @choices)).to eq "japanese"
+      expect(Narou::Input.choose("", "", @choices)).to eq "japanese"
     end
 
     it "English を入力された時 english を返すべき" do
       $stdin = double("$stdin English", gets: "English\n", tty?: true)
-      expect(Narou::Input.choose("", @choices)).to eq "english"
+      expect(Narou::Input.choose("", "", @choices)).to eq "english"
     end
 
     it "pipe で接続された時 japanese を返すべき" do
       $stdin = double("$stdin nontty", tty?: false)
-      expect(Narou::Input.choose("", @choices)).to eq "japanese"
+      expect(Narou::Input.choose("", "", @choices)).to eq "japanese"
     end
   end
 end

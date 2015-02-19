@@ -43,7 +43,7 @@ module Narou
     #
     # @example:
     #   choices = { "ja" => "日本語", "en" => "English", default: "ja" }
-    #   Narou::Input.choose("select a language?", choices)
+    #   Narou::Input.choose("Title: Select language", "Please select a language?", choices)
     #
     def choose(title, message, choices)
       default = choices[:default] || choices.first[0]

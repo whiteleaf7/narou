@@ -6,6 +6,11 @@
 require_relative "../lib/logger"
 
 describe Narou::Logger do
+  before :all do
+    $stdout = Narou::Logger.new
+    $stderr = Narou::LoggerError.new
+  end
+
   after :all do
     $stdout = STDOUT
     $stderr = STDERR

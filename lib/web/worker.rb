@@ -4,6 +4,7 @@
 #
 
 require "singleton"
+require_relative "pushserver"
 
 class Narou::Worker
   include Singleton
