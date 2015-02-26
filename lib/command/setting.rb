@@ -97,6 +97,17 @@ module Command
       trigger(:error, msg, name)
     end
 
+    def sweep_dust_variable(target_name, settings)
+      deleted = false
+      settings.each_value do |scoped_settings|
+        if scoped_settings.has_key?(target_name)
+          scoped_settings.delete(target_name)
+          deleted = true
+        end
+      end
+      deleted
+    end
+
     def execute(argv)
       super
       if argv.empty?
@@ -116,13 +127,23 @@ module Command
           output_error("書式が間違っています。変数名=値 のように書いて下さい")
           next
         end
-        scope = get_scope_of_variable_name(name)
-        unless scope
-          output_error("#{name} という変数は存在しません", name)
-          next
-        end
         if value.nil?
           output_error("書式が間違っています。#{name}=値 のように書いて下さい", name)
+          next
+        end
+        scope = get_scope_of_variable_name(name)
+        unless scope
+          if value == ""
+            # 定義上ではすでに存在しないが、設定ファイルには残っている古い変数
+            # を削除できるようにする
+            if sweep_dust_variable(name, settings)
+              puts "#{name} の設定を削除しました"
+            else
+              output_error("#{name} という変数は存在しません", name)
+            end
+          else
+            output_error("#{name} という変数は設定出来ません", name)
+          end
           next
         end
         if value == ""
