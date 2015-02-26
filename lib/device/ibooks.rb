@@ -23,7 +23,7 @@ module Device::Ibooks
     @@__ibooks_container_dir = File.expand_path(IBOOKS_CONTAINER_DIR)
     unless File.exist?(@@__ibooks_container_dir)
       error "iBooksの管理フォルダが見つかりませんでした。" \
-            "MacOSX Mavericks以降のiBooksのみ管理に対応しています"
+            "OSX Mavericks以降のiBooksのみ管理に対応しています"
       @@__ibooks_container_dir = nil
     end
     @@__already_exec_change_settings = true
