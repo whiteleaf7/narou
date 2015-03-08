@@ -1228,7 +1228,6 @@ class ConverterBase
     convert_double_angle_quotation_to_gaiji(data)
     delete_dust_char(data)
     if title_and_author
-      puts title_and_author
       data.replace(title_and_author + data)
     end
     data.rstrip!
