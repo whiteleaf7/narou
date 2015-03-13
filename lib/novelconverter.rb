@@ -159,7 +159,8 @@ class NovelConverter
     # 失敗した場合はjavaが実行できない場合と確定できる
     unless res[2].success?
       puts
-      error "Javaがインストールされていない可能性があります。EPUBを作成出来ませんでした"
+      puts res
+      error "JavaがインストールされていないかAozoraEpub3実行時にエラーが発生しました。EPUBを作成出来ませんでした"
       return :error
     end
 

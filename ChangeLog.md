@@ -2,6 +2,20 @@
 更新履歴 - ChangeLog
 ====================
 
+2.3.0 : 2015/xx/xx
+------------------
+#### 追加機能
+- Kindle端末で単語の選択を出来るようにするために、小説別変換設定に
+  `enable_insert_word_separator` オプションが追加されました
+	+ このオプションを使うためには `narou init` を実行して AozoraEpub3 の設定を
+	  修正する必要があります
+	+ 各小説の setting.ini 内に `enable_insert_word_separator=true` と追加で書き
+	  込むか、 `narou s force.enable_insert_word_separator=true` とコマンドを打ち
+	  込むことで有効に出来ます。（WEB UI で設定すると楽です）
+	+ このオプションは、Kindle端末で単語が選択出来ない問題に対応するものです。
+	  device が kindle の時のみ使用可能です。また、Send to Kindle で mobi を azw3
+	  に変換する場合は単語選択は可能なので、設定する必要はありません
+
 2.2.0 : 2015/02/19
 ------------------
 #### 追加機能

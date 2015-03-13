@@ -12,10 +12,13 @@ describe ConverterBase do
     novelsetting = NovelSetting.new("", true)
     inspector = Inspector.new(novelsetting)
     @converter = ConverterBase.new(novelsetting, inspector, nil)
-    @converter.instance_variable_set(:@text_type, "textfile")
   end
 
   context "#erase_comments_block" do
+    before do
+      @converter.instance_variable_set(:@text_type, "textfile")
+    end
+
     context "コメントブロックが存在した場合" do
       before do
         @text = <<-EOS
@@ -69,22 +72,88 @@ opqrstu
   context "#modify_kana_ni_to_kanji_ni" do
     describe "ニ(カタカナ)の前後１文字がカタカナの場合" do
       it "カタカナのまま" do
-        expect(@converter.modify_kana_ni_to_kanji_ni("イチニサン")). to eq "イチニサン"
-        expect(@converter.modify_kana_ni_to_kanji_ni("ニーサン")). to eq "ニーサン"
+        expect(@converter.modify_kana_ni_to_kanji_ni("イチニサン")).to eq "イチニサン"
+        expect(@converter.modify_kana_ni_to_kanji_ni("ニーサン")).to eq "ニーサン"
       end
     end
 
     describe "ニ(カタカナ)の前後１文字がカタカナではなく、さらにその前後がカタカナの場合" do
       it "カタカナのまま" do
-        expect(@converter.modify_kana_ni_to_kanji_ni("イチ、ニ、サン")). to eq "イチ、ニ、サン"
-        expect(@converter.modify_kana_ni_to_kanji_ni("『ニ、ニンゲンの――』")). to eq "『ニ、ニンゲンの――』"
-        expect(@converter.modify_kana_ni_to_kanji_ni("ニ、ニンゲン")). to eq "ニ、ニンゲン"
+        expect(@converter.modify_kana_ni_to_kanji_ni("イチ、ニ、サン")).to eq "イチ、ニ、サン"
+        expect(@converter.modify_kana_ni_to_kanji_ni("『ニ、ニンゲンの――』")).to eq "『ニ、ニンゲンの――』"
+        expect(@converter.modify_kana_ni_to_kanji_ni("ニ、ニンゲン")).to eq "ニ、ニンゲン"
       end
     end
 
     describe "ニ(カタカナ)の前後１文字がカタカナではなく、さらにその前後がカタカナではない場合" do
       it "漢字の二に修正する" do
-        expect(@converter.modify_kana_ni_to_kanji_ni("価格はニ千万円")). to eq "価格は二千万円"
+        expect(@converter.modify_kana_ni_to_kanji_ni("価格はニ千万円")).to eq "価格は二千万円"
+      end
+    end
+  end
+
+  context "#insert_word_separator_for_kindle" do
+    before do
+      @converter.instance_variable_set(:@text_type, "body")
+      setting = @converter.instance_variable_get(:@setting)
+      setting.enable_insert_word_separator = true
+    end
+
+    describe "Kindle以外" do
+      before do
+        @converter.instance_variable_set(:@device, Narou.get_device("reader"))
+      end
+
+      it "何も弄らない" do
+        expect(@converter.insert_word_separator("今日もいい天気ですね")).to eq "今日もいい天気ですね"
+      end
+    end
+
+    describe "Kindleの場合" do
+      before do
+        @converter.instance_variable_set(:@device, Narou.get_device("kindle"))
+      end
+
+      it do
+        expect(@converter.insert_word_separator \
+               "今日もいい天気ですね").to eq \
+               "今日［＃zws］もいい［＃zws］天気［＃zws］ですね［＃zws］"
+      end
+
+      it do
+        expect(@converter.insert_word_separator \
+               "合計１５００円です").to eq \
+               "合計［＃zws］１５００［＃zws］円［＃zws］です［＃zws］"
+      end
+
+      it do
+        expect(@converter.insert_word_separator \
+               "［＃二分アキ］「注釈内は区切らない」").to eq \
+               "［＃二分アキ］「［＃zws］注釈内［＃zws］は［＃zws］区切［＃zws］らない［＃zws］」"
+      end
+
+      it do
+        expect(@converter.insert_word_separator \
+               "あいう・えお").to eq \
+               "あいう［＃zws］・［＃zws］えお［＃zws］"
+      end
+
+      it do
+        expect(@converter.insert_word_separator \
+               "アイウ・エオ").to eq \
+               "アイウ・エオ［＃zws］"
+      end
+
+      it do
+        expect(@converter.insert_word_separator \
+               "彼は――そう……言った").to eq \
+               "彼［＃zws］は［＃zws］――［＃zws］そう［＃zws］……［＃zws］言［＃zws］った［＃zws］"
+      end
+
+      it do
+        expect(@converter.insert_word_separator \
+               "「あいう」、「えお」").to eq \
+               "「［＃zws］あいう［＃zws］」、「［＃zws］えお［＃zws］」"
       end
     end
   end

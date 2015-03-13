@@ -341,5 +341,11 @@ class NovelSetting
       value: true,
       help: "漢字の二と間違えてカタカナのニを使っていそうなのを、漢字に直すかどうか"
     },
+    {
+      name: "enable_insert_word_separator",
+      type: :boolean,
+      value: false,
+      help: "単語選択がうまく出来るようにダミーの区切りデータを挿入する（Kindle専用）"
+    },
   ]
 end

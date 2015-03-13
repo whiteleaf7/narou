@@ -15,5 +15,6 @@
 濁点終わり	</span>
 ここから柱	<div class="running_head yoko">		1
 ここで柱終わり	</div>		1
+zws	&#8203;
 
 ### Narou.rb embedded custom chuki ###

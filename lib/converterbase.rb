@@ -7,6 +7,7 @@ require "stringio"
 require "date"
 require "uri"
 require "nkf"
+require_relative "narou"
 require_relative "progressbar"
 require_relative "inspector"
 
@@ -52,6 +53,7 @@ class ConverterBase
     @num_and_comma_list = {}
     @force_indent_special_chapter_list = {}
     @in_author_comment_block = nil
+    @device = Narou.get_device
   end
 
   def outputs(data = "", force = false)
@@ -399,9 +401,8 @@ class ConverterBase
   # おかしくなりやすい矢印文字の変換
   # 
   def convert_arrow(data)
-    @@device ||= Narou.get_device
     # Kindle PW でしか確認してないのでとりあえず device=kindle の場合のみ変換
-    if @@device && @@device.kindle?
+    if @device && @device.kindle?
       data.tr!("⇒⇐", "→←")
     end
   end
@@ -1129,6 +1130,49 @@ class ConverterBase
     after(io, @text_type)
   end
 
+  WORD_SEPARATOR = "［＃zws］"
+
+  def insert_word_separator(str)
+    return str unless @setting.enable_insert_word_separator && @device && @device.kindle?
+    return str if @text_type != "body" && @text_type != "textfile"
+    buffer = ""
+    ss = StringScanner.new(str)
+    before_symbol = false
+    while char = ss.getch
+      symbol = false
+      case char
+      when "［"
+        if ss.scan(/^＃.+?］/)
+          buffer << "［#{ss.matched}"
+          next
+        end
+        symbol = true
+      when /[\d０-９]/
+        ss.scan(/[\d０-９]+/)
+      when /[ぁ-んゝゞ]/
+        ss.scan(/[ぁ-んゝゞー]+/)
+      when /[ァ-ヶ]/
+        ss.scan(/[ァ-ヶー・]+/)
+      when /[Ａ-Ｚａ-ｚA-Za-z]/
+        ss.scan(/[Ａ-Ｚａ-ｚA-Za-z]+/)
+      when /[一-龥朗-鶴]/
+        ss.scan(/[一-龥朗-鶴]+/)
+      else
+        symbol = true
+      end
+      if before_symbol && !symbol
+        buffer << WORD_SEPARATOR
+      end
+      buffer << char
+      unless symbol
+        buffer << ss.matched if ss.matched?
+        buffer << WORD_SEPARATOR
+      end
+      before_symbol = symbol
+    end
+    buffer
+  end
+
   def convert(text, text_type)
     return "" if text == ""
     @text_type = text_type
@@ -1136,7 +1180,7 @@ class ConverterBase
     (io = before_convert(io)).rewind
     (io = convert_main(io)).rewind
     (io = after_convert(io)).rewind
-    return io.read
+    return insert_word_separator(io.read)
   end
 
   #
