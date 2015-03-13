@@ -92,7 +92,7 @@ opqrstu
     end
   end
 
-  context "#insert_word_separator_for_kindle" do
+  context "#insert_word_separator" do
     before do
       @converter.instance_variable_set(:@text_type, "body")
       setting = @converter.instance_variable_get(:@setting)
