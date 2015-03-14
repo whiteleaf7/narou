@@ -1130,8 +1130,11 @@ class ConverterBase
     after(io, @text_type)
   end
 
-  WORD_SEPARATOR = "［＃zws］"
+  WORD_SEPARATOR = "［＃zws］"   # zws = zero width space
 
+  #
+  # Kindle で単語選択をまともに出来るようにするために、０幅スペースを挿入する
+  #
   def insert_word_separator(str)
     return str unless @setting.enable_insert_word_separator && @device && @device.kindle?
     return str if @text_type != "body" && @text_type != "textfile"
