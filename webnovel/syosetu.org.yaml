@@ -24,12 +24,11 @@ error_message: 投稿者が削除、もしくは間違ったアドレスを指�
 # 本文取得設定
 
 body_pattern: |-
-  (?:<div id=maegaki>(?<introduction>.+?)</div><BR><HR><BR>
-  )?<font size=\+1>.+?</font><BR><BR>
+  <font size=\+1>.+?</font><BR><BR>
   (?<body>.+?)
-  <BR>(?:<HR><BR><div id=atogaki>(?<postscript>.+?)</div>)?
+  (?:<div id=atogaki><BR><HR><BR>(?<postscript>.+?)</div>)?
 
-introduction_pattern: null
+introduction_pattern: <div id=maegaki>(?<introduction>.+)<BR><HR><BR></div>
 postscript_pattern: null
 
 illust_current_url: null

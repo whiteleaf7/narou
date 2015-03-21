@@ -1140,6 +1140,12 @@ class ConverterBase
     return str if @text_type != "body" && @text_type != "textfile"
     buffer = ""
     ss = StringScanner.new(str)
+
+    while char = ss.getch
+      buffer << "#{char}#{WORD_SEPARATOR}"
+    end
+    return buffer
+
     before_symbol = false
     while char = ss.getch
       symbol = false
