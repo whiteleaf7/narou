@@ -612,8 +612,8 @@ class ConverterBase
       # 前後に空行を入れたいが、それは行処理ループ中に行う
       symbols_to_zenkaku(str)
       index = @@count_of_rebuild_container += 1
-      @force_indent_special_chapter_list[convert_numbers(index.to_s)] = str
-      "［＃章見出しっぽい文＝#{index}］"
+      @force_indent_special_chapter_list[convert_numbers(index.to_s.rjust(10,"0"))] = str
+      "［＃章見出しっぽい文＝#{index.to_s.rjust(10,"0")}］"
     end
   end
 
