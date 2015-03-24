@@ -99,21 +99,16 @@ opqrstu
       setting.enable_insert_word_separator = true
     end
 
-    describe "Kindle以外" do
-      before do
+    describe "Kindle以外" do before do
         @converter.instance_variable_set(:@device, Narou.get_device("reader"))
       end
 
       it "何も弄らない" do
-        expect(@converter.insert_word_separator("今日もいい天気ですね")).to eq "今日もいい天気ですね"
+        expect(@converter.insert_separator_for_selection("今日もいい天気ですね")).to eq "今日もいい天気ですね"
       end
     end
 
-    describe "Kindleの場合" do
-      before do
-        @converter.instance_variable_set(:@device, Narou.get_device("kindle"))
-      end
-
+    describe "単語単位で区切る" do
       it do
         expect(@converter.insert_word_separator \
                "今日もいい天気ですね").to eq \
@@ -154,6 +149,14 @@ opqrstu
         expect(@converter.insert_word_separator \
                "「あいう」、「えお」").to eq \
                "「［＃zws］あいう［＃zws］」、「［＃zws］えお［＃zws］」"
+      end
+    end
+
+    describe "文字単位で区切る" do
+      it do
+        expect(@converter.insert_char_separator \
+               "今日もいい天気").to eq \
+               "今［＃zws］日［＃zws］も［＃zws］い［＃zws］い［＃zws］天［＃zws］気［＃zws］"
       end
     end
   end

@@ -1133,19 +1133,26 @@ class ConverterBase
   WORD_SEPARATOR = "［＃zws］"   # zws = zero width space
 
   #
-  # Kindle で単語選択をまともに出来るようにするために、０幅スペースを挿入する
+  # Kindle端末で単語選択がしやすいように０幅スペースを挿入する
+  #
+  def insert_separator_for_selection(str)
+    return str unless @device && @device.kindle?
+    return str if @text_type != "body" && @text_type != "textfile"
+    if @setting.enable_insert_word_separator
+      insert_word_separator(str)
+    elsif @setting.enable_insert_char_separator
+      insert_char_separator(str)
+    else
+      str
+    end
+  end
+
+  #
+  # 単語単位でzwsを挿入する
   #
   def insert_word_separator(str)
-    return str unless @setting.enable_insert_word_separator && @device && @device.kindle?
-    return str if @text_type != "body" && @text_type != "textfile"
     buffer = ""
     ss = StringScanner.new(str)
-
-    while char = ss.getch
-      buffer << "#{char}#{WORD_SEPARATOR}"
-    end
-    return buffer
-
     before_symbol = false
     while char = ss.getch
       symbol = false
@@ -1182,6 +1189,18 @@ class ConverterBase
     buffer
   end
 
+  #
+  # 文字単位でzwsを挿入する
+  #
+  def insert_char_separator(str)
+    buffer = ""
+    ss = StringScanner.new(str)
+    while char = ss.getch
+      buffer << "#{char}#{WORD_SEPARATOR}"
+    end
+    buffer
+  end
+
   def convert(text, text_type)
     return "" if text == ""
     @text_type = text_type
@@ -1189,7 +1208,7 @@ class ConverterBase
     (io = before_convert(io)).rewind
     (io = convert_main(io)).rewind
     (io = after_convert(io)).rewind
-    return insert_word_separator(io.read)
+    return insert_separator_for_selection(io.read)
   end
 
   #

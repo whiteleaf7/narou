@@ -32,23 +32,30 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 79}
 
-2.2.0 : 2015/02/19
+2.3.1 : 2015/03/24
+------------------
+#### Bug Fix
+- `enable_insert_word_separator` の動作が単語単位ではなく文字単位で選択になって
+  しまっていたのを修正
+	- 文字単位での選択は `enable_insert_char_separator` という設定で出来るように
+	  しました
+
+2.3.0 : 2015/03/21
 ------------------
 #### 追加機能
-- 漢字の二と間違えてカタカナのニを使っていそうなのを漢字に変換する機能を、設定
-  でON/OFF出来るようにしました
-	+ setting.ini の enable_kana_ni_to_kanji_ni を設定することで変更が可能です
-	+ また、変換した場合は調査結果に記録されるようになります
-- `update.convert-only-new-arrival` オプションが追加されました
-	+ 新着時のみ変換を実行する `update` コマンドの `--convert-only-new-arrival`
-	  を `setting` コマンドでも設定出来るようにするためのものです
-	+ `narou s update.convert-only-new-arrival=true` で設定出来ます
+- Kindle端末で単語の選択を出来るようにするために、小説別変換設定に
+  `enable_insert_word_separator` オプションが追加されました
+	+ このオプションを使うためには `narou init` を実行して AozoraEpub3 の設定を
+	  修正する必要があります
+	+ 各小説の setting.ini 内に `enable_insert_word_separator=true` と追加で書き
+	  込むか、 `narou s force.enable_insert_word_separator=true` とコマンドを打ち
+	  込むことで有効に出来ます。（WEB UI で設定すると楽です）
+	+ このオプションは、Kindle端末で単語が選択出来ない問題に対応するものです。
+	  device が kindle の時のみ使用可能です。また、Send to Kindle で mobi を azw3
+	  に変換する場合は単語選択は可能なので、設定する必要はありません
 
 #### Bug Fix
-- アップデートのログ保存時に文字エンコーディングを指定するようにした
-- Linux で `web` コマンド実行時にエラーが出ていたのを修正
-- カタカナのニを漢字の二に変換する対象を調整
-- Koboで前書き・後書きのレイアウトが崩れないように調整
+- ハーメルンの仕様変更に対応しました
 
 
 narou コマンドのインストール or アップデートが完了しました。

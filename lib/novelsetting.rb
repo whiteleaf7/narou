@@ -345,7 +345,13 @@ class NovelSetting
       name: "enable_insert_word_separator",
       type: :boolean,
       value: false,
-      help: "単語選択がうまく出来るようにダミーの区切りデータを挿入する（Kindle専用）"
+      help: "単語選択がしやすいように単語単位の区切りデータを挿入する（Kindle専用）"
+    },
+    {
+      name: "enable_insert_char_separator",
+      type: :boolean,
+      value: false,
+      help: "文字選択がしやすいように１文字ずつ区切りデータを挿入する（Kindle専用。enable_insert_word_separatorが優先される）"
     },
   ]
 end
