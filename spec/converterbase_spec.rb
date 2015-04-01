@@ -150,6 +150,21 @@ opqrstu
                "「あいう」、「えお」").to eq \
                "「［＃zws］あいう［＃zws］」、「［＃zws］えお［＃zws］」"
       end
+
+      it "ルビは除外" do
+        expect(@converter.insert_word_separator \
+               "これは｜漢字《かんじ》です").to eq \
+               "これは［＃zws］｜漢字《かんじ》［＃zws］です［＃zws］"
+        expect(@converter.insert_word_separator \
+               "俺の妹がこんなに｜可愛い《かわいい》わけがない").to eq \
+               "俺［＃zws］の［＃zws］妹［＃zws］がこんなに［＃zws］｜可愛い《かわいい》［＃zws］わけがない［＃zws］"
+      end
+
+      it "外字注記は連続させる" do
+        expect(@converter.insert_word_separator \
+               "失われし楽園※［＃始め二重山括弧］パラダイスロスト※［＃終わり二重山括弧］!!").to eq \
+               "失［＃zws］われし［＃zws］楽園［＃zws］※［＃始め二重山括弧］［＃zws］パラダイスロスト［＃zws］※［＃終わり二重山括弧］!!"
+      end
     end
 
     describe "文字単位で区切る" do
@@ -157,6 +172,18 @@ opqrstu
         expect(@converter.insert_char_separator \
                "今日もいい天気").to eq \
                "今［＃zws］日［＃zws］も［＃zws］い［＃zws］い［＃zws］天［＃zws］気［＃zws］"
+      end
+
+      it "連続させないとまずいものは連続させる" do
+        expect(@converter.insert_char_separator \
+               "――何ということでしょう……。").to eq \
+               "――［＃zws］何［＃zws］と［＃zws］い［＃zws］う［＃zws］こ［＃zws］と［＃zws］で［＃zws］し［＃zws］ょ［＃zws］う［＃zws］……［＃zws］。［＃zws］"
+      end
+
+      it "外字注記は連続させる" do
+        expect(@converter.insert_char_separator \
+               "失われし楽園※［＃始め二重山括弧］パラダイスロスト※［＃終わり二重山括弧］!!").to eq \
+               "失［＃zws］わ［＃zws］れ［＃zws］し［＃zws］楽［＃zws］園［＃zws］※［＃始め二重山括弧］［＃zws］パ［＃zws］ラ［＃zws］ダ［＃zws］イ［＃zws］ス［＃zws］ロ［＃zws］ス［＃zws］ト［＃zws］※［＃終わり二重山括弧］!!"
       end
     end
   end

@@ -32,31 +32,10 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 79}
 
-2.3.1 : 2015/03/24
+2.3.2 : 2015/04/01
 ------------------
 #### Bug Fix
-- `enable_insert_word_separator` の動作が単語単位ではなく文字単位で選択になって
-  しまっていたのを修正
-	- 文字単位での選択は `enable_insert_char_separator` という設定で出来るように
-	  しました
-- 漢数字変換を無効にした場合に章見出しの自動インデント機能が壊れる問題を修正
-
-2.3.0 : 2015/03/21
-------------------
-#### 追加機能
-- Kindle端末で単語の選択を出来るようにするために、小説別変換設定に
-  `enable_insert_word_separator` オプションが追加されました
-	+ このオプションを使うためには `narou init` を実行して AozoraEpub3 の設定を
-	  修正する必要があります
-	+ 各小説の setting.ini 内に `enable_insert_word_separator=true` と追加で書き
-	  込むか、 `narou s force.enable_insert_word_separator=true` とコマンドを打ち
-	  込むことで有効に出来ます。（WEB UI で設定すると楽です）
-	+ このオプションは、Kindle端末で単語が選択出来ない問題に対応するものです。
-	  device が kindle の時のみ使用可能です。また、Send to Kindle で mobi を azw3
-	  に変換する場合は単語選択は可能なので、設定する必要はありません
-
-#### Bug Fix
-- ハーメルンの仕様変更に対応しました
+- `enable_insert_char_separator` でルビ及び外字注記が壊れる問題を修正
 
 
 narou コマンドのインストール or アップデートが完了しました。

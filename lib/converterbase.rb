@@ -1157,6 +1157,8 @@ class ConverterBase
     while char = ss.getch
       symbol = false
       case char
+      when "｜"
+        ss.scan(/.+?》/)
       when "［"
         if ss.scan(/^＃.+?］/)
           buffer << "［#{ss.matched}"
@@ -1195,8 +1197,29 @@ class ConverterBase
   def insert_char_separator(str)
     buffer = ""
     ss = StringScanner.new(str)
+    before_symbol = false
     while char = ss.getch
-      buffer << "#{char}#{WORD_SEPARATOR}"
+      symbol = false
+      case char
+      when "｜"
+        ss.scan(/.+?》/)
+      when "［"
+        if ss.scan(/^＃.+?］/)
+          buffer << "［#{ss.matched}"
+          next
+        end
+        symbol = true
+      when /[―…!?！？※]/
+        symbol = true
+      end
+      if before_symbol && !symbol
+        buffer << WORD_SEPARATOR
+      end
+      buffer << char
+      unless symbol
+        buffer << WORD_SEPARATOR
+      end
+      before_symbol = symbol
     end
     buffer
   end
