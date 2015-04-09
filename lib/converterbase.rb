@@ -892,7 +892,7 @@ class ConverterBase
     when is_sesame?(m1, m2, last_char)
       sesame(m1)
     when m1.include?("｜")
-      "#{m1.sub(/｜([^｜]*)$/, "［＃ルビ用縦線］\\1")}《#{m2}》"
+      "#{m1.sub(/｜([^｜]*)$/, "［＃ルビ用縦線］\\1")}《#{ruby_youon_to_big(m2)}》"
     when object_of_ruby?(last_char)
       if openclose_symbols[0] == "≪" && m2 !~ /^#{AUTO_RUBY_CHARACTERS}$/
         # 《 》タイプのルビであっても、｜が存在しない場合の自動ルビ化対象はひらがな等だけである

@@ -187,5 +187,41 @@ opqrstu
       end
     end
   end
+
+  describe "#to_ruby" do
+    def to_ruby(match, m1, m2, open_close)
+      @converter.to_ruby(match, m1, m2, open_close).gsub("［＃ルビ用縦線］", "｜")
+    end
+
+    describe "拗音の巨大化チェック" do
+      before do
+        @converter.instance_variable_get(:@setting).enable_ruby_youon_to_big = true
+      end
+
+      it "大きくなるべき" do
+        expect(to_ruby( \
+               "ここは東京", "ここは東京", "とうきょう", ["（", "）"])).to eq \
+               "ここは｜東京《とうきよう》"
+      end
+
+      it "大きくなるべき" do
+        expect(to_ruby( \
+               "ここは｜東京", "ここは｜東京", "とうきょう", ["（", "）"])).to eq \
+               "ここは｜東京《とうきよう》"
+      end
+
+      it "大きくなるべき" do
+        expect(to_ruby( \
+               "ここは東京", "ここは東京", "トウキョウ", ["（", "）"])).to eq \
+               "ここは｜東京《トウキヨウ》"
+      end
+
+      it "大きくなるべき" do
+        expect(to_ruby( \
+               "ここは｜東京", "ここは｜東京", "トウキョウ", ["（", "）"])).to eq \
+               "ここは｜東京《トウキヨウ》"
+      end
+    end
+  end
 end
 
