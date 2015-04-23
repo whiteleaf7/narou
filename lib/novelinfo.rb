@@ -8,6 +8,7 @@ require "time"
 require_relative "html"
 
 class NovelInfo
+  REFRESH_INTERVAL = 10 * 60   # キャッシュを捨てて再取得するまでの時間(s)
   @@novel_info_parameters = {}
 
   def self.load(setting)
@@ -24,7 +25,13 @@ class NovelInfo
   def parse_novel_info
     info_url = @setting["novel_info_url"] or return nil
     result = @@novel_info_parameters[@setting["name"]][@ncode] ||= {}
-    return result unless result.empty?
+    unless result.empty?
+      # WEB UI でプロセスが常駐している間に小説情報（タイトルやあらすじ等）が
+      # 変更される場合があるので、一定時間過ぎたら再取得をする必要がある
+      if Time.now < result["last_load_time"] + REFRESH_INTERVAL
+        return result   # まだ一定時間過ぎていないのでキャッシュを返す
+      end
+    end
     of = "t-nt-ga-s-gf-nu-gl-w"
     request_output_parameters = of.split("-")
     info_source = ""
@@ -32,6 +39,7 @@ class NovelInfo
       info_source = Helper.pretreatment_source(fp.read, @setting["encoding"])
     end
     @setting.multi_match(info_source, *request_output_parameters)
+    result["last_load_time"] = Time.now
     result["title"] = @setting["title"]
     novel_status = @setting["novel_type_string"][@setting["novel_type"]] || 1
     result["end"] = novel_status == 3
