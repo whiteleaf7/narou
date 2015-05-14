@@ -403,7 +403,8 @@ class Downloader
     id_and_title = "#{@id}　#{@title}"
 
     return_status =
-      if update_subtitles.size > 0
+      case
+      when update_subtitles.size > 0
         @cache_dir = create_cache_dir if old_toc.length > 0
         begin
           sections_download_and_save(update_subtitles)
@@ -417,12 +418,17 @@ class Downloader
         end
         update_database
         :ok
-      elsif old_toc["subtitles"].size > latest_toc["subtitles"].size
+      when old_toc["subtitles"].size > latest_toc["subtitles"].size
         # 削除された節がある（かつ更新がない）場合
         puts "#{id_and_title} は一部の話が削除されています"
         :ok
-      elsif old_toc["story"] != latest_toc["story"]
-        # あらすじだけ更新されている場合
+      when old_toc["title"] != latest_toc["title"]
+        # タイトルが更新されている場合
+        puts "#{id_and_title} のタイトルが更新されています"
+        update_database
+        :ok
+      when old_toc["story"] != latest_toc["story"]
+        # あらすじが更新されている場合
         puts "#{id_and_title} のあらすじが更新されています"
         :ok
       else
