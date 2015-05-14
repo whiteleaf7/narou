@@ -1175,6 +1175,10 @@ class ConverterBase
         ss.scan(/[Ａ-Ｚａ-ｚA-Za-z]+/)
       when /[一-龥朗-鶴]/
         ss.scan(/[一-龥朗-鶴]+/)
+      when /[〔「『\(（【〈《≪〝]/
+        buffer << char
+        before_symbol = false
+        next
       else
         symbol = true
       end

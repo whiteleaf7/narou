@@ -124,7 +124,7 @@ opqrstu
       it do
         expect(@converter.insert_word_separator \
                "［＃二分アキ］「注釈内は区切らない」").to eq \
-               "［＃二分アキ］「［＃zws］注釈内［＃zws］は［＃zws］区切［＃zws］らない［＃zws］」"
+               "［＃二分アキ］「注釈内［＃zws］は［＃zws］区切［＃zws］らない［＃zws］」"
       end
 
       it do
@@ -148,7 +148,7 @@ opqrstu
       it do
         expect(@converter.insert_word_separator \
                "「あいう」、「えお」").to eq \
-               "「［＃zws］あいう［＃zws］」、「［＃zws］えお［＃zws］」"
+               "「あいう［＃zws］」、「えお［＃zws］」"
       end
 
       it "ルビは除外" do
@@ -164,6 +164,13 @@ opqrstu
         expect(@converter.insert_word_separator \
                "失われし楽園※［＃始め二重山括弧］パラダイスロスト※［＃終わり二重山括弧］!!").to eq \
                "失［＃zws］われし［＃zws］楽園［＃zws］※［＃始め二重山括弧］［＃zws］パラダイスロスト［＃zws］※［＃終わり二重山括弧］!!"
+      end
+
+      # zws があるせいで禁則処理が正常に働かないための対応
+      it "開きカッコの直後にzwsは挿入しない" do
+        expect(@converter.insert_word_separator \
+               "そっちの『鈴』と一緒に入っていた").to eq \
+               "そっちの［＃zws］『鈴［＃zws］』［＃zws］と［＃zws］一緒［＃zws］に［＃zws］入［＃zws］っていた［＃zws］"
       end
     end
 
