@@ -7,3 +7,6 @@ whiteleaf
 　単語分割のテスト。
 
 「隣の客はよく柿食う客だ」
+
+
+http://www.google.com/

@@ -1170,6 +1170,12 @@ class ConverterBase
           next
         end
         symbol = true
+      when "<"
+        if ss.scan(/.+?>/)
+          buffer << "<#{ss.matched}"
+          next
+        end
+        symbol = true
       when /[\d０-９]/
         ss.scan(/[\d０-９]+/)
       when /[ぁ-んゝゞ]/
@@ -1215,6 +1221,12 @@ class ConverterBase
       when "［"
         if ss.scan(/^＃.+?］/)
           buffer << "［#{ss.matched}"
+          next
+        end
+        symbol = true
+      when "<"
+        if ss.scan(/.+?>/)
+          buffer << "<#{ss.matched}"
           next
         end
         symbol = true
