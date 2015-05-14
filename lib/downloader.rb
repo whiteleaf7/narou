@@ -703,7 +703,7 @@ class Downloader
       "subtitles" => subtitles
     }
     toc_objects
-  rescue OpenURI::HTTPError => e
+  rescue OpenURI::HTTPError, Errno::ECONNRESET => e
     if e.message.include?("404")
       error "小説が削除されているか非公開な可能性があります"
       if @@database.novel_exists?(@id)
