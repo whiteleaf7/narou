@@ -7,7 +7,7 @@ require_relative "../database"
 
 module Command
   class List < CommandBase
-    NEW_ARRIVALS_LIMIT = 6 * 60 * 60   # 更新してから何秒までを新着色にするか
+    ANNOTATION_COLOR_TIME_LIMIT = 6 * 60 * 60   # 更新してから何秒まで色を変更するか
 
     # MEMO: 0 は昔の小説を凍結したままな場合、novel_type が設定されていないので、
     #       nil.to_i → 0 という互換性維持のため
@@ -166,10 +166,13 @@ module Command
         selected_lines[id] = [
           disp_id,
           novel["last_update"].strftime("%y/%m/%d").tap { |s|
-            if novel["new_arrivals_date"] && novel["new_arrivals_date"] + NEW_ARRIVALS_LIMIT >= now
+            new_arrivals_date = novel["new_arrivals_date"]
+            last_update = novel["last_update"]
+            if new_arrivals_date && new_arrivals_date >= last_update \
+               && new_arrivals_date + ANNOTATION_COLOR_TIME_LIMIT >= now
               # 新着表示色
               s.replace "<bold><magenta>#{s}</magenta></bold>"
-            elsif s == today
+            elsif last_update + ANNOTATION_COLOR_TIME_LIMIT >= now
               # 更新だけあった色
               s.replace "<bold><green>#{s}</green></bold>"
             end
