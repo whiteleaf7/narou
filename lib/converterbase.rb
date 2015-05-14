@@ -1240,7 +1240,7 @@ class ConverterBase
     (io = before_convert(io)).rewind
     (io = convert_main(io)).rewind
     (io = after_convert(io)).rewind
-    return insert_separator_for_selection(io.read)
+    return insert_separator_for_selection(replace_by_replace_txt(io.read))
   end
 
   #
@@ -1343,9 +1343,11 @@ class ConverterBase
   # replace.txt により単純置換
   #
   def replace_by_replace_txt(text)
+    result = text.dup
     @setting.replace_pattern.each do |pattern|
       src, dst = pattern
-      text.gsub!(src, dst)
+      result.gsub!(src, dst)
     end
+    result
   end
 end

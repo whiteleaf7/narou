@@ -1,0 +1,9 @@
+test_insert_separator
+whiteleaf
+
+［＃改ページ］
+［＃３字下げ］［＃中見出し］［＃zws］単語分割［＃zws］の［＃zws］テスト［＃zws］［＃中見出し終わり］
+
+
+　［＃zws］単語分割［＃zws］の［＃zws］テスト［＃zws］。
+［＃二分アキ］「隣［＃zws］の［＃zws］客［＃zws］はよく［＃zws］柿食［＃zws］う［＃zws］客［＃zws］だ［＃zws］」

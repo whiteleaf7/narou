@@ -1,0 +1,9 @@
+test_insert_separator
+whiteleaf
+
+［＃改ページ］
+単語分割のテスト
+
+　単語分割のテスト。
+
+「隣の客はよく柿食う客だ」

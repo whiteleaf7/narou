@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2014-09-27 00:52:31 +0900
+# auto generated at 2015-05-15 01:05:21 +0900
 
 Encoding.default_external = Encoding::UTF_8
 
@@ -73,6 +73,14 @@ describe "convert" do
 
   it "horizontal_ellipsis/test_horizontal_ellipsis.txt" do
     check_answer("horizontal_ellipsis/test_horizontal_ellipsis.txt")
+  end
+
+  it "insert_separator/test_insert_separator.txt" do
+    check_answer("insert_separator/test_insert_separator.txt")
+  end
+
+  it "insert_separator_and_replace_txt/test_insert_separator_and_replace_txt.txt" do
+    check_answer("insert_separator_and_replace_txt/test_insert_separator_and_replace_txt.txt")
   end
 
   it "kanji_num/test_kanji_num.txt" do

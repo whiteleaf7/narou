@@ -382,7 +382,6 @@ class NovelConverter
     end
 
     @use_dakuten_font = conv.use_dakuten_font
-    conv.replace_by_replace_txt(result)
 
     inspect_novel(result)
 

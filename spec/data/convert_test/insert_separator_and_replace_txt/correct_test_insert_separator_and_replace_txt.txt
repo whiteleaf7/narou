@@ -1,0 +1,11 @@
+test_insert_separator_and_replace_txt
+whiteleaf
+
+［＃改ページ］
+［＃３字下げ］［＃中見出し］［＃zws］単語分割［＃zws］をしつつ［＃zws］置換［＃zws］する［＃zws］テスト［＃zws］［＃中見出し終わり］
+
+
+　［＃zws］隣［＃zws］の［＃zws］客［＃zws］はよく［＃zws］カキ［＃zws］食［＃zws］う［＃zws］客［＃zws］だ［＃zws］。
+　［＃zws］さんぞうほうしは［＃zws］天竺［＃zws］を［＃zws］目指［＃zws］した［＃zws］。［＃zws］仲間［＃zws］としてそんごくう［＃zws］、［＃zws］さごじょう［＃zws］、［＃zws］チョハッカイ［＃zws］という［＃zws］妖怪［＃zws］を［＃zws］従［＃zws］えていた［＃zws］。
+
+　［＃zws］すでに［＃zws］置換済［＃zws］みの［＃zws］文章［＃zws］
