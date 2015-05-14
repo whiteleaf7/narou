@@ -640,7 +640,12 @@ $console-color: white;
       padding: 7px;
     }
     input {
-      width: 250px;
+      @media (min-width: 768px) {
+        width: 250px;
+      }
+      @media (max-width: 767px) {
+        width: 150px;
+      }
     }
   }
 }
