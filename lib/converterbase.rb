@@ -1154,6 +1154,11 @@ class ConverterBase
     buffer = ""
     ss = StringScanner.new(str)
     before_symbol = false
+
+    if @text_type == "textfile"
+      buffer << ss.scan(/(.+\n){2}/)
+    end
+
     while char = ss.getch
       symbol = false
       case char
