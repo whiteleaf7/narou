@@ -56,6 +56,9 @@ class NovelInfo
     %w(general_firstup novelupdated_at general_lastup).each do |elm|
       result[elm] = date_string_to_time(@setting[elm])
     end
+    result["novelupdated_at"] ||= result["general_firstup"]
+    result["general_lastup"] ||= result["novelupdated_at"]
+
     result
   end
 

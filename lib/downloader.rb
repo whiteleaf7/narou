@@ -545,6 +545,7 @@ class Downloader
   # データベース更新
   #
   def update_database
+    info = @setting["info"] || {}
     data = {
       "id" => @id,
       "author" => @setting["author"],
@@ -557,6 +558,9 @@ class Downloader
       "last_update" => Time.now,
       "new_arrivals_date" => (@new_arrivals ? Time.now : @@database[@id]["new_arrivals_date"]),
       "use_subdirectory" => @download_use_subdirectory,
+      "general_firstup" => info["general_firstup"],
+      "novelupdated_at" => info["novelupdated_at"],
+      "general_lastup" => info["general_lastup"],
     }
     if @@database[@id]
       @@database[@id].merge!(data)
@@ -672,7 +676,7 @@ class Downloader
     #if @setting["narou_api_url"]
     if false
       # なろうAPIの出力がおかしいので直るまで使用中止
-      info = Narou::API.new(@setting, "t-s-gf-nu-w")
+      info = Narou::API.new(@setting, "t-s-gf-gl-nu-w")
     else
       info = NovelInfo.load(@setting)
     end
@@ -687,6 +691,8 @@ class Downloader
       raise DownloaderHTTP404Error unless @setting.matched?("title")
       @setting["story"] = HTML.new(@setting["story"]).to_aozora
     end
+    @setting["info"] = info
+
     @setting["title"] = get_title
     if series_novel?
       # 連載小説

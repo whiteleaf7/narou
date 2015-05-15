@@ -203,6 +203,55 @@ table#novel-list {
     color: green;
     content: " 更新";
   }
+
+  /* 最新話更新日 +/
+  .general-lastup {
+  }
+  /* 60分以内 */
+  .gl-60minutes {
+    &::after {
+      content: "1h";
+      background-color: lighten(red, 23%);
+
+      position: relative;
+      left: 4px;
+      padding: 1px 2px 1px 2px;
+      font-size: 90%;
+      color: white;
+      border-radius: 4px;
+    }
+  }
+  /* 6時間以内 */
+  .gl-6hour {
+    &::after {
+      content: "6h";
+      background-color: #5cb85c;
+
+      position: relative;
+      left: 4px;
+      padding: 1px 2px 1px 2px;
+      font-size: 90%;
+      color: white;
+      border-radius: 4px;
+    }
+  }
+  /* 24時間以内 */
+  .gl-24hour {
+    &::after {
+      content: "24h";
+      background-color: lighten(blue, 30%);
+
+      position: relative;
+      left: 4px;
+      padding: 1px 2px 1px 2px;
+      font-size: 90%;
+      color: white;
+      border-radius: 4px;
+    }
+  }
+  /* 1日を過ぎている */
+  .gl-day {
+  }
 }
 
 .context-menu-target-cover {

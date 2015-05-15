@@ -62,7 +62,7 @@ gf: 掲載日</td><td>(?<general_firstup>.+?)</td>
 nu: 最終投稿日</td><td>(?<novelupdated_at>.+?)</td>
 
 # general_lastup 最終掲載日
-gl: 最終投稿日</td><td>(?<novelupdated_at>.+?)</td>
+gl: 最終投稿日</td><td>(?<general_lastup>.+?)</td>
 
 # writer 作者名
 w: 作者</td><td bgcolor=\#FFFFFF>(?:<a href=.+?>)?(?<writer>.+?)(?:</a>)?</td>
