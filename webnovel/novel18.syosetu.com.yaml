@@ -64,7 +64,7 @@ nu: |-
   )?(?<novelupdated_at>.+?)(?:
   )?</td>
 
-# general_lastup 最終掲載日
+# general_lastup 最終話掲載日
 gl: |-
   <th>最終話掲載日</th>
   <td>(?<general_lastup>.+?)</td>
