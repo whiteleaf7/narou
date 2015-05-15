@@ -370,7 +370,7 @@ class Narou::AppServer < Sinatra::Base
           title: escape_html(data["title"]),
           author: escape_html(data["author"]),
           sitename: data["sitename"],
-          toc_url: %!<a href="#{escape_html(data["toc_url"])}" target="_blank" ! +
+          toc_url: %!<a href="#{escape_html(data["toc_url"])}" class="btn btn-default btn-xs" target="_blank" ! +
                    %!data-toggle="tooltip" data-placement="top" title="#{data["toc_url"]}">! +
                    %!<span class="glyphicon glyphicon-link"></span></a>!,
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
@@ -380,9 +380,10 @@ class Narou::AppServer < Sinatra::Base
             tags.include?("end") ? "完結" : nil,
             tags.include?("404") ? "削除" : nil,
           ].compact.join(", "),
-          download: %!<a href="/novels/#{id}/download"><span class="glyphicon glyphicon-book"></span></a>!,
+          download: %!<a href="/novels/#{id}/download" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-book"></span></a>!,
           frozen: Narou.novel_frozen?(id),
-          new_arrivals_date: data["new_arrivals_date"] ? data["new_arrivals_date"].to_i : nil
+          new_arrivals_date: data["new_arrivals_date"].tap { |m| break m.to_i if m },
+          general_lastup: data["general_lastup"].tap { |m| break m.to_i if m }
         }
       end
     json json_objects

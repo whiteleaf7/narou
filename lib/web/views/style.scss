@@ -188,9 +188,11 @@ table#novel-list {
       @include dataTableSortingHeader("/resources/sort_desc.png");
     }
   }
+  /*
   a {
     display: block;
   }
+  */
 
   span.new-arrivals:after {
     color: magenta;
