@@ -501,9 +501,7 @@ class Narou::AppServer < Sinatra::Base
 
   post "/api/folder" do
     ids = select_valid_novel_ids(params["ids"]) or pass
-    Narou::Worker.push do
-      CommandLine.run!(["folder", ids])
-    end
+    CommandLine.run!(["folder", ids])
   end
 
   post "/api/backup" do
