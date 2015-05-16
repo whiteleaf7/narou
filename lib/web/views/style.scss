@@ -249,10 +249,10 @@ table#novel-list {
       border-radius: 4px;
     }
   }
-  /* 7日以内 */
-  .gl-7days {
+  /* 1週間以内 */
+  .gl-1week {
     &::after {
-      content: "7d";
+      content: "1w";
       color: darken(gray, 15%);
       background-color: lighten(gray, 35%);
 
@@ -263,8 +263,8 @@ table#novel-list {
       border-radius: 4px;
     }
   }
-  /* 1日を過ぎている */
-  .gl-day {
+  /* 上記の日付以上を過ぎている */
+  .gl-other {
   }
 }
 
