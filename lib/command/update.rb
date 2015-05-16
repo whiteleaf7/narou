@@ -49,6 +49,10 @@ module Command
         view_log
         exit 0
       }
+      @opt.on("--gl", "データベースに最新話掲載日を反映させる") {
+        update_general_lastup
+        exit 0
+      }
     end
 
     def execute(argv)
@@ -150,6 +154,31 @@ module Command
       (list[LOG_NUM_LIMIT..-1] || []).each do |path|
         File.delete(path)
       end
+    end
+
+    def update_general_lastup
+      database = Database.instance
+      progressbar = ProgressBar.new(database.get_object.size - 1)
+      puts "最新話掲載日を更新しています..."
+      database.each.with_index do |(id, data), i|
+        progressbar.output(i)
+        setting =  Downloader.get_sitesetting_by_target(id)
+        begin
+          info = NovelInfo.load(setting)
+        rescue OpenURI::HTTPError, Errno::ECONNRESET => e
+          next
+        end
+        next unless info
+        next unless info["title"]
+        data = {
+          "general_firstup" => info["general_firstup"],
+          "novelupdated_at" => info["novelupdated_at"],
+          "general_lastup" => info["general_lastup"]
+        }
+        database[id].merge!(data)
+      end
+      database.save_database
+      puts "\n更新が完了しました"
     end
   end
 end
