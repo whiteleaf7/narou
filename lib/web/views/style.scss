@@ -249,6 +249,20 @@ table#novel-list {
       border-radius: 4px;
     }
   }
+  /* 7日以内 */
+  .gl-7days {
+    &::after {
+      content: "7d";
+      color: darken(gray, 15%);
+      background-color: lighten(gray, 35%);
+
+      position: relative;
+      left: 4px;
+      padding: 1px 2px 1px 2px;
+      font-size: 90%;
+      border-radius: 4px;
+    }
+  }
   /* 1日を過ぎている */
   .gl-day {
   }
