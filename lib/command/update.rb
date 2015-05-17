@@ -156,12 +156,15 @@ module Command
       end
     end
 
-    def update_general_lastup
+    def update_general_lastup(through_frozen_novel: true)
       database = Database.instance
       progressbar = ProgressBar.new(database.get_object.size - 1)
       puts "最新話掲載日を更新しています..."
       database.each.with_index do |(id, data), i|
         progressbar.output(i)
+        if through_frozen_novel
+          next if Narou.novel_frozen?(id)
+        end
         setting =  Downloader.get_sitesetting_by_target(id)
         begin
           info = NovelInfo.load(setting)
@@ -188,7 +191,8 @@ module Command
         setting.clear
       end
       database.save_database
-      puts "\n更新が完了しました"
+      progressbar.clear
+      puts "更新が完了しました"
     end
 
     # オンラインの目次からgeneral_lastupを取得する
