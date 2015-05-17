@@ -573,6 +573,13 @@ class Narou::AppServer < Sinatra::Base
     json res
   end
 
+  post "/api/update_general_lastup" do
+    Narou::Worker.push do
+      CommandLine.run!(["update", "--gl"])
+    end
+  end
+
+
   get "/js/widget.js" do
     if %w(download).include?(params["mode"])
       content_type :js

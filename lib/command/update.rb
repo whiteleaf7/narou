@@ -158,8 +158,8 @@ module Command
 
     def update_general_lastup(through_frozen_novel: true)
       database = Database.instance
-      progressbar = ProgressBar.new(database.get_object.size - 1)
       puts "最新話掲載日を更新しています..."
+      progressbar = ProgressBar.new(database.get_object.size - 1)
       database.each.with_index do |(id, data), i|
         progressbar.output(i)
         if through_frozen_novel
