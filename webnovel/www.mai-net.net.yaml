@@ -22,10 +22,10 @@ toc_url: \\k<top_url>/bbs/sst/sst.php?act=dump&cate=\\k<category>&all=\\k<ncode>
 chapter: ""
 subtitles: |-
   <td width="0%" style="font-size:60%">\[(?<index>\d+?)\]</td><td width="0%" style="font-size:60%"><b>
-  <a href="(?<href>.+?)#kiji">(?<subtitle>.+?)</a></b></td><td width="0%" style="font-size:60%">\[(.+?)\]</td><td width="0%" style="font-size:60%">\((?<subdate>.+?)\)</td>
+  <a href="(?<href>.+?)#kiji">(?<subtitle>.+?)</a></b></td><td width="0%" style="font-size:60%">\[(.+?)\]</td><td width="0%" style="font-size:60%">\((?<subupdate>.+?)\)</td>
 
-# subupdate がない場合、更新チェックは subdate を使うようになる
-subupdate: no
+# subdate(初投稿日)がない場合、一番最初のsubupdateで代用する
+subdate: no
 
 error_message: エラー！恐らく存在しないスレッドを指定しています
 

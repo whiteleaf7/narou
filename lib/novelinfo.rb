@@ -35,8 +35,10 @@ class NovelInfo
     of = "t-nt-ga-s-gf-nu-gl-w"
     request_output_parameters = of.split("-")
     info_source = ""
-    open(info_url) do |fp|
+    cookie = @setting["cookie"] || ""
+    open(info_url, "Cookie" => cookie) do |fp|
       info_source = Helper.pretreatment_source(fp.read, @setting["encoding"])
+      raise Downloader::DownloaderNotFoundError if Downloader.detect_error_message(@setting, info_source)
     end
     @setting.multi_match(info_source, *request_output_parameters)
     result["last_load_time"] = Time.now
@@ -54,15 +56,11 @@ class NovelInfo
     result["story"] = HTML.new(@setting["story"]).to_aozora
     result["writer"] = @setting["writer"]
     %w(general_firstup novelupdated_at general_lastup).each do |elm|
-      result[elm] = date_string_to_time(@setting[elm])
+      result[elm] = Helper.date_string_to_time(@setting[elm])
     end
     result["novelupdated_at"] ||= result["general_firstup"]
     result["general_lastup"] ||= result["novelupdated_at"]
 
     result
-  end
-
-  def date_string_to_time(date)
-    date ? Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒", "///:::")) : nil
   end
 end

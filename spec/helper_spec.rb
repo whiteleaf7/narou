@@ -69,4 +69,14 @@ describe Helper do
       it { expect(Helper.string_cast_to_type("string", :string)).to eq "string" }
     end
   end
+
+  describe ".date_string_to_time" do
+    it do
+      expect(Helper.date_string_to_time("2014年03月02日(日) 07:39")).to eq(Time.parse("2014/3/2 07:39"))
+    end
+
+    it do
+      expect(Helper.date_string_to_time("2012年 11月22日 17時00分")).to eq(Time.parse("2012/11/22 17:00"))
+    end
+  end
 end

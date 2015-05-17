@@ -361,11 +361,16 @@ class Downloader
       ).freeze
   end
 
+  def load_toc_file
+    load_novel_data(TOC_FILE_NAME)
+  end
+
   #
   # ダウンロード処理本体
   #
   def run_download
-    latest_toc = get_latest_table_of_contents
+    old_toc = @new_novel ? nil : load_toc_file
+    latest_toc = get_latest_table_of_contents(old_toc)
     unless latest_toc
       error @setting["toc_url"] + " の目次データが取得出来ませんでした"
       return :failed
@@ -376,7 +381,6 @@ class Downloader
         return :canceled
       end
     end
-    old_toc = @new_novel ? nil : load_novel_data(TOC_FILE_NAME)
     unless old_toc
       init_novel_dir
       old_toc = {}
@@ -541,6 +545,42 @@ class Downloader
     FileUtils.remove_entry_secure(@cache_dir, true) if @cache_dir
   end
 
+  def __search_latest_update_time(key, subtitles)
+    latest = Time.new(0)
+    subtitles.each do |subtitle|
+      time = Helper.date_string_to_time(subtitle[key])
+      latest = time if latest < time
+    end
+    latest
+  end
+
+  #
+  # 小説が更新された日をTime型で取得
+  #
+  def get_novelupdated_at
+    info = @setting["info"] || {}
+    if info["novelupdated_at"]
+      info["novelupdated_at"]
+    else
+      __search_latest_update_time("subupdate", @setting["subtitles"])
+    end
+  end
+
+  #
+  # 小説の最新掲載日をTime型で取得
+  #
+  # 小説家になろう、ハーメルンは小説情報ページの最終話掲載日などから取得した日付
+  # その他サイトは一番新しい話の投稿日（更新日ではない）
+  #
+  def get_general_lastup
+    info = @setting["info"] || {}
+    if info["general_lastup"]
+      info["general_lastup"]
+    else
+      __search_latest_update_time("subdate", @setting["subtitles"])
+    end
+  end
+
   #
   # データベース更新
   #
@@ -559,8 +599,8 @@ class Downloader
       "new_arrivals_date" => (@new_arrivals ? Time.now : @@database[@id]["new_arrivals_date"]),
       "use_subdirectory" => @download_use_subdirectory,
       "general_firstup" => info["general_firstup"],
-      "novelupdated_at" => info["novelupdated_at"],
-      "general_lastup" => info["general_lastup"],
+      "novelupdated_at" => get_novelupdated_at,
+      "general_lastup" => get_general_lastup,
     }
     if @@database[@id]
       @@database[@id].merge!(data)
@@ -677,7 +717,7 @@ class Downloader
   #
   # 目次データを取得する
   #
-  def get_latest_table_of_contents
+  def get_latest_table_of_contents(old_toc, through_error: false)
     toc_source = Downloader.get_toc_source(@setting)
     return nil unless toc_source
     @setting.multi_match(toc_source, "tcode")
@@ -704,11 +744,13 @@ class Downloader
     @setting["title"] = get_title
     if series_novel?
       # 連載小説
-      subtitles = get_subtitles(toc_source)
+      subtitles = get_subtitles(toc_source, old_toc)
     else
       # 短編小説
       subtitles = create_short_story_subtitles(info)
     end
+    @setting["subtitles"] = subtitles
+
     toc_objects = {
       "title" => get_title,
       "author" => @setting["author"],
@@ -718,6 +760,7 @@ class Downloader
     }
     toc_objects
   rescue OpenURI::HTTPError, Errno::ECONNRESET => e
+    raise if through_error   # エラー処理はしなくていいからそのまま例外を受け取りたい時用
     if e.message.include?("404")
       error "小説が削除されているか非公開な可能性があります"
       if @@database.novel_exists?(@id)
@@ -763,7 +806,7 @@ class Downloader
         next true
       end
       # 更新日チェック
-      # subdate : 初稿投稿日(Arcadiaでは改稿日)
+      # subdate : 初稿投稿日
       # subupdate : 改稿日
       old_subdate = old["subdate"]
       latest_subdate = latest["subdate"]
@@ -826,21 +869,34 @@ class Downloader
   #
   # 各話の情報を取得
   #
-  def get_subtitles(toc_source)
+  def get_subtitles(toc_source, old_toc)
     subtitles = []
     toc_post = toc_source.dup
+    old_subtitles = old_toc ? old_toc["subtitles"] : nil
     loop do
       match_data = @setting.multi_match(toc_post, "subtitles")
       break unless match_data
       toc_post = match_data.post_match
       @setting["subtitle"] = @setting["subtitle"].gsub("\t", "")
+      subdate = @setting["subdate"].tap { |sd|
+        # subdate(初回掲載日)がない場合、最初に取得した時のsubupdateで代用する
+        # subdateが取得出来ないのは暁とArcadia
+        unless sd
+          old_index = old_subtitles ? __search_index_in_subtitles(old_subtitles, @setting["index"]) : nil
+          if !old_index || !old_subtitles[old_index]["subdate"]
+            break @setting["subupdate"]
+          end
+          # || 以降は subupdate を取得していない古い(2.4.0以前)toc.yamlがあるためsubdateを使う
+          break old_subtitles[old_index]["subupdate"] || old_subtitles[old_index]["subdate"]
+        end
+      }
       subtitles << {
         "index" => @setting["index"],
         "href" => @setting["href"],
         "chapter" => @setting["chapter"],
         "subtitle" => @setting["subtitle"].gsub("\n", ""),
         "file_subtitle" => Helper.replace_filename_special_chars(@setting["subtitle"]),
-        "subdate" => @setting["subdate"],
+        "subdate" => subdate,
         "subupdate" => @setting["subupdate"]
       }
     end

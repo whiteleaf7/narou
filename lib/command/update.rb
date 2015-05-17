@@ -166,19 +166,41 @@ module Command
         begin
           info = NovelInfo.load(setting)
         rescue OpenURI::HTTPError, Errno::ECONNRESET => e
+          setting.clear
           next
         end
-        next unless info
-        next unless info["title"]
-        data = {
-          "general_firstup" => info["general_firstup"],
-          "novelupdated_at" => info["novelupdated_at"],
-          "general_lastup" => info["general_lastup"]
-        }
-        database[id].merge!(data)
+        if info
+          dates = {
+            "general_firstup" => info["general_firstup"],
+            "novelupdated_at" => info["novelupdated_at"],
+            "general_lastup" => info["general_lastup"]
+          }
+        else
+          # 小説情報ページがない場合は目次から取得する
+          begin
+            dates = get_latest_dates(setting)
+          rescue OpenURI::HTTPError, Errno::ECONNRESET => e
+            setting.clear
+            next
+          end
+        end
+        database[id].merge!(dates)
+        setting.clear
       end
       database.save_database
       puts "\n更新が完了しました"
+    end
+
+    # オンラインの目次からgeneral_lastupを取得する
+    # ただし、toc.yaml に最新話が存在し、かつsubdateが設定されていたらそれを使う
+    def get_latest_dates(setting)
+      downloader = Downloader.new(setting)
+      old_toc = downloader.load_toc_file
+      latest_toc = downloader.get_latest_table_of_contents(old_toc, through_error: true)
+      {
+        "novelupdated_at" => downloader.get_novelupdated_at,
+        "general_lastup" => downloader.get_general_lastup
+      }
     end
   end
 end

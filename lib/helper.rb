@@ -258,6 +258,13 @@ module Helper
   end
 
   #
+  # 日付形式の文字列をTime型に変換する
+  #
+  def date_string_to_time(date)
+    date ? Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒", "///:::")) : nil
+  end
+
+  #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #
   # response = Helper::AsyncCommand.exec("処理に時間がかかる外部コマンド") do
