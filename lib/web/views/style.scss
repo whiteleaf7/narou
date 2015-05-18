@@ -249,12 +249,26 @@ table#novel-list {
       border-radius: 4px;
     }
   }
+	/* 3日以内 */
+  .gl-3days {
+    &::after {
+      content: "3d";
+      color: darken(gray, 15%);
+      background-color: lighten(mix(gray, blue, 70%), 40%);
+
+      position: relative;
+      left: 4px;
+      padding: 1px 2px 1px 2px;
+      font-size: 90%;
+      border-radius: 4px;
+    }
+  }
   /* 1週間以内 */
   .gl-1week {
     &::after {
       content: "1w";
       color: darken(gray, 15%);
-      background-color: lighten(gray, 35%);
+      background-color: lighten(mix(blue, white, 30%), 50%);
 
       position: relative;
       left: 4px;
