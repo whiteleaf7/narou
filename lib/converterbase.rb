@@ -1036,7 +1036,7 @@ class ConverterBase
         # 見出しの次の行が空行ではない場合空行を追加する
         add_tail = "\n" * (2 - calc_cr_count(rest))
         # 見出しと本文の間には空行を２行挟む
-        "［＃改ページ］\n#{midashi(m1)}\n#{add_tail}"
+        "［＃改ページ］\n\n#{midashi(m1)}\n#{add_tail}"
       end
     end
     # 前書きがある場合は、前書き→見出しの順番を見出し→前書きに入れ替えて置換
