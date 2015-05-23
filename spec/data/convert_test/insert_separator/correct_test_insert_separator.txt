@@ -2,6 +2,7 @@ test_insert_separator
 whiteleaf
 
 ［＃改ページ］
+
 ［＃３字下げ］［＃中見出し］［＃zws］単語分割［＃zws］の［＃zws］テスト［＃zws］［＃中見出し終わり］
 
 

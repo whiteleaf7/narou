@@ -2,6 +2,7 @@ test_auto_join_bracket
 whiteleaf
 
 ［＃改ページ］
+
 ［＃３字下げ］［＃中見出し］カギ括弧連結テスト［＃中見出し終わり］
 
 

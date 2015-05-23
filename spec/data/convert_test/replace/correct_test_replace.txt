@@ -2,6 +2,7 @@ test_replace
 whiteleaf
 
 ［＃改ページ］
+
 ［＃３字下げ］［＃中見出し］replace.txtテスト［＃中見出し終わり］
 
 

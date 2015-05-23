@@ -2,6 +2,7 @@ test_horizontal_ellipsis
 whiteleaf
 
 ［＃改ページ］
+
 ［＃３字下げ］［＃中見出し］三点リーダー化テスト［＃中見出し終わり］
 
 
