@@ -341,9 +341,9 @@ class ConverterBase
   # 半角記号を全角に変換
   #
   def symbols_to_zenkaku(data)
-    data.gsub!(/[#{SINGLE_MINUTE_FAMILY}]([^"\n]+)[#{SINGLE_MINUTE_FAMILY}]/, "〝\\1〟")
+    data.gsub!(/[#{SINGLE_MINUTE_FAMILY}]([^"\n]+?)[#{SINGLE_MINUTE_FAMILY}]/, "〝\\1〟")
     # MEMO: シングルミュートを表示出来るフォントはほとんど無いためダブルにする
-    data.gsub!(/[#{DOUBLE_MINUTE_FAMILY}]([^"\n]+)[#{DOUBLE_MINUTE_FAMILY}]/, "〝\\1〟")
+    data.gsub!(/[#{DOUBLE_MINUTE_FAMILY}]([^"\n]+?)[#{DOUBLE_MINUTE_FAMILY}]/, "〝\\1〟")
     data.tr!("-=+/*《》'\"%$#&!?<>＜＞()|‐,._;:[]",
              "－＝＋／＊≪≫’”％＄＃＆！？〈〉〈〉（）｜－，．＿；：［］")
     data.gsub!("\\", "￥")
