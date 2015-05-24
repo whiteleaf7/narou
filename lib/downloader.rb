@@ -433,7 +433,7 @@ class Downloader
         :ok
       when old_toc["story"] != latest_toc["story"]
         # あらすじが更新されている場合
-        puts "#{id_and_title} のあらすじが更新されています"
+        puts "ID:#{id_and_title} のあらすじが更新されています"
         :ok
       else
         :none
