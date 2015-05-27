@@ -576,6 +576,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/update_general_lastup" do
     Narou::Worker.push do
       CommandLine.run!(["update", "--gl"])
+      @@push_server.send_all(:"table.reload")
     end
   end
 
