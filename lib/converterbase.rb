@@ -886,6 +886,12 @@ class ConverterBase
   def to_ruby(match, m1, m2, openclose_symbols)
     last_char = m1[-1]
     case
+    when m2[0] == " "
+      # 先頭が半角スペースはNG
+      match
+    when m2 =~ / {2,}$/
+      # 末尾の半角スペースが2個以上はNG（1個はOK）
+      match
     when last_char == "｜"
       # 直前に｜がある場合ルビ化は抑制される
       "#{m1[0...-1]}#{openclose_symbols[0]}#{m2}#{openclose_symbols[1]}"
