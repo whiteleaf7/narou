@@ -692,11 +692,11 @@ class Downloader
     source.match(message)
   end
 
-  def self.get_toc_source(setting)
-    toc_url = setting["toc_url"]
+  def get_toc_source
+    toc_url = @setting["toc_url"]
     return nil unless toc_url
     toc_source = ""
-    cookie = setting["cookie"] || ""
+    cookie = @setting["cookie"] || ""
     open(toc_url, "Cookie" => cookie) do |toc_fp|
       if toc_fp.base_uri.to_s != toc_url
         # リダイレクトされた場合。
@@ -704,12 +704,12 @@ class Downloader
         # 目次の定義が微妙に ncode.syosetu.com と違うので、設定を取得し直す
         s = Downloader.get_sitesetting_by_target(toc_fp.base_uri.to_s)
         raise DownloaderNotFoundError unless s   # 非公開や削除等でトップページへリダイレクトされる場合がある
-        setting.clear   # 今まで使っていたのは一旦クリア
-        setting = s
-        toc_url = setting["toc_url"]
+        @setting.clear   # 今まで使っていたのは一旦クリア
+        @setting = s
+        toc_url = @setting["toc_url"]
       end
-      toc_source = Helper.pretreatment_source(toc_fp.read, setting["encoding"])
-      raise DownloaderNotFoundError if detect_error_message(setting, toc_source)
+      toc_source = Helper.pretreatment_source(toc_fp.read, @setting["encoding"])
+      raise DownloaderNotFoundError if Downloader.detect_error_message(@setting, toc_source)
     end
     toc_source
   end
@@ -718,7 +718,7 @@ class Downloader
   # 目次データを取得する
   #
   def get_latest_table_of_contents(old_toc, through_error: false)
-    toc_source = Downloader.get_toc_source(@setting)
+    toc_source = get_toc_source
     return nil unless toc_source
     @setting.multi_match(toc_source, "tcode")
     #if @setting["narou_api_url"]
@@ -849,6 +849,8 @@ class Downloader
             next different_check.call
           end
         end
+        #p latest_subdate, old_subdate
+        #exit
         latest_subdate > old_subdate
       end
     end
