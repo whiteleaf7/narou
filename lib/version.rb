@@ -3,5 +3,5 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-Version = "2.4.1"
+Version = "2.4.2"
 
