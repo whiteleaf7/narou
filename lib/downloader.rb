@@ -844,13 +844,14 @@ class Downloader
         end
         latest_subupdate > old_subupdate
       else
+        # 古いバージョンだと old_subdate が nil なので判定出来ないため
+        next true unless old_subdate
+
         if strong_update
           if __strdate_to_ymd(old_subdate) == latest_section_timestamp_ymd
             next different_check.call
           end
         end
-        #p latest_subdate, old_subdate
-        #exit
         latest_subdate > old_subdate
       end
     end
