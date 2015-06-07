@@ -404,7 +404,7 @@ class Downloader
       end
     end
 
-    id_and_title = "#{@id}　#{@title}"
+    id_and_title = "ID:#{@id}　#{@title}"
 
     return_status =
       case
@@ -433,7 +433,7 @@ class Downloader
         :ok
       when old_toc["story"] != latest_toc["story"]
         # あらすじが更新されている場合
-        puts "ID:#{id_and_title} のあらすじが更新されています"
+        puts "#{id_and_title} のあらすじが更新されています"
         :ok
       else
         :none
@@ -447,7 +447,7 @@ class Downloader
           Command::Tag.execute!([@id, "--add", "end", "--color", "white"])
         end
         msg = old_toc.empty? ? "完結しているようです" : "完結したようです"
-        puts "<cyan>ID:#{id_and_title.escape} は#{msg}</cyan>".termcolor
+        puts "<cyan>#{id_and_title.escape} は#{msg}</cyan>".termcolor
         return_status = :ok
       end
     else
@@ -456,7 +456,7 @@ class Downloader
         $stdout.silence do
           Command::Tag.execute!([@id, "--delete", "end"])
         end
-        puts "<cyan>ID:#{id_and_title.escape} は連載を再開したようです</cyan>".termcolor
+        puts "<cyan>#{id_and_title.escape} は連載を再開したようです</cyan>".termcolor
         return_status = :ok
       end
     end
