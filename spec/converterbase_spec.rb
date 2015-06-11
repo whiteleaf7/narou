@@ -172,6 +172,30 @@ opqrstu
                "そっちの『鈴』と一緒に入っていた").to eq \
                "そっちの［＃zws］『鈴［＃zws］』［＃zws］と［＃zws］一緒［＃zws］に［＃zws］入［＃zws］っていた［＃zws］"
       end
+
+      it "開きカッコの直後にzwsは挿入しない" do
+        expect(@converter.insert_word_separator \
+               "（ほげ）『ふが』").to eq \
+               "（ほげ［＃zws］）『ふが［＃zws］』"
+      end
+
+      it "開きカッコの直後にzwsは挿入しない" do
+        expect(@converter.insert_word_separator \
+               "［ほげ］").to eq \
+               "［ほげ［＃zws］］"
+      end
+
+      it "英語はそのまま" do
+        expect(@converter.insert_word_separator \
+               "トムは言った。「This is a pen」").to eq \
+               "トム［＃zws］は［＃zws］言［＃zws］った［＃zws］。「This is a pen［＃zws］」"
+      end
+
+      it "タグの中ではzwsは挿入しない" do
+        expect(@converter.insert_word_separator \
+               "click <a href=\"http://google.com\">link</a>").to eq \
+               "click ［＃zws］<a href=\"http://google.com\">link［＃zws］</a>"
+      end
     end
 
     describe "文字単位で区切る" do

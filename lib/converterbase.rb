@@ -1171,11 +1171,13 @@ class ConverterBase
       when "｜"
         ss.scan(/.+?》/)
       when "［"
+        buffer << char
         if ss.scan(/^＃.+?］/)
-          buffer << "［#{ss.matched}"
-          next
+          buffer << "#{ss.matched}"
+        else
+          before_symbol = false
         end
-        symbol = true
+        next
       when "<"
         if ss.scan(/.+?>/)
           buffer << "<#{ss.matched}"
@@ -1189,7 +1191,7 @@ class ConverterBase
       when /[ァ-ヶ]/
         ss.scan(/[ァ-ヶー・]+/)
       when /[Ａ-Ｚａ-ｚA-Za-z]/
-        ss.scan(/[Ａ-Ｚａ-ｚA-Za-z]+/)
+        ss.scan(/[Ａ-Ｚａ-ｚA-Za-z ]+/)
       when /[一-龥朗-鶴]/
         ss.scan(/[一-龥朗-鶴]+/)
       when /[〔「『\(（【〈《≪〝]/
@@ -1225,17 +1227,23 @@ class ConverterBase
       when "｜"
         ss.scan(/.+?》/)
       when "［"
+        buffer << char
         if ss.scan(/^＃.+?］/)
-          buffer << "［#{ss.matched}"
-          next
+          buffer << "#{ss.matched}"
+        else
+          before_symbol = false
         end
-        symbol = true
+        next
       when "<"
         if ss.scan(/.+?>/)
           buffer << "<#{ss.matched}"
           next
         end
         symbol = true
+      when /[〔「『\(（【〈《≪〝]/
+        buffer << char
+        before_symbol = false
+        next
       when /[―…!?！？※]/
         symbol = true
       end
