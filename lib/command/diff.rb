@@ -125,6 +125,11 @@ module Command
       str !~ /^\d{4}\.\d{2}\.\d{2}@\d{2}[;.]\d{2}[;.]\d{2}$/
     end
 
+    def version_string_to_time(string)
+      ymd, hms = string.split("@")
+      Helper.date_string_to_time("#{ymd} #{hms.tr(".", ":")}")
+    end
+
     def clean_diff(id)
       cache_root_dir = Downloader.get_cache_root_dir(id)
       print Database.instance.get_data("id", id)["title"] + " の"
@@ -232,24 +237,50 @@ module Command
       temp
     end
 
-    def display_diff_list(id)
+    def get_diff_list(id)
+      list = {
+        id: id,
+        title: Database.instance.get_data("id", id)["title"],
+        list: []
+      }
       cache_list = get_sorted_cache_list(id)
-      print Database.instance.get_data("id", id)["title"] + " の"
-      if cache_list.empty?
-        puts "差分はひとつもありません"
-        return
-      end
-      puts "差分一覧"
+      return list if cache_list.empty?
       cache_list.each.with_index(1) do |cache_path, i|
-        puts "<bold><yellow>#{File.basename(cache_path)}   -#{i}</yellow></bold>".termcolor
+        objects = []
+        version_string = File.basename(cache_path)
+        data = {
+          number: i,
+          version_string: version_string,
+          time: version_string_to_time(version_string),
+          objects: objects
+        }
+        list[:list].push(data)
         cache_section_list = Dir.glob(File.join(cache_path, "*.yaml"))
         if cache_section_list.length > 0
           cache_section_list.map { |section_path|
             File.basename(section_path, ".yaml").split(" ", 2)
           }.sort_by { |v| v[0].to_i }.each { |index, subtitle|
-            puts "   第#{index}部分　#{subtitle}"
+            objects.push({ index: index, subtitle: subtitle })
           }
-        else
+        end
+      end
+      list
+    end
+
+    def display_diff_list(id)
+      list = get_diff_list(id)
+      print "#{list[:title]} の"
+      if list[:list].empty?
+        puts "差分はひとつもありません"
+        return
+      end
+      puts "差分一覧"
+      list[:list].each do |data|
+        puts "<bold><yellow>#{data[:version_string]}   -#{data[:number]}</yellow></bold>".termcolor
+        data[:objects].each do |object|
+          puts "   第#{object[:index]}部分　#{object[:subtitle]}"
+        end
+        if data[:objects].empty?
           puts "   (最新話のみのアップデート)"
         end
       end

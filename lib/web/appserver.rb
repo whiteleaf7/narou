@@ -482,14 +482,22 @@ class Narou::AppServer < Sinatra::Base
 
   post "/api/diff" do
     ids = select_valid_novel_ids(params["ids"]) or pass
+    number = params["number"] || "1"
     Narou::Worker.push do
       # diff コマンドは１度に一つのIDしか受け取らないので
       ids.each do |id|
         # セキュリティ的にWEB UIでは独自の差分表示のみ使う
-        CommandLine.run!(["diff", "--no-tool", id])
+        CommandLine.run!(["diff", "--no-tool", id, "--number", number])
         Helper.print_horizontal_rule
       end
     end
+  end
+
+  get "/api/diff_list" do
+    target = params["target"] or return ""
+    id = Downloader.get_id_by_target(target) or return ""
+    @list = Command::Diff.new.get_diff_list(id)
+    haml :diff_list, layout: false
   end
 
   post "/api/inspect" do

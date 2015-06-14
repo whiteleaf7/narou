@@ -486,6 +486,9 @@ input::-ms-clear {
   .modal-content {
     margin-top: 160px;
   }
+  .diff-list-modal .modal-content {
+    margin-top: inherit;
+  }
 }
 @media (max-width:767px) {
   .modal-content {
@@ -822,5 +825,37 @@ $console-color: white;
 /* タグ検索用ボックス */
 #tag-search {
   display: none;
+}
+
+/* 差分表示用ダイアログ */
+.diff-list-container {
+  .title {
+    size: 2em;
+    font-weight: bold;
+    padding-bottom: 5px;
+  }
+  .list {
+    .item {
+      font-size: 90%;
+      cursor: pointer;
+      border-top: 1px solid #ddd;
+      padding-top: 3px;
+      padding-bottom: 3px;
+
+      ul {
+        margin-bottom: 0;
+      }
+
+      &:hover {
+        background-color: #eef;
+        color: mix(blue, black);
+      }
+
+      .date {
+        padding-left: 1em;
+        font-weight: bold;
+      }
+    }
+  }
 }
 

@@ -4,6 +4,7 @@
 #
 
 require "open3"
+require "time"
 
 #
 # 雑多なお助けメソッド群
@@ -261,7 +262,7 @@ module Helper
   # 日付形式の文字列をTime型に変換する
   #
   def date_string_to_time(date)
-    date ? Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒", "///:::")) : nil
+    date ? Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒@;", "///::: :")) : nil
   end
 
   #
