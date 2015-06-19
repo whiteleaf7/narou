@@ -11,6 +11,7 @@
 #### Bug Fix
 - `enable_insert_word_separator` を有効時に `［` が正常に禁則処理されない問題を
   修正
+- i文庫形式に変換する際に `enable_illust` の設定が無視されていたのを修正
 
 
 2.4.2 : 2015/06/07

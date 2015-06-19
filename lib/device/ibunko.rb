@@ -23,17 +23,25 @@ module Device::Ibunko
     return false if @options["no-zip"]
     require "zip"
     Zip.unicode_names = true
+    # TODO: テキストファイル変換時もsettingを取れるようにする
+    setting = {}
+    if @novel_data
+      archive_path = Downloader.get_novel_data_dir_by_target(@novel_data["id"])
+      setting = NovelSetting.new(archive_path, @options["ignore-force"])
+    end
     dirpath = File.dirname(@converted_txt_path)
     translate_illust_chuki_to_img_tag
     zipfile_path = @converted_txt_path.sub(/.txt$/, @device.ebook_file_ext)
     File.delete(zipfile_path) if File.exist?(zipfile_path)
     Zip::File.open(zipfile_path, Zip::File::CREATE) do |zip|
       zip.add(File.basename(@converted_txt_path), @converted_txt_path)
-      illust_dirpath = File.join(dirpath, Illustration::ILLUST_DIR)
       # 挿絵
-      if File.exist?(illust_dirpath)
-        Dir.glob(File.join(illust_dirpath, "*")) do |img_path|
-          zip.add(File.join(Illustration::ILLUST_DIR, File.basename(img_path)), img_path)
+      if setting["enable_illust"]
+        illust_dirpath = File.join(dirpath, Illustration::ILLUST_DIR)
+        if File.exist?(illust_dirpath)
+          Dir.glob(File.join(illust_dirpath, "*")) do |img_path|
+            zip.add(File.join(Illustration::ILLUST_DIR, File.basename(img_path)), img_path)
+          end
         end
       end
       # 表紙画像
