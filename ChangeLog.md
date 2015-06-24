@@ -12,6 +12,7 @@
 - `enable_insert_word_separator` を有効時に `［` が正常に禁則処理されない問題を
   修正
 - i文庫形式に変換する際に `enable_illust` の設定が無視されていたのを修正
+- WEB UI サーバ起動中に converter.rb を編集しても反映されなかったのを修正
 
 
 2.4.2 : 2015/06/07

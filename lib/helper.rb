@@ -303,5 +303,50 @@ module Helper
       }
     end
   end
+
+  #
+  # 更新時刻を考慮したファイルのローダー
+  #
+  class CacheLoader
+    @@cache = {}
+    @@mutex = Mutex.new
+
+    #
+    # ファイルの更新時刻を考慮してファイルのデータを取得する。
+    # 前回取得した時からファイルが変更されていない場合は、キャッシュを返す
+    #
+    # options にはファイルを読み込む時に File.read に渡すオプションを指定できる
+    #
+    def self.load(path, options = { encoding: Encoding::UTF_8 })
+      @@mutex.synchronize do
+        fullpath = File.expand_path(path)
+        cache_data = @@cache[fullpath]
+        mtime = File.mtime(fullpath)
+        if cache_data && mtime == cache_data[:mtime]
+          return cache_data[:body]
+        end
+        body = File.read(fullpath, options)
+        @@cache[fullpath] = {
+          mtime: mtime, body: body
+        }
+        return body
+      end
+    end
+
+    #
+    # 指定したファイルのキャッシュを削除する
+    #
+    # path を指定しなかった場合、全てのキャッシュを削除する
+    #
+    def self.flush(path = nil)
+      @@mutex.synchronize do
+        if path
+          @@cache.delete(path)
+        else
+          @@cache.clear
+        end
+      end
+    end
+  end
 end
 
