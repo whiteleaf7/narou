@@ -317,7 +317,7 @@ module Helper
     #
     # options にはファイルを読み込む時に File.read に渡すオプションを指定できる
     #
-    def self.load(path, options = { encoding: Encoding::UTF_8 })
+    def self.load(path, options = { mode: "r:BOM|UTF-8" })
       @@mutex.synchronize do
         fullpath = File.expand_path(path)
         cache_data = @@cache[fullpath]

@@ -3,6 +3,8 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "helper"
+
 class Ini
   DELIMITER = "="
   GLOBAL_SECTION = "global"
@@ -24,7 +26,7 @@ class Ini
   def self.load_file(file)
     case
     when file.kind_of?(String)
-      text = open(file, "r:BOM|UTF-8") { |fp| fp.read }
+      text = Helper::CacheLoader.load(file)
       ini = new(text)
       ini.filename = file
       return ini.object

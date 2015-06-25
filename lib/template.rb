@@ -47,7 +47,7 @@ class Template
     [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
       path = File.join(dir, TEMPLATE_DIR, src_filename + ".erb")
       next unless File.exist?(path)
-      src = open(path, "r:BOM|UTF-8") { |fp| fp.read }
+      src = Helper::CacheLoader.load(path)
       result = ERB.new(src, nil, "-").result(_binding)
       return result
     end
