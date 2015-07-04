@@ -227,15 +227,19 @@ module Command
     SETTING_VARIABLES = {
       local: {
         # 変数名 => [受け付ける型, 説明(, 不可視化フラグ)]
-        "convert.no-epub" => [:boolean, "EPUB変換を無効にするか"],
-        "convert.no-mobi" => [:boolean, "MOBI変換を無効にするか"],
-        "convert.no-strip" => [:boolean, "MOBIのstripを無効にするか\n" +
-                                         " " * 6 + "※注意：KDP用のMOBIはstripしないでください"],
-        "convert.no-zip" => [:boolean, "i文庫用のzipファイル作成を無効にするか"],
-        "convert.no-open" => [:boolean, "変換時に保存フォルダを開かないようにするか"],
+        "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
+        "update.strong" => [:boolean, "更新漏れが無い様に改稿日の分は必ずDLするか"],
+        "update.logging" => [:boolean, "更新時のログを保存するかどうか"],
+        "update.convert-only-new-arrival" => [:boolean, "更新時に新着のみ変換を実行するかどうか"],
         "convert.copy-to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
         "convert.copy_to" => [:directory, "copy-toの昔の書き方(非推奨)", INVISIBLE],
+        "convert.no-epub" => [:boolean, "EPUB変換を無効にするか", INVISIBLE],
+        "convert.no-mobi" => [:boolean, "MOBI変換を無効にするか", INVISIBLE],
+        "convert.no-strip" => [:boolean, "MOBIのstripを無効にするか\n" +
+                                         " " * 6 + "※注意：KDP用のMOBIはstripしないでください", INVISIBLE],
+        "convert.no-zip" => [:boolean, "i文庫用のzipファイル作成を無効にするか", INVISIBLE],
+        "convert.no-open" => [:boolean, "変換時に保存フォルダを開かないようにするか"],
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
         "convert.multi-device" => [:string, "複数の端末用に同時に変換する。deviceよりも優先される。端末名をカンマ区切りで入力。ただのEPUBを出力したい場合はepubを指定"],
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
@@ -245,10 +249,6 @@ module Command
                                                   " " * 6 + "※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策"],
         "send.without-freeze" => [:boolean, "一括送信時に凍結された小説は対象外に"],
         "send.backup-bookmark" => [:boolean, "一括送信時に栞データを自動でバックアップするか(KindlePW系用)"],
-        "update.strong" => [:boolean, "更新漏れが無い様に改稿日の分は必ずDLするか"],
-        "update.logging" => [:boolean, "更新時のログを保存するかどうか"],
-        "update.convert-only-new-arrival" => [:boolean, "更新時に新着のみ変換を実行するかどうか"],
-        "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
         "multiple-delimiter" => [:string, "--multiple指定時の区切り文字"],
       },
       global: {
