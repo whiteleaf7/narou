@@ -171,21 +171,21 @@ module Command
     end
 
     def self.get_color(tagname)
-      @@tag_colors ||= Inventory.load("tag_colors", :local)
-      color = @@tag_colors[tagname]
+      tag_colors = Inventory.load("tag_colors", :local)
+      color = tag_colors[tagname]
       return color if color
-      last_color = @@tag_colors.values.last || COLORS.last
+      last_color = tag_colors.values.last || COLORS.last
       index = (COLORS.index(last_color) + 1) % COLORS.size
       color = COLORS[index]
-      @@tag_colors[tagname] = color
-      @@tag_colors.save
+      tag_colors[tagname] = color
+      tag_colors.save
       color
     end
 
     def set_color(tagname, color)
-      @@tag_colors ||= Inventory.load("tag_colors", :local)
-      @@tag_colors[tagname] = color
-      @@tag_colors.save
+      tag_colors = Inventory.load("tag_colors", :local)
+      tag_colors[tagname] = color
+      tag_colors.save
     end
   end
 end
