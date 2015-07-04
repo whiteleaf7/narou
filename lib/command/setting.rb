@@ -233,6 +233,7 @@ module Command
         "update.convert-only-new-arrival" => [:boolean, "更新時に新着のみ変換を実行するかどうか"],
         "convert.copy-to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
+        "convert.copy-to-grouping" => [:boolean, "copy-toで指定したフォルダの中で更にdevice毎にフォルダを振り分ける"],
         "convert.copy_to" => [:directory, "copy-toの昔の書き方(非推奨)", INVISIBLE],
         "convert.no-epub" => [:boolean, "EPUB変換を無効にするか", INVISIBLE],
         "convert.no-mobi" => [:boolean, "MOBI変換を無効にするか", INVISIBLE],

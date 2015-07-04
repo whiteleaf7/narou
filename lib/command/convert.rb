@@ -308,21 +308,44 @@ module Command
       return mobi_path
     end
 
+    class NoSuchDirectory < StandardError; end
+
     #
     # convert.copy-to で指定されたディレクトリに書籍データをコピーする
     #
     def copy_to_converted_file(src_path)
+      copy_to_dir = get_copy_to_directory
+      return nil unless copy_to_dir
+      FileUtils.copy(src_path, copy_to_dir)
+      return File.join(copy_to_dir, File.basename(src_path))
+    rescue NoSuchDirectory => e
+      error "#{e.message} はフォルダではないかすでに削除されています。コピー出来ませんでした"
+      nil
+    end
+
+    #
+    # 書籍ファイルのコピー先を取得
+    #
+    # copy-to が設定されていなければ nil を返す。
+    # 存在しないディレクトリだった場合は例外を投げる
+    #
+    private def get_copy_to_directory
       # 2.1.0 から convert.copy_to から convert.copy-to へ名称が変更された
-      # (互換性維持のための処理)
+      # (互換性維持のため、copy_to も使えるようにはしておく)
       copy_to_dir = @options["copy-to"] || @options["copy_to"]
       return nil unless copy_to_dir
-      if File.directory?(copy_to_dir)
-        FileUtils.copy(src_path, copy_to_dir)
-        return File.join(copy_to_dir, File.basename(src_path))
-      else
-        error "#{copy_to_dir} はフォルダではないかすでに削除されています。コピー出来ませんでした"
-        return nil
+      unless File.directory?(copy_to_dir)
+        raise NoSuchDirectory, copy_to_dir
       end
+      # deviceごとにフォルダ振り分けの処理
+      if !@options["copy-to-grouping"] || !@device
+        return copy_to_dir
+      end
+      copy_to_dir_with_device = File.join(copy_to_dir, @device.display_name)
+      unless File.directory?(copy_to_dir_with_device)
+        FileUtils.mkdir(copy_to_dir_with_device)
+      end
+      copy_to_dir_with_device
     end
   end
 end

@@ -14,6 +14,10 @@
 	+ 例えば `enable_illust` の共通設定を変更したい場合、
 	  `narou s default.enable_illust=false` とすることで変更出来ます
 	  (WEB UIからは環境設定のページで隠しオプションを表示)
+- `convert.copy-to-grouping` オプションを追加しました
+	+ copy-to で指定したフォルダの中に更に device もしくは convert.multi-device
+	  で指定した端末毎に振り分けるように出来ます
+	+ 有効にするには `narou s convert.copy-to-grouping=true` を実行して下さい
 
 #### 仕様変更
 - default.* 系設定追加に伴い、新規DL時の setting.ini の全ての項目がコメント
