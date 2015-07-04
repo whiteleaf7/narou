@@ -12,6 +12,6 @@ module Device::Kobo
   DISPLAY_NAME = "Kobo"
 
   RELATED_VARIABLES = {
-    "force.enable_half_indent_bracket" => false,
+    "default.enable_half_indent_bracket" => false,
   }
 end

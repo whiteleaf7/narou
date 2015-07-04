@@ -729,14 +729,14 @@ class Downloader
       info = NovelInfo.load(@setting)
     end
     if info
-      raise DownloaderHTTP404Error unless info["title"]
+      raise DownloaderNotFoundError unless info["title"]
       @setting["title"] = info["title"]
       @setting["author"] = info["writer"]
       @setting["story"] = info["story"]
     else
       # 小説情報ページがないサイトの場合は目次ページから取得する
       @setting.multi_match(toc_source, "title", "author", "story")
-      raise DownloaderHTTP404Error unless @setting.matched?("title")
+      raise DownloaderNotFoundError unless @setting.matched?("title")
       @setting["story"] = HTML.new(@setting["story"]).to_aozora
     end
     @setting["info"] = info
@@ -1193,10 +1193,15 @@ class Downloader
     novel_dir_path = get_novel_data_dir
     file_title = File.basename(novel_dir_path)
     FileUtils.mkdir_p(novel_dir_path) unless File.exist?(novel_dir_path)
-    default_settings = NovelSetting::DEFAULT_SETTINGS
+    original_settings = NovelSetting::ORIGINAL_SETTINGS
     special_preset_dir = File.join(Narou.get_preset_dir, @setting["domain"], @setting["ncode"])
     exists_special_preset_dir = File.exist?(special_preset_dir)
-    [NovelSetting::INI_NAME, "converter.rb", NovelSetting::REPLACE_NAME].each do |filename|
+    templates = [
+      [NovelSetting::INI_NAME, 1.1],
+      ["converter.rb", 1.0],
+      [NovelSetting::REPLACE_NAME, 1.0]
+    ]
+    templates.each do |(filename, binary_version)|
       if exists_special_preset_dir
         preset_file_path = File.join(special_preset_dir, filename)
         if File.exist?(preset_file_path)
@@ -1206,7 +1211,7 @@ class Downloader
           next
         end
       end
-      Template.write(filename, novel_dir_path, binding)
+      Template.write(filename, novel_dir_path, binding, binary_version)
     end
   end
 end

@@ -12,8 +12,8 @@ module Device::Ibunko
   DISPLAY_NAME = "i文庫"
 
   RELATED_VARIABLES = {
-    "force.enable_half_indent_bracket" => false,
-    "force.enable_dakuten_font" => false
+    "default.enable_half_indent_bracket" => false,
+    "default.enable_dakuten_font" => false
   }
 
   #
@@ -26,8 +26,7 @@ module Device::Ibunko
     # TODO: テキストファイル変換時もsettingを取れるようにする
     setting = {}
     if @novel_data
-      archive_path = Downloader.get_novel_data_dir_by_target(@novel_data["id"])
-      setting = NovelSetting.new(archive_path, @options["ignore-force"])
+      setting = NovelSetting.load(@novel_data["id"], @options["ignore-force"])
     end
     dirpath = File.dirname(@converted_txt_path)
     translate_illust_chuki_to_img_tag

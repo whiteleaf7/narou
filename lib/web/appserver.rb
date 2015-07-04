@@ -285,15 +285,17 @@ class Narou::AppServer < Sinatra::Base
     @novel_title = @data["title"]
     @setting_variables = []
     @error_list = {}
-    @novel_setting = NovelSetting.load(@id, true)
-    @default_settings = NovelSetting::DEFAULT_SETTINGS
-    @force_settings = Inventory.load("local_setting", :local).select { |n| n.start_with?("force.") }
+    @novel_setting = NovelSetting.new(@id, true)    # 空っぽの設定を作成
+    @novel_setting.settings = @novel_setting.load_setting_ini["global"]
+    @original_settings = NovelSetting::ORIGINAL_SETTINGS
+    @force_settings = NovelSetting.load_force_settings
+    @default_settings = NovelSetting.load_default_settings
     @replace_pattern = @novel_setting.load_replace_pattern
   end
 
   post "/novels/:id/setting" do
     # 変換設定保存
-    @default_settings.each do |info|
+    @original_settings.each do |info|
       name, type = info[:name], info[:type]
       param_data = params[name]
       value = nil
@@ -306,7 +308,9 @@ class Narou::AppServer < Sinatra::Base
             value = false
           end
         else
-          value = Helper.string_cast_to_type(param_data, type)
+          if param_data.strip != ""
+            value = Helper.string_cast_to_type(param_data, type)
+          end
         end
         @novel_setting[name] = value
       rescue Helper::InvalidVariableType => e

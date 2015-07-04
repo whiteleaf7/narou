@@ -15,6 +15,6 @@ module Device::Epub
   DISPLAY_NAME = "EPUB"
 
   RELATED_VARIABLES = {
-    "force.enable_half_indent_bracket" => false,
+    "default.enable_half_indent_bracket" => false,
   }
 end

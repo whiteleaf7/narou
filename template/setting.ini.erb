@@ -1,9 +1,21 @@
 <%# -*- coding: utf-8 -*- -%>
-<% Template.target_binary_version(1.0) -%>
-<% default_settings.each do |element| -%>
+<% Template.target_binary_version(1.1) -%>
+; 小説の変換時の挙動を変更出来ます。
+; 行頭がセミコロンの行はコメントです。
+;
+; 変更したい設定値の行頭のセミコロンを削除し、値を設定して下さい。
+; コメントになったままの行は、各種操作によって設定した値によって最終決定されます。
+; 設定値が決定されるフローは以下の通りです。
+;
+; 1. force.* が設定されているか
+; 2. setting.ini の項目が有効になっているか
+; 3. default.* が設定されているか
+; 4. 上記いずれかにも該当しない場合、Narou.rb のオリジナル設定
+
+<% original_settings.each do |element| -%>
 <% element[:help].split("\n").each do |help_line| -%>
 ; <%= help_line %>
 <% end -%>
-<%= element[:name] %> = <%= element[:value].kind_of?(String) ? %!"#{element[:value]}"! : element[:value] %>
+; <%= element[:name] %> = <%= element[:value].kind_of?(String) ? %!"#{element[:value]}"! : element[:value] %>
 
 <% end -%>

@@ -19,14 +19,14 @@ class Template
   # _binding      変数とか設定したいスコープの binding 変数を渡す
   # overwrite     上書きするか
   #
-  def self.write(src_filename, dest_filepath, _binding, overwrite = false)
+  def self.write(src_filename, dest_filepath, _binding, binary_version, overwrite = false)
     if File.directory?(dest_filepath)
       dest_filepath = File.join(dest_filepath, src_filename)
     end
     unless overwrite
       return if File.exist?(dest_filepath)
     end
-    result = get(src_filename, _binding) or return nil
+    result = get(src_filename, _binding, binary_version) or return nil
     if Helper.os_windows?
       File.write(dest_filepath, result)
     else
@@ -41,7 +41,7 @@ class Template
   # 1. root_dir/template
   # 2. script_dir/template
   #
-  def self.get(src_filename, _binding, binary_version = 1.0)
+  def self.get(src_filename, _binding, binary_version)
     @@binary_version = binary_version
     @@src_filename = src_filename
     [Narou.get_root_dir, Narou.get_script_dir].each do |dir|

@@ -14,7 +14,7 @@ module Device::Ibooks
   IBOOKS_CONTAINER_DIR = "~/Library/Containers/com.apple.BKAgentService/Data/Documents/iBooks/Books"
 
   RELATED_VARIABLES = {
-    "force.enable_half_indent_bracket" => false,
+    "default.enable_half_indent_bracket" => false,
   }
 
   def hook_change_settings(&original_func)

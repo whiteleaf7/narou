@@ -22,6 +22,8 @@ module Command
   ・各コマンドの設定の変更が出来ます。
   ・Global な設定はユーザープロファイルに保存され、すべての narou コマンドで使われます
   ・下の一覧は一部です。すべてを確認するには -a オプションを付けて確認して下さい
+  ・default. で始まる設定は、setting.ini で未設定時の項目の挙動を指定することが出来ます
+  ・force. で始まる設定は、setting.ini や default.* 等の指定を全て無視して項目の挙動を強制出来ます
 
   Local Variable List:
         <name>           <value>              説明
@@ -219,6 +221,7 @@ module Command
       SETTING_VARIABLES
     end
 
+    VISIBLE = false
     INVISIBLE = true
 
     SETTING_VARIABLES = {
@@ -260,10 +263,13 @@ module Command
       }
     }
 
-    NovelSetting::DEFAULT_SETTINGS.each do |default|
-      SETTING_VARIABLES[:local]["force." + default[:name]] = [
-        Helper.type_of_value(default[:value]), "\n      " + default[:help], INVISIBLE
-      ]
+    [["default", INVISIBLE], ["force", INVISIBLE]].each do |(type, visibility)|
+      NovelSetting::ORIGINAL_SETTINGS.each do |default|
+        value = [
+          Helper.type_of_value(default[:value]), "\n      " + default[:help], visibility
+        ]
+        SETTING_VARIABLES[:local]["#{type}." + default[:name]] = value
+      end
     end
 
     Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), "*.rb"))) do |path|

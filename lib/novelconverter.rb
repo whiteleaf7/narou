@@ -59,7 +59,7 @@ class NovelConverter
     else
       archive_path = File.dirname(filename) + "/"
     end
-    setting = NovelSetting.new(archive_path, options[:ignore_force])
+    setting = NovelSetting.create(archive_path, options[:ignore_force])
     setting.author = ""
     setting.title = File.basename(filename)
     novel_converter = new(setting, output_filename, options[:display_inspector])
@@ -298,7 +298,7 @@ class NovelConverter
     processed_title = processed_title.gsub("《", "※［＃始め二重山括弧］")
                                      .gsub("》", "※［＃終わり二重山括弧］")
     tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
-    Template.get(tempalte_name, binding)
+    Template.get(tempalte_name, binding, 1.0)
   end
 
   #

@@ -48,14 +48,15 @@
           ・各コマンドの設定の変更が出来ます<br>
           - if scope == :local
             - if @view_invisible
-              ・force.* 系の設定は setting.ini の設定を無視して反映されるようになります<br>
+              ・default.* 系の設定は個別の変換設定で未設定の項目の挙動を指定することが出来ます<br>
+              ・force.* 系の設定は個別設定、default.* 等の設定を無視して反映されるようになります<br>
               ・default_args.* 系の設定は、各種コマンドのオプションを省略した場合に使用されるオプションを指定出来ます<br>
           - else
             ・Global な設定はユーザープロファイルに保存され、すべての narou コマンドで使われます<br>
           - if @view_invisible
-            ・隠しオプションを非表示にするには<a href="?"><u>ここをクリック</u></a><br>
+            ・隠しオプションを非表示にするには<a href="?##{scope}"><u>ここをクリック</u></a><br>
           - else
-            ・隠しオプションを表示するには<a href="?view_invisible=1"><u>ここをクリック</u></a><br>
+            ・隠しオプションを表示するには<a href="?view_invisible=1##{scope}"><u>ここをクリック</u></a><br>
         .list-group
           - variables.each do |name, value|
             - item = inventory[name]
@@ -75,7 +76,7 @@
               .list-group-item-text
                 - case value[0]
                 - when :boolean
-                  - if name.start_with?("force.")
+                  - if name =~ /^(force|default)\./
                     .switch-toggle.well.switch-3
                       <input id="#{name}-nil" type="radio" name="#{name}" value="nil" #{item.nil? ? "checked" : ""}>
                       %label(for="#{name}-nil")

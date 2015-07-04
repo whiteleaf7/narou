@@ -232,7 +232,7 @@ module Command
         end
       end
       temp = Tempfile.open([temp_prefix, ".txt"])
-      temp.write(Template.get("diff.txt", binding))
+      temp.write(Template.get("diff.txt", binding, 1.0))
       temp.close
       temp
     end

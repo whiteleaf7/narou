@@ -10,29 +10,52 @@ class NovelSetting
   INI_NAME = "setting.ini"
   REPLACE_NAME = "replace.txt"
 
-  attr_accessor :id, :author, :title, :archive_path, :replace_pattern
+  attr_accessor :id, :author, :title, :archive_path, :replace_pattern, :settings
 
+  #
+  # データベースに登録されている小説の設定を取得する
+  #
   def self.load(target, ignore_force)
-    archive_path = Downloader.get_novel_data_dir_by_target(target)
-    if archive_path
-      setting = new(archive_path, ignore_force)
-      data = Downloader.get_data_by_target(target)
-      setting.id = data["id"]
-      setting.author = data["author"]
-      setting.title = data["title"]
-      setting
-    else
-      nil
-    end
+    setting = create(target, ignore_force)
+    data = Downloader.get_data_by_target(target)
+    setting.id = data["id"]
+    setting.author = data["author"]
+    setting.title = data["title"]
+    setting
   end
 
-  def initialize(archive_path, ignore_force)
+  #
+  # 小説設定オブジェクトを作成する
+  #
+  # target には小説ID等の他、小説保存フォルダを指定できる。
+  # テキストファイル変換時はデータベースに登録されていないので load ではなくこちらを使用する
+  #
+  def self.create(target, ignore_force)
+    setting = new(target, ignore_force)
+    setting.load_settings
+    setting.set_attribute
+    setting.load_replace_pattern
+    setting
+  end
+
+  def initialize(target, ignore_force)
+    if File.directory?(target)
+      archive_path = target
+    else
+      archive_path = Downloader.get_novel_data_dir_by_target(target).to_s
+    end
     @archive_path = File.expand_path(archive_path)
     @ignore_force = ignore_force
     @replace_pattern = []
-    load_settings
-    set_attribute
-    load_replace_pattern
+    @settings = {}
+  end
+
+  def ini_path
+    File.join(@archive_path, INI_NAME)
+  end
+
+  def load_setting_ini
+    Ini.load_file(ini_path) rescue Ini.load("")
   end
 
   #
@@ -41,37 +64,62 @@ class NovelSetting
   # 設定値の優先順位は
   # 1. narou setting コマンドで設定した force.*
   # 2. setting.ini
-  # 3. DEFAULT_SETTINGS
+  # 3. narou setting コマンドで設定した default.*
+  # 4. ORIGINAL_SETTINGS
   #
   def load_settings
-    @setting = {}
-    ini_path = File.join(@archive_path, INI_NAME)
-    ini = Ini.load_file(ini_path) rescue Ini.load("")
-    force_settings = {}
-    unless @ignore_force
-      # 設定値を強制的に上書きするデータの読込
-      Inventory.load("local_setting", :local).each { |name, value|
-        if name =~ /^force\.(.+)$/
-          force_settings[$1] = value
-        end
-      }
-    end
-    DEFAULT_SETTINGS.each do |element|
+    @settings.clear
+    ini = load_setting_ini
+    force_settings = @ignore_force ? {} : NovelSetting.load_force_settings
+    default_settings = NovelSetting.load_default_settings
+    ORIGINAL_SETTINGS.each do |element|
       name, value, type = element[:name], element[:value], element[:type]
       if force_settings.include?(name)
-        @setting[name] = force_settings[name]
+        @settings[name] = force_settings[name]
       elsif ini["global"].include?(name) && type == Helper.type_of_value(ini["global"][name])
-        @setting[name] = ini["global"][name]
+        @settings[name] = ini["global"][name]
+      elsif default_settings.include?(name)
+        @settings[name] = default_settings[name]
       else
-        @setting[name] = value
+        @settings[name] = value
       end
     end
     # デフォルト設定以外を読み込む
     ini["global"].each do |key, value|
-      unless @setting.include?(key)
-        @setting[key] = value
+      unless @settings.include?(key)
+        @settings[key] = value
       end
     end
+  end
+
+  #
+  # local_settings から group.name 形式のデータを取得
+  #
+  # { name: value, ... } 形式のハッシュとして返す
+  #
+  def self.load_settings_by_pattern(pattern)
+    res = Inventory.load("local_setting", :local).map { |name, value|
+      if name =~ /^#{pattern}\.(.+)$/
+        [$1, value]
+      else
+        nil
+      end
+    }.compact.flatten
+    Hash[*res]
+  end
+
+  #
+  # force.* 設定を取得
+  #
+  def self.load_force_settings
+    load_settings_by_pattern("force")
+  end
+
+  #
+  # default.* 設定を取得
+  #
+  def self.load_default_settings
+    load_settings_by_pattern("default")
   end
 
   #
@@ -80,7 +128,7 @@ class NovelSetting
   def save_settings
     ini = Ini.new
     ini.filename = File.join(@archive_path, INI_NAME)
-    ini.object["global"].merge!(@setting)
+    ini.object["global"].merge!(@settings)
     ini.save
   end
 
@@ -88,11 +136,11 @@ class NovelSetting
   # 指定された設定の型チェック
   #
   def check_value_of_type(name, value)
-    index = DEFAULT_SETTINGS.index { |v| v[:name] == name }
+    index = ORIGINAL_SETTINGS.index { |v| v[:name] == name }
     return unless index
-    default = DEFAULT_SETTINGS[index]
-    if default && default[:type] != Helper.type_of_value(value)
-      raise Helper::InvalidVariableType, default[:type]
+    original = ORIGINAL_SETTINGS[index]
+    if original && original[:type] != Helper.type_of_value(value)
+      raise Helper::InvalidVariableType, original[:type]
     end
   end
 
@@ -100,15 +148,15 @@ class NovelSetting
   # 設定データ用アクセサ定義
   #
   def set_attribute
-    @setting.each_key do |key|
+    @settings.each_key do |key|
       instance_eval <<-EOS
         def #{key}
-          @setting["#{key}"]
+          @settings["#{key}"]
         end
 
         def #{key}=(value)
           check_value_of_type("#{key}", value)
-          @setting["#{key}"] = value
+          @settings["#{key}"] = value
         end
       EOS
     end
@@ -118,12 +166,14 @@ class NovelSetting
   # 配列風のアクセサ定義
   #
   def [](name)
-    @setting[name]
+    @settings[name]
   end
 
   def []=(name, value)
-    check_value_of_type(name, value)
-    @setting[name] = value
+    unless value.nil?
+      check_value_of_type(name, value)
+    end
+    @settings[name] = value
   end
 
   #
@@ -156,7 +206,7 @@ class NovelSetting
     File.write(replace_txt_path, buff)
   end
 
-  DEFAULT_SETTINGS = [
+  ORIGINAL_SETTINGS = [
     # name: 変数名
     # type: 変数の型
     # value: 初期値

@@ -14,7 +14,7 @@ module Device::Kindle
   DISPLAY_NAME = "Kindle"
 
   RELATED_VARIABLES = {
-    "force.enable_half_indent_bracket" => true,
+    "default.enable_half_indent_bracket" => true,
   }
 
   include Device::BackupBookmarkUtility
