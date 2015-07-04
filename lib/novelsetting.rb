@@ -39,7 +39,7 @@ class NovelSetting
   end
 
   def initialize(target, ignore_force)
-    if File.directory?(target)
+    if File.directory?(target.to_s)
       archive_path = target
     else
       archive_path = Downloader.get_novel_data_dir_by_target(target).to_s
