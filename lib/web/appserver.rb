@@ -179,6 +179,7 @@ class Narou::AppServer < Sinatra::Base
   before do
     Narou::Worker.push_as_system_worker do
       Inventory.clear
+      Database.instance.refresh
     end
   end
 

@@ -48,6 +48,10 @@ class Database
   end
 
   def initialize
+    refresh
+  end
+
+  def refresh
     @database = Inventory.load(DATABASE_NAME, :local)
   end
 
