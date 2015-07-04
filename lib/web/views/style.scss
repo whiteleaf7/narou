@@ -859,3 +859,11 @@ $console-color: white;
   }
 }
 
+/* テーブルのリロードボタン */
+#icon-refresh-table {
+  color: #aaa;
+  &:hover {
+    cursor: pointer;
+    color: #777;
+  }
+}
