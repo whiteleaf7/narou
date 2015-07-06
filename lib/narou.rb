@@ -12,9 +12,6 @@ if Helper.engine_jruby?
 end
 
 module Narou
- class << self
-  extend Memoist
-
   LOCAL_SETTING_DIR = ".narou"
   GLOBAL_SETTING_DIR = ".narousetting"
   AOZORAEPUB3_JAR_NAME = "AozoraEpub3.jar"
@@ -22,6 +19,9 @@ module Narou
   PRESET_DIR = "preset"
   MISC_DIR = "misc"
   EXIT_ERROR_CODE = 127
+
+ class << self
+  extend Memoist
 
   @@is_web = false
 
