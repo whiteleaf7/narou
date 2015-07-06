@@ -12,7 +12,7 @@ if Helper.engine_jruby?
 end
 
 module Narou
-class << self
+ class << self
   extend Memoist
 
   LOCAL_SETTING_DIR = ".narou"
@@ -169,5 +169,5 @@ class << self
   def web?
     @@is_web
   end
-end
+ end
 end
