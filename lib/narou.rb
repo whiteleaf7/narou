@@ -12,9 +12,8 @@ if Helper.engine_jruby?
 end
 
 module Narou
+class << self
   extend Memoist
-
-  module_function
 
   LOCAL_SETTING_DIR = ".narou"
   GLOBAL_SETTING_DIR = ".narousetting"
@@ -152,7 +151,6 @@ module Narou
   def get_misc_dir
     File.join(get_root_dir, MISC_DIR)
   end
-  memoize :get_misc_dir
 
   require_relative "device"
 
@@ -171,4 +169,5 @@ module Narou
   def web?
     @@is_web
   end
+end
 end
