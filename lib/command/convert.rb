@@ -329,7 +329,7 @@ module Command
     # copy-to が設定されていなければ nil を返す。
     # 存在しないディレクトリだった場合は例外を投げる
     #
-    private def get_copy_to_directory
+    def get_copy_to_directory
       # 2.1.0 から convert.copy_to から convert.copy-to へ名称が変更された
       # (互換性維持のため、copy_to も使えるようにはしておく)
       copy_to_dir = @options["copy-to"] || @options["copy_to"]
@@ -347,5 +347,6 @@ module Command
       end
       copy_to_dir_with_device
     end
+    private :get_copy_to_directory
   end
 end
