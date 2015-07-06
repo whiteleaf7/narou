@@ -4,6 +4,7 @@
 #
 
 require "yaml"
+require "singleton"
 require_relative "narou"
 
 class Mailer

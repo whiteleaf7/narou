@@ -4,6 +4,7 @@
 #
 
 require "json"
+require "singleton"
 require_relative "web-socket-ruby/lib/web_socket"
 require_relative "../eventable"
 
