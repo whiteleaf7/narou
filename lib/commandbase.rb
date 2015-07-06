@@ -48,6 +48,9 @@ module Command
     rescue OptionParser::MissingArgument => e
       error "オプションの引数が指定されていないか正しくありません(#{e})"
       exit Narou::EXIT_ERROR_CODE
+    rescue OptionParser::AmbiguousOption => e
+      error "曖昧な省略オプションです(#{e})"
+      exit Narou::EXIT_ERROR_CODE
     end
 
     def load_local_settings
