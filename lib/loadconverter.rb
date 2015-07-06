@@ -61,7 +61,7 @@ end
 def load_converter(title, archive_path)
   converter_path = File.join(archive_path, "converter.rb")
   if File.exist?(converter_path)
-    eval(Helper::CacheLoader.load(converter_path), binding, converter_path)
+    eval(File.read(converter_path, mode: "r:BOM|UTF-8"), binding, converter_path)
   else
     return BlankConverter
   end

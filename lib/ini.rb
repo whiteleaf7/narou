@@ -26,7 +26,7 @@ class Ini
   def self.load_file(file)
     case
     when file.kind_of?(String)
-      text = Helper::CacheLoader.load(file)
+      text = File.read(file, mode: "r:BOM|UTF-8")
       ini = new(text)
       ini.filename = file
       return ini.object
