@@ -231,6 +231,7 @@ module Command
         "update.strong" => [:boolean, "更新漏れが無い様に改稿日の分は必ずDLするか"],
         "update.logging" => [:boolean, "更新時のログを保存するかどうか"],
         "update.convert-only-new-arrival" => [:boolean, "更新時に新着のみ変換を実行するかどうか"],
+        "update.sort-by" => [:string, "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries(40)}"],
         "convert.copy-to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
         "convert.copy-to-grouping" => [:boolean, "copy-toで指定したフォルダの中で更にdevice毎にフォルダを振り分ける"],

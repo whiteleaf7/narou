@@ -21,6 +21,11 @@ module Narou
   EXIT_ERROR_CODE = 127
   GLOBAL_REPLACE_NAME = "replace.txt"
 
+  UPDATE_SORT_KEYS = {
+    "id" => "ID", "last_update" => "更新日", "title" => "タイトル", "author" => "作者名",
+    "new_arrivals_date" => "新着日", "general_lastup" => "最新話掲載日"
+  }
+
  class << self
   extend Memoist
 
@@ -209,6 +214,12 @@ module Narou
 
   def web?
     @@is_web
+  end
+
+  def update_sort_key_summaries(width = 27)
+    ({"KEY" => "対象"}.merge(UPDATE_SORT_KEYS)).map { |(key, summary)|
+      "#{key.rjust(width)} : #{summary}"
+    }.join("\n")
   end
  end
 end

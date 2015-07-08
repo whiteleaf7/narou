@@ -21,6 +21,13 @@
 - 全小説を対象にした replace.txt による置換に対応しました
 	+ narou init を使用したフォルダに replace.txt を設置すると認識します。
 	  WEB UI においては環境設定にて設定できます
+- `update` コマンドにアップデートの順番を変更する `--sort-by` オプションが追加
+  されました（短縮 `-s`）
+	+ `narou u --sort-by general_update` のように直接コマンドのオプションとして
+	  指定するか、 `narou s update.sort-by=general_update` と設定として保存して
+	  下さい
+	+ 指定出来るのは id, last_update(更新日), title(タイトル), author(作者名),
+	  new_arrivals_date(新着日), general_lastup(最新話掲載日) です
 
 #### 仕様変更
 - default.* 系設定追加に伴い、新規DL時の setting.ini の全ての項目がコメント

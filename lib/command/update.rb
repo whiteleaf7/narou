@@ -3,11 +3,14 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require "memoist"
 require_relative "../database"
 require_relative "../downloader"
 
 module Command
   class Update < CommandBase
+    extend Memoist
+
     LOG_DIR_NAME = "log"
     LOG_NUM_LIMIT = 30   # ログの保存する上限数
     LOG_FILENAME_FORMAT = "update_log_%s.txt"
@@ -53,6 +56,39 @@ module Command
         update_general_lastup
         exit 0
       }
+      @opt.on("-s", "--sort-by [KEY]", "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries}") { |key|
+        @options["sort-by"] = key
+      }
+    end
+
+    def get_data_value(target, key)
+      value = Downloader.get_data_by_target(target)[key]
+      value ? value : Time.new(0)
+    end
+    memoize :get_data_value
+
+    #
+    # 項目名でアップデート対象をソートする
+    #
+    # key に偽を渡した場合はソートしない
+    #
+    def sort_by_key(key, list)
+      return list unless key
+      list.sort { |a, b|
+        value_a, value_b = [a, b].map { |target|
+          get_data_value(target, key)
+        }
+        # 日付系は降順にする
+        if value_a.class == Time
+          value_b <=> value_a
+        else
+          value_a <=> value_b
+        end
+      }
+    end
+
+    def valid_sort_key?(key)
+      Narou::UPDATE_SORT_KEYS.keys.include?(key)
     end
 
     def execute(argv)
@@ -67,8 +103,17 @@ module Command
         no_open = true
       end
       tagname_to_ids(update_target_list)
+
+      sort_key = @options["sort-by"].downcase
+      unless valid_sort_key?(sort_key)
+        error "#{sort_key} は正しいキーではありません。次の中から選択して下さい\n " \
+              "#{Narou.update_sort_key_summaries(17)}"
+        exit Narou::EXIT_ERROR_CODE
+      end
+      flush_cache    # memoist のキャッシュ削除
+
       update_log = $stdout.capture(quiet: false) do
-        update_target_list.each_with_index do |target, i|
+        sort_by_key(sort_key, update_target_list).each_with_index do |target, i|
           display_message = nil
           data = Downloader.get_data_by_target(target)
           if !data
