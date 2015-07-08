@@ -19,6 +19,7 @@ module Narou
   PRESET_DIR = "preset"
   MISC_DIR = "misc"
   EXIT_ERROR_CODE = 127
+  GLOBAL_REPLACE_NAME = "replace.txt"
 
  class << self
   extend Memoist
@@ -103,6 +104,46 @@ module Narou
 
   def aozoraepub3_directory?(path)
     File.exist?(create_aozoraepub3_jar_path(path))
+  end
+
+  def parse_replace_txt(text)
+    pattern = []
+    text.each_line do |line|
+      line.sub!(/[\r\n]+\z/, "")
+      next if line[0] == ";"    # コメント記号
+      pair = line.split("\t", 2)
+      if pair.length == 2 && pair[0]
+        pattern << pair
+      end
+    end
+    pattern
+  end
+
+  def write_replace_txt(path, pairs)
+    buffer = pairs.each_with_object("\t").map(&:join).join("\n")
+    File.write(path, buffer)
+  end
+
+  def load_global_replace_pattern
+    path = File.join(get_root_dir, GLOBAL_REPLACE_NAME)
+    if File.exist?(path)
+      pairs = Helper::CacheLoader.memo(path) do |text|
+        parse_replace_txt(text)
+      end
+    else
+      pairs = []
+    end
+    @@global_replace_pattern_pairs = pairs
+    pairs
+  end
+
+  def global_replace_pattern
+    @@global_replace_pattern_pairs ||= load_global_replace_pattern
+  end
+
+  def save_global_replace_pattern
+    path = File.join(get_root_dir, GLOBAL_REPLACE_NAME)
+    write_replace_txt(path, @@global_replace_pattern_pairs)
   end
 
   #

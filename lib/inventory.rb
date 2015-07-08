@@ -38,7 +38,9 @@ module Inventory
     return nil unless dir
     @inventory_file_path = File.join(dir, name + ".yaml")
     if File.exist?(@inventory_file_path)
-      self.merge!(YAML.load(Helper::CacheLoader.load(@inventory_file_path)))
+      self.merge!(Helper::CacheLoader.memo(@inventory_file_path) { |yaml|
+        YAML.load(yaml)
+      })
     end
   end
 

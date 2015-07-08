@@ -1370,7 +1370,7 @@ class ConverterBase
   #
   def replace_by_replace_txt(text)
     result = text.dup
-    @setting.replace_pattern.each do |pattern|
+    (@setting.replace_pattern + Narou.global_replace_pattern).each do |pattern|
       src, dst = pattern
       result.gsub!(src, dst)
     end

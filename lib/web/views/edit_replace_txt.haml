@@ -1,0 +1,59 @@
+:javascript
+  local_initialize_functions.push(function($) {
+    var tooltip_opt = {
+      animation: false,
+      container: "body",
+    };
+    // replace.txt 設定パネル
+    $(".btn-replace-remove").on("click", function(e) {
+      e.preventDefault();
+      if ($(".replace-pattern-tr").size() === 1) {
+        // 入力欄のtrが全部なくなると追加出来なくなるので、消す前に1個追加しておく
+        $("#btn-replace-add").trigger("click");
+      }
+      $(this).tooltip("destroy").closest("tr").remove();
+    });
+    $blank_tr = $(".replace-pattern-tr:last").clone(true);   // 読み込み直後の末尾は空なので流用
+    $("#btn-replace-add").on("click", function(e) {
+      e.preventDefault();
+      var $clone = $blank_tr.clone(true);
+      $clone.find("button").tooltip(tooltip_opt);
+      $(".replace-pattern-tr:last").after($clone);
+      $(this).tooltip("hide");
+    });
+    $("[data-toggle=remove-tooltip]").tooltip(tooltip_opt);
+  });
+
+#replace-panel.panel.panel-settings{ class: @replace_panel_var[:panel_class] }
+  .panel-heading
+    = @replace_panel_var[:title]
+  .panel-body{ class: @replace_panel_var[:body_class] }
+    = @replace_panel_var[:body].join("<br>")
+  .list-group
+    .list-group-item.form-group
+      .list-group-item-text
+        %table#replace-txt-table
+          %thead
+            %tr
+              %td 対象文字列
+              %td &nbsp;
+              %td 置き換える文字列
+              %td &nbsp;
+          %tbody
+            -# 末尾に新規入力用の空要素を追加
+            - (@replace_pattern + [["",""]]).each do |pattern|
+              %tr.replace-pattern-tr
+                %td
+                  %input{type:"text", name:"replace_pattern[][left]", value:pattern[0], class:"form-control"}
+                %td
+                  %span.glyphicon.glyphicon-chevron-right
+                %td
+                  %input{type:"text", name:"replace_pattern[][right]", value:pattern[1], class:"form-control"}
+                %td
+                  %button.btn-replace-remove.btn.btn-default(data-toggle="remove-tooltip" title="削除" data-placement="right")
+                    %span.glyphicon.glyphicon-remove
+            %tr
+              %td(colspan=4)
+                %button#btn-replace-add.btn.btn-default(data-toggle="tooltip" title="１行追加" data-placement="right")
+                  %span.glyphicon.glyphicon-plus
+

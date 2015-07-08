@@ -1,11 +1,11 @@
 -# このページ内専用のjavascriptでjQueryオブジェクトを参照したい場合この関数に記述
 :javascript
-  var local_initialize_function = function($) {
+  local_initialize_functions.push(function($) {
     $("[data-toggle=tooltip]").tooltip({
       animation: false,
       container: "body",
     });
-  };
+  });
 
 %form(action="/settings" method="POST")
   %input(type="hidden" name="view_invisible" value="#{@view_invisible ? 1 : 0}")
@@ -35,12 +35,20 @@
   .container.container-main.theme-showcase(role="main")
     - @setting_variables.each do |scope, variables|
       - inventory = Inventory.load("#{scope}_setting", scope)
+      - unless @view_invisible
+        -# 隠しパラメータは配列の最初の方に集めておく
+        -# (リストの最後に隠しパラメータがあると、リストの最下部の表示が切れるため)
+        - variables = variables.select { |_, v| v[2] }.merge(variables.reject { |_, v| v[2] })
 
       %p.panel-settings-link
         - if scope == :local
           goto <a href="#global" data-move-to="#global">Global Variables</a>
+          ・
+          <a href="#replace-panel" data-move-to="#replace-panel">置換設定</a>
         - else
           goto <a href="#local" data-move-to="#local">Local Variables</a>
+          ・
+          <a href="#replace-panel" data-move-to="#replace-panel">置換設定</a>
 
       .panel.panel-primary.panel-settings
         .panel-heading{id: scope} #{scope.capitalize} Variables
@@ -61,7 +69,7 @@
           - variables.each do |name, value|
             - item = inventory[name]
             - unless @view_invisible
-              - if value[2]
+              - if value[2] == Command::Setting::INVISIBLE
                 - if value[0] == :boolean
                   - hidden_value = convert_boolean_to_on_off(item)
                 - else
@@ -109,8 +117,17 @@
                   %p.alert-danger
                     = @error_list[name]
                 .clear
-          .panel-footer
-            %input.btn.btn-info(type="submit" value="設定を保存" style="float:none")
-            %span(style="color:gray")
-              （Local、Globalどちらも保存されます）
 
+    %p.panel-settings-link
+      goto <a href="#local" data-move-to="#local">Local Variables</a>
+      ・
+      <a href="#global" data-move-to="#global">Global Variables</a>
+
+    - @replace_panel_var = { title: "全小説対象の置換設定",
+      panel_class: "panel-primary",
+      body_class: "list-group-item-info",
+      body: ["・全ての小説に対する置換設定を行うことが出来ます",
+             "・変更を反映させるには再度変換を実行する必要があります"] }
+    = haml :edit_replace_txt
+
+    %input(type="submit" value="設定を保存" class="btn btn-info" style="float:none")

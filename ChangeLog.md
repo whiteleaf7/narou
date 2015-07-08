@@ -18,6 +18,9 @@
 	+ copy-to で指定したフォルダの中に更に device もしくは convert.multi-device
 	  で指定した端末毎に振り分けるように出来ます
 	+ 有効にするには `narou s convert.copy-to-grouping=true` を実行して下さい
+- 全小説を対象にした replace.txt による置換に対応しました
+	+ narou init を使用したフォルダに replace.txt を設置すると認識します。
+	  WEB UI においては環境設定にて設定できます
 
 #### 仕様変更
 - default.* 系設定追加に伴い、新規DL時の setting.ini の全ての項目がコメント

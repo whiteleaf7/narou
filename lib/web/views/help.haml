@@ -1,5 +1,5 @@
 :javascript
-  var local_initialize_function = function($) {
+  local_initialize_functions.push(function($) {
     $("[data-toggle=tooltip]").tooltip({
       animation: false,
       container: "body",
@@ -34,7 +34,7 @@
     }
 
     $("#bookmarklet").attr("href", createBookmarkletStrings(bookmarklet));
-  };
+  });
 
 .navbar.navbar-default.navbar-fixed-top(role="navigation")
   .container

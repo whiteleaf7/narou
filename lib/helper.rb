@@ -266,6 +266,25 @@ module Helper
   end
 
   #
+  # 指定のファイルが前回のチェック時より新しいかどうか
+  #
+  # 初回チェック時は無条件で新しいと判定
+  #
+  def file_latest?(path)
+    @@file_mtime_list ||= {}
+    fullpath = File.expand_path(path)
+    last_mtime = @@file_mtime_list[fullpath]
+    mtime = File.mtime(fullpath)
+    if mtime == last_mtime
+      result = false
+    else
+      result = true
+      @@file_mtime_list[fullpath] = mtime
+    end
+    result
+  end
+
+  #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #
   # response = Helper::AsyncCommand.exec("処理に時間がかかる外部コマンド") do
@@ -307,9 +326,14 @@ module Helper
   #
   # 更新時刻を考慮したファイルのローダー
   #
-  class CacheLoader
-    @@cache = {}
+  module CacheLoader
+    module_function
+
     @@mutex = Mutex.new
+    @@caches = {}
+    @@result_caches = {}
+
+    DEFAULT_OPTIONS = { mode: "r:BOM|UTF-8" }
 
     #
     # ファイルの更新時刻を考慮してファイルのデータを取得する。
@@ -317,20 +341,58 @@ module Helper
     #
     # options にはファイルを読み込む時に File.read に渡すオプションを指定できる
     #
-    def self.load(path, options = { mode: "r:BOM|UTF-8" })
+    def load(path, options = DEFAULT_OPTIONS)
       @@mutex.synchronize do
         fullpath = File.expand_path(path)
-        cache_data = @@cache[fullpath]
-        mtime = File.mtime(fullpath)
-        if cache_data && mtime == cache_data[:mtime]
-          return cache_data[:body]
+        cache_data = @@caches[fullpath]
+        if Helper.file_latest?(fullpath) || !cache_data
+          body = File.read(fullpath, options)
+          @@caches[fullpath] = body
+          return body
+        else
+          return cache_data
         end
-        body = File.read(fullpath, options)
-        @@cache[fullpath] = {
-          mtime: mtime, body: body
-        }
-        return body
       end
+    end
+
+    #
+    # ファイルを処理するブロックの結果をキャッシュ化する
+    #
+    # CacheLoader.load がファイルの中身だけをキャッシュ化するのに対して
+    # これはブロックの結果をキャッシュする。ファイルが更新されない限り、
+    # ブロックの結果は変わらない
+    #
+    # ex.)
+    # Helper::CacheLoader.memo("filepath") do |data|
+    #   # data に関する処理
+    #   result  # ここで nil を返すと次回も再度読み込まれる
+    # end
+    #
+    def memo(path, options = DEFAULT_OPTIONS, &block)
+      @@mutex.synchronize do
+        fail ArgumentError, "need a block" unless block
+        fullpath = File.expand_path(path)
+        key = generate_key(fullpath, block)
+        cache = @@result_caches[key]
+        if Helper.file_latest?(fullpath) || !cache
+          data = File.read(fullpath, options)
+          @@result_caches[key] = result = block.call(data)
+          return result
+        else
+          return cache
+        end
+      end
+    end
+
+    #
+    # キャッシュを格納する際に必要なキーを生成する
+    #
+    # ブロックはその場所が実行されるたびに違うprocオブジェクトが生成されるため、
+    # 同一性判定のために「どのソース」の「何行目」かで判定を行う
+    #
+    def generate_key(fullpath, block)
+      src, line = block.source_location
+      "#{fullpath}:#{src}:#{line}"
     end
 
     #
@@ -338,12 +400,15 @@ module Helper
     #
     # path を指定しなかった場合、全てのキャッシュを削除する
     #
-    def self.flush(path = nil)
+    def clear(path = nil)
       @@mutex.synchronize do
         if path
-          @@cache.delete(path)
+          fullpath = File.expand_path(path)
+          @@cache.delete(fullpath)
+          @@result_caches.delete(fullpath)
         else
           @@cache.clear
+          @@result_caches.clear
         end
       end
     end

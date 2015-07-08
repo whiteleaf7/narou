@@ -180,6 +180,7 @@ class Narou::AppServer < Sinatra::Base
     Narou::Worker.push_as_system_worker do
       Inventory.clear
       Database.instance.refresh
+      Narou.load_global_replace_pattern
     end
   end
 
@@ -202,6 +203,7 @@ class Narou::AppServer < Sinatra::Base
     @view_invisible = params["view_invisible"] == "1"
     @setting_variables = Command::Setting.get_setting_variables
     @error_list = {}
+    @global_replace_pattern = @replace_pattern = Narou.global_replace_pattern
   end
 
   post "/settings" do
@@ -246,6 +248,19 @@ class Narou::AppServer < Sinatra::Base
         end
       end
     end
+
+    # 置換設定保存
+    params_replace_pattern = params["replace_pattern"]
+    @global_replace_pattern.clear
+    if params_replace_pattern.kind_of?(Array)
+      params_replace_pattern.each do |pattern|
+        left, right = pattern["left"].strip, pattern["right"].strip
+        next if left == ""
+        @global_replace_pattern << [left, right]
+      end
+    end
+    Narou.save_global_replace_pattern
+
     if @error_list.empty?
       session[:alert] = [ "保存が完了しました", "success" ]
     else

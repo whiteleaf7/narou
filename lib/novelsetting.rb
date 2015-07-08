@@ -183,16 +183,7 @@ class NovelSetting
     @replace_pattern.clear
     replace_txt_path = File.join(@archive_path, REPLACE_NAME)
     if File.exist?(replace_txt_path)
-      open(replace_txt_path, "r:BOM|UTF-8") do |fp|
-        fp.each do |line|
-          line.sub!(/[\r\n]+\z/, "")
-          next if line[0] == ";"    # コメント記号
-          pattern = line.split("\t", 2)
-          if pattern.length == 2 && pattern[0]
-            @replace_pattern << pattern
-          end
-        end
-      end
+      @replace_pattern = Narou.parse_replace_txt(File.read(replace_txt_path, mode: "r:BOM|UTF-8"))
     end
     @replace_pattern
   end
@@ -202,8 +193,7 @@ class NovelSetting
   #
   def save_replace_pattern
     replace_txt_path = File.join(@archive_path, REPLACE_NAME)
-    buff = @replace_pattern.each_with_object("\t").map(&:join).join("\n")
-    File.write(replace_txt_path, buff)
+    Narou.write_replace_txt(replace_txt_path, @replace_pattern)
   end
 
   ORIGINAL_SETTINGS = [
