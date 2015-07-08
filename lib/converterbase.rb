@@ -952,7 +952,7 @@ class ConverterBase
   def rebuild_url(data)
     @url_list.each_with_index do |url, id|
       data.sub!("［＃ＵＲＬ＝#{convert_numbers(id.to_s)}］",
-                "<a href=\"#{Helper.ampersand_to_entity(url)}\">#{url}</a>")
+                "<a href=\"#{url}\">#{url}</a>")
     end
   end
 
