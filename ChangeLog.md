@@ -2,7 +2,7 @@
 更新履歴 - ChangeLog
 ====================
 
-2.5.0 : master
+2.5.0 : 2015/07/10
 ------------------
 #### 追加機能
 - WEB UI の個別メニューから「差分を表示」を選択した際に、過去の差分を選択出来る
@@ -14,6 +14,8 @@
 	+ 例えば `enable_illust` の共通設定を変更したい場合、
 	  `narou s default.enable_illust=false` とすることで変更出来ます
 	  (WEB UIからは環境設定のページで隠しオプションを表示)
+- `convert` コマンドに `--ignore-default` オプションを追加しました。変換時の
+  default.* 系設定を無視します
 - `convert.copy-to-grouping` オプションを追加しました
 	+ copy-to で指定したフォルダの中に更に device もしくは convert.multi-device
 	  で指定した端末毎に振り分けるように出来ます
