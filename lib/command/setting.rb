@@ -263,7 +263,7 @@ module Command
         },
         "update.sort-by" => {
           type: :select,
-          help: "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries(40)}",
+          help: "アップデートを指定した項目順で行う\n#{Narou.update_sort_key_summaries(40)}",
           select_keys: Narou::UPDATE_SORT_KEYS.keys,
           select_summaries: Narou::UPDATE_SORT_KEYS.values
         },
