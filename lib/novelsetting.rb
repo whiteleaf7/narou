@@ -369,9 +369,11 @@ class NovelSetting
     },
     {
       name: "title_date_align",
-      type: :string,
+      type: :select,
       value: "right",
-      help: "enable_add_date_to_title で付与する日付の位置。left か right"
+      help: "enable_add_date_to_title で付与する日付の位置。left(タイトルの前) か right(タイトルの後)",
+      select_keys: %w(left right),
+      select_summaries: %w(タイトルの前 タイトルの後)
     },
     {
       name: "enable_ruby_youon_to_big",

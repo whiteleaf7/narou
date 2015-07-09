@@ -11,6 +11,8 @@ module Narou
     "device" => "変換、送信対象の端末",
     "difftool" => "Diffで使うツールのパスを指定する\n※WEB UIでは使われません",
     "update.sort-by" => "アップデートする順番を変更する",
+    "default.title_date_align" => "enable_add_date_to_title で付与する日付の位置",
+    "force.title_date_align" => "enable_add_date_to_title で付与する日付の位置",
   }
 end
 

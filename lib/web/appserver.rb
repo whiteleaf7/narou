@@ -318,13 +318,14 @@ class Narou::AppServer < Sinatra::Base
       param_data = params[name]
       value = nil
       begin
-        case type
-        when :boolean
+        if type == :boolean
           if param_data
             value = convert_on_off_to_boolean(param_data)
           else
             value = false
           end
+        elsif param_data.kind_of?(Array)
+          value = param_data.join(",")
         else
           if param_data.strip != ""
             value = Helper.string_cast_to_type(param_data, type)

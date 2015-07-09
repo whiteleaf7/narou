@@ -28,6 +28,12 @@
       container: "body",
     };
     $("[data-toggle=tooltip]").tooltip(tooltip_opt);
+
+    // セレクトボタン設定
+    $(".selectpicker").selectpicker({
+      container: "body",
+      width: "100%"
+    });
   });
 
 %form(action="/novels/#{@id}/setting" method="POST")
@@ -95,6 +101,20 @@
                   %label(for="#{name}-true")
                     する
                   %a.btn.btn-primary
+              - when :select
+                %div.input-style
+                  %select{name: name, class: "selectpicker show-tick"}
+                    %option(value="") 未設定
+                    - original[:select_keys].each_with_index do |key, index|
+                      %option{selected: value == key, value: key}
+                        = original[:select_summaries][index]
+              - when :multiple
+                %div.input-style
+                  %select{name: "#{name}[]", class: "selectpicker", multiple: true, title: "未設定"}
+                    - selected_items = value.to_s.split(",")
+                    - original[:select_keys].each_with_index do |key, index|
+                      %option{selected: selected_items.include?(key), value: key}
+                        = original[:select_summaries][index]
               - else
                 %input{type:"text", name:name, value:value, class:"form-control",
                        placeholder:Helper.variable_type_to_description(original[:type]).strip }
