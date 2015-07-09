@@ -56,7 +56,7 @@ module Command
         update_general_lastup
         exit 0
       }
-      @opt.on("-s", "--sort-by [KEY]", "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries}") { |key|
+      @opt.on("-s", "--sort-by KEY", "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries}") { |key|
         @options["sort-by"] = key
       }
     end
