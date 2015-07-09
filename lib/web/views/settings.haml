@@ -73,20 +73,20 @@
           - variables.each do |name, value|
             - item = inventory[name]
             - unless @view_invisible
-              - if value[2] == Command::Setting::INVISIBLE
-                - if value[0] == :boolean
+              - if value[:invisible]
+                - if value[:type] == :boolean
                   - hidden_value = convert_boolean_to_on_off(item)
                 - else
                   - hidden_value = item
                 %input{type:"hidden", name:name, value:hidden_value}
                 - next
-            - message = Narou::SETTING_VARIABLES_WEBUI_MESSAGES[name] || value[1]
+            - message = Narou::SETTING_VARIABLES_WEBUI_MESSAGES[name] || value[:help]
             - message = message.strip.gsub("\n", "<br>")
             - error_style = {class: "has-error", style: "background-color:#f2dede"}
             .list-group-item.form-group{@error_list[name] ? error_style : {}}
               %h4.list-group-item-heading #{name}
               .list-group-item-text
-                - case value[0]
+                - case value[:type]
                 - when :boolean
                   - if name =~ /^(force|default)\./
                     .switch-toggle.well.switch-3
@@ -116,19 +116,19 @@
                   %div.input-style
                     %select{name: name, class: "selectpicker show-tick"}
                       %option(value="") 未設定
-                      - value[3].each_with_index do |key, index|
+                      - value[:select_keys].each_with_index do |key, index|
                         %option{selected: item == key, value: key}
-                          = value[4][index]
+                          = value[:select_summaries][index]
                 - when :multiple
                   %div.input-style
                     %select{name: "#{name}[]", class: "selectpicker", multiple: true, title: "未設定"}
                       - selected_items = item.to_s.split(",")
-                      - value[3].each_with_index do |key, index|
+                      - value[:select_keys].each_with_index do |key, index|
                         %option{selected: selected_items.include?(key), value: key}
-                          = value[4][index]
+                          = value[:select_summaries][index]
                 - else
                   %input{type:"text", name:name, value:item, class:"form-control",
-                         placeholder:Helper.variable_type_to_description(value[0]).strip }
+                         placeholder:Helper.variable_type_to_description(value[:type]).strip }
                 %p
                   = message != "" ? message : "&nbsp;"
                 - if @error_list[name]

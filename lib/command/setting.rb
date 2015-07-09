@@ -11,12 +11,6 @@ module Command
   class Setting < CommandBase
     include Narou::Eventable
 
-    VARIABLE_TYPE = 0
-    VARIABLE_SUMMARY = 1
-    VARIABLE_VISIBILITY = 2
-    VARIABLE_SELECT_KEYS = 3
-    VARIABLE_SELECT_VALUES = 3
-
     class InvalidSelectValue < StandardError; end
 
     def self.oneline_help
@@ -82,15 +76,15 @@ module Command
         raise Helper::InvalidVariableName, "#{name} は不明な名前です"
       end
       variable_definition = SETTING_VARIABLES[scope][name]
-      case variable_definition[VARIABLE_TYPE]
+      case variable_definition[:type]
       when :select
-        select_values = variable_definition[VARIABLE_SELECT_KEYS]
+        select_values = variable_definition[:select_keys]
         unless select_values.include?(value)
           raise InvalidSelectValue, "不明な値です。#{select_values.join(", ")} の中から指定して下さい"
         end
         casted_value = value
       when :multiple
-        select_values = variable_definition[VARIABLE_SELECT_KEYS]
+        select_values = variable_definition[:select_keys]
         value.split(",").each do |input_value|
           unless select_values.include?(input_value)
             raise InvalidSelectValue, "不明な値です。#{select_values.join(", ")} の中から指定して下さい"
@@ -98,7 +92,7 @@ module Command
         end
         casted_value = value
       else
-        casted_value = Helper.string_cast_to_type(value, variable_definition[VARIABLE_TYPE])
+        casted_value = Helper.string_cast_to_type(value, variable_definition[:type])
       end
       [scope, casted_value]
     end
@@ -227,9 +221,9 @@ module Command
     def get_variable_list_strings(scope)
       result = ""
       SETTING_VARIABLES[scope].each do |name, info|
-        if @options["all"] || info[2] != INVISIBLE
-          type_description = Helper.variable_type_to_description(info[0])
-          result << "    <bold><green>#{name.ljust(18)}</green></bold> #{type_description} #{info[1]}\n".termcolor
+        if @options["all"] || !info[:invisible]
+          type_description = Helper.variable_type_to_description(info[:type])
+          result << "    <bold><green>#{name.ljust(18)}</green></bold> #{type_description} #{info[:help]}\n".termcolor
         end
       end
       result
@@ -247,67 +241,140 @@ module Command
       SETTING_VARIABLES
     end
 
-    VISIBLE = false
-    INVISIBLE = true
-
     SETTING_VARIABLES = {
       local: {
-        # 変数名 => [受け付ける型, 説明(, 不可視化フラグ, 選択肢, 各選択肢の表示名)]
-        "device" => [:select, "変換、送信対象の端末(sendの--help参照)", VISIBLE,
-                     Device::DEVICES.keys, Device::DEVICES.values.map { |d| d::DISPLAY_NAME }],
-        "update.strong" => [:boolean, "更新漏れが無い様に改稿日の分は必ずDLするか"],
-        "update.logging" => [:boolean, "更新時のログを保存するかどうか"],
-        "update.convert-only-new-arrival" => [:boolean, "更新時に新着のみ変換を実行するかどうか"],
-        "update.sort-by" => [:select, "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries(40)}",
-                             VISIBLE, Narou::UPDATE_SORT_KEYS.keys, Narou::UPDATE_SORT_KEYS.values],
-        "convert.copy-to" => [:directory, "変換したらこのフォルダにコピーする\n" +
-                                          " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
-        "convert.copy-to-grouping" => [:boolean, "copy-toで指定したフォルダの中で更にdevice毎にフォルダを振り分ける"],
-        "convert.copy_to" => [:directory, "copy-toの昔の書き方(非推奨)", INVISIBLE],
-        "convert.no-epub" => [:boolean, "EPUB変換を無効にするか", INVISIBLE],
-        "convert.no-mobi" => [:boolean, "MOBI変換を無効にするか", INVISIBLE],
-        "convert.no-strip" => [:boolean, "MOBIのstripを無効にするか\n" +
-                                         " " * 6 + "※注意：KDP用のMOBIはstripしないでください", INVISIBLE],
-        "convert.no-zip" => [:boolean, "i文庫用のzipファイル作成を無効にするか", INVISIBLE],
-        "convert.no-open" => [:boolean, "変換時に保存フォルダを開かないようにするか"],
-        "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
-        "convert.multi-device" => [:multiple, "複数の端末用に同時に変換する。deviceよりも優先される。" \
-                     "端末名をカンマ区切りで入力。ただのEPUBを出力したい場合はepubを指定", VISIBLE,
-                     Device::DEVICES.keys, Device::DEVICES.values.map { |d| d::DISPLAY_NAME }],
-        "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
-        "download.wait-steps" => [:integer, "この値で指定した話数ごとにウェイトを入れる\n" +
-                                       " " * 6 + "※注意：11以上を設定してもなろうの場合は10話ごとにウェイトが入ります"],
-        "download.use-subdirectory" => [:boolean, "小説を一定数ごとにサブフォルダへ分けて保存するか\n" +
-                                                  " " * 6 + "※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策"],
-        "send.without-freeze" => [:boolean, "一括送信時に凍結された小説は対象外に"],
-        "send.backup-bookmark" => [:boolean, "一括送信時に栞データを自動でバックアップするか(KindlePW系用)"],
-        "multiple-delimiter" => [:string, "--multiple指定時の区切り文字"],
+        # 変数名 => { type: 受け付ける型, help: 説明[, invisible: 不可視化フラグ,
+        #             select_keys: 選択肢型の時のキー(配列),
+        #             select_summaries: 選択肢型の時のキーの概要(配列)] }
+        "device" => {
+          type: :select,
+          help: "変換、送信対象の端末(sendの--help参照)",
+          select_keys: Device::DEVICES.keys,
+          select_summaries: Device::DEVICES.values.map { |d| d::DISPLAY_NAME }
+        },
+        "update.strong" => {
+          type: :boolean, help: "更新漏れが無い様に改稿日の分は必ずDLするか"
+        },
+        "update.logging" => {
+          type: :boolean, help: "更新時のログを保存するかどうか"
+        },
+        "update.convert-only-new-arrival" => {
+          type: :boolean, help: "更新時に新着のみ変換を実行するかどうか"
+        },
+        "update.sort-by" => {
+          type: :select,
+          help: "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries(40)}",
+          select_keys: Narou::UPDATE_SORT_KEYS.keys,
+          select_summaries: Narou::UPDATE_SORT_KEYS.values
+        },
+        "convert.copy-to" => {
+          type: :directory,
+          help: "変換したらこのフォルダにコピーする\n" \
+                "      ※注意：存在しないフォルダだとエラーになる"
+        },
+        "convert.copy-to-grouping" => {
+          type: :boolean, help: "copy-toで指定したフォルダの中で更にdevice毎にフォルダを振り分ける"
+        },
+        "convert.copy_to" => {
+          type: :directory, help: "copy-toの昔の書き方(非推奨)", invisible: true
+        },
+        "convert.no-epub" => {
+          type: :boolean, help: "EPUB変換を無効にするか", invisible: true
+        },
+        "convert.no-mobi" => {
+          type: :boolean, help: "MOBI変換を無効にするか", invisible: true
+        },
+        "convert.no-strip" => {
+          type: :boolean,
+          help: "MOBIのstripを無効にするか\n" \
+                "      ※注意：KDP用のMOBIはstripしないでください",
+          invisible: true
+        },
+        "convert.no-zip" => {
+          type: :boolean, help: "i文庫用のzipファイル作成を無効にするか", invisible: true
+        },
+        "convert.no-open" => {
+          type: :boolean, help: "変換時に保存フォルダを開かないようにするか"
+        },
+        "convert.inspect" => {
+          type: :boolean, help: "常に変換時に調査結果を表示するか"
+        },
+        "convert.multi-device" => {
+          type: :multiple,
+          help: "複数の端末用に同時に変換する。deviceよりも優先される。" \
+                "端末名をカンマ区切りで入力。ただのEPUBを出力したい場合はepubを指定",
+          select_keys: Device::DEVICES.keys,
+          select_summaries: Device::DEVICES.values.map { |d| d::DISPLAY_NAME }
+        },
+        "download.interval" => {
+          type: :float, help: "各話DL時に指定した秒数待機する。デフォルト0"
+        },
+        "download.wait-steps" => {
+          type: :integer,
+          help: "この値で指定した話数ごとにウェイトを入れる\n" \
+                "      ※注意：11以上を設定してもなろうの場合は10話ごとにウェイトが入ります"
+        },
+        "download.use-subdirectory" => {
+          type: :boolean,
+          help: "小説を一定数ごとにサブフォルダへ分けて保存するか\n" \
+                "      ※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策"
+        },
+        "send.without-freeze" => {
+          type: :boolean, help: "一括送信時に凍結された小説は対象外に"
+        },
+        "send.backup-bookmark" => {
+          type: :boolean, help: "一括送信時に栞データを自動でバックアップするか(KindlePW系用)"
+        },
+        "multiple-delimiter" => {
+          type: :string, help:  "--multiple指定時の区切り文字"
+        },
       },
       global: {
-        "aozoraepub3dir" => [:directory, "AozoraEpub3のあるフォルダを指定", INVISIBLE],
-        "difftool" => [:string, "Diffで使うツールのパスを指定する"],
-        "difftool.arg" => [:string, "difftoolで使う引数を設定(オプション)"],
-        "no-color" => [:boolean, "カラー表示を無効にするか"],
-        "server-port" => [:integer, "WEBサーバ起動時のポート"],
-        "server-bind" => [:string, "WEBサーバのホスト制限(未設定時:起動PCのIP)", INVISIBLE],
-        "over18" => [:boolean, "18歳以上かどうか", INVISIBLE],
-        "dismiss-notice" => [:boolean, "お知らせを消すかどうか", INVISIBLE],
+        "aozoraepub3dir" => {
+          type: :directory, help: "AozoraEpub3のあるフォルダを指定", invisible: true
+        },
+        "difftool" => {
+          type: :string, help: "Diffで使うツールのパスを指定する"
+        },
+        "difftool.arg" => {
+          type: :string, help: "difftoolで使う引数を設定(オプション)"
+        },
+        "no-color" => {
+          type: :boolean, help: "カラー表示を無効にするか"
+        },
+        "server-port" => {
+          type: :integer, help: "WEBサーバ起動時のポート"
+        },
+        "server-bind" => {
+          type: :string, help: "WEBサーバのホスト制限(未設定時:起動PCのIP)", invisible: true
+        },
+        "over18" => {
+          type: :boolean, help: "18歳以上かどうか", invisible: true
+        },
+        "dismiss-notice" => {
+          type: :boolean, help: "お知らせを消すかどうか", invisible: true
+        },
       }
     }
 
-    [["default", INVISIBLE], ["force", INVISIBLE]].each do |(type, visibility)|
+    %w(default force).each do |kind|
       NovelSetting::ORIGINAL_SETTINGS.each do |default|
-        value = [
-          Helper.type_of_value(default[:value]), "\n      " + default[:help], visibility
-        ]
-        SETTING_VARIABLES[:local]["#{type}." + default[:name]] = value
+        value = {
+          type: default[:type],
+          help: "\n      " + default[:help],
+          invisible: true,
+          select_keys: default[:select_keys],
+          select_summaries: default[:select_summaries]
+        }
+        SETTING_VARIABLES[:local]["#{kind}." + default[:name]] = value
       end
     end
 
     Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), "*.rb"))) do |path|
       cmd_name = File.basename(path, ".rb")
-      SETTING_VARIABLES[:local]["default_args." + cmd_name] =
-        [:string, "#{cmd_name} コマンドのデフォルトオプション", INVISIBLE]
+      SETTING_VARIABLES[:local]["default_args." + cmd_name] = {
+        type: :string, help: "#{cmd_name} コマンドのデフォルトオプション", invisible: true
+      }
     end
 
     SETTING_VARIABLES.freeze

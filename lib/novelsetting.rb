@@ -76,7 +76,7 @@ class NovelSetting
       name, value, type = element[:name], element[:value], element[:type]
       if force_settings.include?(name)
         @settings[name] = force_settings[name]
-      elsif ini["global"].include?(name) && type == Helper.type_of_value(ini["global"][name])
+      elsif ini["global"].include?(name) && type_eq_value(type, ini["global"][name])
         @settings[name] = ini["global"][name]
       elsif default_settings.include?(name)
         @settings[name] = default_settings[name]
@@ -132,6 +132,16 @@ class NovelSetting
     ini.save
   end
 
+  def type_eq_value(type, value)
+    type_of_value = Helper.type_of_value(value)
+    case type
+    when :string, :select, :multiple
+      :string == type_of_value
+    else
+      type == type_of_value
+    end
+  end
+
   #
   # 指定された設定の型チェック
   #
@@ -139,7 +149,7 @@ class NovelSetting
     index = ORIGINAL_SETTINGS.index { |v| v[:name] == name }
     return unless index
     original = ORIGINAL_SETTINGS[index]
-    if original && original[:type] != Helper.type_of_value(value)
+    if original && !type_eq_value(original[:type], value)
       raise Helper::InvalidVariableType, original[:type]
     end
   end

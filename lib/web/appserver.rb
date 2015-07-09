@@ -214,7 +214,7 @@ class Narou::AppServer < Sinatra::Base
       @setting_variables[scope].each do |name, info|
         param_data = params[name]
         argument = ""
-        if info[0] == :boolean
+        if info[:type] == :boolean
           # :boolean 用のフォームデータは on, off, nil で渡される。
           # ただしチェックボックスはチェックした時だけ on が渡されるので、
           # 何もデータが無い＝off を選択したと判断する。
