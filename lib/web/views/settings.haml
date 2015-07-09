@@ -43,7 +43,7 @@
       - unless @view_invisible
         -# 隠しパラメータは配列の最初の方に集めておく
         -# (リストの最後に隠しパラメータがあると、リストの最下部の表示が切れるため)
-        - variables = variables.select { |_, v| v[2] }.merge(variables.reject { |_, v| v[2] })
+        - variables = variables.select { |_, v| v[:invisible] }.merge(variables.reject { |_, v| v[:invisible] })
 
       %p.panel-settings-link
         - if scope == :local
