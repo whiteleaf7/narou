@@ -62,7 +62,8 @@ module Command
     end
 
     def get_data_value(target, key)
-      value = Downloader.get_data_by_target(target)[key]
+      data = Downloader.get_data_by_target(target) or return nil
+      value = data[key]
       value ? value : Time.new(0)
     end
     memoize :get_data_value
@@ -78,6 +79,13 @@ module Command
         value_a, value_b = [a, b].map { |target|
           get_data_value(target, key)
         }
+        if value_a.nil? && !value_b.nil?
+          next 1
+        elsif !value_a.nil? && value_b.nil?
+          next -1
+        elsif value_a.nil? && value_b.nil?
+          next 0
+        end
         # 日付系は降順にする
         if value_a.class == Time
           value_b <=> value_a
