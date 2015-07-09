@@ -5,6 +5,10 @@
       animation: false,
       container: "body",
     });
+    $(".selectpicker").selectpicker({
+      container: "body",
+      width: "100%"
+    });
   });
 
 %form(action="/settings" method="POST")
@@ -108,6 +112,20 @@
                           %span しない
                           %span する
                       %a.btn.btn-primary
+                - when :select
+                  %div.input-style
+                    %select{name: name, class: "selectpicker show-tick"}
+                      %option(value="") 未設定
+                      - value[3].each_with_index do |key, index|
+                        %option{selected: item == key, value: key}
+                          = value[4][index]
+                - when :multiple
+                  %div.input-style
+                    %select{name: "#{name}[]", class: "selectpicker", multiple: true, title: "未設定"}
+                      - selected_items = item.to_s.split(",")
+                      - value[3].each_with_index do |key, index|
+                        %option{selected: selected_items.include?(key), value: key}
+                          = value[4][index]
                 - else
                   %input{type:"text", name:name, value:item, class:"form-control",
                          placeholder:Helper.variable_type_to_description(value[0]).strip }

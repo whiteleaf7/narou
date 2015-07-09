@@ -225,6 +225,8 @@ class Narou::AppServer < Sinatra::Base
           else
             argument = "false"
           end
+        elsif param_data.kind_of?(Array)
+          argument = param_data.join(",")
         else
           argument = param_data
         end

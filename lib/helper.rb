@@ -175,7 +175,7 @@ module Helper
       "整数        "
     when :float
       "小数点数    "
-    when :string
+    when :string, :select, :multiple
       "文字列      "
     when :directory
       "フォルダパス"
@@ -219,7 +219,7 @@ module Helper
       else
         raise InvalidVariableType, type
       end
-    when :string
+    when :string, :select, :multiple
       result = value
     else
       raise UnknownVariableType, type

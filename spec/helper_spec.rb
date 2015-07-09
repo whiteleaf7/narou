@@ -68,6 +68,14 @@ describe Helper do
     context "string" do
       it { expect(Helper.string_cast_to_type("string", :string)).to eq "string" }
     end
+
+    context "select" do
+      it { expect(Helper.string_cast_to_type("string", :select)).to eq "string" }
+    end
+
+    context "multiple" do
+      it { expect(Helper.string_cast_to_type("string", :multiple)).to eq "string" }
+    end
   end
 
   describe ".date_string_to_time" do

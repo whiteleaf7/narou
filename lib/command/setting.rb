@@ -11,6 +11,14 @@ module Command
   class Setting < CommandBase
     include Narou::Eventable
 
+    VARIABLE_TYPE = 0
+    VARIABLE_SUMMARY = 1
+    VARIABLE_VISIBILITY = 2
+    VARIABLE_SELECT_KEYS = 3
+    VARIABLE_SELECT_VALUES = 3
+
+    class InvalidSelectValue < StandardError; end
+
     def self.oneline_help
       "各コマンドの設定を変更します"
     end
@@ -73,7 +81,25 @@ module Command
       unless scope
         raise Helper::InvalidVariableName, "#{name} は不明な名前です"
       end
-      casted_value = Helper.string_cast_to_type(value, SETTING_VARIABLES[scope][name][0])
+      variable_definition = SETTING_VARIABLES[scope][name]
+      case variable_definition[VARIABLE_TYPE]
+      when :select
+        select_values = variable_definition[VARIABLE_SELECT_KEYS]
+        unless select_values.include?(value)
+          raise InvalidSelectValue, "不明な値です。#{select_values.join(", ")} の中から指定して下さい"
+        end
+        casted_value = value
+      when :multiple
+        select_values = variable_definition[VARIABLE_SELECT_KEYS]
+        value.split(",").each do |input_value|
+          unless select_values.include?(input_value)
+            raise InvalidSelectValue, "不明な値です。#{select_values.join(", ")} の中から指定して下さい"
+          end
+        end
+        casted_value = value
+      else
+        casted_value = Helper.string_cast_to_type(value, variable_definition[VARIABLE_TYPE])
+      end
       [scope, casted_value]
     end
 
@@ -154,7 +180,7 @@ module Command
         end
         begin
           scope, casted_value = casting_variable(name, value)
-        rescue Helper::InvalidVariableName, Helper::InvalidVariableType => e
+        rescue Helper::InvalidVariableName, Helper::InvalidVariableType, InvalidSelectValue => e
           output_error(e.message, name)
           next
         end
@@ -226,12 +252,14 @@ module Command
 
     SETTING_VARIABLES = {
       local: {
-        # 変数名 => [受け付ける型, 説明(, 不可視化フラグ)]
-        "device" => [:string, "変換、送信対象の端末(sendの--help参照)"],
+        # 変数名 => [受け付ける型, 説明(, 不可視化フラグ, 選択肢, 各選択肢の表示名)]
+        "device" => [:select, "変換、送信対象の端末(sendの--help参照)", VISIBLE,
+                     Device::DEVICES.keys, Device::DEVICES.values.map { |d| d::DISPLAY_NAME }],
         "update.strong" => [:boolean, "更新漏れが無い様に改稿日の分は必ずDLするか"],
         "update.logging" => [:boolean, "更新時のログを保存するかどうか"],
         "update.convert-only-new-arrival" => [:boolean, "更新時に新着のみ変換を実行するかどうか"],
-        "update.sort-by" => [:string, "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries(40)}"],
+        "update.sort-by" => [:select, "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries(40)}",
+                             VISIBLE, Narou::UPDATE_SORT_KEYS.keys, Narou::UPDATE_SORT_KEYS.values],
         "convert.copy-to" => [:directory, "変換したらこのフォルダにコピーする\n" +
                                           " " * 6 + "※注意：存在しないフォルダだとエラーになる"],
         "convert.copy-to-grouping" => [:boolean, "copy-toで指定したフォルダの中で更にdevice毎にフォルダを振り分ける"],
@@ -243,7 +271,9 @@ module Command
         "convert.no-zip" => [:boolean, "i文庫用のzipファイル作成を無効にするか", INVISIBLE],
         "convert.no-open" => [:boolean, "変換時に保存フォルダを開かないようにするか"],
         "convert.inspect" => [:boolean, "常に変換時に調査結果を表示するか"],
-        "convert.multi-device" => [:string, "複数の端末用に同時に変換する。deviceよりも優先される。端末名をカンマ区切りで入力。ただのEPUBを出力したい場合はepubを指定"],
+        "convert.multi-device" => [:multiple, "複数の端末用に同時に変換する。deviceよりも優先される。" \
+                     "端末名をカンマ区切りで入力。ただのEPUBを出力したい場合はepubを指定", VISIBLE,
+                     Device::DEVICES.keys, Device::DEVICES.values.map { |d| d::DISPLAY_NAME }],
         "download.interval" => [:float, "各話DL時に指定した秒数待機する。デフォルト0"],
         "download.wait-steps" => [:integer, "この値で指定した話数ごとにウェイトを入れる\n" +
                                        " " * 6 + "※注意：11以上を設定してもなろうの場合は10話ごとにウェイトが入ります"],

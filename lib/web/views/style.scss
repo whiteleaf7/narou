@@ -667,13 +667,12 @@ $console-color: white;
     width: 750px;
   }
 
-  input {
+  input, .input-style {
     @media (min-width: 501px) {
       float: right;
       width: 150px;
     }
     @media (max-width: 500px) {
-      float: left;
     }
   }
 
