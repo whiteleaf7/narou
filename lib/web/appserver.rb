@@ -303,7 +303,7 @@ class Narou::AppServer < Sinatra::Base
     @novel_title = @data["title"]
     @setting_variables = []
     @error_list = {}
-    @novel_setting = NovelSetting.new(@id, true)    # 空っぽの設定を作成
+    @novel_setting = NovelSetting.new(@id, true, true)    # 空っぽの設定を作成
     @novel_setting.settings = @novel_setting.load_setting_ini["global"]
     @original_settings = NovelSetting::ORIGINAL_SETTINGS
     @force_settings = NovelSetting.load_force_settings

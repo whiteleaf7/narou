@@ -53,7 +53,7 @@ module Command
 
     def display_log(title)
       puts "(#{title} の小説状態調査状況ログ)"
-      novel_setting = NovelSetting.load(title, false)
+      novel_setting = NovelSetting.load(title, false, false)
       puts Inspector.read_messages(novel_setting) || "調査ログがまだ無いようです"
     end
   end
