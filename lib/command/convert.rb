@@ -90,6 +90,9 @@ module Command
       @opt.on("-v", "--verbose", "AozoraEpub3, kindlegen の標準出力を全て表示する") {
         @options["verbose"] = true
       }
+      @opt.on("--ignore-default", "settingコマンドのdefault系設定を無視する") {
+        @options["ignore-default"] = true
+      }
       @opt.on("--ignore-force", "settingコマンドのforce系設定を無視する") {
         @options["ignore-force"] = true
       }
@@ -194,6 +197,7 @@ module Command
                   output_filename: @output_filename,
                   display_inspector: @options["inspect"],
                   ignore_force: @options["ignore-force"],
+                  ignore_default: @options["ignore-default"],
                 })
           @novel_data = Downloader.get_data_by_target(target)
         end
@@ -250,6 +254,7 @@ module Command
                output_filename: @output_filename,
                display_inspector: @options["inspect"],
                ignore_force: @options["ignore-force"],
+               ignore_default: @options["ignore-default"],
              })
     rescue ArgumentError => e
       if e.message =~ /invalid byte sequence in UTF-8/

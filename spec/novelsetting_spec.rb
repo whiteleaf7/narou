@@ -11,7 +11,7 @@ describe NovelSetting do
   context "setting.ini 書き出し関係" do
     before do
       @tmpdir = Dir.mktmpdir
-      @novel_setting = NovelSetting.new(@tmpdir, true)
+      @novel_setting = NovelSetting.new(@tmpdir, true, true)
       @inipath = File.join(@tmpdir, NovelSetting::INI_NAME)
     end
 

@@ -9,7 +9,7 @@ require_relative "../lib/converterbase"
 
 describe ConverterBase do
   before do
-    novelsetting = NovelSetting.create("", true)
+    novelsetting = NovelSetting.create("", true, true)
     inspector = Inspector.new(novelsetting)
     @converter = ConverterBase.new(novelsetting, inspector, nil)
   end

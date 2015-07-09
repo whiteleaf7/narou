@@ -32,9 +32,10 @@ class NovelConverter
   def self.convert(target, options = {})
     options = {
       # default paraeters
-      output_filename: nil, display_inspector: false, ignore_force: false,
+      output_filename: nil, display_inspector: false,
+      ignore_force: false, ignore_default: false
     }.merge(options)
-    setting = NovelSetting.load(target, options[:ignore_force])
+    setting = NovelSetting.load(target, options[:ignore_force], options[:ignore_default])
     if setting
       novel_converter = new(setting, options[:output_filename], options[:display_inspector])
       return {
@@ -51,7 +52,8 @@ class NovelConverter
   def self.convert_file(filename, options = {})
     options = {
       # default parameters
-      encoding: nil, output_filename: nil, display_inspector: false, ignore_force: false,
+      encoding: nil, output_filename: nil, display_inspector: false,
+      ignore_force: false, ignore_default: false
     }.merge(options)
     output_filename = options[:output_filename]
     if output_filename
@@ -59,7 +61,7 @@ class NovelConverter
     else
       archive_path = File.dirname(filename) + "/"
     end
-    setting = NovelSetting.create(archive_path, options[:ignore_force])
+    setting = NovelSetting.create(archive_path, options[:ignore_force], options[:ignore_default])
     setting.author = ""
     setting.title = File.basename(filename)
     novel_converter = new(setting, output_filename, options[:display_inspector])

@@ -15,8 +15,8 @@ class NovelSetting
   #
   # データベースに登録されている小説の設定を取得する
   #
-  def self.load(target, ignore_force)
-    setting = create(target, ignore_force)
+  def self.load(target, ignore_force, ignore_default)
+    setting = create(target, ignore_force, ignore_default)
     data = Downloader.get_data_by_target(target)
     setting.id = data["id"]
     setting.author = data["author"]
@@ -30,15 +30,15 @@ class NovelSetting
   # target には小説ID等の他、小説保存フォルダを指定できる。
   # テキストファイル変換時はデータベースに登録されていないので load ではなくこちらを使用する
   #
-  def self.create(target, ignore_force)
-    setting = new(target, ignore_force)
+  def self.create(target, ignore_force, ignore_default)
+    setting = new(target, ignore_force, ignore_default)
     setting.load_settings
     setting.set_attribute
     setting.load_replace_pattern
     setting
   end
 
-  def initialize(target, ignore_force)
+  def initialize(target, ignore_force, ignore_default)
     if File.directory?(target.to_s)
       archive_path = target
     else
@@ -46,6 +46,7 @@ class NovelSetting
     end
     @archive_path = File.expand_path(archive_path)
     @ignore_force = ignore_force
+    @ignore_default = ignore_default
     @replace_pattern = []
     @settings = {}
   end
@@ -71,7 +72,7 @@ class NovelSetting
     @settings.clear
     ini = load_setting_ini
     force_settings = @ignore_force ? {} : NovelSetting.load_force_settings
-    default_settings = NovelSetting.load_default_settings
+    default_settings = @ignore_default ? {} : NovelSetting.load_default_settings
     ORIGINAL_SETTINGS.each do |element|
       name, value, type = element[:name], element[:value], element[:type]
       if force_settings.include?(name)

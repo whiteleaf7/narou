@@ -80,7 +80,7 @@ describe "convert" do
     dir = File.dirname(path)
     filename = File.basename(path)
     $stdout.silence do
-      CommandLine.run(["convert", path, "--no-epub", "--no-open", "--ignore-force"])
+      CommandLine.run(["convert", path, "--no-epub", "--no-open", "--ignore-force", "--ignore-default"])
     end
     output_file = File.join(dir, "[#{AUTHOR}] #{filename}")
     correct_file = File.join(dir, "correct_#{filename}")

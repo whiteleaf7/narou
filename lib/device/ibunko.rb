@@ -26,7 +26,7 @@ module Device::Ibunko
     # TODO: テキストファイル変換時もsettingを取れるようにする
     setting = {}
     if @novel_data
-      setting = NovelSetting.load(@novel_data["id"], @options["ignore-force"])
+      setting = NovelSetting.load(@novel_data["id"], @options["ignore-force"], @options["ignore-default"])
     end
     dirpath = File.dirname(@converted_txt_path)
     translate_illust_chuki_to_img_tag
