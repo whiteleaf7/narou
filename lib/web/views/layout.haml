@@ -22,6 +22,7 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     :javascript
       var local_initialize_functions = [];
+      var slideNavbar;
   %body
     - if session[:alert]
       - message, type = session[:alert]
@@ -47,7 +48,7 @@
     %script{:src => "/resources/common.ui.js"}
     :javascript
       $(document).ready(function($) {
-        var slideNavbar = $(".navbar-collapse").slideNavbar();
+        slideNavbar = $(".navbar-collapse").slideNavbar();
         $.each(local_initialize_functions, function() {
           this($);
         });
