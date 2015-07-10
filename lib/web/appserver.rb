@@ -299,8 +299,8 @@ class Narou::AppServer < Sinatra::Base
   end
 
   before "/novels/:id/setting" do
-    @title = "小説の変換設定"
     @novel_title = @data["title"]
+    @title = "小説の変換設定 - #{h @novel_title}"
     @setting_variables = []
     @error_list = {}
     @novel_setting = NovelSetting.new(@id, true, true)    # 空っぽの設定を作成
