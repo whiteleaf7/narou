@@ -200,7 +200,6 @@ class Narou::AppServer < Sinatra::Base
 
   before "/settings" do
     @title = "環境設定"
-    @view_invisible = params["view_invisible"] == "1"
     @setting_variables = Command::Setting.get_setting_variables
     @error_list = {}
     @global_replace_pattern = @replace_pattern = Narou.global_replace_pattern

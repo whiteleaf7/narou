@@ -13,7 +13,6 @@
   });
 
 %form(action="/settings" method="POST")
-  %input(type="hidden" name="view_invisible" value="#{@view_invisible ? 1 : 0}")
   .navbar.navbar-default.navbar-fixed-top(role="navigation")
     .container
       .navbar-header
@@ -38,115 +37,104 @@
           %span#queue 0
 
   .container.container-main.theme-showcase(role="main")
-    - @setting_variables.each do |scope, variables|
-      - inventory = Inventory.load("#{scope}_setting", scope)
-      - unless @view_invisible
-        -# 隠しパラメータは配列の最初の方に集めておく
-        -# (リストの最後に隠しパラメータがあると、リストの最下部の表示が切れるため)
-        - variables = variables.select { |_, v| v[:invisible] }.merge(variables.reject { |_, v| v[:invisible] })
+    .container-settings
+      %p
+        %ul.nav.nav-pills(role="tablist")
+          - Command::Setting.get_setting_tab_names.each.with_index do |(key, name), index|
+            %li(role="presentation"){class: index == 0 ? "active" : nil}
+              %a{ href: "##{key}", :"aria-controls" => "#{key}", role: "tab", :"data-toggle" => "tab" }
+                = name
+          %li(role="presentation")
+            %a(href="#replace" aria-controls="replace" role="tab" data-toggle="tab")
+              置換設定
 
-      %p.panel-settings-link
-        - if scope == :local
-          goto <a href="#global" data-move-to="#global">Global Variables</a>
-          ・
-          <a href="#replace-panel" data-move-to="#replace-panel">置換設定</a>
-        - else
-          goto <a href="#local" data-move-to="#local">Local Variables</a>
-          ・
-          <a href="#replace-panel" data-move-to="#replace-panel">置換設定</a>
+      - inventory = Inventory.load("local_setting", :local).merge(Inventory.load("global_setting", :global))
+      - local_and_global_variables = @setting_variables[:local].merge(@setting_variables[:global])
+      - tab_info = Command::Setting.get_setting_tab_info
 
-      .panel.panel-primary.panel-settings
-        .panel-heading{id: scope} #{scope.capitalize} Variables
-        .panel-body.list-group-item-info
-          ・各コマンドの設定の変更が出来ます<br>
-          - if scope == :local
-            - if @view_invisible
-              ・default.* 系の設定は個別の変換設定で未設定の項目の挙動を指定することが出来ます<br>
-              ・force.* 系の設定は個別設定、default.* 等の設定を無視して反映されるようになります<br>
-              ・default_args.* 系の設定は、各種コマンドのオプションを省略した場合に使用されるオプションを指定出来ます<br>
+      -# :tab が設定されていないものを hidden として設定しておく
+      - local_and_global_variables.each do |name, value|
+        - unless value[:tab]
+          - item = inventory[name]
+          - if value[:type] == :boolean
+            - hidden_value = convert_boolean_to_on_off(item)
           - else
-            ・Global な設定はユーザープロファイルに保存され、すべての narou コマンドで使われます<br>
-          - if @view_invisible
-            ・隠しオプションを非表示にするには<a href="?##{scope}"><u>ここをクリック</u></a><br>
-          - else
-            ・隠しオプションを表示するには<a href="?view_invisible=1##{scope}"><u>ここをクリック</u></a><br>
-        .list-group
-          - variables.each do |name, value|
-            - item = inventory[name]
-            - unless @view_invisible
-              - if value[:invisible]
-                - if value[:type] == :boolean
-                  - hidden_value = convert_boolean_to_on_off(item)
-                - else
-                  - hidden_value = item
-                %input{type:"hidden", name:name, value:hidden_value}
-                - next
-            - message = Narou::SETTING_VARIABLES_WEBUI_MESSAGES[name] || value[:help]
-            - message = message.strip.gsub("\n", "<br>")
-            - error_style = {class: "has-error", style: "background-color:#f2dede"}
-            .list-group-item.form-group{@error_list[name] ? error_style : {}}
-              %h4.list-group-item-heading #{name}
-              .list-group-item-text
-                - case value[:type]
-                - when :boolean
-                  - if name =~ /^(force|default)\./
-                    .switch-toggle.well.switch-3
-                      <input id="#{name}-nil" type="radio" name="#{name}" value="nil" #{item.nil? ? "checked" : ""}>
-                      %label(for="#{name}-nil")
-                        未設定
-                      <input id="#{name}-false" type="radio" name="#{name}" value="off" #{item == false ? "checked" : ""}>
-                      %label(for="#{name}-false")
-                        しない
-                      <input id="#{name}-true" type="radio" name="#{name}" value="on" #{item ? "checked" : ""}>
-                      %label(for="#{name}-true")
-                        する
-                      %a.btn.btn-primary
-                  - else
-                    %label.switch-light.well
-                      <input type="checkbox" name="#{name}" #{item ? "checked" : ""}>
-                      - if name == "over18"
-                        %span
-                          %span いいえ
-                          %span はい
+            - hidden_value = item
+          %input{type:"hidden", name:name, value:hidden_value}
+
+      .tab-content
+        - Command::Setting.get_setting_tab_names.each.with_index do |(key, _), index|
+          .tab-pane{ role: "tabpanel", id: "#{key}", class: index == 0 ? "active" : nil }
+            .panel.panel-info.panel-settings
+              - if tab_info.has_key?(key)
+                .panel-heading
+                  = tab_info[key]
+              .list-group
+                - local_and_global_variables.each do |name, value|
+                  - next if value[:tab] != key
+                  - item = inventory[name]
+                  - message = Narou::SETTING_VARIABLES_WEBUI_MESSAGES[name] || value[:help]
+                  - message = message.strip.gsub("\n", "<br>")
+                  - error_style = {class: "has-error", style: "background-color:#f2dede"}
+                  .list-group-item.form-group{@error_list[name] ? error_style : {}}
+                    %h4.list-group-item-heading #{name}
+                    .list-group-item-text
+                      - case value[:type]
+                      - when :boolean
+                        - if name =~ /^(force|default)\./
+                          .switch-toggle.well.switch-3
+                            <input id="#{name}-nil" type="radio" name="#{name}" value="nil" #{item.nil? ? "checked" : ""}>
+                            %label(for="#{name}-nil")
+                              未設定
+                            <input id="#{name}-false" type="radio" name="#{name}" value="off" #{item == false ? "checked" : ""}>
+                            %label(for="#{name}-false")
+                              しない
+                            <input id="#{name}-true" type="radio" name="#{name}" value="on" #{item ? "checked" : ""}>
+                            %label(for="#{name}-true")
+                              する
+                            %a.btn.btn-primary
+                        - else
+                          %label.switch-light.well
+                            <input type="checkbox" name="#{name}" #{item ? "checked" : ""}>
+                            - if name == "over18"
+                              %span
+                                %span いいえ
+                                %span はい
+                            - else
+                              %span
+                                %span しない
+                                %span する
+                            %a.btn.btn-primary
+                      - when :select
+                        %div.input-style
+                          %select{name: name, class: "selectpicker show-tick"}
+                            %option(value="") 未設定
+                            - value[:select_keys].each_with_index do |key, index|
+                              %option{selected: item == key, value: key}
+                                = value[:select_summaries][index]
+                      - when :multiple
+                        %div.input-style
+                          %select{name: "#{name}[]", class: "selectpicker", multiple: true, title: "未設定"}
+                            - selected_items = item.to_s.split(",")
+                            - value[:select_keys].each_with_index do |key, index|
+                              %option{selected: selected_items.include?(key), value: key}
+                                = value[:select_summaries][index]
                       - else
-                        %span
-                          %span しない
-                          %span する
-                      %a.btn.btn-primary
-                - when :select
-                  %div.input-style
-                    %select{name: name, class: "selectpicker show-tick"}
-                      %option(value="") 未設定
-                      - value[:select_keys].each_with_index do |key, index|
-                        %option{selected: item == key, value: key}
-                          = value[:select_summaries][index]
-                - when :multiple
-                  %div.input-style
-                    %select{name: "#{name}[]", class: "selectpicker", multiple: true, title: "未設定"}
-                      - selected_items = item.to_s.split(",")
-                      - value[:select_keys].each_with_index do |key, index|
-                        %option{selected: selected_items.include?(key), value: key}
-                          = value[:select_summaries][index]
-                - else
-                  %input{type:"text", name:name, value:item, class:"form-control",
-                         placeholder:Helper.variable_type_to_description(value[:type]).strip }
-                %p
-                  = message != "" ? message : "&nbsp;"
-                - if @error_list[name]
-                  %p.alert-danger
-                    = @error_list[name]
-                .clear
+                        %input{type:"text", name:name, value:item, class:"form-control",
+                               placeholder:Helper.variable_type_to_description(value[:type]).strip }
+                      %p
+                        = message != "" ? message : "&nbsp;"
+                      - if @error_list[name]
+                        %p.alert-danger
+                          = @error_list[name]
+                      .clear
 
-    %p.panel-settings-link
-      goto <a href="#local" data-move-to="#local">Local Variables</a>
-      ・
-      <a href="#global" data-move-to="#global">Global Variables</a>
+        .tab-pane(role="tabpanel" id="replace")
+          - @replace_panel_var = { title: "全小説対象の置換設定",
+            panel_class: "panel-primary",
+            body_class: "list-group-item-info",
+            body: ["・全ての小説に対する置換設定を行うことが出来ます",
+                   "・変更を反映させるには再度変換を実行する必要があります"] }
+          = haml :edit_replace_txt
 
-    - @replace_panel_var = { title: "全小説対象の置換設定",
-      panel_class: "panel-primary",
-      body_class: "list-group-item-info",
-      body: ["・全ての小説に対する置換設定を行うことが出来ます",
-             "・変更を反映させるには再度変換を実行する必要があります"] }
-    = haml :edit_replace_txt
-
-    %input(type="submit" value="設定を保存" class="btn btn-info" style="float:none")
+        %input(type="submit" value="設定を保存" class="btn btn-info" style="float:none")

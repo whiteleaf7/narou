@@ -658,13 +658,15 @@ $console-color: white;
   }
 }
 
+.container-settings {
+  @media (min-width: 768px) {
+    width: 750px;
+  }
+}
+
 .panel-settings {
   h4 {
     word-break: break-all;
-  }
-
-  @media (min-width: 768px) {
-    width: 750px;
   }
 
   input, .input-style {
