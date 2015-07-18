@@ -38,19 +38,22 @@
 
   .container.container-main.theme-showcase(role="main")
     .container-settings
+      - inventory = Inventory.load("local_setting", :local).merge(Inventory.load("global_setting", :global))
+      - local_and_global_variables = @setting_variables[:local].merge(@setting_variables[:global])
+      - tab_info = Command::Setting.get_setting_tab_info
+      - error_tabs = @error_list.map { |name, _| local_and_global_variables[name][:tab] }.uniq
+
       %p
         %ul.nav.nav-pills(role="tablist")
           - Command::Setting.get_setting_tab_names.each.with_index do |(key, name), index|
             %li(role="presentation"){class: index == 0 ? "active" : nil}
               %a{ href: "##{key}", :"aria-controls" => "#{key}", role: "tab", :"data-toggle" => "tab" }
                 = name
+                - if error_tabs.include?(key)
+                  %span.text-danger.glyphicon.glyphicon-exclamation-sign
           %li(role="presentation")
             %a(href="#replace" aria-controls="replace" role="tab" data-toggle="tab")
               置換設定
-
-      - inventory = Inventory.load("local_setting", :local).merge(Inventory.load("global_setting", :global))
-      - local_and_global_variables = @setting_variables[:local].merge(@setting_variables[:global])
-      - tab_info = Command::Setting.get_setting_tab_info
 
       -# :tab が設定されていないものを hidden として設定しておく
       - local_and_global_variables.each do |name, value|
