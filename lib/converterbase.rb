@@ -1225,7 +1225,13 @@ class ConverterBase
       symbol = false
       case char
       when "｜"
-        ss.scan(/.+?》/)
+        buffer << char
+        if ss.scan(/.+?》/)
+          buffer << "#{ss.matched}"
+        else
+          before_symbol = false
+        end
+        next
       when "［"
         buffer << char
         if ss.scan(/^＃.+?］/)
