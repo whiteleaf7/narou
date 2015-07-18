@@ -419,9 +419,11 @@ class Narou::AppServer < Sinatra::Base
   end
 
   post "/api/download" do
-    target = params["target"] or pass
+    targets = params["targets"] or pass
+    targets = targets.split
+    pass if targets.size == 0
     Narou::Worker.push do
-      CommandLine.run!(["download", target])
+      CommandLine.run!(["download"] + targets)
       @@push_server.send_all("table.reload" => true)
     end
   end
