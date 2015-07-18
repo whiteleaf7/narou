@@ -10,6 +10,19 @@
       container: "body",
       width: "100%"
     });
+
+    var storage = new Narou.Storage;
+    // 直前に開いていたタブを復元
+    var related_active_tab = storage.get("related_active_tab");
+    if (related_active_tab) {
+      $('a[href="#' + related_active_tab + '"]').tab("show");
+    }
+    // 開いたタブを記憶しておく
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+      var active_tab = (e.target + "").split("#")[1];
+      storage.set("related_active_tab", active_tab);
+      storage.save();
+    })
   });
 
 %form(action="/settings" method="POST")
