@@ -134,8 +134,8 @@
 
         .tab-pane(role="tabpanel" id="replace")
           - @replace_panel_var = { title: "全小説対象の置換設定",
-            panel_class: "panel-primary",
-            body_class: "list-group-item-info",
+            panel_class: "panel-info",
+            body_class: "list-group-item-default",
             body: ["・全ての小説に対する置換設定を行うことが出来ます",
                    "・変更を反映させるには再度変換を実行する必要があります"] }
           = haml :edit_replace_txt
