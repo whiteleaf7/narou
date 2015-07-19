@@ -15,8 +15,11 @@ require_relative "progressbar"
 require_relative "helper"
 require_relative "inventory"
 require_relative "html"
+require_relative "eventable"
 
 class NovelConverter
+  include Narou::Eventable
+
   NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
   NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO = "ibunko_novel.txt"
 
@@ -208,7 +211,7 @@ class NovelConverter
   # EPUBファイルをkindlegenでMOBIへ
   # AozoraEpub3.jar と同じ場所に kindlegen が無ければ何もしない
   #
-  # 返り値：正常終了 :success、エラー終了 :error、中断終了 :abort、kindlegenがなかった nil
+  # 返り値：正常終了 :success、エラー終了 :error、中断終了 :abort
   #
   def self.epub_to_mobi(epub_path, verbose = false)
     kindlegen_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "kindlegen")
@@ -268,15 +271,61 @@ class NovelConverter
     @use_dakuten_font = false
   end
 
+  #
+  # 変換処理メインループ
+  #
+  def convert_main(text = nil)
+    display_header
+    initialize_event
+
+    if text
+      converted_text = convert_main_for_text(text)
+    else
+      converted_text = convert_main_for_novel
+      update_latest_convert_novel
+    end
+
+    inspect_novel(converted_text)
+
+    output_path = create_output_path(text, converted_text)
+    File.write(output_path, converted_text)
+
+    display_footer
+
+    output_path
+  end
+
+  def initialize_event
+    progressbar = nil
+
+    one(:"convert_main.init") do |toc|
+      progressbar = ProgressBar.new(toc["subtitles"].size)
+    end
+    on(:"convert_main.loop") do |i|
+      progressbar.output(i)
+    end
+    one(:"convert_main.finish") do
+      progressbar.clear
+    end
+  end
+
+  def display_header
+    print "ID:#{@novel_id}　" if @novel_id
+    puts "#{@novel_title} の変換を開始"
+  end
+
+  def display_footer
+    puts "縦書用の変換が終了しました"
+  end
+
   def load_novel_section(subtitle_info)
     file_subtitle = subtitle_info["file_subtitle"] || subtitle_info["subtitle"]   # 互換性維持のため
     path = File.join(@section_save_dir, "#{subtitle_info["index"]} #{file_subtitle}.yaml")
     YAML.load_file(path)
   end
 
-  def create_novel_text_by_template(sections)
-    toc = @toc
-    cover_chuki = @cover_chuki
+  def create_novel_text_by_template(sections, toc)
+    cover_chuki = create_cover_chuki
     device = Narou.get_device
     setting = @setting
     processed_title = toc["title"]
@@ -329,84 +378,100 @@ class NovelConverter
     end
   end
 
-  def find_site_setting
-    @@site_settings.find { |s| s.multi_match(@toc["toc_url"], "url") }
+  #
+  # 目次情報からサイト設定を取得
+  #
+  def find_site_setting(toc)
+    @@site_settings.find { |s| s.multi_match(toc["toc_url"], "url") }
   end
 
   #
-  # 変換処理メイン
+  # 各小説用の converter.rb 変換オブジェクトを生成
   #
-  def convert_main(text = nil)
-    print "ID:#{@novel_id}　" if @novel_id
-    puts "#{@novel_title} の変換を開始"
-    sections = []
-    @cover_chuki = create_cover_chuki
+  def create_converter
+    load_converter(@novel_title, @setting.archive_path).new(@setting, @inspector, @illustration)
+  end
 
-    conv = load_converter(@novel_title, @setting.archive_path).new(@setting, @inspector, @illustration)
-    if text
-      result = conv.convert(text, "textfile")
-      unless @setting.enable_enchant_midashi
-        @inspector.info "テキストファイルの処理を実行しましたが、改行直後の見出し付与は有効になっていません。" +
-                        "setting.ini の enable_enchant_midashi を true にすることをお薦めします。"
-      end
-      splited = result.split("\n", 3)
-      result = [splited[0], splited[1], @cover_chuki, splited[2]].join("\n")   # 表紙の挿絵注記を3行目に挟み込む
-    else
-      @section_save_dir = Downloader.get_novel_section_save_dir(@setting.archive_path)
-      @toc = Downloader.get_toc_data(@setting.archive_path)
-      @toc["story"] = conv.convert(@toc["story"], "story")
-      html = HTML.new
-      site_setting = find_site_setting
-      html.set_illust_setting({current_url: site_setting["illust_current_url"],
-                               grep_pattern: site_setting["illust_grep_pattern"]})
-      progressbar = ProgressBar.new(@toc["subtitles"].size)
-      @toc["subtitles"].each_with_index do |subinfo, i|
-        progressbar.output(i)
-        section = load_novel_section(subinfo)
-        if section["chapter"].length > 0
-          section["chapter"] = conv.convert(section["chapter"], "chapter")
-        end
-        @inspector.subtitle = section["subtitle"]
-        element = section["element"]
-        data_type = element.delete("data_type") || "text"
-        element.each do |text_type, elm_text|
-          if data_type == "html"
-            html.string = elm_text
-            elm_text = html.to_aozora
-          end
-          element[text_type] = conv.convert(elm_text, text_type)
-        end
-        section["subtitle"] = conv.convert(section["subtitle"], "subtitle")
-        sections << section
-      end
-      progressbar.clear
-      result = create_novel_text_by_template(sections)
-    end
-
-    @use_dakuten_font = conv.use_dakuten_font
-
-    inspect_novel(result)
-
+  #
+  # 最終的に出力するパスを生成
+  #
+  def create_output_path(is_text_file_mode, converted_text)
+    output_path = ""
     if @output_filename
-      save_path = File.join(@setting.archive_path, File.basename(@output_filename))
+      output_path = File.join(@setting.archive_path, File.basename(@output_filename))
     else
-      if text
-        info = get_title_and_author_by_text(result)
+      if is_text_file_mode
+        info = get_title_and_author_by_text(converted_text)
       else
         info = { "author" => @novel_author, "title" => @novel_title }
       end
-      save_filename = Narou.create_novel_filename(info)
-      save_path = File.join(@setting.archive_path, save_filename)
-      if save_path !~ /\.\w+$/
-        save_path += ".txt"
+      filename = Narou.create_novel_filename(info)
+      output_path = File.join(@setting.archive_path, filename)
+      if output_path !~ /\.\w+$/
+        output_path += ".txt"
       end
     end
-    File.write(save_path, result)
-    puts "縦書用の変換が終了しました"
+    output_path
+  end
 
-    update_latest_convert_novel
+  #
+  # テキストファイル変換時の実質的なメイン処理
+  #
+  def convert_main_for_text(text)
+    conv = create_converter
+    result = conv.convert(text, "textfile")
+    unless @setting.enable_enchant_midashi
+      @inspector.info "テキストファイルの処理を実行しましたが、改行直後の見出し付与は有効になっていません。" +
+                      "setting.ini の enable_enchant_midashi を true にすることをお薦めします。"
+    end
+    splited = result.split("\n", 3)
+    # 表紙の挿絵注記を3行目に挟み込む
+    converted_text = [splited[0], splited[1], create_cover_chuki, splited[2]].join("\n")
 
-    save_path
+    @use_dakuten_font = conv.use_dakuten_font
+
+    converted_text
+  end
+
+  #
+  # 管理小説変換時の実質的なメイン処理
+  #
+  def convert_main_for_novel
+    conv = create_converter
+    sections = []
+    @section_save_dir = Downloader.get_novel_section_save_dir(@setting.archive_path)
+    toc = Downloader.get_toc_data(@setting.archive_path)
+    toc["story"] = conv.convert(toc["story"], "story")
+    html = HTML.new
+    site_setting = find_site_setting(toc)
+    html.set_illust_setting({current_url: site_setting["illust_current_url"],
+                             grep_pattern: site_setting["illust_grep_pattern"]})
+    trigger(:"convert_main.init", toc)
+    toc["subtitles"].each_with_index do |subinfo, i|
+      trigger(:"convert_main.loop", i)
+      section = load_novel_section(subinfo)
+      if section["chapter"].length > 0
+        section["chapter"] = conv.convert(section["chapter"], "chapter")
+      end
+      @inspector.subtitle = section["subtitle"]
+      element = section["element"]
+      data_type = element.delete("data_type") || "text"
+      element.each do |text_type, elm_text|
+        if data_type == "html"
+          html.string = elm_text
+          elm_text = html.to_aozora
+        end
+        element[text_type] = conv.convert(elm_text, text_type)
+      end
+      section["subtitle"] = conv.convert(section["subtitle"], "subtitle")
+      sections << section
+    end
+    trigger(:"convert_main.finish")
+    converted_text = create_novel_text_by_template(sections, toc)
+
+    @use_dakuten_font = conv.use_dakuten_font
+
+    converted_text
   end
 
   #
