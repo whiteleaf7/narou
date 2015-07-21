@@ -375,8 +375,7 @@ module Command
       },
       global: {
         "aozoraepub3dir" => {
-          type: :directory, help: "AozoraEpub3のあるフォルダを指定", invisible: true,
-          tab: :global
+          type: :directory, help: "AozoraEpub3のあるフォルダを指定", invisible: true
         },
         "difftool" => {
           type: :string, help: "Diffで使うツールのパスを指定する",
