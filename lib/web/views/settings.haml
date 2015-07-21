@@ -112,7 +112,7 @@
                         - else
                           %label.switch-light.well
                             <input type="checkbox" name="#{name}" #{item ? "checked" : ""}>
-                            - if name == "over18"
+                            - if name == "over18" || name =~ /^dismiss\-notice/
                               %span
                                 %span いいえ
                                 %span はい
