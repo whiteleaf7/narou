@@ -65,6 +65,7 @@ module Command
 
     def interactive_mode
       targets = []
+      return targets if Narou.web?
       puts "【対話モード】"
       puts "ダウンロードしたい小説のNコードもしくはURLを入力して下さい。(1行に1つ)"
       puts "連続して複数の小説を入力していきます。"
