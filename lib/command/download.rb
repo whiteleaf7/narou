@@ -124,7 +124,14 @@ module Command
           end
           next
         end
-        if Downloader.start(download_target, @options["force"], true).status != :ok
+        begin
+          downloader = Downloader.new(download_target, force: @options["force"], from_download: true)
+        rescue Downloader::InvalidTarget => e
+          error e.message
+          mistook_count += 1
+          next
+        end
+        if downloader.start_download.status != :ok
           mistook_count += 1
           next
         end

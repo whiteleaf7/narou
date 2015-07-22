@@ -34,44 +34,27 @@ class Downloader
 
   attr_reader :id
 
-  #
-  # ターゲット(ID、URL、Nコード、小説名)を指定して小説データのダウンロードを開始する
-  #
-  # force が true なら全話強制ダウンロード
-  #
-  def self.start(target, force = false, from_download = false)
-    setting = nil
-    target = Narou.alias_to_id(target)
-    fail_status = OpenStruct.new(:id => nil, :new_arrivals => nil,
-                                 :status => false).freeze
-    case type = get_target_type(target)
-    when :url, :ncode
-      setting = get_sitesetting_by_target(target)
-      unless setting
-        error "対応外の#{type}です(#{target})"
-        return fail_status
-      end
-    when :id
-      data = @@database[target.to_i]
-      unless data
-        error "指定のID(#{target})は存在しません"
-        return fail_status
-      end
-      setting = get_sitesetting_by_sitename(data["sitename"])
-      setting.multi_match(data["toc_url"], "url")
-    when :other
-      data = @@database.get_data("title", target)
-      if data
-        setting = get_sitesetting_by_sitename(data["sitename"])
-        setting.multi_match(data["toc_url"], "url")
-      else
-        error "指定の小説(#{target})は存在しません"
-        return fail_status
+  class InvalidTarget < StandardError; end
+
+  def initialize(target, options = {})
+    id = Downloader.get_id_by_target(target)
+    options = {
+      force: false, from_download: false,
+    }.merge(options)
+    setting = Downloader.get_sitesetting_by_target(target)
+
+    unless setting
+      case type = Downloader.get_target_type(target)
+      when :url, :ncode
+        raise InvalidTarget, "対応外の#{type}です(#{target})"
+      when :id
+        raise InvalidTarget, "指定のID(#{target})は存在しません"
+      when :other
+        raise InvalidTarget, "指定の小説(#{target})は存在しません"
       end
     end
-    downloader = Downloader.new(setting, force, from_download)
-    result = downloader.start_download
-    result
+
+    initialize_variables(id, setting, options)
   end
 
   #
@@ -286,37 +269,42 @@ class Downloader
   end
 
   #
-  # コンストラクタ
+  # 変数初期化
   #
-  def initialize(site_setting, force = false, from_download = false)
+  def initialize_variables(id, setting, options)
     @title = nil
     @file_title = nil
-    @setting = site_setting
-    @force = force
-    @from_download = from_download
+    @setting = setting
+    @force = options[:force]
+    @from_download = options[:form_download]
     @cache_dir = nil
     @new_arrivals = false
     @novel_data_dir = nil
     @novel_status = nil
-    @id = @@database.get_id("toc_url", @setting["toc_url"]) || @@database.get_new_id
+    @id = id || @@database.create_new_id
     @new_novel = @@database[@id].!
     @section_download_cache = {}
-
-    # ウェイト管理関係初期化
-    @@__run_once ||= false
-    unless @@__run_once
-      @@__run_once = true
-      @@__wait_counter = 0
-      @@__last_download_time = Time.now - 20
-      @@interval_sleep_time = Inventory.load("local_setting", :local)["download.interval"] || 0
-      @@interval_sleep_time = 0 if @@interval_sleep_time < 0
-      @@max_steps_wait_time = [STEPS_WAIT_TIME, @@interval_sleep_time].max
-    end
     @download_wait_steps = Inventory.load("local_setting", :local)["download.wait-steps"] || 0
     @download_use_subdirectory = use_subdirectory?
     if @setting["is_narou"] && (@download_wait_steps > 10 || @download_wait_steps == 0)
       @download_wait_steps = 10
     end
+    initialize_wait_counter
+  end
+
+  #
+  # ウェイト関係初期化
+  #
+  def initialize_wait_counter
+    @@__run_once ||= false
+    unless @@__run_once
+      @@__run_once = true
+      @@__wait_counter = 0
+      @@__last_download_time = Time.now - 20
+    end
+    @@interval_sleep_time = Inventory.load("local_setting", :local)["download.interval"] || 0
+    @@interval_sleep_time = 0 if @@interval_sleep_time < 0
+    @@max_steps_wait_time = [STEPS_WAIT_TIME, @@interval_sleep_time].max
   end
 
   #

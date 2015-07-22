@@ -100,7 +100,7 @@ class Database
     nil
   end
 
-  def get_new_id
+  def create_new_id
     max_id = @database.keys.max
     id = max_id ? max_id + 1 : 0
     id

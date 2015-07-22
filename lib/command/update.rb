@@ -142,7 +142,8 @@ module Command
             mistook_count += 1
             next
           end
-          result = Downloader.start(target)
+          downloader = Downloader.new(target)
+          result = downloader.start_download
           case result.status
           when :ok
             unless @options["no-convert"] ||
@@ -253,8 +254,8 @@ module Command
 
     # オンラインの目次からgeneral_lastupを取得する
     # ただし、toc.yaml に最新話が存在し、かつsubdateが設定されていたらそれを使う
-    def get_latest_dates(setting)
-      downloader = Downloader.new(setting)
+    def get_latest_dates(target)
+      downloader = Downloader.new(target)
       old_toc = downloader.load_toc_file
       latest_toc = downloader.get_latest_table_of_contents(old_toc, through_error: true)
       {
