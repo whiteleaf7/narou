@@ -40,6 +40,7 @@ class Downloader
     id = Downloader.get_id_by_target(target)
     options = {
       force: false, from_download: false,
+      stream: $stdout
     }.merge(options)
     setting = Downloader.get_sitesetting_by_target(target)
 
@@ -122,8 +123,8 @@ class Downloader
     else
       @@database.delete(id)
       @@database.save_database
-      error "#{path} が見つかりません。"
-      warn "保存フォルダが消去されていたため、データベースのインデックスを削除しました。"
+      error "#{path} が見つかりません。\n" \
+            "保存フォルダが消去されていたため、データベースのインデックスを削除しました。"
       return nil
     end
   end
@@ -277,6 +278,7 @@ class Downloader
     @setting = setting
     @force = options[:force]
     @from_download = options[:form_download]
+    @stream = options[:stream]
     @cache_dir = nil
     @new_arrivals = false
     @novel_data_dir = nil
@@ -360,12 +362,12 @@ class Downloader
     old_toc = @new_novel ? nil : load_toc_file
     latest_toc = get_latest_table_of_contents(old_toc)
     unless latest_toc
-      error @setting["toc_url"] + " の目次データが取得出来ませんでした"
+      @stream.error @setting["toc_url"] + " の目次データが取得出来ませんでした"
       return :failed
     end
     if @setting["confirm_over18"]
       unless confirm_over18?
-        puts "18歳以上のみ閲覧出来る小説です。ダウンロードを中止しました"
+        @stream.puts "18歳以上のみ閲覧出来る小説です。ダウンロードを中止しました"
         return :canceled
       end
     end
@@ -382,7 +384,7 @@ class Downloader
     end
 
     if old_toc.empty? && update_subtitles.count == 0
-      error "#{@setting['title']} の目次がありません"
+      @stream.error "#{@setting['title']} の目次がありません"
       return :failed
     end
 
@@ -405,23 +407,23 @@ class Downloader
           end
         rescue Interrupt
           remove_cache_dir
-          puts "ダウンロードを中断しました"
+          @stream.puts "ダウンロードを中断しました"
           exit Narou::EXIT_ERROR_CODE
         end
         update_database
         :ok
       when old_toc["subtitles"].size > latest_toc["subtitles"].size
         # 削除された節がある（かつ更新がない）場合
-        puts "#{id_and_title} は一部の話が削除されています"
+        @stream.puts "#{id_and_title} は一部の話が削除されています"
         :ok
       when old_toc["title"] != latest_toc["title"]
         # タイトルが更新されている場合
-        puts "#{id_and_title} のタイトルが更新されています"
+        @stream.puts "#{id_and_title} のタイトルが更新されています"
         update_database
         :ok
       when old_toc["story"] != latest_toc["story"]
         # あらすじが更新されている場合
-        puts "#{id_and_title} のあらすじが更新されています"
+        @stream.puts "#{id_and_title} のあらすじが更新されています"
         :ok
       else
         :none
@@ -435,7 +437,7 @@ class Downloader
           Command::Tag.execute!([@id, "--add", "end", "--color", "white"])
         end
         msg = old_toc.empty? ? "完結しているようです" : "完結したようです"
-        puts "<cyan>#{id_and_title.escape} は#{msg}</cyan>".termcolor
+        @stream.puts "<cyan>#{id_and_title.escape} は#{msg}</cyan>".termcolor
         return_status = :ok
       end
     else
@@ -444,7 +446,7 @@ class Downloader
         $stdout.silence do
           Command::Tag.execute!([@id, "--delete", "end"])
         end
-        puts "<cyan>#{id_and_title.escape} は連載を再開したようです</cyan>".termcolor
+        @stream.puts "<cyan>#{id_and_title.escape} は連載を再開したようです</cyan>".termcolor
         return_status = :ok
       end
     end
@@ -750,7 +752,7 @@ class Downloader
   rescue OpenURI::HTTPError, Errno::ECONNRESET => e
     raise if through_error   # エラー処理はしなくていいからそのまま例外を受け取りたい時用
     if e.message.include?("404")
-      error "小説が削除されているか非公開な可能性があります"
+      @stream.error "小説が削除されているか非公開な可能性があります"
       if @@database.novel_exists?(@id)
         $stdout.silence do
           Command::Tag.execute!(%W(#{@id} --add 404 --color white))
@@ -758,7 +760,7 @@ class Downloader
         Command::Freeze.execute!([@id])
       end
     else
-      error "何らかの理由により目次が取得できませんでした(#{e.message})"
+      @stream.error "何らかの理由により目次が取得できませんでした(#{e.message})"
     end
     false
   end
@@ -918,7 +920,7 @@ class Downloader
   def sections_download_and_save(subtitles)
     max = subtitles.size
     return if max == 0
-    puts "<bold><green>#{"ID:#{@id}　#{get_title}".escape} のDL開始</green></bold>".termcolor
+    @stream.puts "<bold><green>#{"ID:#{@id}　#{get_title}".escape} のDL開始</green></bold>".termcolor
     save_least_one = false
     subtitles.each_with_index do |subtitle_info, i|
       index, subtitle, file_subtitle, chapter = %w(index subtitle file_subtitle chapter).map { |k|
@@ -928,24 +930,24 @@ class Downloader
       info["element"] = a_section_download(subtitle_info)
 
       unless chapter.empty?
-        puts "#{chapter}"
+        @stream.puts "#{chapter}"
       end
       if get_novel_type == NOVEL_TYPE_SERIES
         if index.to_s.length <= DISPLAY_LIMIT_DIGITS
           # indexの数字がでかいと見た目がみっともないので特定の桁以内だけ表示する
-          print "第#{index}部分　"
+          @stream.print "第#{index}部分　"
         end
       else
-        print "短編　"
+        @stream.print "短編　"
       end
-      print "#{subtitle} (#{i+1}/#{max})"
+      @stream.print "#{subtitle} (#{i+1}/#{max})"
 
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
       if File.exist?(File.join(get_novel_data_dir, section_file_relative_path))
         if @force
           if different_section?(section_file_relative_path, info)
-            print " (更新あり)"
+            @stream.print " (更新あり)"
             move_to_cache_dir(section_file_relative_path)
           end
         else
@@ -953,13 +955,13 @@ class Downloader
         end
       else
         if !@from_download || (@from_download && @force)
-          print " <bold><magenta>(新着)</magenta></bold>".termcolor
+          @stream.print " <bold><magenta>(新着)</magenta></bold>".termcolor
         end
         @new_arrivals = true
       end
       save_novel_data(section_file_relative_path, info)
       save_least_one = true
-      puts
+      @stream.puts
     end
     remove_cache_dir unless save_least_one
   end
@@ -1050,17 +1052,17 @@ class Downloader
     rescue OpenURI::HTTPError => e
       if e.message =~ /^503/
         if retry_count == 0
-          error "上限までリトライしましたがファイルがダウンロード出来ませんでした"
+          @stream.error "上限までリトライしましたがファイルがダウンロード出来ませんでした"
           exit Narou::EXIT_ERROR_CODE
         end
         retry_count -= 1
-        puts
-        warn "server message: #{e.message}"
-        warn "リトライ待機中……"
+        @stream.puts
+        @stream.warn "server message: #{e.message}"
+        @stream.warn "リトライ待機中……"
         @@display_hint_once ||= false
         unless @@display_hint_once
-          warn "ヒント: narou s download.wait-steps=10 とすることで、" \
-               "10話ごとにウェイトをいれられます"
+          @stream.warn "ヒント: narou s download.wait-steps=10 とすることで、" \
+                       "10話ごとにウェイトをいれられます"
           @@display_hint_once = true
         end
         sleep(WAITING_TIME_FOR_503)
