@@ -45,6 +45,8 @@ module Command
 
     # 他のコマンドでタグを使う
     narou freeze --on end       # end(完結タグ)が付いた小説を一括で凍結
+    narou update tag:404        # 404タグを明示する
+                                # ID:404 が存在しなければ明示する必要はない
 
   Options:
       EOS

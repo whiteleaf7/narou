@@ -76,6 +76,16 @@ module Command
         end
       end
       array.map! { |arg|
+        if arg =~ /^[0-9]+$/
+          # 優先度はID＞タグのため、数字のみ指定されたら
+          # そのIDが存在した場合はIDとみなす
+          next arg if database[arg.to_i]
+        end
+        if arg =~ /^tag:(.+)$/
+          # tag:タグ名 は直接タグと指定できる形式
+          # (数字タグとIDがかぶった場合にタグを指定出来るようにするもの)
+          arg = $1
+        end
         ids = tag_index[arg]
         ids.empty? ? arg : ids
       }.flatten!
