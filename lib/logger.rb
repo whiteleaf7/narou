@@ -107,18 +107,30 @@ module Narou::LoggerModule
       end
     end
   end
+
+  def write_base(str, stream)
+    str = str.to_s
+    if str.encoding == Encoding::ASCII_8BIT
+      str.force_encoding(Encoding::UTF_8)
+    end
+    write_console(str, stream)
+  end
+
+  def warn(str)
+    self.puts str
+  end
+
+  def error(str)
+    self.puts "<bold><red>[ERROR]</red></bold> ".termcolor + str
+  end
 end
 
 class Narou::Logger < StringIO
   include Narou::LoggerModule
   
   def write(str)
-    str = str.to_s
-    if str.encoding == Encoding::ASCII_8BIT
-      str.force_encoding(Encoding::UTF_8)
-    end
+    write_base(str, STDOUT)
     super(str)
-    write_console(str, STDOUT)
   end
 
   def tty?
@@ -130,12 +142,8 @@ class Narou::LoggerError < StringIO
   include Narou::LoggerModule
 
   def write(str)
-    str = str.to_s
-    if str.encoding == Encoding::ASCII_8BIT
-      str.force_encoding(Encoding::UTF_8)
-    end
+    write_base(str, STDERR)
     super(str)
-    write_console(str, STDERR)
   end
 
   def tty?
@@ -144,11 +152,11 @@ class Narou::LoggerError < StringIO
 end
 
 def warn(str)
-  puts str
+  $stdout.warn str
 end
 
 def error(str)
-  puts "<bold><red>[ERROR]</red></bold> ".termcolor + str
+  $stdout.error str
 end
 
 $stdout = Narou::Logger.new
