@@ -277,7 +277,7 @@ class Downloader
     @file_title = nil
     @setting = setting
     @force = options[:force]
-    @from_download = options[:form_download]
+    @from_download = options[:from_download]
     @stream = options[:stream]
     @cache_dir = nil
     @new_arrivals = false
