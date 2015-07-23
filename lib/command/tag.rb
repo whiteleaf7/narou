@@ -10,6 +10,8 @@ require_relative "../inventory"
 module Command
   class Tag < CommandBase
     COLORS = %w(green yellow blue magenta cyan red white)
+    # 禁止文字
+    BAN_CHAR = /[:;"'><$@&^\\\|%'\/`]/
 
     def self.oneline_help
       "各小説にタグを設定及び閲覧が出来ます"
@@ -43,12 +45,21 @@ module Command
 
     # 他のコマンドでタグを使う
     narou freeze --on end       # end(完結タグ)が付いた小説を一括で凍結
+    narou update tag:404        # 404タグを明示する
+                                # ID:404 が存在しなければ明示する必要はない
 
   Options:
       EOS
       @opt.on("-a", "--add TAGS", String, "タグを追加する") { |tags|
         @options["mode"] = :add
-        @options["tags"] = tags.split
+        @options["tags"] = tags.split.tap { |array|
+          array.each do |tag|
+            if tag =~ BAN_CHAR
+              error "#{tag} に使用禁止記号が含まれています"
+              exit Narou::EXIT_ERROR_CODE
+            end
+          end
+        }
       }
       @opt.on("-d", "--delete TAGS", String, "タグを外す") { |tags|
         @options["mode"] = :delete
