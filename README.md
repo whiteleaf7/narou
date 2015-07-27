@@ -10,12 +10,15 @@ Narou.rb ― 「小説家になろう」「小説を読もう！」ダウンロ�
 横書き用に特化されたWEB小説を違和感なく縦書きで読むことが出来るようになります。
 また、校正機能もありますので、小説としての一般的な整形ルールに矯正します。（例：感嘆符のあとにはスペースが必ずくる）
 
-[ノクターンノベルズ](http://noc.syosetu.com/)及び[ムーンライトノベルズ](http://mnlt.syosetu.com/)にも対応しています。
+対応小説サイト：
++ 小説家になろう（小説を読もう） http://syosetu.com/
++ ノクターンノベルズ http://noc.syosetu.com/
++ ムーンライトノベルズ http://mnlt.syosetu.com/
++ ハーメルン http://syosetu.org/
++ Arcadia http://www.mai-net.net/
++ 暁 http://www.akatsuki-novels.com/
 
-**NEW!!**
-[ハーメルン](http://syosetu.org/)、[Arcadia](http://www.mai-net.net/)（理想郷）、[暁](http://www.akatsuki-novels.com/)にも対応しました！
-
-全てコンソールで操作するCUIアプリケーションです。
+コンソールで操作するアプリケーションですが、ブラウザを使って直感的に操作することができる WEB UI も搭載！
 
 主な機能は小説家になろうの小説のダウンロード、更新管理、テキスト整形、AozoraEpub3・kindlegen連携によるEPUB/MOBI出力です。
 
