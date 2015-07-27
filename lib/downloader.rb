@@ -12,6 +12,7 @@ require_relative "sitesetting"
 require_relative "template"
 require_relative "database"
 require_relative "inventory"
+require_relative "eventable"
 require_relative "narou/api"
 require_relative "html"
 require_relative "input"
@@ -20,6 +21,8 @@ require_relative "input"
 # 小説サイトからのダウンロード
 #
 class Downloader
+  include Narou::Eventable
+
   NOVEL_SITE_SETTING_DIR = "webnovel/"
   SECTION_SAVE_DIR_NAME = "本文"    # 本文を保存するディレクトリ名
   CACHE_SAVE_DIR_NAME = "cache"   # 差分用キャッシュ保存用ディレクトリ名
@@ -944,7 +947,8 @@ class Downloader
 
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
-      if File.exist?(File.join(get_novel_data_dir, section_file_relative_path))
+      section_file_full_path = File.join(get_novel_data_dir, section_file_relative_path)
+      if File.exist?(section_file_full_path)
         if @force
           if different_section?(section_file_relative_path, info)
             @stream.print " (更新あり)"
@@ -956,6 +960,10 @@ class Downloader
       else
         if !@from_download || (@from_download && @force)
           @stream.print " <bold><magenta>(新着)</magenta></bold>".termcolor
+          trigger(:newarrival, {
+            id: @id,
+            subtitle_info: subtitle_info
+          })
         end
         @new_arrivals = true
       end

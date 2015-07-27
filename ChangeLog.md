@@ -6,10 +6,23 @@
 ------------------
 #### 追加機能
 - WEB UI: Download に複数の小説を同時に指定出来るようにしました
+- hotnentry 機能を追加しました
+	+ update 時に新着投稿のみを一つにまとめた書籍データを生成します
+	+ `narou s hotentry=true` で有効に出来ます
+	+ この機能は `convert.no-epub` の制限を受けないので、no-epub を有効にしておき
+	  update 時に hotnentry のデータのみを変換することも可能です
+	+ 変換時にデバイスへ送信しなかった場合は `narou send` もしくは `narou send
+	  hotentry` にて **最新の** hotnetry データを送信します
+	+ `narou mail hotentry` にて最新の hotentry をメール送信します。また、
+	  `narou s hotentry.auto-mail=true` と設定していた場合、変換時に自動でメール
+	  送信します（mail の設定が済んでいる場合のみ）
+	+ 変換設定は各小説の設定がそれぞれ使用されます
+	+ multi-device には未対応です
 
 #### 仕様変更
 - WEB UI: 個別変換ページのタイトルに小説のタイトルを付けるようにしました
 - WEB UI: 環境設定画面をタブで整理しました
+- タグとエイリアスに hotentry という名前を設定出来ないようにしました
 
 #### Bug Fix
 - `enable_insert_char_separator` でルビが消える不具合を修正

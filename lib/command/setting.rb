@@ -277,6 +277,14 @@ module Command
           select_summaries: Device::DEVICES.values.map { |d| d::DISPLAY_NAME },
           tab: :general
         },
+        "hotentry" => {
+          type: :boolean, help: "新着投稿だけをまとめたデータを作るか",
+          tab: :general
+        },
+        "hotentry.auto-mail" => {
+          type: :boolean, help: "新着投稿作成時にメールを送る(mail設定済みの場合)",
+          tab: :general
+        },
         "update.strong" => {
           type: :boolean, help: "更新漏れが無い様に改稿日の分は必ずDLするか",
           tab: :general

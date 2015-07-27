@@ -12,6 +12,8 @@ module Command
     COLORS = %w(green yellow blue magenta cyan red white)
     # 禁止文字
     BAN_CHAR = /[:;"'><$@&^\\\|%'\/`]/
+    # 禁止ワード
+    BAN_WORD = %w(hotentry)
 
     def self.oneline_help
       "各小説にタグを設定及び閲覧が出来ます"
@@ -56,6 +58,9 @@ module Command
           array.each do |tag|
             if tag =~ BAN_CHAR
               error "#{tag} に使用禁止記号が含まれています"
+              exit Narou::EXIT_ERROR_CODE
+            elsif BAN_WORD.include?(tag)
+              error "#{tag} は使用禁止ワードです"
               exit Narou::EXIT_ERROR_CODE
             end
           end

@@ -22,6 +22,7 @@ module Command
   ・narou setting device=<device>としておけば、<device>の入力を省略できます
     また、convertコマンドで変換時に(端末がPCに接続されていれば)自動でデータを送信するようになります
   ・<target>を省略した場合、管理している小説全てのファイルのタイムスタンプを端末のものと比べて新しければ送信します
+  ・<target>にhotentryを指定した場合、最新のhotnetryを送信します
 
   Examples:
     narou send kindle 6
@@ -73,6 +74,8 @@ module Command
         error "#{device.display_name} が接続されていません"
         exit Narou::EXIT_ERROR_CODE
       end
+
+      @options["hotentry"] = Inventory.load("local_setting", :local)["hotentry"]
       send_all = false
       titles = {}
       if argv.empty?
@@ -81,6 +84,10 @@ module Command
           next if @options["without-freeze"] && Narou.novel_frozen?(id)
           argv << id
           titles[id] = data["title"]
+        end
+        if @options["hotentry"]
+          argv << "hotentry"
+          titles["hotentry"] = "hotentry"
         end
       end
 
@@ -95,7 +102,11 @@ module Command
 
       tagname_to_ids(argv)
       argv.each do |target|
-        ebook_path = Narou.get_ebook_file_path(target, device.ebook_file_ext)
+        if target == "hotentry"
+          ebook_path = Update.get_newest_hotentry_file_path(device)
+        else
+          ebook_path = Narou.get_ebook_file_path(target, device.ebook_file_ext)
+        end
         unless ebook_path
           error "#{target} は存在しません"
           next
@@ -106,7 +117,12 @@ module Command
         end
         if send_all
           if device.ebook_file_old?(ebook_path)
-            puts "<bold><green>ID:#{target}　#{TermColorLight.escape(titles[target])}</green></bold>".termcolor
+            if target == "hotentry"
+              display_target = target
+            else
+              display_target = "ID:#{target}　#{TermColorLight.escape(titles[target])}"
+            end
+            puts "<bold><green>#{display_target}</green></bold>".termcolor
           else
             next
           end

@@ -6,7 +6,9 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-$debug = File.exist?(File.join(File.expand_path(File.dirname(__FILE__)), "debug"))
+script_dir = File.expand_path(File.dirname(__FILE__))
+$debug = File.exist?(File.join(script_dir, "debug"))
+
 Encoding.default_external = Encoding::UTF_8
 
 if ARGV.delete("--time")

@@ -7,6 +7,9 @@ require_relative "../inventory"
 
 module Command
   class Alias < CommandBase
+    # 禁止ワード
+    BAN_WORD = %w(hotentry)
+
     def self.oneline_help
       "小説のIDに紐付けた別名を作成します"
     end
@@ -53,6 +56,10 @@ module Command
       argv.each_with_index do |arg, i|
         Helper.print_horizontal_rule if i > 0
         alias_name, target = arg.split("=", 2)
+        if BAN_WORD.include?(alias_name)
+          error "#{alias_name} は使用禁止ワードです"
+          next
+        end
         unless alias_name =~ /^\w+$/
           error "別名にはアルファベット・数字・アンダースコアしか使えません"
           next

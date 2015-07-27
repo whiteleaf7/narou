@@ -36,19 +36,20 @@ module Device::Ibooks
     ebook_file_path = original_func.call
     return ebook_file_path unless ebook_file_path
     return ebook_file_path unless @@__ibooks_container_dir
+    epubdir_path = nil
     if @argument_target_type == :file
-      warn "テキストファイル変換時はiBooksへの登録は行われません"
-      return ebook_file_path
+      @toc_url = nil
+    else
+      @toc_url = @novel_data["toc_url"]
+      epubdir_path = get_epubdir_path_in_ibooks_container
     end
-    @toc_url = @novel_data["toc_url"]
-    epubdir_path = get_epubdir_path_in_ibooks_container
     if epubdir_path && File.exist?(epubdir_path)
       extract_epub(ebook_file_path, epubdir_path)
       puts "iBooksに登録してあるEPUBを更新しました"
     else
       epubdir_path = watch_ibooks_container(ebook_file_path)
       if epubdir_path
-        regist_epubdir_path_to_setting(epubdir_path)
+        regist_epubdir_path_to_setting(epubdir_path) if @toc_url
         puts "iBooksへの登録を確認しました"
       else
         error "EPUBの展開後のフォルダが見つかりませんでした。" \

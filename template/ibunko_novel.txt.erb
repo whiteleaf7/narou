@@ -1,5 +1,6 @@
 <%# -*- coding: utf-8 -*- -%>
-<% Template.target_binary_version(1.0) -%>
+<% Template.target_binary_version(1.1) -%>
+<% unless is_hotentry %>
 <%= processed_title %>
 <%= toc["author"] %>
 <%= cover_chuki %>
@@ -11,6 +12,7 @@
 <%= toc["toc_url"] %>
 ――――――――――――――――――――――――
 
+<%- end -%>
 <% sections.each_with_index do |section, i| -%>
 ［＃改ページ］
 <% if section["chapter"] != "" -%>
@@ -40,6 +42,6 @@
 ［＃ここで字下げ終わり］
 <% end -%>
 <% end -%>
-<% if setting.enable_display_end_of_book -%>
+<% if setting.enable_display_end_of_book && !is_hotentry -%>
 ［＃ここから地付き］［＃小書き］（本を読み終わりました）［＃小書き終わり］［＃ここで地付き終わり］
 <% end -%>

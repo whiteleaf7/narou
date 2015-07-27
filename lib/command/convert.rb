@@ -15,6 +15,8 @@ module Command
       "小説を変換します。管理小説以外にテキストファイルも変換可能"
     end
 
+    attr_accessor :device, :converted_txt_path
+
     @@sending_error_list = []
 
     def self.display_sending_error_list
@@ -38,6 +40,8 @@ module Command
     end
 
     def initialize
+      @argument_target_type = :file
+
       super("<target> [<target2> ...] [options]")
       @opt.separator <<-EOS
 
@@ -185,7 +189,6 @@ module Command
         end
 
         if File.file?(target.to_s)
-          @argument_target_type = :file
           res = convert_txt(target)
         else
           @argument_target_type = :novel
@@ -209,30 +212,7 @@ module Command
         next if ebook_file.nil?
         if ebook_file
           copied_file_path = copy_to_converted_file(ebook_file)
-          if copied_file_path
-            puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
-          end
-          if @device && @device.physical_support? &&
-             @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
-            if @argument_target_type == :novel
-              if Send.execute!([@device.name, target]) > 0
-                @@sending_error_list << ebook_file
-              end
-            else
-              puts @device.name + "へ送信しています"
-              copy_to_path = nil
-              begin
-                copy_to_path = @device.copy_to_documents(ebook_file)
-              rescue Device::SendFailure
-              end
-              if copy_to_path
-                puts copy_to_path.encode(Encoding::UTF_8) + " へコピーしました"
-              else
-                error "送信に失敗しました"
-                @@sending_error_list << ebook_file
-              end
-            end
-          end
+          send_file_to_device(ebook_file)
         end
 
         if @options["no-open"].! && Narou.web?.!
@@ -276,41 +256,14 @@ module Command
     # 変換された整形済みテキストファイルをデバイスに対応した書籍データに変換する
     #
     def convert_txt_to_ebook_file
-      return false if @options["no-epub"]
-      # epub
-      status = NovelConverter.txt_to_epub(@converted_txt_path, @use_dakuten_font, nil, @device, @options["verbose"])
-      return nil if status != :success
-      if @device && @device.kobo?
-        epub_ext = @device.ebook_file_ext
-      else
-        epub_ext = ".epub"
-      end
-      epub_path = @converted_txt_path.sub(/.txt$/, epub_ext)
-
-      if !@device || !@device.kindle? || @options["no-mobi"]
-        puts File.basename(epub_path) + " を出力しました"
-        puts "<bold><green>EPUBファイルを出力しました</green></bold>".termcolor
-        return epub_path
-      end
-
-      # mobi
-      status = NovelConverter.epub_to_mobi(epub_path, @options["verbose"])
-      return nil if status != :success
-      mobi_path = epub_path.sub(/\.epub$/, @device.ebook_file_ext)
-
-      # strip
-      unless @options["no-strip"]
-        puts "kindlestrip実行中"
-        begin
-          SectionStripper.strip(mobi_path, nil, false)
-        rescue StripException => e
-          error "#{e.message}"
-        end
-      end
-      puts File.basename(mobi_path).encode(Encoding::UTF_8) + " を出力しました"
-      puts "<bold><green>MOBIファイルを出力しました</green></bold>".termcolor
-
-      return mobi_path
+      return NovelConverter.convert_txt_to_ebook_file(@converted_txt_path, {
+        use_dakuten_font: @use_dakuten_font,
+        device: @device,
+        verbose: @options["verbose"],
+        no_epub: @options["no-epub"],
+        no_mobi: @options["no-mobi"],
+        no_strip: @options["no-strip"]
+      })
     end
 
     class NoSuchDirectory < StandardError; end
@@ -322,7 +275,9 @@ module Command
       copy_to_dir = get_copy_to_directory
       return nil unless copy_to_dir
       FileUtils.copy(src_path, copy_to_dir)
-      return File.join(copy_to_dir, File.basename(src_path))
+      copied_file_path = File.join(copy_to_dir, File.basename(src_path))
+      puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
+      copied_file_path
     rescue NoSuchDirectory => e
       error "#{e.message} はフォルダではないかすでに削除されています。コピー出来ませんでした"
       nil
@@ -353,5 +308,29 @@ module Command
       copy_to_dir_with_device
     end
     private :get_copy_to_directory
+
+    def send_file_to_device(ebook_file)
+      if @device && @device.physical_support? &&
+        @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
+        if @argument_target_type == :novel
+          if Send.execute!([@device.name, target]) > 0
+            @@sending_error_list << ebook_file
+          end
+        else
+          puts @device.name + "へ送信しています"
+          copy_to_path = nil
+          begin
+            copy_to_path = @device.copy_to_documents(ebook_file)
+          rescue Device::SendFailure
+          end
+          if copy_to_path
+            puts copy_to_path.encode(Encoding::UTF_8) + " へコピーしました"
+          else
+            error "送信に失敗しました"
+            @@sending_error_list << ebook_file
+          end
+        end
+      end
+    end
   end
 end

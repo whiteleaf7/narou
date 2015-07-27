@@ -259,6 +259,60 @@ class NovelConverter
     :success
   end
 
+  #
+  # 変換された整形済みテキストファイルをデバイスに対応した書籍データに変換する
+  #
+  def self.convert_txt_to_ebook_file(txt_path, options)
+    options = {
+      use_dakuten_font: false,
+      dst_dir: nil,
+      device: nil,
+      verbose: false,
+      no_epub: false,
+      no_mobi: false,
+      no_strip: false
+    }.merge(options)
+
+    device = options[:device]
+
+    return false if options[:no_epub]
+    # epub
+    status = NovelConverter.txt_to_epub(txt_path, options[:use_dakuten_font],
+                                        options[:dst_dir], device, options[:verbose])
+    return nil if status != :success
+    if device && device.kobo?
+      epub_ext = device.ebook_file_ext
+    else
+      epub_ext = ".epub"
+    end
+    epub_path = txt_path.sub(/.txt$/, epub_ext)
+
+    if !device || !device.kindle? || options[:no_mobi]
+      puts File.basename(epub_path) + " を出力しました"
+      puts "<bold><green>EPUBファイルを出力しました</green></bold>".termcolor
+      return epub_path
+    end
+
+    # mobi
+    status = NovelConverter.epub_to_mobi(epub_path, options[:verbose])
+    return nil if status != :success
+    mobi_path = epub_path.sub(/\.epub$/, device.ebook_file_ext)
+
+    # strip
+    unless options[:no_strip]
+      puts "kindlestrip実行中"
+      begin
+        SectionStripper.strip(mobi_path, nil, false)
+      rescue StripException => e
+        error "#{e.message}"
+      end
+    end
+    puts File.basename(mobi_path).encode(Encoding::UTF_8) + " を出力しました"
+    puts "<bold><green>MOBIファイルを出力しました</green></bold>".termcolor
+
+    return mobi_path
+  end
+
   def initialize(setting, output_filename = nil, display_inspector = false)
     @setting = setting
     @novel_id = setting.id
@@ -269,6 +323,7 @@ class NovelConverter
     @illustration = Illustration.new(@setting, @inspector)
     @display_inspector = display_inspector
     @use_dakuten_font = false
+    @converter = create_converter
   end
 
   #
@@ -298,8 +353,8 @@ class NovelConverter
   def initialize_event
     progressbar = nil
 
-    one(:"convert_main.init") do |toc|
-      progressbar = ProgressBar.new(toc["subtitles"].size)
+    one(:"convert_main.init") do |subtitles|
+      progressbar = ProgressBar.new(subtitles.size)
     end
     on(:"convert_main.loop") do |i|
       progressbar.output(i)
@@ -318,13 +373,15 @@ class NovelConverter
     puts "縦書用の変換が終了しました"
   end
 
-  def load_novel_section(subtitle_info)
+  def load_novel_section(subtitle_info, section_save_dir)
     file_subtitle = subtitle_info["file_subtitle"] || subtitle_info["subtitle"]   # 互換性維持のため
-    path = File.join(@section_save_dir, "#{subtitle_info["index"]} #{file_subtitle}.yaml")
+    path = File.join(section_save_dir, "#{subtitle_info["index"]} #{file_subtitle}.yaml")
     YAML.load_file(path)
   end
 
-  def create_novel_text_by_template(sections, toc)
+  # is_hotentry を有効にすると、テンプレートで作成するテキストファイルに
+  # あらすじ、作品タイトル、本の読み終わり表示が付与されなくなる
+  def create_novel_text_by_template(sections, toc, is_hotentry = false)
     cover_chuki = create_cover_chuki
     device = Narou.get_device
     setting = @setting
@@ -349,7 +406,7 @@ class NovelConverter
     processed_title = processed_title.gsub("《", "※［＃始め二重山括弧］")
                                      .gsub("》", "※［＃終わり二重山括弧］")
     tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
-    Template.get(tempalte_name, binding, 1.0)
+    Template.get(tempalte_name, binding, 1.1)
   end
 
   #
@@ -381,8 +438,8 @@ class NovelConverter
   #
   # 目次情報からサイト設定を取得
   #
-  def find_site_setting(toc)
-    @@site_settings.find { |s| s.multi_match(toc["toc_url"], "url") }
+  def find_site_setting(toc_url)
+    @@site_settings.find { |s| s.multi_match(toc_url, "url") }
   end
 
   #
@@ -418,8 +475,7 @@ class NovelConverter
   # テキストファイル変換時の実質的なメイン処理
   #
   def convert_main_for_text(text)
-    conv = create_converter
-    result = conv.convert(text, "textfile")
+    result = @converter.convert(text, "textfile")
     unless @setting.enable_enchant_midashi
       @inspector.info "テキストファイルの処理を実行しましたが、改行直後の見出し付与は有効になっていません。" +
                       "setting.ini の enable_enchant_midashi を true にすることをお薦めします。"
@@ -428,7 +484,7 @@ class NovelConverter
     # 表紙の挿絵注記を3行目に挟み込む
     converted_text = [splited[0], splited[1], create_cover_chuki, splited[2]].join("\n")
 
-    @use_dakuten_font = conv.use_dakuten_font
+    @use_dakuten_font = @converter.use_dakuten_font
 
     converted_text
   end
@@ -436,22 +492,37 @@ class NovelConverter
   #
   # 管理小説変換時の実質的なメイン処理
   #
-  def convert_main_for_novel
-    conv = create_converter
-    sections = []
-    @section_save_dir = Downloader.get_novel_section_save_dir(@setting.archive_path)
+  # 引数 subtitles にデータを渡した場合はそれを直接使う
+  # is_hotentry を有効にすると出力されるテキストファイルにあらすじや作品タイトル等が含まれなくなる
+  #
+  def convert_main_for_novel(subtitles = nil, is_hotentry = false)
     toc = Downloader.get_toc_data(@setting.archive_path)
-    toc["story"] = conv.convert(toc["story"], "story")
+    toc["story"] = @converter.convert(toc["story"], "story")
     html = HTML.new
-    site_setting = find_site_setting(toc)
+    site_setting = find_site_setting(toc["toc_url"])
     html.set_illust_setting({current_url: site_setting["illust_current_url"],
                              grep_pattern: site_setting["illust_grep_pattern"]})
-    trigger(:"convert_main.init", toc)
-    toc["subtitles"].each_with_index do |subinfo, i|
+
+    subtitles ||= toc["subtitles"]
+    sections = subtitles_to_sections(subtitles, html)
+    converted_text = create_novel_text_by_template(sections, toc, is_hotentry)
+
+    converted_text
+  end
+
+  #
+  # subtitle info から変換処理をする
+  #
+  def subtitles_to_sections(subtitles, html)
+    sections = []
+    section_save_dir = Downloader.get_novel_section_save_dir(@setting.archive_path)
+
+    trigger(:"convert_main.init", subtitles)
+    subtitles.each_with_index do |subinfo, i|
       trigger(:"convert_main.loop", i)
-      section = load_novel_section(subinfo)
+      section = load_novel_section(subinfo, section_save_dir)
       if section["chapter"].length > 0
-        section["chapter"] = conv.convert(section["chapter"], "chapter")
+        section["chapter"] = @converter.convert(section["chapter"], "chapter")
       end
       @inspector.subtitle = section["subtitle"]
       element = section["element"]
@@ -461,17 +532,14 @@ class NovelConverter
           html.string = elm_text
           elm_text = html.to_aozora
         end
-        element[text_type] = conv.convert(elm_text, text_type)
+        element[text_type] = @converter.convert(elm_text, text_type)
       end
-      section["subtitle"] = conv.convert(section["subtitle"], "subtitle")
+      section["subtitle"] = @converter.convert(section["subtitle"], "subtitle")
       sections << section
     end
     trigger(:"convert_main.finish")
-    converted_text = create_novel_text_by_template(sections, toc)
-
-    @use_dakuten_font = conv.use_dakuten_font
-
-    converted_text
+    @use_dakuten_font = @converter.use_dakuten_font
+    sections
   end
 
   #

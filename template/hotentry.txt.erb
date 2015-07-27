@@ -1,0 +1,28 @@
+<%# -*- coding: utf-8 -*- -%>
+<% Template.target_binary_version(1.0) -%>
+<%= hotentry_title %>
+Narou.rb
+
+［＃改ページ］
+このデータは<%= Time.now.strftime("%y年%m月%d日　%H時%M分") %>頃作成されました。
+
+■収録作品一覧
+<% converted_text_array.each do |entry| -%>
+［＃１字下げ］<%= entry[:setting].title %>
+<% end -%>
+
+<% converted_text_array.each do |entry| -%>
+<%- setting = entry[:setting] -%>
+［＃改ページ］
+<% if device && device.ibooks? -%>
+<%# ibooks だと左右中央が機能しないため -%>
+<%= "\n" * 6 -%>
+<% else -%>
+［＃ページの左右中央］
+<% end -%>
+［＃１字下げ］［＃大見出し］<%= setting.title %>［＃大見出し終わり］
+［＃ここから地付き］<%= setting.author %>［＃ここで地付き終わり］
+<%= entry[:text] %>
+<% end -%>
+
+［＃ここから地付き］［＃小書き］（本を読み終わりました）［＃小書き終わり］［＃ここで地付き終わり］

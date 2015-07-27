@@ -1,5 +1,6 @@
 <%# -*- coding: utf-8 -*- -%>
-<% Template.target_binary_version(1.0) -%>
+<% Template.target_binary_version(1.1) -%>
+<% unless is_hotentry -%>
 <%= processed_title %>
 <%= toc["author"] %>
 <%= cover_chuki %>
@@ -13,14 +14,16 @@
 <a href="<%= toc["toc_url"] %>"><%= toc["toc_url"] %></a>
 ［＃区切り線］
 
+<%- end -%>
 <% sections.each_with_index do |section, i| -%>
 ［＃改ページ］
 <% if section["chapter"] != "" -%>
-［＃ページの左右中央］
 ［＃ここから柱］<%= toc["title"] %>［＃ここで柱終わり］
 <% if device && device.ibooks? -%>
 <%# ibooks だと左右中央が機能しないため -%>
 <%= "\n" * 6 -%>
+<% else -%>
+［＃ページの左右中央］
 <% end -%>
 ［＃３字下げ］［＃大見出し］<%= section["chapter"] %>［＃大見出し終わり］
 ［＃改ページ］
@@ -68,6 +71,6 @@
 <% end -%>
 <% end -%>
 <% end -%>
-<% if setting.enable_display_end_of_book -%>
+<% if setting.enable_display_end_of_book && !is_hotentry -%>
 ［＃ここから地付き］［＃小書き］（本を読み終わりました）［＃小書き終わり］［＃ここで地付き終わり］
 <% end -%>

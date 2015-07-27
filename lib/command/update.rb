@@ -3,9 +3,12 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require "fileutils"
 require "memoist"
 require_relative "../database"
 require_relative "../downloader"
+require_relative "../template"
+require_relative "../novelconverter"
 
 module Command
   class Update < CommandBase
@@ -14,6 +17,11 @@ module Command
     LOG_DIR_NAME = "log"
     LOG_NUM_LIMIT = 30   # ログの保存する上限数
     LOG_FILENAME_FORMAT = "update_log_%s.txt"
+
+    HOTENTRY_DIR_NAME = "hotentry"
+    HOTENTRY_TEMPLATE_NAME = "hotentry.txt"
+    HOTENTRY_TITLE_PATTERN = "hotentry %y/%m/%d %H:%M"
+    HOTENTRY_FILE_PATTERN = "hotentry_%y-%m-%d_%H%M.txt"
 
     def self.oneline_help
       "小説を更新します"
@@ -123,6 +131,11 @@ module Command
       end
       flush_cache    # memoist のキャッシュ削除
 
+      inv = Inventory.load("local_setting", :local)
+      @options["hotentry"] = inv["hotentry"]
+      @options["hotentry.auto-mail"] = inv["hotentry.auto-mail"]
+      hotentry = {}
+
       update_log = $stdout.capture(quiet: false) do
         sort_by_key(sort_key, update_target_list).each_with_index do |target, i|
           display_message = nil
@@ -143,6 +156,14 @@ module Command
             next
           end
           downloader = Downloader.new(target)
+
+          if @options["hotentry"]
+            downloader.on(:newarrival) do |hash|
+              entry = hotentry[hash[:id]] ||= []
+              entry << hash[:subtitle_info]
+            end
+          end
+
           result = downloader.start_download
           case result.status
           when :ok
@@ -163,7 +184,10 @@ module Command
           end
         end
       end
+
+      process_hotentry(hotentry)
       save_log(update_log)
+
       exit mistook_count if mistook_count > 0
     rescue Interrupt
       puts "アップデートを中断しました"
@@ -262,6 +286,111 @@ module Command
         "novelupdated_at" => downloader.get_novelupdated_at,
         "general_lastup" => downloader.get_general_lastup
       }
+    end
+
+    #
+    # 新着話をまとめたデータの作成に関する処理
+    #
+    def process_hotentry(hotentry)
+      return if hotentry.empty?
+      cmd_convert = Command::Convert.new
+      cmd_convert.load_local_settings
+      cmd_convert.device = Narou.get_device
+
+      ebook_path = convert_hotentry(hotentry, cmd_convert)
+      copy_hotentry(ebook_path, cmd_convert)
+      send_hotentry(ebook_path, cmd_convert)
+      mail_hotentry
+    end
+
+    def convert_hotentry(hotentry, cmd_convert)
+      output_filename = nil
+      display_inspector = false
+      ignore_force = false
+      ignore_default = false
+
+      converted_text_array = []
+      use_dakuten_font = false
+
+      Helper.print_horizontal_rule
+      puts "hotentry の変換を開始"
+
+      subtitles_size = hotentry.inject(0) { |sum, (_, subtitles)| subtitles.size + sum }
+      progressbar = ProgressBar.new(subtitles_size)
+      total_progress = 0
+
+      hotentry.each do |id, subtitles|
+        setting = NovelSetting.load(id, ignore_force, ignore_default)
+        novel_converter = NovelConverter.new(setting, output_filename, display_inspector)
+        last_num = 0
+        novel_converter.on(:"convert_main.loop") do |i|
+          progressbar.output(total_progress + i)
+          last_num = i
+        end
+        converted_text_array << {
+          setting: setting,
+          text: novel_converter.convert_main_for_novel(subtitles, true)
+        }
+        use_dakuten_font |= novel_converter.use_dakuten_font
+
+        total_progress += last_num + 1
+      end
+      progressbar.clear
+      puts "縦書用の変換が終了しました"
+
+      device = Narou.get_device
+      now = Time.now
+      # テキストの生成
+      hotentry_title = now.strftime(HOTENTRY_TITLE_PATTERN)
+      hotentry_text = Template.get(HOTENTRY_TEMPLATE_NAME, binding, 1.0)
+      # 生成したテキストファイルの保存
+      txt_output_path = File.join(Update.hotentry_dirname, now.strftime(HOTENTRY_FILE_PATTERN))
+      create_inclusive_directory(txt_output_path)
+      File.write(txt_output_path, hotentry_text)
+      # テキストを書籍データに変換
+      relay_proc = -> {
+        NovelConverter.convert_txt_to_ebook_file(txt_output_path, {
+          use_dakuten_font: use_dakuten_font,
+          device: device
+        })
+      }
+      if device
+        cmd_convert.extend(device.get_hook_module)
+        cmd_convert.converted_txt_path = txt_output_path
+        cmd_convert.hook_call(:change_settings)
+      end
+      if cmd_convert.respond_to?(:hook_convert_txt_to_ebook_file)
+        ebook_path = cmd_convert.hook_convert_txt_to_ebook_file(&relay_proc)
+      else
+        ebook_path = relay_proc.call
+      end
+      ebook_path
+    end
+
+    def create_inclusive_directory(path)
+      FileUtils.mkdir_p(File.dirname(path))
+    end
+
+    def copy_hotentry(ebook_path, cmd_convert)
+      cmd_convert.copy_to_converted_file(ebook_path)
+    end
+
+    def send_hotentry(ebook_path, cmd_convert)
+      cmd_convert.send_file_to_device(ebook_path)
+    end
+
+    def mail_hotentry
+      return unless @options["hotentry.auto-mail"]
+      Mail.execute!(["hotentry"])
+    end
+
+    def self.hotentry_dirname
+      @@__hotentry_dirname ||= File.join(Narou.get_root_dir, HOTENTRY_DIR_NAME)
+    end
+
+    def self.get_newest_hotentry_file_path(device)
+      pattern = File.join(Update.hotentry_dirname, "hotentry_*#{device.ebook_file_ext}")
+      Dir.glob(pattern).sort.last
     end
   end
 end
