@@ -1045,8 +1045,9 @@ class Downloader
   def download_raw_data(url)
     raw = nil
     retry_count = RETRY_MAX_FOR_503
+    cookie = @setting["cookie"] || ""
     begin
-      open(url) do |fp|
+      open(url, "Cookie" => cookie) do |fp|
         raw = Helper.pretreatment_source(fp.read, @setting["encoding"])
       end
     rescue OpenURI::HTTPError => e
