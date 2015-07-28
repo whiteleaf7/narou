@@ -10,6 +10,7 @@
 	+ `narou s hotentry=true` で有効に出来ます
 	+ この機能は `convert.no-epub` の制限を受けないので、no-epub を有効にしておき
 	  update 時に hotnentry のデータのみを変換することも可能です
+	+ 収録順序を変更したい場合は update.sort-by を設定して下さい
 	+ 変換時にデバイスへ送信しなかった場合は `narou send` もしくは `narou send
 	  hotentry` にて **最新の** hotnetry データを送信します
 	+ `narou mail hotentry` にて最新の hotentry をメール送信します。また、
@@ -24,7 +25,7 @@
 
 #### WEB UI
 - Download に複数の小説を同時に指定出来るようにしました
-- 個別変換ページのタイトルに小説のタイトルを付けるようにしました
+- 個別変換設定ページのタイトルに小説のタイトルを付けるようにしました
 - 環境設定画面をタブで整理しました
 - setting.ini に保存する時にコメントを復元するようにしました
 
