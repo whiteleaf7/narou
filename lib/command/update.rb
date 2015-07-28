@@ -64,6 +64,9 @@ module Command
         update_general_lastup
         exit 0
       }
+      @opt.on("-f", "--force", "凍結済みも更新する") {
+        @options["force"] = true
+      }
       @opt.on("-s", "--sort-by KEY", "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries}") { |key|
         @options["sort-by"] = key
       }
@@ -142,7 +145,7 @@ module Command
           data = Downloader.get_data_by_target(target)
           if !data
             display_message = "<bold><red>[ERROR]</red></bold> #{target} は管理小説の中に存在しません".termcolor
-          elsif Narou.novel_frozen?(target)
+          elsif Narou.novel_frozen?(target) && !@options["force"]
             if argv.length > 0
               display_message = "ID:#{data["id"]}　#{data["title"]} は凍結中です"
             else

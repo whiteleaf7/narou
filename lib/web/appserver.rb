@@ -437,16 +437,13 @@ class Narou::AppServer < Sinatra::Base
   end
 
   post "/api/update" do
-    Narou::Worker.push do
-      CommandLine.run!(["update"])
-      @@push_server.send_all("table.reload" => true)
+    ids = select_valid_novel_ids(params["ids"]) || []
+    opt_arguments = []
+    if params["force"] == "true"
+      opt_arguments << "--force"
     end
-  end
-
-  post "/api/update_select" do
-    ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["update", ids])
+      CommandLine.run!(["update", ids, opt_arguments])
       @@push_server.send_all("table.reload" => true)
     end
   end
