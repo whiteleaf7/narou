@@ -1192,11 +1192,13 @@ class Downloader
     novel_dir_path = get_novel_data_dir
     file_title = File.basename(novel_dir_path)
     FileUtils.mkdir_p(novel_dir_path) unless File.exist?(novel_dir_path)
-    original_settings = NovelSetting::ORIGINAL_SETTINGS
+    original_settings = NovelSetting.get_original_settings
+    default_settings = NovelSetting.load_default_settings
+    novel_setting = NovelSetting.new(@id, true, true)
     special_preset_dir = File.join(Narou.get_preset_dir, @setting["domain"], @setting["ncode"])
     exists_special_preset_dir = File.exist?(special_preset_dir)
     templates = [
-      [NovelSetting::INI_NAME, 1.1],
+      [NovelSetting::INI_NAME, NovelSetting::INI_ERB_BINARY_VERSION],
       ["converter.rb", 1.0],
       [NovelSetting::REPLACE_NAME, 1.0]
     ]

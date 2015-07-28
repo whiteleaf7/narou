@@ -304,7 +304,7 @@ class Narou::AppServer < Sinatra::Base
     @error_list = {}
     @novel_setting = NovelSetting.new(@id, true, true)    # 空っぽの設定を作成
     @novel_setting.settings = @novel_setting.load_setting_ini["global"]
-    @original_settings = NovelSetting::ORIGINAL_SETTINGS
+    @original_settings = NovelSetting.get_original_settings
     @force_settings = NovelSetting.load_force_settings
     @default_settings = NovelSetting.load_default_settings
     @replace_pattern = @novel_setting.load_replace_pattern
@@ -612,6 +612,16 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  post "/api/setting_burn" do
+    ids = select_valid_novel_ids(params["ids"]) or pass
+    Narou::Worker.push do
+      CommandLine.run!(["setting", "--burn", ids])
+    end
+  end
+
+  # -------------------------------------------------------------------------------
+  # ウィジット関係
+  # -------------------------------------------------------------------------------
 
   get "/js/widget.js" do
     if %w(download).include?(params["mode"])

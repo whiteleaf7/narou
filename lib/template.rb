@@ -8,6 +8,7 @@ require_relative "narou"
 
 class Template
   TEMPLATE_DIR = "template/"
+  OVERWRITE = true
 
   class LoadError < StandardError; end
 

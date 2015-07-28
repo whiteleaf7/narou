@@ -18,7 +18,8 @@ module Command
     end
 
     def initialize
-      super("[<name>=<value> ...] [options]")
+      super "[<name>=<value> ...] [options]\n" \
+            "--burn <target> [<target2> ...]"
       @opt.separator <<-EOS
 
   ・各コマンドの設定の変更が出来ます。
@@ -54,6 +55,9 @@ module Command
         @options["all"] = true
         display_variable_list
         exit 0
+      }
+      @opt.on("--burn", "指定した小説の未設定項目に共通設定を焼き付ける") {
+        @options["burn"] = true
       }
     end
 
@@ -132,6 +136,10 @@ module Command
 
     def execute(argv)
       super
+      if @options["burn"]
+        burn_default_settings(argv)
+        return
+      end
       if argv.empty?
         puts @opt.help
         return
@@ -235,6 +243,48 @@ module Command
       puts
       puts "Global Variable List:"
       puts get_variable_list_strings(:global).gsub(/^ {4}/, "")
+    end
+
+    #
+    # 小説の setting.ini の未設定項目に共通設定を焼き付ける
+    #
+    # default.* が設定されているならそれを、なければオリジナル設定を
+    #
+    def burn_default_settings(argv)
+      if argv.empty?
+        error "対象小説を指定して下さい"
+        exit Narou::EXIT_ERROR_CODE
+      end
+      msg = "指定された小説のsetting.iniの未項目設定に共通設定を焼き付けます。\n" \
+            "よろしいですか"
+      return unless Narou::Input.confirm(msg)
+
+      tagname_to_ids(argv)
+      argv.each do |arg|
+        data = Downloader.get_data_by_target(arg)
+        unless data
+          error "#{arg} は存在しません"
+          next
+        end
+        novel_setting = NovelSetting.new(arg, true, true)    # 空っぽの設定を作成
+        novel_setting.settings = novel_setting.load_setting_ini["global"]
+        original_settings = NovelSetting.get_original_settings
+        default_settings = NovelSetting.load_default_settings
+
+        original_settings.each do |original|
+          name = original[:name]
+          unless novel_setting.settings.include?(name)
+            if default_settings.include?(name)
+              novel_setting[name] = default_settings[name]
+            else
+              novel_setting[name] = original[:value]
+            end
+          end
+        end
+
+        novel_setting.save_settings
+        puts "#{data["title"]} の設定を保存しました"
+      end
     end
 
     def self.get_setting_variables

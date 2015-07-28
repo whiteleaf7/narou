@@ -1,5 +1,5 @@
 <%# -*- coding: utf-8 -*- -%>
-<% Template.target_binary_version(1.1) -%>
+<% Template.target_binary_version(1.2) -%>
 ; 小説の変換時の挙動を変更出来ます。
 ; 行頭がセミコロンの行はコメントです。
 ;
@@ -16,6 +16,22 @@
 <% element[:help].split("\n").each do |help_line| -%>
 ; <%= help_line %>
 <% end -%>
-; <%= element[:name] %> = <%= element[:value].kind_of?(String) ? %!"#{element[:value]}"! : element[:value] %>
+<% name = element[:name] -%>
+<% novel_setting_value_is_nil = novel_setting[name].nil? -%>
+<% if novel_setting_value_is_nil -%>; <% end -%>
+<% if !novel_setting_value_is_nil -%>
+<%   value = novel_setting[name] -%>
+<% elsif default_settings.include?(name) -%>
+<%   value = default_settings[name] -%>
+<% else -%>
+<%   value = element[:value] -%>
+<% end -%>
+<%= name %> = <%= element[:value].kind_of?(String) ? %!"#{value}"! : value %>
 
+<% end -%>
+<%# 独自設定の書き込み -%>
+<% ini = novel_setting.load_setting_ini["global"].merge(novel_setting.settings) -%>
+<% own_setting_keys = ini.keys - original_settings.map { |s| s[:name] }  -%>
+<% own_setting_keys.each do |key| -%>
+<%= key %> = <%= ini[key].kind_of?(String) ? %!"#{ini[key]}"! : ini[key] %>
 <% end -%>

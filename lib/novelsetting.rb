@@ -5,9 +5,11 @@
 
 require "fileutils"
 require_relative "ini"
+require_relative "downloader"
 
 class NovelSetting
   INI_NAME = "setting.ini"
+  INI_ERB_BINARY_VERSION = 1.2
   REPLACE_NAME = "replace.txt"
 
   attr_accessor :id, :author, :title, :archive_path, :replace_pattern, :settings
@@ -123,14 +125,19 @@ class NovelSetting
     load_settings_by_pattern("default")
   end
 
+  def get_value_by_original(name)
+    index = ORIGINAL_SETTINGS_KEY_INDEXES[name]
+    index ? ORIGINAL_SETTINGS[index] : nil
+  end
+
   #
   # 設定を保存
   #
   def save_settings
-    ini = Ini.new
-    ini.filename = File.join(@archive_path, INI_NAME)
-    ini.object["global"].merge!(@settings)
-    ini.save
+    original_settings = NovelSetting.get_original_settings
+    default_settings = NovelSetting.load_default_settings
+    novel_setting = self
+    Template.write(INI_NAME, @archive_path, binding, INI_ERB_BINARY_VERSION, Template::OVERWRITE)
   end
 
   def type_eq_value(type, value)
@@ -147,10 +154,9 @@ class NovelSetting
   # 指定された設定の型チェック
   #
   def check_value_of_type(name, value)
-    index = ORIGINAL_SETTINGS.index { |v| v[:name] == name }
-    return unless index
-    original = ORIGINAL_SETTINGS[index]
-    if original && !type_eq_value(original[:type], value)
+    original = get_value_by_original(name)
+    return unless original
+    unless type_eq_value(original[:type], value)
       raise Helper::InvalidVariableType, original[:type]
     end
   end
@@ -205,6 +211,10 @@ class NovelSetting
   def save_replace_pattern
     replace_txt_path = File.join(@archive_path, REPLACE_NAME)
     Narou.write_replace_txt(replace_txt_path, @replace_pattern)
+  end
+
+  def self.get_original_settings
+    ORIGINAL_SETTINGS
   end
 
   ORIGINAL_SETTINGS = [
@@ -407,4 +417,10 @@ class NovelSetting
       help: "文字選択がしやすいように１文字ずつ区切りデータを挿入する（Kindle専用。enable_insert_word_separator が有効な場合無この設定は無視される）"
     },
   ]
+
+  ORIGINAL_SETTINGS_KEY_INDEXES = {}.tap { |hash|
+    ORIGINAL_SETTINGS.each_with_index do |s, i|
+      hash[s[:name]] = i
+    end
+  }
 end
