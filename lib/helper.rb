@@ -110,7 +110,7 @@ module Helper
   #
   def pretreatment_source(src, encoding = Encoding::UTF_8)
     src.force_encoding(encoding).gsub("\r", "")
-    src.encode("UTF-16BE", encoding, :invalid => :replace, :undef => :replace, :replace => "?").encode("UTF-8")
+       .encode("UTF-16BE", encoding, :invalid => :replace, :undef => :replace, :replace => "?").encode("UTF-8")
   end
 
   ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)", "#39" => "'" }
