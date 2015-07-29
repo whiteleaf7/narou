@@ -96,10 +96,10 @@
                       未設定
                     <input id="#{name}-false" type="radio" name="#{name}" value="off" #{value == false ? "checked" : ""}>
                     %label(for="#{name}-false")
-                      しない
+                      いいえ
                     <input id="#{name}-true" type="radio" name="#{name}" value="on" #{value ? "checked" : ""}>
                     %label(for="#{name}-true")
-                      する
+                      はい
                     %a.btn.btn-primary
                 - when :select
                   %div.input-style

@@ -89,15 +89,15 @@ module Narou::ServerHelpers
   end
 
   #
-  # 与えられたデータが真偽値だった場合、設定画面用に「する」「しない」に変換する
+  # 与えられたデータが真偽値だった場合、設定画面用に「はい」「いいえ」に変換する
   # 真偽値ではなかった場合、そのまま返す
   #
   def value_to_msg(value)
     case value
     when TrueClass
-      "する"
+      "はい"
     when FalseClass
-      "しない"
+      "いいえ"
     else
       value
     end

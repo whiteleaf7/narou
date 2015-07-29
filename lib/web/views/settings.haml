@@ -104,22 +104,17 @@
                               未設定
                             <input id="#{name}-false" type="radio" name="#{name}" value="off" #{item == false ? "checked" : ""}>
                             %label(for="#{name}-false")
-                              しない
+                              いいえ
                             <input id="#{name}-true" type="radio" name="#{name}" value="on" #{item ? "checked" : ""}>
                             %label(for="#{name}-true")
-                              する
+                              はい
                             %a.btn.btn-primary
                         - else
                           %label.switch-light.well
                             <input type="checkbox" name="#{name}" #{item ? "checked" : ""}>
-                            - if name == "over18" || name =~ /^dismiss\-notice/
-                              %span
-                                %span いいえ
-                                %span はい
-                            - else
-                              %span
-                                %span しない
-                                %span する
+                            %span
+                              %span いいえ
+                              %span はい
                             %a.btn.btn-primary
                       - when :select
                         %div.input-style

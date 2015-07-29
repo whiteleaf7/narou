@@ -328,7 +328,7 @@ module Command
           tab: :general
         },
         "hotentry" => {
-          type: :boolean, help: "新着投稿だけをまとめたデータを作るか",
+          type: :boolean, help: "新着投稿だけをまとめたデータを作る",
           tab: :general
         },
         "hotentry.auto-mail" => {
@@ -340,11 +340,11 @@ module Command
           tab: :general
         },
         "update.logging" => {
-          type: :boolean, help: "更新時のログを保存するかどうか",
+          type: :boolean, help: "更新時のログを保存する",
           tab: :etc
         },
         "update.convert-only-new-arrival" => {
-          type: :boolean, help: "更新時に新着のみ変換を実行するかどうか",
+          type: :boolean, help: "更新時に新着のみ変換を実行する",
           tab: :general
         },
         "update.sort-by" => {
@@ -364,30 +364,30 @@ module Command
           type: :directory, help: "copy-toの昔の書き方(非推奨)", invisible: true
         },
         "convert.no-epub" => {
-          type: :boolean, help: "EPUB変換を無効にするか", invisible: true,
+          type: :boolean, help: "EPUB変換を無効にする", invisible: true,
           tab: :etc
         },
         "convert.no-mobi" => {
-          type: :boolean, help: "MOBI変換を無効にするか", invisible: true,
+          type: :boolean, help: "MOBI変換を無効にする", invisible: true,
           tab: :etc
         },
         "convert.no-strip" => {
           type: :boolean,
-          help: "MOBIのstripを無効にするか\n" \
+          help: "MOBIのstripを無効にする\n" \
                 "      ※注意：KDP用のMOBIはstripしないでください",
           invisible: true,
           tab: :etc
         },
         "convert.no-zip" => {
-          type: :boolean, help: "i文庫用のzipファイル作成を無効にするか", invisible: true,
+          type: :boolean, help: "i文庫用のzipファイル作成を無効にする", invisible: true,
           tab: :etc
         },
         "convert.no-open" => {
-          type: :boolean, help: "変換時に保存フォルダを開かないようにするか",
+          type: :boolean, help: "変換時に保存フォルダを開かないようにする",
           tab: :general
         },
         "convert.inspect" => {
-          type: :boolean, help: "常に変換時に調査結果を表示するか",
+          type: :boolean, help: "常に変換時に調査結果を表示する",
           tab: :inspect
         },
         "convert.multi-device" => {
@@ -414,16 +414,16 @@ module Command
         },
         "download.use-subdirectory" => {
           type: :boolean,
-          help: "小説を一定数ごとにサブフォルダへ分けて保存するか\n" \
+          help: "小説を一定数ごとにサブフォルダへ分けて保存する\n" \
                 "      ※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策",
           tab: :etc
         },
         "send.without-freeze" => {
-          type: :boolean, help: "一括送信時に凍結された小説は対象外に",
+          type: :boolean, help: "一括送信時に凍結された小説は対象外にする",
           tab: :general
         },
         "send.backup-bookmark" => {
-          type: :boolean, help: "一括送信時に栞データを自動でバックアップするか(KindlePW系用)",
+          type: :boolean, help: "一括送信時に栞データを自動でバックアップする(KindlePW系用)",
           tab: :etc
         },
         "multiple-delimiter" => {
@@ -444,7 +444,7 @@ module Command
           tab: :global
         },
         "no-color" => {
-          type: :boolean, help: "カラー表示を無効にするか",
+          type: :boolean, help: "カラー表示を無効にする",
           tab: :global
         },
         "server-port" => {
@@ -460,7 +460,7 @@ module Command
           tab: :global
         },
         "dismiss-notice" => {
-          type: :boolean, help: "お知らせを消すかどうか", invisible: true,
+          type: :boolean, help: "お知らせを消す", invisible: true,
           tab: :global
         },
       }

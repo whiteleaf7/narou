@@ -232,13 +232,13 @@ class NovelSetting
       name: "enable_convert_num_to_kanji",
       type: :boolean,
       value: true,
-      help: "数字の漢数字変換を有効に"
+      help: "数字の漢数字変換を有効にする"
     },
     {
       name: "enable_kanji_num_with_units",
       type: :boolean,
       value: true,
-      help: "漢数字変換した場合、千・万などに変換するか"
+      help: "漢数字変換した場合、千・万などに変換する"
     },
     {
       name: "kanji_num_with_units_lower_digit_zero",
@@ -262,19 +262,19 @@ class NovelSetting
       name: "enable_auto_indent",
       type: :boolean,
       value: true,
-      help: "自動行頭字下げ機能。行頭字下げが行われているかを判断し、適切に行頭字下げをする"
+      help: "自動行頭字下げ機能。行頭字下げが行われているかを判断し、適切に行頭字下げをするか"
     },
     {
       name: "enable_force_indent",
       type: :boolean,
       value: false,
-      help: "行頭字下げを必ず行う。enable_auto_indent の設定は無視される"
+      help: "行頭字下げを必ず行うか。enable_auto_indent の設定は無視される"
     },
     {
       name: "enable_auto_join_in_brackets",
       type: :boolean,
       value: true,
-      help: "かぎ括弧内自動連結を有効に\n例)\n「～～～！\n　＊＊＊？」  → 「～～～！　＊＊＊？」"
+      help: "かぎ括弧内自動連結を有効にする\n例)\n「～～～！\n　＊＊＊？」  → 「～～～！　＊＊＊？」"
     },
     {
       name: "enable_auto_join_line",
@@ -292,25 +292,25 @@ class NovelSetting
       name: "enable_author_comments",
       type: :boolean,
       value: true,
-      help: "作者コメントを検出するか（テキストファイルを直接変換する場合のみの設定）"
+      help: "作者コメントを検出する（テキストファイルを直接変換する場合のみの設定）"
     },
     {
       name: "enable_erase_introduction",
       type: :boolean,
       value: false,
-      help: "前書きを削除するか"
+      help: "前書きを削除する"
     },
     {
       name: "enable_erase_postscript",
       type: :boolean,
       value: false,
-      help: "後書きを削除するか"
+      help: "後書きを削除する"
     },
     {
       name: "enable_ruby",
       type: :boolean,
       value: true,
-      help: "ルビ処理を有効に"
+      help: "ルビ処理を有効にする"
     },
     {
       name: "enable_illust",
@@ -358,19 +358,19 @@ class NovelSetting
       name: "enable_dakuten_font",
       type: :boolean,
       value: true,
-      help: "濁点フォントを使用するか。false の場合は縦中横による擬似表現を使用する"
+      help: "濁点フォントを使用する。false の場合は縦中横による擬似表現を使用する"
     },
     {
       name: "enable_display_end_of_book",
       type: :boolean,
       value: true,
-      help: "小説の最後に本を読み終わった表示をするかどうか"
+      help: "小説の最後に本を読み終わった表示をする"
     },
     {
       name: "enable_add_date_to_title",
       type: :boolean,
       value: false,
-      help: "変換後の小説のタイトルに更新日の日付を付加するかどうか"
+      help: "変換後の小説のタイトルに更新日の日付を付加する"
     },
     {
       name: "title_date_format",
@@ -390,19 +390,19 @@ class NovelSetting
       name: "enable_ruby_youon_to_big",
       type: :boolean,
       value: false,
-      help: "ルビの拗音(ぁ、ぃ等)を商業書籍のように大きくするかどうか"
+      help: "ルビの拗音(ぁ、ぃ等)を商業書籍のように大きくする"
     },
     {
       name: "enable_pack_blank_line",
       type: :boolean,
       value: true,
-      help: "縦書きで読みやすいように空行を減らすかどうか"
+      help: "縦書きで読みやすいように空行を減らす"
     },
     {
       name: "enable_kana_ni_to_kanji_ni",
       type: :boolean,
       value: true,
-      help: "漢字の二と間違えてカタカナのニを使っていそうなのを、漢字に直すかどうか"
+      help: "漢字の二と間違えてカタカナのニを使っていそうなのを、漢字に直す"
     },
     {
       name: "enable_insert_word_separator",
