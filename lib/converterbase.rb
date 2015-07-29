@@ -798,7 +798,7 @@ class ConverterBase
   # かぎ括弧内自動連結
   #
   def auto_join_in_brackets(data)
-    if !@setting.enable_auto_join_in_brackets && !@setting.enable_inspect_invalid_openclose_brackets
+    if !@setting.enable_auto_join_in_brackets && !@setting.enable_inspect
       return
     end
     OPENCLOSE_REGEXPS.each_with_index do |openclose, i|
@@ -813,7 +813,7 @@ class ConverterBase
         end
         "［＃かぎ括弧＝#{j}］"
       end
-      if @setting.enable_inspect_invalid_openclose_brackets
+      if @setting.enable_inspect
         # 正しく閉じてないかぎ括弧だけが data に残ってる
         @inspector.inspect_invalid_openclose_brackets(data, BRACKETS[i], stack)
       end

@@ -223,6 +223,12 @@ class NovelSetting
     # value: 初期値
     # help: 説明(setting.ini に書き出される)
     {
+      name: "enable_inspect",
+      type: :boolean,
+      value: false,
+      help: "小説に対する各種調査を実行する。結果を表示するには narou inspect コマンドを使用"
+    },
+    {
       name: "enable_convert_num_to_kanji",
       type: :boolean,
       value: true,
@@ -269,12 +275,6 @@ class NovelSetting
       type: :boolean,
       value: true,
       help: "かぎ括弧内自動連結を有効に\n例)\n「～～～！\n　＊＊＊？」  → 「～～～！　＊＊＊？」"
-    },
-    {
-      name: "enable_inspect_invalid_openclose_brackets",
-      type: :boolean,
-      value: false,
-      help: "かぎ括弧内のとじ開きが正しくされているかどうか調査する"
     },
     {
       name: "enable_auto_join_line",

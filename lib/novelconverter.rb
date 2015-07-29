@@ -551,9 +551,10 @@ class NovelConverter
   end
 
   def inspect_novel(text)
-    # 行末読点の現在状況を調査する
-    @inspector.inspect_end_touten_conditions(text)
-    @inspector.countup_return_in_brackets(text)
+    if @setting.enable_inspect
+      @inspector.inspect_end_touten_conditions(text)   # 行末読点の現在状況を調査する
+      @inspector.countup_return_in_brackets(text)      # カギ括弧内の改行状況を調査する
+    end
 
     if !@display_inspector
       unless @inspector.empty?

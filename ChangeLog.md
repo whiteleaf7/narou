@@ -33,6 +33,10 @@
 
 #### 仕様変更
 - タグとエイリアスに hotentry という名前を設定出来ないようにしました
+- 小説内の調査を `enable_inspect` を有効にしないと実行しないように変更しました
+  （カギ括弧関連の調査が、カギ括弧を多用する小説だとかなりの負荷になるため）
+- setting.ini 内の `enable_inspect_invalid_openclose_brackets` を廃止し、
+  `enable_inspect` に統合しました
 
 #### Bug Fix
 - `enable_insert_char_separator` でルビが消える不具合を修正
