@@ -284,7 +284,7 @@ class ConverterBase
     data.gsub!(/([!?！？]+)([^!?！？])/) do
       m1, m2 = $1, $2
       m2 = "　" if m2 == " "
-      if m2 =~ /[^」］\]』】〉》〕＞>≫)）"”’〟　☆★♪［―]/
+      if m2 =~ /[^」］｝\]\}』】〉》〕＞>≫)）"”’〟　☆★♪［―]/
         "#{m1}　#{m2}"
       else
         "#{m1}#{m2}"
@@ -344,7 +344,7 @@ class ConverterBase
     data.gsub!(/[#{SINGLE_MINUTE_FAMILY}]([^"\n]+?)[#{SINGLE_MINUTE_FAMILY}]/, "〝\\1〟")
     # MEMO: シングルミュートを表示出来るフォントはほとんど無いためダブルにする
     data.gsub!(/[#{DOUBLE_MINUTE_FAMILY}]([^"\n]+?)[#{DOUBLE_MINUTE_FAMILY}]/, "〝\\1〟")
-    data.tr!("-=+/*《》'\"%$#&!?<>＜＞()|‐,._;:[]",
+    data.tr!("-=+/*《》'\"%$#&!?<>＜＞()|‐,._;:\[\]{}",
              "－＝＋／＊≪≫’”％＄＃＆！？〈〉〈〉（）｜－，．＿；：［］")
     data.gsub!("\\", "￥")
     data
