@@ -13,6 +13,11 @@ module Narou
     "update.sort-by" => "アップデートを指定した項目順で行う",
     "default.title_date_align" => "enable_add_date_to_title で付与する日付の位置",
     "force.title_date_align" => "enable_add_date_to_title で付与する日付の位置",
+    "difftool.arg" => "difftoolで使う引数(指定しなければ単純に新旧ファイルを引数に呼び出す)\n" \
+                      "特殊な変数\n" \
+                      "<b>%NEW</b> : 最新データの差分用ファイルパス\n" \
+                      "<b>%OLD</b> : 古い方の差分用ファイルパス",
+    "no-color" => "コンソールのカラー表示を無効にする\n※要WEB UIサーバ再起動"
   }
 end
 
