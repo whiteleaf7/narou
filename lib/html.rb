@@ -3,6 +3,8 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "helper"
+
 class HTML
   attr_accessor :string
 
@@ -36,6 +38,7 @@ class HTML
     @string = s_to_aozora
     @string = img_to_aozora
     @string = delete_tag
+    @string = Helper.restor_entity(@string)
     @string
   end
 

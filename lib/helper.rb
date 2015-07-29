@@ -109,7 +109,8 @@ module Helper
   # ダウンロードしてきたデータを使いやすいように処理
   #
   def pretreatment_source(src, encoding = Encoding::UTF_8)
-    restor_entity(src.force_encoding(encoding)).gsub("\r", "")
+    src.force_encoding(encoding).gsub("\r", "")
+    src.encode("UTF-16BE", encoding, :invalid => :replace, :undef => :replace, :replace => "?").encode("UTF-8")
   end
 
   ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)", "#39" => "'" }
@@ -117,7 +118,7 @@ module Helper
   # エンティティ復号
   #
   def restor_entity(str)
-    result = str.encode("UTF-16BE", "UTF-8", :invalid => :replace, :undef => :replace, :replace => "?").encode("UTF-8")
+    result = str.dup
     ENTITIES.each do |key, value|
       result.gsub!("&#{key};", value)
     end
