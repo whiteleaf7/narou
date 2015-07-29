@@ -73,6 +73,7 @@
         .panel-body
           ・この小説専用の変換時の設定を変更出来ます（setting.ini を書き換えます）<br>
           ・変更を反映させるには再度変換を実行する必要があります<br>
+          ・未設定の項目は、変換時に共通設定（default.* 系設定及びNarou.rbオリジナル設定）が適用されます<br>
           ・環境設定で force.* 系設定が有効になっている場合、ここでの該当項目は無視されます<br>
         .list-group
           - @original_settings.each do |original|
