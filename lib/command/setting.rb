@@ -301,7 +301,7 @@ module Command
 
     SETTING_TAB_NAMES = {
       general: "一般",
-      etc: "その他",
+      detail: "詳細",
       global: "Global",
       default: "default.*",
       force: "force.*",
@@ -333,7 +333,7 @@ module Command
         },
         "hotentry.auto-mail" => {
           type: :boolean, help: "新着投稿作成時にメールを送る(mail設定済みの場合)",
-          tab: :etc
+          tab: :detail
         },
         "update.strong" => {
           type: :boolean, help: "更新漏れが無い様に改稿日の分は必ずDLするか",
@@ -341,7 +341,7 @@ module Command
         },
         "update.logging" => {
           type: :boolean, help: "更新時のログを保存する",
-          tab: :etc
+          tab: :detail
         },
         "update.convert-only-new-arrival" => {
           type: :boolean, help: "更新時に新着のみ変換を実行する",
@@ -365,22 +365,22 @@ module Command
         },
         "convert.no-epub" => {
           type: :boolean, help: "EPUB変換を無効にする", invisible: true,
-          tab: :etc
+          tab: :detail
         },
         "convert.no-mobi" => {
           type: :boolean, help: "MOBI変換を無効にする", invisible: true,
-          tab: :etc
+          tab: :detail
         },
         "convert.no-strip" => {
           type: :boolean,
           help: "MOBIのstripを無効にする\n" \
                 "      ※注意：KDP用のMOBIはstripしないでください",
           invisible: true,
-          tab: :etc
+          tab: :detail
         },
         "convert.no-zip" => {
           type: :boolean, help: "i文庫用のzipファイル作成を無効にする", invisible: true,
-          tab: :etc
+          tab: :detail
         },
         "convert.no-open" => {
           type: :boolean, help: "変換時に保存フォルダを開かないようにする",
@@ -404,19 +404,19 @@ module Command
         },
         "download.interval" => {
           type: :float, help: "各話DL時に指定した秒数待機する。デフォルト0",
-          tab: :etc
+          tab: :detail
         },
         "download.wait-steps" => {
           type: :integer,
           help: "この値で指定した話数ごとにウェイトを入れる\n" \
                 "      ※注意：11以上を設定してもなろうの場合は10話ごとにウェイトが入ります",
-          tab: :etc
+          tab: :detail
         },
         "download.use-subdirectory" => {
           type: :boolean,
           help: "小説を一定数ごとにサブフォルダへ分けて保存する\n" \
                 "      ※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策",
-          tab: :etc
+          tab: :detail
         },
         "send.without-freeze" => {
           type: :boolean, help: "一括送信時に凍結された小説は対象外にする",
@@ -424,11 +424,11 @@ module Command
         },
         "send.backup-bookmark" => {
           type: :boolean, help: "一括送信時に栞データを自動でバックアップする(KindlePW系用)",
-          tab: :etc
+          tab: :detail
         },
         "multiple-delimiter" => {
           type: :string, help:  "--multiple指定時の区切り文字",
-          tab: :etc
+          tab: :detail
         },
       },
       global: {
