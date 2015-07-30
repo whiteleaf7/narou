@@ -389,7 +389,7 @@ class NovelConverter
     data = Database.instance.get_data("id", @novel_id)
     # タイトルに新着更新日を付加する
     if @setting.enable_add_date_to_title
-      new_arrivals_date = data["new_arrivals_date"] || data["last_update"]
+      new_arrivals_date = data[@setting.title_date_target] || Time.now
       date_str = new_arrivals_date.strftime(@setting.title_date_format)
       if @setting.title_date_align == "left"
         processed_title = date_str + processed_title

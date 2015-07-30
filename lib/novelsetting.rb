@@ -370,7 +370,7 @@ class NovelSetting
       name: "enable_add_date_to_title",
       type: :boolean,
       value: false,
-      help: "変換後の小説のタイトルに更新日の日付を付加する"
+      help: "変換後の小説のタイトルに最新話掲載日や更新日等の日付を付加する"
     },
     {
       name: "title_date_format",
@@ -385,6 +385,14 @@ class NovelSetting
       help: "enable_add_date_to_title で付与する日付の位置。left(タイトルの前) か right(タイトルの後)",
       select_keys: %w(left right),
       select_summaries: %w(タイトルの前 タイトルの後)
+    },
+    {
+      name: "title_date_target",
+      type: :select,
+      value: "general_lastup",
+      help: "enable_add_date_to_title で付与する日付の種類。\ngeneral_lastup(最新話掲載日),last_update(更新日),new_arrivals_date(新着を確認した日),convert(変換した日)",
+      select_keys: %w(general_lastup last_update new_arrivals_date convert),
+      select_summaries: %w(最新話掲載日 更新日 新着を確認した日 変換した日)
     },
     {
       name: "enable_ruby_youon_to_big",
