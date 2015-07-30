@@ -315,13 +315,11 @@ table.dataTable {
  */
 .navbar {
   $navbar-background-color: rgba(248,248,248,0.93);
-  background-color: $navbar-background-color;
 
   @media (max-width:767px) {
     .navbar-collapse {
       position: absolute;
       right: -270px;
-      background-color: $navbar-background-color;
       width: 270px;
       border-left: 1px solid #aaa !important;
       border-bottom: 1px solid #aaa !important;
@@ -341,16 +339,11 @@ table.dataTable {
     li.active {
       a {
         padding-left: 4px !important;
-        background-color: inherit !important;
-        color: inherit !important;
       }
       a:hover {
-        background-color: #f5f5f5 !important;
-        color: inherit !important;
       }
       @media (max-width:767px) {
         a:hover {
-          background-color: inherit !important;
         }
       }
       span.active-ok {
@@ -746,13 +739,6 @@ $console-color: white;
   position: relative;
   margin-right: 0;
   cursor: default;
-
-  &.active {
-    color: #d9534f !important;
-    #queue {
-      background-color: #d9534f !important;
-    }
-  }
 }
 #queue {
   position: relative;

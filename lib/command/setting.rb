@@ -336,7 +336,7 @@ module Command
           tab: :detail
         },
         "update.strong" => {
-          type: :boolean, help: "更新漏れが無い様に改稿日の分は必ずDLするか",
+          type: :boolean, help: "更新漏れが無い様に改稿日の分は必ずDLする",
           tab: :general
         },
         "update.logging" => {
@@ -429,6 +429,12 @@ module Command
         "multiple-delimiter" => {
           type: :string, help:  "--multiple指定時の区切り文字",
           tab: :detail
+        },
+        "theme" => {
+          type: :select, help: "WEB UI 用テーマ選択",
+          select_keys: Narou.get_theme_names,
+          select_summaries: Narou.get_theme_names,
+          tab: :general
         },
       },
       global: {

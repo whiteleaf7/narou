@@ -221,5 +221,21 @@ module Narou
       "#{key.rjust(width)} : #{summary}"
     }.join("\n")
   end
+
+  def get_theme
+    Inventory.load("local_setting", :local)["theme"]
+  end
+
+  def get_theme_dir(name = nil)
+    File.join([get_script_dir, "lib/web/public/theme", name].compact)
+  end
+
+  def get_theme_names
+    Dir.glob(get_theme_dir("*")).map do |path|
+      name = File.basename(path)
+      name == "fonts" ? nil : name
+    end.compact
+  end
+  memoize :get_theme_names
  end
 end

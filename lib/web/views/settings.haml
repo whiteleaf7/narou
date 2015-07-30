@@ -89,6 +89,7 @@
                 - local_and_global_variables.each do |name, value|
                   - next if value[:tab] != key
                   - item = inventory[name]
+                  - need_clear = false
                   - message = Narou::SETTING_VARIABLES_WEBUI_MESSAGES[name] || value[:help]
                   - message = message.strip.gsub("\n", "<br>")
                   - error_style = {class: "has-error", style: "background-color:#f2dede"}
@@ -123,6 +124,7 @@
                             - value[:select_keys].each_with_index do |key, index|
                               %option{selected: item == key, value: key}
                                 = value[:select_summaries][index]
+                        - need_clear = true
                       - when :multiple
                         %div.input-style
                           %select{name: "#{name}[]", class: "selectpicker", multiple: true, title: "未設定"}
@@ -130,15 +132,18 @@
                             - value[:select_keys].each_with_index do |key, index|
                               %option{selected: selected_items.include?(key), value: key}
                                 = value[:select_summaries][index]
+                        - need_clear = true
                       - else
                         %input{type:"text", name:name, value:item, class:"form-control",
                                placeholder:Helper.variable_type_to_description(value[:type]).strip }
+                        - need_clear = true
                       %p
                         = message != "" ? message : "&nbsp;"
                       - if @error_list[name]
                         %p.alert-danger
                           = @error_list[name]
-                      .clear
+                      - if need_clear
+                        .clearfix
 
         .tab-pane(role="tabpanel" id="replace")
           - @replace_panel_var = { title: "全小説対象の置換設定",

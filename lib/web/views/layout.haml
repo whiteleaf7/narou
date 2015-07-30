@@ -8,7 +8,12 @@
     %meta{:content => "none", :name => "robots"}/
     %title Narou.rb WEB UI #{@title ? "- #{@title}" : ""}
     %link{:href => "/favicon.ico", :rel => "shortcut icon"}/
-    %link{:href => "//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", :rel => "stylesheet"}/
+    - if @bootstrap_theme
+      %link{:href => "/theme/#{@bootstrap_theme}/bootstrap.min.css", :rel => "stylesheet"}/
+      %link{:href => "/theme/#{@bootstrap_theme}/style.css", :rel => "stylesheet"}/
+    - else
+      %link{:href => "//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css", :rel => "stylesheet"}/
+      %link{:href => "/resources/default-style.css", :rel => "stylesheet"}/
     %link{:href => "//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.css", :rel => "stylesheet"}/
     %link{:href => "//cdn.datatables.net/colreorder/1.1.2/css/dataTables.colReorder.css", :rel => "stylesheet"}/
     %link{:href => "//cdn.datatables.net/colvis/1.1.1/css/dataTables.colVis.css", :rel => "stylesheet"}/
