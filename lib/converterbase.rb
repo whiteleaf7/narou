@@ -836,7 +836,7 @@ class ConverterBase
   end
 
   CHARACTER_OF_RUBY = "一-龠Ａ-Ｚａ-ｚA-Za-z"
-  AUTO_RUBY_CHARACTERS = "([ぁ-んァ-ヶーゝゞ・Ａ-Ｚａ-ｚA-Za-z 　]{,20})"
+  AUTO_RUBY_CHARACTERS = "([ぁ-んァ-ヶーゝゞ・ 　]{,20})"
 
   #
   # 小説家になろうのルビ対策
