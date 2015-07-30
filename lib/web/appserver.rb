@@ -432,7 +432,7 @@ class Narou::AppServer < Sinatra::Base
     pass if targets.size == 0
     Narou::Worker.push do
       CommandLine.run!(["download"] + targets)
-      @@push_server.send_all("table.reload" => true)
+      @@push_server.send_all(:"table.reload")
     end
   end
 
@@ -440,7 +440,7 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["download", "--force", ids])
-      @@push_server.send_all("table.reload" => true)
+      @@push_server.send_all(:"table.reload")
     end
   end
 
@@ -452,7 +452,7 @@ class Narou::AppServer < Sinatra::Base
     end
     Narou::Worker.push do
       CommandLine.run!(["update", ids, opt_arguments])
-      @@push_server.send_all("table.reload" => true)
+      @@push_server.send_all(:"table.reload")
     end
   end
 
@@ -467,7 +467,7 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["freeze", ids])
-      @@push_server.send_all("table.reload" => true)
+      @@push_server.send_all(:"table.reload")
     end
   end
 
@@ -475,7 +475,7 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["freeze", "--on", ids])
-      @@push_server.send_all("table.reload" => true)
+      @@push_server.send_all(:"table.reload")
     end
   end
 
@@ -483,7 +483,7 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["freeze", "--off", ids])
-      @@push_server.send_all("table.reload" => true)
+      @@push_server.send_all(:"table.reload")
     end
   end
 
@@ -495,7 +495,7 @@ class Narou::AppServer < Sinatra::Base
     end
     Narou::Worker.push do
       CommandLine.run!(["remove", "--yes", ids, opt_arguments])
-      @@push_server.send_all("table.reload" => true)
+      @@push_server.send_all(:"table.reload")
     end
   end
 
@@ -503,7 +503,7 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
       CommandLine.run!(["remove", "--yes", "--with-file", ids])
-      @@push_server.send_all("table.reload" => true)
+      @@push_server.send_all(:"table.reload")
     end
   end
 
