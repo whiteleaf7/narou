@@ -481,8 +481,12 @@ class Narou::AppServer < Sinatra::Base
 
   post "/api/remove" do
     ids = select_valid_novel_ids(params["ids"]) or pass
+    opt_arguments = []
+    if params["with_file"] == "true"
+      opt_arguments << "--with-file"
+    end
     Narou::Worker.push do
-      CommandLine.run!(["remove", "--yes", ids])
+      CommandLine.run!(["remove", "--yes", ids, opt_arguments])
       @@push_server.send_all("table.reload" => true)
     end
   end

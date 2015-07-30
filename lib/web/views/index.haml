@@ -172,16 +172,10 @@
         %li
           %a#button-freeze-off(href="#") 選択した小説の凍結を解除
     .btn-group
-      %button.btn.btn-danger.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
-        Remove
-        %span.caret
-        %span.sr-only Toggle Dropdown
-      %ul.dropdown-menu(role="menu")
-        %li
-          %a#button-remove(href="#") 選択した小説を削除
-        %li
-          %a#button-remove-with-file(href="#") 選択した小説をファイルも含めて削除
-    %button#button-convert.btn.btn-default.enable-selected(type="button" data-toggle="tooltip" |
+      %button#button-remove.btn.btn-danger.enable-selected(type="button" data-toggle="tooltip" |
+                            title="選択した小説を削除") Remove |
+    .btn-group
+      %button#button-convert.btn.btn-default.enable-selected(type="button" data-toggle="tooltip" |
                             title="選択した小説を変換") Convert |
     .btn-group
       %button.btn.btn-default.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
@@ -234,8 +228,6 @@
     %a(href="#") 送信
   %li#context-menu-remove
     %a(href="#") 削除
-  %li#context-menu-remove-with-file
-    %a(href="#") 完全に削除
   %li#context-menu-convert
     %a(href="#") 変換
   %li#context-menu-inspect
