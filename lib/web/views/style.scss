@@ -334,9 +334,6 @@ table.dataTable {
   .active-ok {
     display: none;
   }
-  li.dropdown.open > .dropdown-toggle {
-    background-color: darken($navbar-background-color, 15%) !important;
-  }
   ul.dropdown-menu {
     li.with-icon a {
       padding-left: 8px !important;
