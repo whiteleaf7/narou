@@ -359,7 +359,7 @@ module Command
           type: :directory,
           help: "変換したらこのフォルダにコピーする\n" \
                 "      ※注意：存在しないフォルダだとエラーになる",
-                tab: :general
+          tab: :general
         },
         "convert.copy_to" => {
           type: :directory, help: "copy-toの昔の書き方(非推奨)", invisible: true
@@ -389,7 +389,7 @@ module Command
         },
         "convert.inspect" => {
           type: :boolean, help: "常に変換時に調査結果を表示する",
-          tab: :inspect
+          tab: :detail
         },
         "convert.multi-device" => {
           type: :multiple,
