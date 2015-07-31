@@ -256,6 +256,7 @@ module Command
         exit Narou::EXIT_ERROR_CODE
       end
       msg = "指定された小説のsetting.iniの未項目設定に共通設定を焼き付けます。\n" \
+            "(共通設定とはsetting.iniの項目が未設定時に使用される default.* 系設定およびNarou.rbオリジナル設定のこと)\n" \
             "よろしいですか"
       return unless Narou::Input.confirm(msg)
 
