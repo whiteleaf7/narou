@@ -18,12 +18,11 @@
 <% sections.each_with_index do |section, i| -%>
 ［＃改ページ］
 <% if section["chapter"] != "" -%>
+［＃ページの左右中央］
 ［＃ここから柱］<%= toc["title"] %>［＃ここで柱終わり］
 <% if device && device.ibooks? -%>
 <%# ibooks だと左右中央が機能しないため -%>
 <%= "\n" * 6 -%>
-<% else -%>
-［＃ページの左右中央］
 <% end -%>
 ［＃３字下げ］［＃大見出し］<%= section["chapter"] %>［＃大見出し終わり］
 ［＃改ページ］

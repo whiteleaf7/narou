@@ -14,12 +14,7 @@ Narou.rb
 <% converted_text_array.each do |entry| -%>
 <%- setting = entry[:setting] -%>
 ［＃改ページ］
-<% if device && device.ibooks? -%>
-<%# ibooks だと左右中央が機能しないため -%>
-<%= "\n" * 6 -%>
-<% else -%>
 ［＃ページの左右中央］
-<% end -%>
 ［＃１字下げ］［＃大見出し］<%= setting.title %>［＃大見出し終わり］
 ［＃ここから地付き］<%= setting.author %>［＃ここで地付き終わり］
 <%= entry[:text] %>
