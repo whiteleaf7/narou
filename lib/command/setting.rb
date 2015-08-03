@@ -333,7 +333,7 @@ module Command
           tab: :general
         },
         "hotentry.auto-mail" => {
-          type: :boolean, help: "新着投稿作成時にメールを送る(mail設定済みの場合)",
+          type: :boolean, help: "hotentryをメールで送る(mail設定済みの場合)",
           tab: :detail
         },
         "update.strong" => {
