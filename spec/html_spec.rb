@@ -58,4 +58,26 @@ describe HTML do
     html = HTML.new(test_html)
     expect(html.to_aozora).to eq(test_txt)
   end
+
+  describe "装飾タグの削除" do
+    before do
+      @strip_html = HTML.new
+      @strip_html.strip_decoration_tag = true
+    end
+
+    it do
+      @strip_html.string = "<b>太字</b>"
+      expect(@strip_html.to_aozora).to eq "太字"
+    end
+
+    it do
+      @strip_html.string = "<b>太字<i>斜体</i></b><s>打ち消し</s>"
+      expect(@strip_html.to_aozora).to eq "太字斜体打ち消し"
+    end
+
+    it do
+      @strip_html.string = "<b><ruby>漢字<rt>かんじ</ruby></b>"
+      expect(@strip_html.to_aozora).to eq "｜漢字《かんじ》"
+    end
+  end
 end

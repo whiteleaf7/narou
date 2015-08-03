@@ -3,15 +3,17 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require "uri"
 require_relative "helper"
 
 class HTML
-  attr_accessor :string
+  attr_accessor :string, :strip_decoration_tag
 
   def initialize(string = "")
     @string = string
     @illust_current_url = nil
     @illust_grep_pattern = /<img.+?src=\"(?<src>.+?)\".*?>/i
+    @strip_decoration_tag = false
   end
 
   #
@@ -33,9 +35,11 @@ class HTML
   def to_aozora
     @string = br_to_aozora
     @string = ruby_to_aozora
-    @string = b_to_aozora
-    @string = i_to_aozora
-    @string = s_to_aozora
+    unless @strip_decoration_tag
+      @string = b_to_aozora
+      @string = i_to_aozora
+      @string = s_to_aozora
+    end
     @string = img_to_aozora
     @string = delete_tag
     @string = Helper.restor_entity(@string)

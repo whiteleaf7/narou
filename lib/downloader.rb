@@ -730,7 +730,9 @@ class Downloader
       # 小説情報ページがないサイトの場合は目次ページから取得する
       @setting.multi_match(toc_source, "title", "author", "story")
       raise DownloaderNotFoundError unless @setting.matched?("title")
-      @setting["story"] = HTML.new(@setting["story"]).to_aozora
+      story_html = HTML.new(@setting["story"])
+      story_html.strip_decoration_tag = true
+      @setting["story"] = story_html.to_aozora
     end
     @setting["info"] = info
 

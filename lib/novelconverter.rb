@@ -499,6 +499,7 @@ class NovelConverter
     toc = Downloader.get_toc_data(@setting.archive_path)
     toc["story"] = @converter.convert(toc["story"], "story")
     html = HTML.new
+    html.strip_decoration_tag = @setting.enable_strip_decoration_tag
     site_setting = find_site_setting(toc["toc_url"])
     html.set_illust_setting({current_url: site_setting["illust_current_url"],
                              grep_pattern: site_setting["illust_grep_pattern"]})

@@ -221,6 +221,7 @@ module Command
 
     def create_temp_by_sections(temp_prefix, sections, novel_info)
       html = HTML.new
+      html.strip_decoration_tag = true
       sections.each do |section|
         element = section["element"]
         data_type = element.delete("data_type") || "text"

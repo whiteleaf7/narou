@@ -424,6 +424,12 @@ class NovelSetting
       value: false,
       help: "文字選択がしやすいように１文字ずつ区切りデータを挿入する（Kindle専用。enable_insert_word_separator が有効な場合無この設定は無視される）"
     },
+    {
+      name: "enable_strip_decoration_tag",
+      type: :boolean,
+      value: false,
+      help: "HTMLの装飾系タグを削除する（主にArcadiaの作品に影響）"
+    },
   ]
 
   ORIGINAL_SETTINGS_KEY_INDEXES = {}.tap { |hash|
