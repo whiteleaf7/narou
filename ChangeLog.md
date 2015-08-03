@@ -2,7 +2,7 @@
 更新履歴 - ChangeLog
 ====================
 
-2.6.1 : master
+2.6.1 : 2015/08/03
 ------------------
 #### 追加機能
 - setting.iniに装飾タグを削除する `enable_strip_decoration_tag` を追加しました

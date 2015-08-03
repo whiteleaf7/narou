@@ -86,6 +86,17 @@ Gem::Specification.new do |gem|
 - 小説家になろうのルビ仕様に追随できていなかった部分を修正
 - WEB UI の凍結表示状態がおかしくなることがあったのを修正
 
+
+2.6.1 : 2015/08/03
+------------------
+#### 追加機能
+- setting.iniに装飾タグを削除する `enable_strip_decoration_tag` を追加しました
+	+ タグ内で改行されておかしくなった場合に対処出来るようにするためのものです
+
+#### Bug Fix
+- 章が存在する小説で章ページおかしくなる不具合を修正
+- Arcadia でトリップのついていない作者名が正しく取得出来ない不具合を修正
+
 #{"*" * 79}
   EOS
   gem.post_install_message = install_message.gsub("\t", "  ")
