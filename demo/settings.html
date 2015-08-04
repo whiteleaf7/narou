@@ -1,0 +1,2443 @@
+<!DOCTYPE html>
+<html lang='ja'>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+    <meta content='width=device-width, initial-scale=1' name='viewport'>
+    <meta content='whiteleaf' name='author'>
+    <meta content='none' name='robots'>
+    <title>Narou.rb WEB UI - 環境設定</title>
+    <link href='./favicon.ico' rel='shortcut icon'>
+    <link href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css' rel='stylesheet'>
+    <link href='/resources/default-style.css' rel='stylesheet'>
+    <link href='//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.css' rel='stylesheet'>
+    <link href='//cdn.datatables.net/colreorder/1.1.2/css/dataTables.colReorder.css' rel='stylesheet'>
+    <link href='//cdn.datatables.net/colvis/1.1.1/css/dataTables.colVis.css' rel='stylesheet'>
+    <link href='//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.5/css/bootstrap-select.min.css' rel='stylesheet'>
+    <link href='./resources/perfect-scrollbar.min.css' rel='stylesheet'>
+    <link href='./resources/toggle-switch.css' rel='stylesheet'>
+    <link href='./resources/style.css' rel='stylesheet'>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script>
+      var local_initialize_functions = [];
+      var slideNavbar;
+    </script>
+  </head>
+  <body>
+    <script>
+      local_initialize_functions.push(function($) {
+        $("[data-toggle=tooltip]").tooltip({
+          animation: false,
+          container: "body",
+        });
+        // セレクトボタン設定
+        $(".selectpicker").selectpicker({
+          container: "body",
+          width: "100%"
+        });
+      
+        var storage = new Narou.Storage;
+        // 直前に開いていたタブを復元
+        var related_active_tab = storage.get("related_active_tab");
+        if (related_active_tab) {
+          $('a[href="#' + related_active_tab + '"]').tab("show");
+        }
+        // 開いたタブを記憶しておく
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+          var active_tab = (e.target + "").split("#")[1];
+          storage.set("related_active_tab", active_tab);
+          storage.save();
+        })
+      });
+    </script>
+    <form action='/settings' method='POST'>
+      <div class='navbar navbar-default navbar-fixed-top' role='navigation'>
+        <div class='container'>
+          <div class='navbar-header'>
+            <button class='navbar-toggle' type='button'>
+              <span class='sr-only'>Toggle navigation</span>
+              <span class='icon-bar'></span>
+              <span class='icon-bar'></span>
+              <span class='icon-bar'></span>
+            </button>
+            <a class='navbar-brand' data-move-to='top' href='#'>Narou.rb WEB UI</a>
+          </div>
+          <div class='collapse navbar-collapse'>
+            <ul class='nav navbar-nav'>
+              <li class='active'>
+                <a href='./settings.html'>環境設定</a>
+              </li>
+              <li>
+                <a href='./help.html'>ヘルプ</a>
+              </li>
+              <li>
+                <a href='./'>戻る</a>
+              </li>
+            </ul>
+            <div class='navbar-form navbar-left'>
+              <input class='btn btn-info' style='margin-left: 50px' type='submit' value='設定を保存'>
+            </div>
+            <p class='navbar-text navbar-right' data-placement='bottom' data-toggle='tooltip' id='queue-text' title='キューに積まれた処理の数'>
+              <span class='glyphicon glyphicon-inbox'></span>
+              <span id='queue'>0</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class='container container-main theme-showcase' role='main'>
+        <div class='container-settings'>
+          <p>
+            <ul class='nav nav-pills' role='tablist'>
+              <li class='active' role='presentation'>
+                <a aria-controls='general' data-toggle='tab' href='#general' role='tab'>
+                  一般
+                </a>
+              </li>
+              <li role='presentation'>
+                <a aria-controls='detail' data-toggle='tab' href='#detail' role='tab'>
+                  詳細
+                </a>
+              </li>
+              <li role='presentation'>
+                <a aria-controls='global' data-toggle='tab' href='#global' role='tab'>
+                  Global
+                </a>
+              </li>
+              <li role='presentation'>
+                <a aria-controls='default' data-toggle='tab' href='#default' role='tab'>
+                  default.*
+                </a>
+              </li>
+              <li role='presentation'>
+                <a aria-controls='force' data-toggle='tab' href='#force' role='tab'>
+                  force.*
+                </a>
+              </li>
+              <li role='presentation'>
+                <a aria-controls='command' data-toggle='tab' href='#command' role='tab'>
+                  コマンド
+                </a>
+              </li>
+              <li role='presentation'>
+                <a aria-controls='replace' data-toggle='tab' href='#replace' role='tab'>
+                  置換設定
+                </a>
+              </li>
+            </ul>
+          </p>
+          <input name='convert.copy_to' type='hidden'>
+          <div class='tab-content'>
+            <div class='active tab-pane' id='general' role='tabpanel'>
+              <div class='panel panel-info panel-settings'>
+                <div class='list-group'>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>device</h4>
+                    <div class='list-group-item-text'>
+                      <div class='input-style'>
+                        <select class='selectpicker show-tick' name='device'>
+                          <option value=''>未設定</option>
+                          <option value='epub'>
+                            EPUB
+                          </option>
+                          <option value='ibooks'>
+                            iBooks
+                          </option>
+                          <option value='ibunko'>
+                            i文庫
+                          </option>
+                          <option value='kindle'>
+                            Kindle
+                          </option>
+                          <option value='kobo'>
+                            Kobo
+                          </option>
+                          <option value='reader'>
+                            SonyReader
+                          </option>
+                        </select>
+                      </div>
+                      <p>
+                        変換、送信対象の端末
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>hotentry</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="hotentry" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        新着投稿だけをまとめたデータを作る
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>update.strong</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="update.strong" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        更新漏れが無い様に改稿日の分は必ずDLする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>update.convert-only-new-arrival</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="update.convert-only-new-arrival" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        更新時に新着のみ変換を実行する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>update.sort-by</h4>
+                    <div class='list-group-item-text'>
+                      <div class='input-style'>
+                        <select class='selectpicker show-tick' name='update.sort-by'>
+                          <option value=''>未設定</option>
+                          <option value='id'>
+                            ID
+                          </option>
+                          <option value='last_update'>
+                            更新日
+                          </option>
+                          <option value='title'>
+                            タイトル
+                          </option>
+                          <option value='author'>
+                            作者名
+                          </option>
+                          <option value='new_arrivals_date'>
+                            新着日
+                          </option>
+                          <option value='general_lastup'>
+                            最新話掲載日
+                          </option>
+                        </select>
+                      </div>
+                      <p>
+                        アップデートを指定した項目順で行う
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>convert.copy-to</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='convert.copy-to' placeholder='フォルダパス' type='text'>
+                      <p>
+                        変換したらこのフォルダにコピーする<br>      ※注意：存在しないフォルダだとエラーになる
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>convert.no-open</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="convert.no-open" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        変換時に保存フォルダを開かないようにする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>convert.multi-device</h4>
+                    <div class='list-group-item-text'>
+                      <div class='input-style'>
+                        <select class='selectpicker' multiple name='convert.multi-device[]' title='未設定'>
+                          <option value='epub'>
+                            EPUB
+                          </option>
+                          <option value='ibooks'>
+                            iBooks
+                          </option>
+                          <option value='ibunko'>
+                            i文庫
+                          </option>
+                          <option value='kindle'>
+                            Kindle
+                          </option>
+                          <option value='kobo'>
+                            Kobo
+                          </option>
+                          <option value='reader'>
+                            SonyReader
+                          </option>
+                        </select>
+                      </div>
+                      <p>
+                        複数の端末用に同時に変換する。deviceよりも優先される。<br>ただのEPUBを出力したい場合はepubを指定
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>convert.copy-to-grouping</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="convert.copy-to-grouping" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        copy-toで指定したフォルダの中で更にdevice毎にフォルダを振り分ける
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>send.without-freeze</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="send.without-freeze" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        一括送信時に凍結された小説は対象外にする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>theme</h4>
+                    <div class='list-group-item-text'>
+                      <div class='input-style'>
+                        <select class='selectpicker show-tick' name='theme'>
+                          <option value=''>未設定</option>
+                          <option value='Cerulean'>
+                            Cerulean
+                          </option>
+                          <option value='Darkly'>
+                            Darkly
+                          </option>
+                          <option value='Readable'>
+                            Readable
+                          </option>
+                          <option value='Slate'>
+                            Slate
+                          </option>
+                          <option value='Superhero'>
+                            Superhero
+                          </option>
+                          <option value='United'>
+                            United
+                          </option>
+                        </select>
+                      </div>
+                      <p>
+                        WEB UI 用テーマ選択
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class='tab-pane' id='detail' role='tabpanel'>
+              <div class='panel panel-info panel-settings'>
+                <div class='list-group'>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>hotentry.auto-mail</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="hotentry.auto-mail" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        新着投稿作成時にメールを送る(mail設定済みの場合)
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>update.logging</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="update.logging" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        更新時のログを保存する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>convert.no-epub</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="convert.no-epub" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        EPUB変換を無効にする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>convert.no-mobi</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="convert.no-mobi" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        MOBI変換を無効にする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>convert.no-strip</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="convert.no-strip" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        MOBIのstripを無効にする<br>      ※注意：KDP用のMOBIはstripしないでください
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>convert.no-zip</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="convert.no-zip" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        i文庫用のzipファイル作成を無効にする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>convert.inspect</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="convert.inspect" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        常に変換時に調査結果を表示する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>download.interval</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='download.interval' placeholder='小数点数' type='text'>
+                      <p>
+                        各話DL時に指定した秒数待機する。デフォルト0
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>download.wait-steps</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='download.wait-steps' placeholder='整数' type='text'>
+                      <p>
+                        この値で指定した話数ごとにウェイトを入れる<br>      ※注意：11以上を設定してもなろうの場合は10話ごとにウェイトが入ります
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>download.use-subdirectory</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="download.use-subdirectory" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        小説を一定数ごとにサブフォルダへ分けて保存する<br>      ※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>send.backup-bookmark</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="send.backup-bookmark" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        一括送信時に栞データを自動でバックアップする(KindlePW系用)
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>multiple-delimiter</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='multiple-delimiter' placeholder='文字列' type='text'>
+                      <p>
+                        --multiple指定時の区切り文字
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class='tab-pane' id='global' role='tabpanel'>
+              <div class='panel panel-info panel-settings'>
+                <div class='panel-heading'>
+                  Global な設定はユーザープロファイルに保存され、すべての narou コマンドで使われます
+                </div>
+                <div class='list-group'>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>difftool</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='difftool' placeholder='文字列' type='text'>
+                      <p>
+                        Diffで使うツールのパスを指定する<br>※WEB UIでは使われません
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>difftool.arg</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='difftool.arg' placeholder='文字列' type='text' value='-u %OLD %NEW'>
+                      <p>
+                        difftoolで使う引数(指定しなければ単純に新旧ファイルを引数に呼び出す)<br>特殊な変数<br><b>%NEW</b> : 最新データの差分用ファイルパス<br><b>%OLD</b> : 古い方の差分用ファイルパス
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>no-color</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="no-color" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        コンソールのカラー表示を無効にする<br>※要WEB UIサーバ再起動
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>server-port</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='server-port' placeholder='整数' type='text' value='4567'>
+                      <p>
+                        WEBサーバ起動時のポート
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>server-bind</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='server-bind' placeholder='文字列' type='text'>
+                      <p>
+                        WEBサーバのホスト制限(未設定時:起動PCのIP)
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>over18</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="over18" checked>
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        18歳以上かどうか
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>dismiss-notice</h4>
+                    <div class='list-group-item-text'>
+                      <label class='switch-light well'>
+                        <input type="checkbox" name="dismiss-notice" >
+                        <span>
+                          <span>いいえ</span>
+                          <span>はい</span>
+                        </span>
+                        <a class='btn btn-primary'></a>
+                      </label>
+                      <p>
+                        お知らせを消す
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class='tab-pane' id='default' role='tabpanel'>
+              <div class='panel panel-info panel-settings'>
+                <div class='panel-heading'>
+                  default.* 系の設定は個別の変換設定で未設定の項目の挙動を指定することが出来ます
+                </div>
+                <div class='list-group'>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_inspect</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_inspect-nil" type="radio" name="default.enable_inspect" value="nil" checked>
+                        <label for='default.enable_inspect-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_inspect-false" type="radio" name="default.enable_inspect" value="off" >
+                        <label for='default.enable_inspect-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_inspect-true" type="radio" name="default.enable_inspect" value="on" >
+                        <label for='default.enable_inspect-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        小説に対する各種調査を実行する。結果を表示するには narou inspect コマンドを使用
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_convert_num_to_kanji</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_convert_num_to_kanji-nil" type="radio" name="default.enable_convert_num_to_kanji" value="nil" checked>
+                        <label for='default.enable_convert_num_to_kanji-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_convert_num_to_kanji-false" type="radio" name="default.enable_convert_num_to_kanji" value="off" >
+                        <label for='default.enable_convert_num_to_kanji-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_convert_num_to_kanji-true" type="radio" name="default.enable_convert_num_to_kanji" value="on" >
+                        <label for='default.enable_convert_num_to_kanji-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        数字の漢数字変換を有効にする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_kanji_num_with_units</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_kanji_num_with_units-nil" type="radio" name="default.enable_kanji_num_with_units" value="nil" checked>
+                        <label for='default.enable_kanji_num_with_units-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_kanji_num_with_units-false" type="radio" name="default.enable_kanji_num_with_units" value="off" >
+                        <label for='default.enable_kanji_num_with_units-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_kanji_num_with_units-true" type="radio" name="default.enable_kanji_num_with_units" value="on" >
+                        <label for='default.enable_kanji_num_with_units-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        漢数字変換した場合、千・万などに変換する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.kanji_num_with_units_lower_digit_zero</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default.kanji_num_with_units_lower_digit_zero' placeholder='整数' type='text'>
+                      <p>
+                        〇(ゼロ)が最低この数字以上付いてないと千・万などをつける対象にしない
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_alphabet_force_zenkaku</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_alphabet_force_zenkaku-nil" type="radio" name="default.enable_alphabet_force_zenkaku" value="nil" checked>
+                        <label for='default.enable_alphabet_force_zenkaku-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_alphabet_force_zenkaku-false" type="radio" name="default.enable_alphabet_force_zenkaku" value="off" >
+                        <label for='default.enable_alphabet_force_zenkaku-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_alphabet_force_zenkaku-true" type="radio" name="default.enable_alphabet_force_zenkaku" value="on" >
+                        <label for='default.enable_alphabet_force_zenkaku-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        アルファベットを強制的に全角にする。falseの場合英文は半角、それ以外は全角になる
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_half_indent_bracket</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_half_indent_bracket-nil" type="radio" name="default.enable_half_indent_bracket" value="nil" checked>
+                        <label for='default.enable_half_indent_bracket-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_half_indent_bracket-false" type="radio" name="default.enable_half_indent_bracket" value="off" >
+                        <label for='default.enable_half_indent_bracket-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_half_indent_bracket-true" type="radio" name="default.enable_half_indent_bracket" value="on" >
+                        <label for='default.enable_half_indent_bracket-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        行頭かぎ括弧に二分アキを挿入する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_auto_indent</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_auto_indent-nil" type="radio" name="default.enable_auto_indent" value="nil" checked>
+                        <label for='default.enable_auto_indent-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_auto_indent-false" type="radio" name="default.enable_auto_indent" value="off" >
+                        <label for='default.enable_auto_indent-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_auto_indent-true" type="radio" name="default.enable_auto_indent" value="on" >
+                        <label for='default.enable_auto_indent-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        自動行頭字下げ機能。行頭字下げが行われているかを判断し、適切に行頭字下げをするか
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_force_indent</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_force_indent-nil" type="radio" name="default.enable_force_indent" value="nil" checked>
+                        <label for='default.enable_force_indent-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_force_indent-false" type="radio" name="default.enable_force_indent" value="off" >
+                        <label for='default.enable_force_indent-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_force_indent-true" type="radio" name="default.enable_force_indent" value="on" >
+                        <label for='default.enable_force_indent-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        行頭字下げを必ず行うか。enable_auto_indent の設定は無視される
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_auto_join_in_brackets</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_auto_join_in_brackets-nil" type="radio" name="default.enable_auto_join_in_brackets" value="nil" checked>
+                        <label for='default.enable_auto_join_in_brackets-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_auto_join_in_brackets-false" type="radio" name="default.enable_auto_join_in_brackets" value="off" >
+                        <label for='default.enable_auto_join_in_brackets-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_auto_join_in_brackets-true" type="radio" name="default.enable_auto_join_in_brackets" value="on" >
+                        <label for='default.enable_auto_join_in_brackets-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        かぎ括弧内自動連結を有効にする<br>例)<br>「～～～！<br>　＊＊＊？」  → 「～～～！　＊＊＊？」
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_auto_join_line</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_auto_join_line-nil" type="radio" name="default.enable_auto_join_line" value="nil" checked>
+                        <label for='default.enable_auto_join_line-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_auto_join_line-false" type="radio" name="default.enable_auto_join_line" value="off" >
+                        <label for='default.enable_auto_join_line-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_auto_join_line-true" type="radio" name="default.enable_auto_join_line" value="on" >
+                        <label for='default.enable_auto_join_line-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        行末が読点で終わっている部分を出来るだけ連結する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_enchant_midashi</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_enchant_midashi-nil" type="radio" name="default.enable_enchant_midashi" value="nil" checked>
+                        <label for='default.enable_enchant_midashi-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_enchant_midashi-false" type="radio" name="default.enable_enchant_midashi" value="off" >
+                        <label for='default.enable_enchant_midashi-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_enchant_midashi-true" type="radio" name="default.enable_enchant_midashi" value="on" >
+                        <label for='default.enable_enchant_midashi-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        ［＃改ページ］直後の行に中見出しを付与する（テキストファイルを直接変換する場合のみの設定）
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_author_comments</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_author_comments-nil" type="radio" name="default.enable_author_comments" value="nil" checked>
+                        <label for='default.enable_author_comments-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_author_comments-false" type="radio" name="default.enable_author_comments" value="off" >
+                        <label for='default.enable_author_comments-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_author_comments-true" type="radio" name="default.enable_author_comments" value="on" >
+                        <label for='default.enable_author_comments-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        作者コメントを検出する（テキストファイルを直接変換する場合のみの設定）
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_erase_introduction</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_erase_introduction-nil" type="radio" name="default.enable_erase_introduction" value="nil" checked>
+                        <label for='default.enable_erase_introduction-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_erase_introduction-false" type="radio" name="default.enable_erase_introduction" value="off" >
+                        <label for='default.enable_erase_introduction-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_erase_introduction-true" type="radio" name="default.enable_erase_introduction" value="on" >
+                        <label for='default.enable_erase_introduction-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        前書きを削除する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_erase_postscript</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_erase_postscript-nil" type="radio" name="default.enable_erase_postscript" value="nil" checked>
+                        <label for='default.enable_erase_postscript-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_erase_postscript-false" type="radio" name="default.enable_erase_postscript" value="off" >
+                        <label for='default.enable_erase_postscript-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_erase_postscript-true" type="radio" name="default.enable_erase_postscript" value="on" >
+                        <label for='default.enable_erase_postscript-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        後書きを削除する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_ruby</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_ruby-nil" type="radio" name="default.enable_ruby" value="nil" checked>
+                        <label for='default.enable_ruby-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_ruby-false" type="radio" name="default.enable_ruby" value="off" >
+                        <label for='default.enable_ruby-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_ruby-true" type="radio" name="default.enable_ruby" value="on" >
+                        <label for='default.enable_ruby-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        ルビ処理を有効にする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_illust</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_illust-nil" type="radio" name="default.enable_illust" value="nil" checked>
+                        <label for='default.enable_illust-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_illust-false" type="radio" name="default.enable_illust" value="off" >
+                        <label for='default.enable_illust-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_illust-true" type="radio" name="default.enable_illust" value="on" >
+                        <label for='default.enable_illust-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        挿絵タグを有効にする（false なら削除）
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_transform_fraction</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_transform_fraction-nil" type="radio" name="default.enable_transform_fraction" value="nil" checked>
+                        <label for='default.enable_transform_fraction-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_transform_fraction-false" type="radio" name="default.enable_transform_fraction" value="off" >
+                        <label for='default.enable_transform_fraction-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_transform_fraction-true" type="radio" name="default.enable_transform_fraction" value="on" >
+                        <label for='default.enable_transform_fraction-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        ○／×表記を×分の○表記に変換する。日付表記(10/23)と誤爆しやすいので注意
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_transform_date</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_transform_date-nil" type="radio" name="default.enable_transform_date" value="nil" checked>
+                        <label for='default.enable_transform_date-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_transform_date-false" type="radio" name="default.enable_transform_date" value="off" >
+                        <label for='default.enable_transform_date-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_transform_date-true" type="radio" name="default.enable_transform_date" value="on" >
+                        <label for='default.enable_transform_date-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        日付表記(20yy/mm/dd)を任意の形式(date_formatで指定)に変換する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.date_format</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default.date_format' placeholder='文字列' type='text'>
+                      <p>
+                        書式は http://bit.ly/1m5e3w7 を参考
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_convert_horizontal_ellipsis</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_convert_horizontal_ellipsis-nil" type="radio" name="default.enable_convert_horizontal_ellipsis" value="nil" checked>
+                        <label for='default.enable_convert_horizontal_ellipsis-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_convert_horizontal_ellipsis-false" type="radio" name="default.enable_convert_horizontal_ellipsis" value="off" >
+                        <label for='default.enable_convert_horizontal_ellipsis-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_convert_horizontal_ellipsis-true" type="radio" name="default.enable_convert_horizontal_ellipsis" value="on" >
+                        <label for='default.enable_convert_horizontal_ellipsis-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        中黒(・)を並べて三点リーダーもどきにしているのを三点リーダーに変換する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_convert_page_break</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_convert_page_break-nil" type="radio" name="default.enable_convert_page_break" value="nil" checked>
+                        <label for='default.enable_convert_page_break-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_convert_page_break-false" type="radio" name="default.enable_convert_page_break" value="off" >
+                        <label for='default.enable_convert_page_break-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_convert_page_break-true" type="radio" name="default.enable_convert_page_break" value="on" >
+                        <label for='default.enable_convert_page_break-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        `to_page_break_threshold` で設定した個数以上連続する空行を改ページに変換する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.to_page_break_threshold</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default.to_page_break_threshold' placeholder='整数' type='text'>
+                      <p>
+                        ここで設定した値が `enable_convert_page_break` に反映される
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_dakuten_font</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_dakuten_font-nil" type="radio" name="default.enable_dakuten_font" value="nil" checked>
+                        <label for='default.enable_dakuten_font-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_dakuten_font-false" type="radio" name="default.enable_dakuten_font" value="off" >
+                        <label for='default.enable_dakuten_font-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_dakuten_font-true" type="radio" name="default.enable_dakuten_font" value="on" >
+                        <label for='default.enable_dakuten_font-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        濁点フォントを使用する。false の場合は縦中横による擬似表現を使用する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_display_end_of_book</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_display_end_of_book-nil" type="radio" name="default.enable_display_end_of_book" value="nil" checked>
+                        <label for='default.enable_display_end_of_book-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_display_end_of_book-false" type="radio" name="default.enable_display_end_of_book" value="off" >
+                        <label for='default.enable_display_end_of_book-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_display_end_of_book-true" type="radio" name="default.enable_display_end_of_book" value="on" >
+                        <label for='default.enable_display_end_of_book-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        小説の最後に本を読み終わった表示をする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_add_date_to_title</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_add_date_to_title-nil" type="radio" name="default.enable_add_date_to_title" value="nil" checked>
+                        <label for='default.enable_add_date_to_title-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_add_date_to_title-false" type="radio" name="default.enable_add_date_to_title" value="off" >
+                        <label for='default.enable_add_date_to_title-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_add_date_to_title-true" type="radio" name="default.enable_add_date_to_title" value="on" >
+                        <label for='default.enable_add_date_to_title-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        変換後の小説のタイトルに最新話掲載日や更新日等の日付を付加する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.title_date_format</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default.title_date_format' placeholder='文字列' type='text'>
+                      <p>
+                        enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.title_date_align</h4>
+                    <div class='list-group-item-text'>
+                      <div class='input-style'>
+                        <select class='selectpicker show-tick' name='default.title_date_align'>
+                          <option value=''>未設定</option>
+                          <option value='left'>
+                            タイトルの前
+                          </option>
+                          <option value='right'>
+                            タイトルの後
+                          </option>
+                        </select>
+                      </div>
+                      <p>
+                        enable_add_date_to_title で付与する日付の位置
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.title_date_target</h4>
+                    <div class='list-group-item-text'>
+                      <div class='input-style'>
+                        <select class='selectpicker show-tick' name='default.title_date_target'>
+                          <option value=''>未設定</option>
+                          <option value='general_lastup'>
+                            最新話掲載日
+                          </option>
+                          <option value='last_update'>
+                            更新日
+                          </option>
+                          <option value='new_arrivals_date'>
+                            新着を確認した日
+                          </option>
+                          <option value='convert'>
+                            変換した日
+                          </option>
+                        </select>
+                      </div>
+                      <p>
+                        enable_add_date_to_title で付与する日付の種類。<br>general_lastup(最新話掲載日),last_update(更新日),new_arrivals_date(新着を確認した日),convert(変換した日)
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_ruby_youon_to_big</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_ruby_youon_to_big-nil" type="radio" name="default.enable_ruby_youon_to_big" value="nil" checked>
+                        <label for='default.enable_ruby_youon_to_big-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_ruby_youon_to_big-false" type="radio" name="default.enable_ruby_youon_to_big" value="off" >
+                        <label for='default.enable_ruby_youon_to_big-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_ruby_youon_to_big-true" type="radio" name="default.enable_ruby_youon_to_big" value="on" >
+                        <label for='default.enable_ruby_youon_to_big-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        ルビの拗音(ぁ、ぃ等)を商業書籍のように大きくする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_pack_blank_line</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_pack_blank_line-nil" type="radio" name="default.enable_pack_blank_line" value="nil" checked>
+                        <label for='default.enable_pack_blank_line-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_pack_blank_line-false" type="radio" name="default.enable_pack_blank_line" value="off" >
+                        <label for='default.enable_pack_blank_line-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_pack_blank_line-true" type="radio" name="default.enable_pack_blank_line" value="on" >
+                        <label for='default.enable_pack_blank_line-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        縦書きで読みやすいように空行を減らす
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_kana_ni_to_kanji_ni</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_kana_ni_to_kanji_ni-nil" type="radio" name="default.enable_kana_ni_to_kanji_ni" value="nil" checked>
+                        <label for='default.enable_kana_ni_to_kanji_ni-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_kana_ni_to_kanji_ni-false" type="radio" name="default.enable_kana_ni_to_kanji_ni" value="off" >
+                        <label for='default.enable_kana_ni_to_kanji_ni-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_kana_ni_to_kanji_ni-true" type="radio" name="default.enable_kana_ni_to_kanji_ni" value="on" >
+                        <label for='default.enable_kana_ni_to_kanji_ni-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        漢字の二と間違えてカタカナのニを使っていそうなのを、漢字に直す
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_insert_word_separator</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_insert_word_separator-nil" type="radio" name="default.enable_insert_word_separator" value="nil" checked>
+                        <label for='default.enable_insert_word_separator-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_insert_word_separator-false" type="radio" name="default.enable_insert_word_separator" value="off" >
+                        <label for='default.enable_insert_word_separator-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_insert_word_separator-true" type="radio" name="default.enable_insert_word_separator" value="on" >
+                        <label for='default.enable_insert_word_separator-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        単語選択がしやすいように単語単位の区切りデータを挿入する（Kindle専用）
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_insert_char_separator</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_insert_char_separator-nil" type="radio" name="default.enable_insert_char_separator" value="nil" checked>
+                        <label for='default.enable_insert_char_separator-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_insert_char_separator-false" type="radio" name="default.enable_insert_char_separator" value="off" >
+                        <label for='default.enable_insert_char_separator-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_insert_char_separator-true" type="radio" name="default.enable_insert_char_separator" value="on" >
+                        <label for='default.enable_insert_char_separator-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        文字選択がしやすいように１文字ずつ区切りデータを挿入する（Kindle専用。enable_insert_word_separator が有効な場合無この設定は無視される）
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default.enable_strip_decoration_tag</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="default.enable_strip_decoration_tag-nil" type="radio" name="default.enable_strip_decoration_tag" value="nil" checked>
+                        <label for='default.enable_strip_decoration_tag-nil'>
+                          未設定
+                        </label>
+                        <input id="default.enable_strip_decoration_tag-false" type="radio" name="default.enable_strip_decoration_tag" value="off" >
+                        <label for='default.enable_strip_decoration_tag-false'>
+                          いいえ
+                        </label>
+                        <input id="default.enable_strip_decoration_tag-true" type="radio" name="default.enable_strip_decoration_tag" value="on" >
+                        <label for='default.enable_strip_decoration_tag-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        HTMLの装飾系タグを削除する（主にArcadiaの作品に影響）
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class='tab-pane' id='force' role='tabpanel'>
+              <div class='panel panel-info panel-settings'>
+                <div class='panel-heading'>
+                  force.* 系の設定は個別設定、default.* 等の設定を無視して反映されるようになります
+                </div>
+                <div class='list-group'>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_inspect</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_inspect-nil" type="radio" name="force.enable_inspect" value="nil" checked>
+                        <label for='force.enable_inspect-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_inspect-false" type="radio" name="force.enable_inspect" value="off" >
+                        <label for='force.enable_inspect-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_inspect-true" type="radio" name="force.enable_inspect" value="on" >
+                        <label for='force.enable_inspect-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        小説に対する各種調査を実行する。結果を表示するには narou inspect コマンドを使用
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_convert_num_to_kanji</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_convert_num_to_kanji-nil" type="radio" name="force.enable_convert_num_to_kanji" value="nil" checked>
+                        <label for='force.enable_convert_num_to_kanji-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_convert_num_to_kanji-false" type="radio" name="force.enable_convert_num_to_kanji" value="off" >
+                        <label for='force.enable_convert_num_to_kanji-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_convert_num_to_kanji-true" type="radio" name="force.enable_convert_num_to_kanji" value="on" >
+                        <label for='force.enable_convert_num_to_kanji-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        数字の漢数字変換を有効にする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_kanji_num_with_units</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_kanji_num_with_units-nil" type="radio" name="force.enable_kanji_num_with_units" value="nil" checked>
+                        <label for='force.enable_kanji_num_with_units-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_kanji_num_with_units-false" type="radio" name="force.enable_kanji_num_with_units" value="off" >
+                        <label for='force.enable_kanji_num_with_units-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_kanji_num_with_units-true" type="radio" name="force.enable_kanji_num_with_units" value="on" >
+                        <label for='force.enable_kanji_num_with_units-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        漢数字変換した場合、千・万などに変換する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.kanji_num_with_units_lower_digit_zero</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='force.kanji_num_with_units_lower_digit_zero' placeholder='整数' type='text'>
+                      <p>
+                        〇(ゼロ)が最低この数字以上付いてないと千・万などをつける対象にしない
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_alphabet_force_zenkaku</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_alphabet_force_zenkaku-nil" type="radio" name="force.enable_alphabet_force_zenkaku" value="nil" checked>
+                        <label for='force.enable_alphabet_force_zenkaku-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_alphabet_force_zenkaku-false" type="radio" name="force.enable_alphabet_force_zenkaku" value="off" >
+                        <label for='force.enable_alphabet_force_zenkaku-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_alphabet_force_zenkaku-true" type="radio" name="force.enable_alphabet_force_zenkaku" value="on" >
+                        <label for='force.enable_alphabet_force_zenkaku-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        アルファベットを強制的に全角にする。falseの場合英文は半角、それ以外は全角になる
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_half_indent_bracket</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_half_indent_bracket-nil" type="radio" name="force.enable_half_indent_bracket" value="nil" checked>
+                        <label for='force.enable_half_indent_bracket-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_half_indent_bracket-false" type="radio" name="force.enable_half_indent_bracket" value="off" >
+                        <label for='force.enable_half_indent_bracket-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_half_indent_bracket-true" type="radio" name="force.enable_half_indent_bracket" value="on" >
+                        <label for='force.enable_half_indent_bracket-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        行頭かぎ括弧に二分アキを挿入する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_auto_indent</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_auto_indent-nil" type="radio" name="force.enable_auto_indent" value="nil" checked>
+                        <label for='force.enable_auto_indent-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_auto_indent-false" type="radio" name="force.enable_auto_indent" value="off" >
+                        <label for='force.enable_auto_indent-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_auto_indent-true" type="radio" name="force.enable_auto_indent" value="on" >
+                        <label for='force.enable_auto_indent-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        自動行頭字下げ機能。行頭字下げが行われているかを判断し、適切に行頭字下げをするか
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_force_indent</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_force_indent-nil" type="radio" name="force.enable_force_indent" value="nil" checked>
+                        <label for='force.enable_force_indent-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_force_indent-false" type="radio" name="force.enable_force_indent" value="off" >
+                        <label for='force.enable_force_indent-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_force_indent-true" type="radio" name="force.enable_force_indent" value="on" >
+                        <label for='force.enable_force_indent-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        行頭字下げを必ず行うか。enable_auto_indent の設定は無視される
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_auto_join_in_brackets</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_auto_join_in_brackets-nil" type="radio" name="force.enable_auto_join_in_brackets" value="nil" checked>
+                        <label for='force.enable_auto_join_in_brackets-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_auto_join_in_brackets-false" type="radio" name="force.enable_auto_join_in_brackets" value="off" >
+                        <label for='force.enable_auto_join_in_brackets-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_auto_join_in_brackets-true" type="radio" name="force.enable_auto_join_in_brackets" value="on" >
+                        <label for='force.enable_auto_join_in_brackets-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        かぎ括弧内自動連結を有効にする<br>例)<br>「～～～！<br>　＊＊＊？」  → 「～～～！　＊＊＊？」
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_auto_join_line</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_auto_join_line-nil" type="radio" name="force.enable_auto_join_line" value="nil" checked>
+                        <label for='force.enable_auto_join_line-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_auto_join_line-false" type="radio" name="force.enable_auto_join_line" value="off" >
+                        <label for='force.enable_auto_join_line-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_auto_join_line-true" type="radio" name="force.enable_auto_join_line" value="on" >
+                        <label for='force.enable_auto_join_line-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        行末が読点で終わっている部分を出来るだけ連結する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_enchant_midashi</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_enchant_midashi-nil" type="radio" name="force.enable_enchant_midashi" value="nil" checked>
+                        <label for='force.enable_enchant_midashi-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_enchant_midashi-false" type="radio" name="force.enable_enchant_midashi" value="off" >
+                        <label for='force.enable_enchant_midashi-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_enchant_midashi-true" type="radio" name="force.enable_enchant_midashi" value="on" >
+                        <label for='force.enable_enchant_midashi-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        ［＃改ページ］直後の行に中見出しを付与する（テキストファイルを直接変換する場合のみの設定）
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_author_comments</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_author_comments-nil" type="radio" name="force.enable_author_comments" value="nil" checked>
+                        <label for='force.enable_author_comments-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_author_comments-false" type="radio" name="force.enable_author_comments" value="off" >
+                        <label for='force.enable_author_comments-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_author_comments-true" type="radio" name="force.enable_author_comments" value="on" >
+                        <label for='force.enable_author_comments-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        作者コメントを検出する（テキストファイルを直接変換する場合のみの設定）
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_erase_introduction</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_erase_introduction-nil" type="radio" name="force.enable_erase_introduction" value="nil" checked>
+                        <label for='force.enable_erase_introduction-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_erase_introduction-false" type="radio" name="force.enable_erase_introduction" value="off" >
+                        <label for='force.enable_erase_introduction-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_erase_introduction-true" type="radio" name="force.enable_erase_introduction" value="on" >
+                        <label for='force.enable_erase_introduction-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        前書きを削除する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_erase_postscript</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_erase_postscript-nil" type="radio" name="force.enable_erase_postscript" value="nil" checked>
+                        <label for='force.enable_erase_postscript-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_erase_postscript-false" type="radio" name="force.enable_erase_postscript" value="off" >
+                        <label for='force.enable_erase_postscript-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_erase_postscript-true" type="radio" name="force.enable_erase_postscript" value="on" >
+                        <label for='force.enable_erase_postscript-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        後書きを削除する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_ruby</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_ruby-nil" type="radio" name="force.enable_ruby" value="nil" checked>
+                        <label for='force.enable_ruby-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_ruby-false" type="radio" name="force.enable_ruby" value="off" >
+                        <label for='force.enable_ruby-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_ruby-true" type="radio" name="force.enable_ruby" value="on" >
+                        <label for='force.enable_ruby-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        ルビ処理を有効にする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_illust</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_illust-nil" type="radio" name="force.enable_illust" value="nil" checked>
+                        <label for='force.enable_illust-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_illust-false" type="radio" name="force.enable_illust" value="off" >
+                        <label for='force.enable_illust-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_illust-true" type="radio" name="force.enable_illust" value="on" >
+                        <label for='force.enable_illust-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        挿絵タグを有効にする（false なら削除）
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_transform_fraction</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_transform_fraction-nil" type="radio" name="force.enable_transform_fraction" value="nil" checked>
+                        <label for='force.enable_transform_fraction-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_transform_fraction-false" type="radio" name="force.enable_transform_fraction" value="off" >
+                        <label for='force.enable_transform_fraction-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_transform_fraction-true" type="radio" name="force.enable_transform_fraction" value="on" >
+                        <label for='force.enable_transform_fraction-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        ○／×表記を×分の○表記に変換する。日付表記(10/23)と誤爆しやすいので注意
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_transform_date</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_transform_date-nil" type="radio" name="force.enable_transform_date" value="nil" checked>
+                        <label for='force.enable_transform_date-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_transform_date-false" type="radio" name="force.enable_transform_date" value="off" >
+                        <label for='force.enable_transform_date-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_transform_date-true" type="radio" name="force.enable_transform_date" value="on" >
+                        <label for='force.enable_transform_date-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        日付表記(20yy/mm/dd)を任意の形式(date_formatで指定)に変換する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.date_format</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='force.date_format' placeholder='文字列' type='text'>
+                      <p>
+                        書式は http://bit.ly/1m5e3w7 を参考
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_convert_horizontal_ellipsis</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_convert_horizontal_ellipsis-nil" type="radio" name="force.enable_convert_horizontal_ellipsis" value="nil" checked>
+                        <label for='force.enable_convert_horizontal_ellipsis-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_convert_horizontal_ellipsis-false" type="radio" name="force.enable_convert_horizontal_ellipsis" value="off" >
+                        <label for='force.enable_convert_horizontal_ellipsis-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_convert_horizontal_ellipsis-true" type="radio" name="force.enable_convert_horizontal_ellipsis" value="on" >
+                        <label for='force.enable_convert_horizontal_ellipsis-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        中黒(・)を並べて三点リーダーもどきにしているのを三点リーダーに変換する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_convert_page_break</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_convert_page_break-nil" type="radio" name="force.enable_convert_page_break" value="nil" checked>
+                        <label for='force.enable_convert_page_break-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_convert_page_break-false" type="radio" name="force.enable_convert_page_break" value="off" >
+                        <label for='force.enable_convert_page_break-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_convert_page_break-true" type="radio" name="force.enable_convert_page_break" value="on" >
+                        <label for='force.enable_convert_page_break-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        `to_page_break_threshold` で設定した個数以上連続する空行を改ページに変換する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.to_page_break_threshold</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='force.to_page_break_threshold' placeholder='整数' type='text'>
+                      <p>
+                        ここで設定した値が `enable_convert_page_break` に反映される
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_dakuten_font</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_dakuten_font-nil" type="radio" name="force.enable_dakuten_font" value="nil" checked>
+                        <label for='force.enable_dakuten_font-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_dakuten_font-false" type="radio" name="force.enable_dakuten_font" value="off" >
+                        <label for='force.enable_dakuten_font-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_dakuten_font-true" type="radio" name="force.enable_dakuten_font" value="on" >
+                        <label for='force.enable_dakuten_font-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        濁点フォントを使用する。false の場合は縦中横による擬似表現を使用する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_display_end_of_book</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_display_end_of_book-nil" type="radio" name="force.enable_display_end_of_book" value="nil" checked>
+                        <label for='force.enable_display_end_of_book-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_display_end_of_book-false" type="radio" name="force.enable_display_end_of_book" value="off" >
+                        <label for='force.enable_display_end_of_book-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_display_end_of_book-true" type="radio" name="force.enable_display_end_of_book" value="on" >
+                        <label for='force.enable_display_end_of_book-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        小説の最後に本を読み終わった表示をする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_add_date_to_title</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_add_date_to_title-nil" type="radio" name="force.enable_add_date_to_title" value="nil" checked>
+                        <label for='force.enable_add_date_to_title-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_add_date_to_title-false" type="radio" name="force.enable_add_date_to_title" value="off" >
+                        <label for='force.enable_add_date_to_title-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_add_date_to_title-true" type="radio" name="force.enable_add_date_to_title" value="on" >
+                        <label for='force.enable_add_date_to_title-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        変換後の小説のタイトルに最新話掲載日や更新日等の日付を付加する
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.title_date_format</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='force.title_date_format' placeholder='文字列' type='text'>
+                      <p>
+                        enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.title_date_align</h4>
+                    <div class='list-group-item-text'>
+                      <div class='input-style'>
+                        <select class='selectpicker show-tick' name='force.title_date_align'>
+                          <option value=''>未設定</option>
+                          <option value='left'>
+                            タイトルの前
+                          </option>
+                          <option value='right'>
+                            タイトルの後
+                          </option>
+                        </select>
+                      </div>
+                      <p>
+                        enable_add_date_to_title で付与する日付の位置
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.title_date_target</h4>
+                    <div class='list-group-item-text'>
+                      <div class='input-style'>
+                        <select class='selectpicker show-tick' name='force.title_date_target'>
+                          <option value=''>未設定</option>
+                          <option value='general_lastup'>
+                            最新話掲載日
+                          </option>
+                          <option value='last_update'>
+                            更新日
+                          </option>
+                          <option value='new_arrivals_date'>
+                            新着を確認した日
+                          </option>
+                          <option value='convert'>
+                            変換した日
+                          </option>
+                        </select>
+                      </div>
+                      <p>
+                        enable_add_date_to_title で付与する日付の種類。<br>general_lastup(最新話掲載日),last_update(更新日),new_arrivals_date(新着を確認した日),convert(変換した日)
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_ruby_youon_to_big</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_ruby_youon_to_big-nil" type="radio" name="force.enable_ruby_youon_to_big" value="nil" checked>
+                        <label for='force.enable_ruby_youon_to_big-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_ruby_youon_to_big-false" type="radio" name="force.enable_ruby_youon_to_big" value="off" >
+                        <label for='force.enable_ruby_youon_to_big-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_ruby_youon_to_big-true" type="radio" name="force.enable_ruby_youon_to_big" value="on" >
+                        <label for='force.enable_ruby_youon_to_big-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        ルビの拗音(ぁ、ぃ等)を商業書籍のように大きくする
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_pack_blank_line</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_pack_blank_line-nil" type="radio" name="force.enable_pack_blank_line" value="nil" checked>
+                        <label for='force.enable_pack_blank_line-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_pack_blank_line-false" type="radio" name="force.enable_pack_blank_line" value="off" >
+                        <label for='force.enable_pack_blank_line-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_pack_blank_line-true" type="radio" name="force.enable_pack_blank_line" value="on" >
+                        <label for='force.enable_pack_blank_line-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        縦書きで読みやすいように空行を減らす
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_kana_ni_to_kanji_ni</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_kana_ni_to_kanji_ni-nil" type="radio" name="force.enable_kana_ni_to_kanji_ni" value="nil" checked>
+                        <label for='force.enable_kana_ni_to_kanji_ni-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_kana_ni_to_kanji_ni-false" type="radio" name="force.enable_kana_ni_to_kanji_ni" value="off" >
+                        <label for='force.enable_kana_ni_to_kanji_ni-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_kana_ni_to_kanji_ni-true" type="radio" name="force.enable_kana_ni_to_kanji_ni" value="on" >
+                        <label for='force.enable_kana_ni_to_kanji_ni-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        漢字の二と間違えてカタカナのニを使っていそうなのを、漢字に直す
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_insert_word_separator</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_insert_word_separator-nil" type="radio" name="force.enable_insert_word_separator" value="nil" checked>
+                        <label for='force.enable_insert_word_separator-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_insert_word_separator-false" type="radio" name="force.enable_insert_word_separator" value="off" >
+                        <label for='force.enable_insert_word_separator-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_insert_word_separator-true" type="radio" name="force.enable_insert_word_separator" value="on" >
+                        <label for='force.enable_insert_word_separator-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        単語選択がしやすいように単語単位の区切りデータを挿入する（Kindle専用）
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_insert_char_separator</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_insert_char_separator-nil" type="radio" name="force.enable_insert_char_separator" value="nil" checked>
+                        <label for='force.enable_insert_char_separator-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_insert_char_separator-false" type="radio" name="force.enable_insert_char_separator" value="off" >
+                        <label for='force.enable_insert_char_separator-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_insert_char_separator-true" type="radio" name="force.enable_insert_char_separator" value="on" >
+                        <label for='force.enable_insert_char_separator-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        文字選択がしやすいように１文字ずつ区切りデータを挿入する（Kindle専用。enable_insert_word_separator が有効な場合無この設定は無視される）
+                      </p>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>force.enable_strip_decoration_tag</h4>
+                    <div class='list-group-item-text'>
+                      <div class='switch-toggle well switch-3'>
+                        <input id="force.enable_strip_decoration_tag-nil" type="radio" name="force.enable_strip_decoration_tag" value="nil" checked>
+                        <label for='force.enable_strip_decoration_tag-nil'>
+                          未設定
+                        </label>
+                        <input id="force.enable_strip_decoration_tag-false" type="radio" name="force.enable_strip_decoration_tag" value="off" >
+                        <label for='force.enable_strip_decoration_tag-false'>
+                          いいえ
+                        </label>
+                        <input id="force.enable_strip_decoration_tag-true" type="radio" name="force.enable_strip_decoration_tag" value="on" >
+                        <label for='force.enable_strip_decoration_tag-true'>
+                          はい
+                        </label>
+                        <a class='btn btn-primary'></a>
+                      </div>
+                      <p>
+                        HTMLの装飾系タグを削除する（主にArcadiaの作品に影響）
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class='tab-pane' id='command' role='tabpanel'>
+              <div class='panel panel-info panel-settings'>
+                <div class='panel-heading'>
+                  default_args.* 系の設定は、各種コマンドのオプションを省略した場合に使用されるオプションを指定出来ます
+                </div>
+                <div class='list-group'>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.alias</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.alias' placeholder='文字列' type='text'>
+                      <p>
+                        alias コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.backup</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.backup' placeholder='文字列' type='text'>
+                      <p>
+                        backup コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.browser</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.browser' placeholder='文字列' type='text'>
+                      <p>
+                        browser コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.convert</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.convert' placeholder='文字列' type='text'>
+                      <p>
+                        convert コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.diff</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.diff' placeholder='文字列' type='text'>
+                      <p>
+                        diff コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.download</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.download' placeholder='文字列' type='text'>
+                      <p>
+                        download コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.folder</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.folder' placeholder='文字列' type='text'>
+                      <p>
+                        folder コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.freeze</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.freeze' placeholder='文字列' type='text'>
+                      <p>
+                        freeze コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.help</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.help' placeholder='文字列' type='text'>
+                      <p>
+                        help コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.init</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.init' placeholder='文字列' type='text'>
+                      <p>
+                        init コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.inspect</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.inspect' placeholder='文字列' type='text'>
+                      <p>
+                        inspect コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.list</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.list' placeholder='文字列' type='text'>
+                      <p>
+                        list コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.mail</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.mail' placeholder='文字列' type='text'>
+                      <p>
+                        mail コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.remove</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.remove' placeholder='文字列' type='text'>
+                      <p>
+                        remove コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.send</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.send' placeholder='文字列' type='text'>
+                      <p>
+                        send コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.setting</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.setting' placeholder='文字列' type='text'>
+                      <p>
+                        setting コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.tag</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.tag' placeholder='文字列' type='text'>
+                      <p>
+                        tag コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.update</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.update' placeholder='文字列' type='text'>
+                      <p>
+                        update コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.version</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.version' placeholder='文字列' type='text'>
+                      <p>
+                        version コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                  <div class='list-group-item form-group'>
+                    <h4 class='list-group-item-heading'>default_args.web</h4>
+                    <div class='list-group-item-text'>
+                      <input class='form-control' name='default_args.web' placeholder='文字列' type='text'>
+                      <p>
+                        web コマンドのデフォルトオプション
+                      </p>
+                      <div class='clearfix'></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class='tab-pane' id='replace' role='tabpanel'>
+              <script>
+                local_initialize_functions.push(function($) {
+                  var tooltip_opt = {
+                    animation: false,
+                    container: "body",
+                  };
+                  // replace.txt 設定パネル
+                  $(".btn-replace-remove").on("click", function(e) {
+                    e.preventDefault();
+                    if ($(".replace-pattern-tr").size() === 1) {
+                      // 入力欄のtrが全部なくなると追加出来なくなるので、消す前に1個追加しておく
+                      $("#btn-replace-add").trigger("click");
+                    }
+                    $(this).tooltip("destroy").closest("tr").remove();
+                  });
+                  $blank_tr = $(".replace-pattern-tr:last").clone(true);   // 読み込み直後の末尾は空なので流用
+                  $("#btn-replace-add").on("click", function(e) {
+                    e.preventDefault();
+                    var $clone = $blank_tr.clone(true);
+                    $clone.find("button").tooltip(tooltip_opt);
+                    $(".replace-pattern-tr:last").after($clone);
+                    $(this).tooltip("hide");
+                  });
+                  $("[data-toggle=remove-tooltip]").tooltip(tooltip_opt);
+                });
+              </script>
+              <div class='panel panel-info panel-settings' id='replace-panel'>
+                <div class='panel-heading'>
+                  全小説対象の置換設定
+                </div>
+                <div class='list-group-item-default panel-body'>
+                  ・全ての小説に対する置換設定を行うことが出来ます<br>・変更を反映させるには再度変換を実行する必要があります
+                </div>
+                <div class='list-group'>
+                  <div class='list-group-item form-group'>
+                    <div class='list-group-item-text'>
+                      <table id='replace-txt-table'>
+                        <thead>
+                          <tr>
+                            <td>対象文字列</td>
+                            <td>&nbsp;</td>
+                            <td>置き換える文字列</td>
+                            <td>&nbsp;</td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class='replace-pattern-tr'>
+                            <td>
+                              <input class='form-control' name='replace_pattern[][left]' type='text' value=''>
+                            </td>
+                            <td>
+                              <span class='glyphicon glyphicon-chevron-right'></span>
+                            </td>
+                            <td>
+                              <input class='form-control' name='replace_pattern[][right]' type='text' value=''>
+                            </td>
+                            <td>
+                              <button class='btn-replace-remove btn btn-default' data-placement='right' data-toggle='remove-tooltip' title='削除'>
+                                <span class='glyphicon glyphicon-remove'></span>
+                              </button>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan='4'>
+                              <button class='btn btn-default' data-placement='right' data-toggle='tooltip' id='btn-replace-add' title='１行追加'>
+                                <span class='glyphicon glyphicon-plus'></span>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <input class='btn btn-info' style='float:none' type='submit' value='設定を保存'>
+          </div>
+        </div>
+      </div>
+    </form>
+    <script src='//code.jquery.com/jquery-1.11.1.min.js'></script>
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
+    <script src='//cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js'></script>
+    <script src='//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.js'></script>
+    <script src='//cdn.datatables.net/colreorder/1.1.2/js/dataTables.colReorder.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.5/js/bootstrap-select.min.js'></script>
+    <script src='./resources/dataTables.colVis.js'></script>
+    <script src='./resources/bootbox.min.js'></script>
+    <script src='./resources/shortcut.js'></script>
+    <script src='./resources/perfect-scrollbar.min.js'></script>
+    <script src='./resources/jquery.outerclick.js'></script>
+    <script src='./resources/jquery.slidenavbar.js'></script>
+    <script src='./resources/jquery.moveto.js'></script>
+    <script src='./resources/narou.library.js'></script>
+    <script src='./resources/common.ui.js'></script>
+    <script>
+      $(document).ready(function($) {
+        slideNavbar = $(".navbar-collapse").slideNavbar();
+        $.each(local_initialize_functions, function() {
+          this($);
+        });
+      });
+    </script>
+  </body>
+</html>

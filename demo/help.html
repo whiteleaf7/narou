@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang='ja'>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+    <meta content='width=device-width, initial-scale=1' name='viewport'>
+    <meta content='whiteleaf' name='author'>
+    <meta content='none' name='robots'>
+    <title>Narou.rb WEB UI - ヘルプ</title>
+    <link href='./favicon.ico' rel='shortcut icon'>
+    <link href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css' rel='stylesheet'>
+    <link href='/resources/default-style.css' rel='stylesheet'>
+    <link href='//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.css' rel='stylesheet'>
+    <link href='//cdn.datatables.net/colreorder/1.1.2/css/dataTables.colReorder.css' rel='stylesheet'>
+    <link href='//cdn.datatables.net/colvis/1.1.1/css/dataTables.colVis.css' rel='stylesheet'>
+    <link href='//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.5/css/bootstrap-select.min.css' rel='stylesheet'>
+    <link href='./resources/perfect-scrollbar.min.css' rel='stylesheet'>
+    <link href='./resources/toggle-switch.css' rel='stylesheet'>
+    <link href='./resources/style.css' rel='stylesheet'>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script>
+      var local_initialize_functions = [];
+      var slideNavbar;
+    </script>
+  </head>
+  <body>
+    <script>
+      local_initialize_functions.push(function($) {
+        $("[data-toggle=tooltip]").tooltip({
+          animation: false,
+          container: "body",
+        });
+      });
+    </script>
+    <div class='navbar navbar-default navbar-fixed-top' role='navigation'>
+      <div class='container'>
+        <div class='navbar-header'>
+          <button class='navbar-toggle' type='button'>
+            <span class='sr-only'>Toggle navigation</span>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+          </button>
+          <a class='navbar-brand' data-move-to='top' href='#'>Narou.rb WEB UI</a>
+        </div>
+        <div class='collapse navbar-collapse' id='bs-navbar-collapse-1'>
+          <ul class='nav navbar-nav'>
+            <li>
+              <a href='./settings.html'>環境設定</a>
+            </li>
+            <li class='active'>
+              <a href='./help.html'>ヘルプ</a>
+            </li>
+            <li>
+              <a href='./'>戻る</a>
+            </li>
+          </ul>
+          <p class='navbar-text navbar-right' data-placement='bottom' data-toggle='tooltip' id='queue-text' title='キューに積まれた処理の数'>
+            <span class='glyphicon glyphicon-inbox'></span>
+            <span id='queue'>0</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class='container theme-showcase' id='help-container' role='main'>
+      <h2>ブックマークレット</h2>
+      <p>小説掲載サイトを表示したまま直接ダウンロード出来るブックマークレットです。<br> 下記のリンクをブックマークに登録して、ダウンロードしたい小説のページで実行して下さい。（WEB UIサーバ起動中に限ります）<br> ブックマークバーにドラッグ＆ドロップしたり、右クリックからブックマークにいれると簡単です。</p>
+      <p>
+        <a id='bookmarklet' onclick='return false'>
+          <big>
+            <u>Narou.rbでダウンロード</u>
+          </big>
+        </a>
+      </p>
+      <p>
+        <small>基本的に小説ページ内にダウンロード中の表示が出ますが、IEを使っていてかつ小説家になろうの小説をダウンロードしようとした場合のみ、技術的制約から別ウィンドウが開きます。</small>
+      </p>
+      <hr>
+      <h2>画面の簡単な説明</h2>
+      <img class='img-thumbnail' id='ss-main' src='/resources/help/ssmain.png'>
+      <h4>
+        タイトルロゴ
+        <div class='badge number'>1</div>
+      </h4>
+      <div>
+        <p>クリックすることでページ上部に移動することができます</p>
+      </div>
+      <h4>
+        操作ボタン
+        <div class='badge number'>2</div>
+      </h4>
+      <div>
+        <p>押すことで各種操作を行うことが出来ます。Freeze, Remove, Convert, Other ボタンはひとつ以上の小説を選択していないと押すことは出来ません。また、Update, Send ボタンは小説をひとつも選択してない場合は全小説が対象に、選択しているときは選択した小説が対象になります。</p>
+        <p>各種操作は一旦キューに積まれ、順番に処理されます（Update 中に Convert を押しても、更新処理が終わるまでは変換はされない）。現在のキュー数は画面右上の<code>*1</code>で分かります。</p>
+      </div>
+      <h4>
+        検索ボックス
+        <div class='badge number'>3</div>
+      </h4>
+      <div>
+        <p>このボックスに入力することで、小説一覧から小説を絞り込む事ができます。小説一覧に見えている項目は全て検索対象で、日付等も対象になります。半角スペースで区切ることで、複数の単語で絞り込むことが出来ます。</p>
+      </div>
+      <h4>
+        小説一覧テーブル
+        <div class='badge number'>4</div>
+      </h4>
+      <div>
+        <p>現在管理している小説の一覧が表示されます。クリックすると選択状態になり、各種操作の対象となります。</p>
+        <p>テーブル上部の項目名をクリックすると、その項目でソートすることが出来ます。また、項目名を左右にドラッグ＆ドロップすることで、項目の順番を入れ替えることが出来ます。</p>
+        <p>表示項目はカスタマイズすることが可能です。上部メニューの「表示＞表示する項目を設定」から各種項目の表示・非表示を選択出来ます。</p>
+        <p>１ページに表示する件数を調整する場合は<code>*2</code>で行うことが出来ます。</p>
+        <p>上記の各種設定はブラウザに保存され、開き直した場合も同じ状態が復元されます。デフォルトの状態に戻す場合はメニューの「表示＞表示設定を全てリセット」を実行します。</p>
+      </div>
+      <h4>タグ</h4>
+      <div>
+        <img class='img-thumbnail' id='ss-tag' src='/resources/help/tag.png'>
+        <p>小説にタグが設定されている場合、タグ欄に表示されます。そのタグをクリックすることで絞込ができるようになっています。タグを絞り込んだ状態で、さらに検索ボックスから検索することも可能です。</p>
+        <p>タグの絞込状態を解除するにはメニューのタグから解除ボタンを押すか、タグの右側にある小さな空白ラベルをクリックすることでも解除することが出来ます。</p>
+      </div>
+      <h4>シングル選択モード</h4>
+      <div>
+        <p>デフォルトの選択方法で、小説一覧をクリックしてひとつずつ選択するモードです。</p>
+      </div>
+      <h4>範囲選択モード</h4>
+      <div>
+        <img class='img-thumbnail' id='ss-rect-select' src='/resources/help/rect_select.png'>
+        <p>一度に複数の小説を選択する場合に便利なモードです。始点をクリックしたあと終点をクリックして範囲を確定するか、始点から終点までをドラッグすることで範囲を決めることが出来ます。</p>
+        <p>範囲が確定された際にメニューが表示されるので、選択や解除等を選択します。反転は現在の選択状態を逆転させます。</p>
+      </div>
+    </div>
+    <script src='//code.jquery.com/jquery-1.11.1.min.js'></script>
+    <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'></script>
+    <script src='//cdn.datatables.net/1.10.2/js/jquery.dataTables.min.js'></script>
+    <script src='//cdn.datatables.net/plug-ins/725b2a2115b/integration/bootstrap/3/dataTables.bootstrap.js'></script>
+    <script src='//cdn.datatables.net/colreorder/1.1.2/js/dataTables.colReorder.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.5/js/bootstrap-select.min.js'></script>
+    <script src='./resources/dataTables.colVis.js'></script>
+    <script src='./resources/bootbox.min.js'></script>
+    <script src='./resources/shortcut.js'></script>
+    <script src='./resources/perfect-scrollbar.min.js'></script>
+    <script src='./resources/jquery.outerclick.js'></script>
+    <script src='./resources/jquery.slidenavbar.js'></script>
+    <script src='./resources/jquery.moveto.js'></script>
+    <script src='./resources/narou.library.js'></script>
+    <script src='./resources/common.ui.js'></script>
+    <script>
+      $(document).ready(function($) {
+        slideNavbar = $(".navbar-collapse").slideNavbar();
+        $.each(local_initialize_functions, function() {
+          this($);
+        });
+      });
+    </script>
+  </body>
+</html>
