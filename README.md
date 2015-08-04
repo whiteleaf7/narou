@@ -25,7 +25,7 @@ Narou.rb ― 「小説家になろう」「小説を読もう！」ダウンロ�
 + Arcadia http://www.mai-net.net/
 + 暁 http://www.akatsuki-novels.com/
 
-コンソールで操作するアプリケーションですが、ブラウザを使って直感的に操作することができる WEB UI も搭載！
+コンソールで操作するアプリケーションですが、ブラウザを使って直感的に操作することができる WEB UI も搭載！（[デモページ](http://whiteleaf7.github.io/narou/demo/)）
 
 主な機能は小説家になろうの小説のダウンロード、更新管理、テキスト整形、AozoraEpub3・kindlegen連携によるEPUB/MOBI出力です。
 
