@@ -616,3 +616,27 @@ input::-ms-clear {
   #icon-refresh-table:hover {
     cursor: pointer;
     color: #777; }
+
+#demo-logo {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  border: 5px solid #22ddf3;
+  padding: 5px;
+  margin: 10px;
+  background-color: #f5fff5;
+  color: #555;
+  width: 230px;
+  z-index: 9999;
+}
+
+#demo-logo .header {
+  font-weight: bold;
+  font-size: 1.5em;
+  text-align: center;
+}
+
+#demo-logo .body {
+  text-align: center;
+}
+
