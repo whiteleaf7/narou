@@ -115,10 +115,10 @@ table#novel-list {
   table#novel-list tr.frozen.selected td.column-id > div:before {
     color: #2b7cb8; }
   table#novel-list thead .sorting_asc {
-    background: url("/resources/sort_asc.png") no-repeat center right !important;
+    background: url("./sort_asc.png") no-repeat center right !important;
     background-color: #403535 !important; }
   table#novel-list thead .sorting_desc {
-    background: url("/resources/sort_desc.png") no-repeat center right !important;
+    background: url("./sort_desc.png") no-repeat center right !important;
     background-color: #403535 !important; }
   table#novel-list span.new-arrivals:after {
     color: magenta;
