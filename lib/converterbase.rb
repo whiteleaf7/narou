@@ -1387,20 +1387,47 @@ class ConverterBase
     result
   end
 
+  DASH_FILES = %w(singledash.png doubledash.png)
+
   def double_dash_to_image(text)
     return text unless @setting.enable_double_dash_to_image
-    # AozoraEpub3 は相対パスじゃないとエラーになるので相対パスに変換
-    single_pathname = Pathname(File.join(Narou.get_preset_dir, "singledash.png"))
-    double_pathname = Pathname(File.join(Narou.get_preset_dir, "doubledash.png"))
-    single_path = single_pathname.relative_path_from(Pathname(@setting.archive_path)).to_s
-    double_path = double_pathname.relative_path_from(Pathname(@setting.archive_path)).to_s
+    begin
+      # AozoraEpub3 は相対パスじゃないとエラーになるので相対パスに変換
+      dash_paths = dash_image_relative_paths(Narou.get_preset_dir)
+    rescue ArgumentError => e
+      if e.message =~ /^different prefix/
+        # Windowsにおいて、スクリプト本体のあるドライブと小説フォルダがあるドライブが
+        # 違う場合、相対パスを計算できなくなる。そのための対処として、.narou ディレクトリ
+        # に画像データをコピーし、同一ドライブ内で相対パスを取れるようにする
+        copy_dash_images_to_local_setting_dir
+        dash_paths = dash_image_relative_paths(Narou.get_local_setting_dir)
+      else
+        raise
+      end
+    end
     text.gsub(/―{2,}/) do |match|
       len = match.length
-      result = "※［＃（#{double_path}）］" * (len / 2)
+      result = "※［＃（#{dash_paths[1]}）］" * (len / 2)
       if len.odd?
-        result += "※［＃（#{single_path}）］"
+        result += "※［＃（#{dash_paths[0]}）］"
       end
       result
+    end
+  end
+
+  def dash_image_relative_paths(base_dir)
+    DASH_FILES.map do |name|
+      pathname = Pathname(File.join(base_dir, name))
+      pathname.relative_path_from(Pathname(@setting.archive_path)).to_s
+    end
+  end
+
+  def copy_dash_images_to_local_setting_dir
+    DASH_FILES.each do |name|
+      path = File.join(Narou.get_local_setting_dir, name)
+      unless File.exist?(path)
+        FileUtils.copy(File.join(Narou.get_preset_dir, name), path)
+      end
     end
   end
 end
