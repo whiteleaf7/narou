@@ -7,6 +7,7 @@ require "stringio"
 require "date"
 require "uri"
 require "nkf"
+require "pathname"
 require_relative "narou"
 require_relative "progressbar"
 require_relative "inspector"
@@ -1272,7 +1273,10 @@ class ConverterBase
     (io = before_convert(io)).rewind
     (io = convert_main(io)).rewind
     (io = after_convert(io)).rewind
-    return insert_separator_for_selection(replace_by_replace_txt(io.read))
+    data = replace_by_replace_txt(io.read)
+    data = insert_separator_for_selection(data)
+    data = double_dash_to_image(data)
+    return data
   end
 
   #
@@ -1381,5 +1385,22 @@ class ConverterBase
       result.gsub!(src, dst)
     end
     result
+  end
+
+  def double_dash_to_image(text)
+    return text unless @setting.enable_double_dash_to_image
+    # AozoraEpub3 は相対パスじゃないとエラーになるので相対パスに変換
+    single_pathname = Pathname(File.join(Narou.get_preset_dir, "singledash.png"))
+    double_pathname = Pathname(File.join(Narou.get_preset_dir, "doubledash.png"))
+    single_path = single_pathname.relative_path_from(Pathname(@setting.archive_path)).to_s
+    double_path = double_pathname.relative_path_from(Pathname(@setting.archive_path)).to_s
+    text.gsub(/―{2,}/) do |match|
+      len = match.length
+      result = "※［＃（#{double_path}）］" * (len / 2)
+      if len.odd?
+        result += "※［＃（#{single_path}）］"
+      end
+      result
+    end
   end
 end

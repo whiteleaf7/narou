@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2015-05-15 01:05:21 +0900
+# auto generated at 2015-08-07 22:44:33 +0900
 
 Encoding.default_external = Encoding::UTF_8
 
@@ -61,6 +61,10 @@ describe "convert" do
 
   it "convert_page_break/test_convert_page_break.txt" do
     check_answer("convert_page_break/test_convert_page_break.txt")
+  end
+
+  it "double_dash_to_image/test_double_dash_to_image.txt" do
+    check_answer("double_dash_to_image/test_double_dash_to_image.txt")
   end
 
   it "english/test_english.txt" do

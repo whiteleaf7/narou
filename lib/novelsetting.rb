@@ -430,6 +430,12 @@ class NovelSetting
       value: false,
       help: "HTMLの装飾系タグを削除する（主にArcadiaの作品に影響）"
     },
+    {
+      name: "enable_double_dash_to_image",
+      type: :boolean,
+      value: false,
+      help: "２倍ダッシュ（――）を画像に差し替える。Kindleのデフォルトフォントみたいにダッシュが太くて気になる人用"
+    },
   ]
 
   ORIGINAL_SETTINGS_KEY_INDEXES = {}.tap { |hash|
