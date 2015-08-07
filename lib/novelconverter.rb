@@ -181,6 +181,10 @@ class NovelConverter
       return :error
     end
 
+    error_list = stdout_capture.scan(/^(?:\[ERROR\]|エラーが発生しました :).+$/)
+    warn_list = stdout_capture.scan(/^\[WARN\].+$/)
+    info_list = stdout_capture.scan(/^\[INFO\].+$/)
+
     if verbose
       puts
       puts "==== AozoraEpub3 stdout capture " + "=" * 47
@@ -188,12 +192,11 @@ class NovelConverter
       puts "=" * 79
     end
 
-    error_list = stdout_capture.scan(/^(?:\[ERROR\]|エラーが発生しました :).+$/)
-    warn_list = stdout_capture.scan(/^\[WARN\].+$/)
-    info_list = stdout_capture.scan(/^\[INFO\].+$/)
-    if !error_list.empty? || !warn_list.empty? || !info_list.empty?
-      puts
-      puts error_list, warn_list, info_list
+    if !error_list.empty? || !warn_list.empty?
+      unless verbose
+        puts
+        puts error_list, warn_list
+      end
       unless error_list.empty?
         # AozoraEpub3 のエラーにはEPUBが出力されないエラーとEPUBが出力されるエラーの2種類ある。
         # EPUBが出力される場合は「変換完了」という文字があるのでそれを検出する
