@@ -36,7 +36,7 @@ rt { font-size: 0.6em; }
 }
 
 /* 二分アキ */
-.half_em_space { text-indent: 0.5em; }
+.half_em_space { padding-top: 0.5em; }
 
 /* パラメーター（折り返しあり） */
 .custom_parameter_block {
