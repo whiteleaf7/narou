@@ -554,7 +554,9 @@ class Narou::AppServer < Sinatra::Base
     result = '<div><span class="tag label label-default" data-tag="">タグ検索を解除</span></div>'
     tagname_list = Command::Tag.get_tag_list.keys
     tagname_list.each do |tagname|
-      result << "<div>#{decorate_tags([tagname])}</div>"
+      result << "<div>#{decorate_tags([tagname])} " \
+                "<span class='select-color-button' data-target-tag='#{h tagname}'>" \
+                "<span class='#{Command::Tag.get_color(tagname)}'>a</span></span></div>"
     end
     result
   end
@@ -620,6 +622,16 @@ class Narou::AppServer < Sinatra::Base
     Narou::Worker.push do
       CommandLine.run!(["setting", "--burn", ids])
     end
+  end
+
+  post "/api/change_tag_color" do
+    tag = params["tag"] or pass
+    color = params["color"] or pass
+    tag_colors = Inventory.load("tag_colors", :local)
+    tag_colors[tag] = color
+    tag_colors.save
+    @@push_server.send_all(:"table.reload")
+    @@push_server.send_all(:"tag.updateCanvas")
   end
 
   # -------------------------------------------------------------------------------

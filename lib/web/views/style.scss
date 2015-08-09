@@ -402,31 +402,50 @@ input::-ms-clear {
 /*
  * タグ
  */
+.select-color-button {
+  float: right;
+}
+.select-color-button span {
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  border-radius: 0.7em;
+  text-align: center;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+}
+
 .label {
   cursor: pointer;
 }
-.label-green {
+.label-green, .select-color-button .green {
   background-color: #5cb85c;
 }
-.label-yellow {
+.label-yellow, .select-color-button .yellow {
   background-color: #f7d71e;
   color: #666;
 }
-.label-blue {
+.label-blue, .select-color-button .blue {
   background-color: #428bca;
 }
-.label-magenta {
+.label-magenta, .select-color-button .magenta {
   background-color: #d37bca;
 }
-.label-cyan {
+.label-cyan, .select-color-button .cyan {
   background-color: #5bc0de;
 }
-.label-red {
+.label-red, .select-color-button .red {
   background-color: #d9534f;
 }
-.label-white {
+.label-white, .select-color-button .white {
   background-color: #e3e3e3;
   color: #666;
+}
+
+.label-fixed-width {
+  display: inline-block;
+  width: 100%;
 }
 
 .dataTable {
@@ -490,9 +509,39 @@ input::-ms-clear {
  * 選択メニュー
  */
 #rect-select-menu {
-  position: absolute;
-  display: none;
   z-index: 101;
+}
+
+/*
+ * 色選択メニュー
+ */
+#select-color-menu {
+  position: fixed;
+  z-index: 9999;
+  border-color: #bbb;
+  background-color: white;
+}
+#select-color-menu:before {
+  content: "";
+  position: absolute;
+  display: block;
+  top: 20px;
+  left: -18px;
+  border-style: solid;
+  border-width: 9px;
+  border-color: transparent white transparent transparent;
+  z-index: 10001;
+}
+#select-color-menu:after {
+  content: "";
+  position: absolute;
+  display: block;
+  top: 20px;
+  left: -19px;
+  border-style: solid;
+  border-width: 9px;
+  border-color: transparent #bbb transparent transparent;
+  z-index: 10000;
 }
 
 /*
@@ -727,8 +776,6 @@ $console-color: white;
  * 個別メニュー
  */
 #context-menu {
-  position: absolute;
-  display: none;
   z-index: 102;
 }
 
