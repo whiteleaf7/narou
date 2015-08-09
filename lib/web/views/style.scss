@@ -520,6 +520,7 @@ input::-ms-clear {
   z-index: 9999;
   border-color: #bbb;
   background-color: white;
+  min-width: 130px;
 }
 #select-color-menu:before {
   content: "";
