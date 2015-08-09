@@ -437,7 +437,7 @@ class Downloader
       unless tags.include?("end")
         update_database if update_subtitles.count == 0
         $stdout.silence do
-          Command::Tag.execute!([@id, "--add", "end", "--color", "white"])
+          Command::Tag.execute!(%W(#{id} --add end --color white --no-overwrite-color))
         end
         msg = old_toc.empty? ? "完結しているようです" : "完結したようです"
         @stream.puts "<cyan>#{id_and_title.escape} は#{msg}</cyan>".termcolor
@@ -760,7 +760,7 @@ class Downloader
       @stream.error "小説が削除されているか非公開な可能性があります"
       if @@database.novel_exists?(@id)
         $stdout.silence do
-          Command::Tag.execute!(%W(#{@id} --add 404 --color white))
+          Command::Tag.execute!(%W(#{@id} --add 404 --color white --no-overwrite-color))
         end
         Command::Freeze.execute!([@id])
       end

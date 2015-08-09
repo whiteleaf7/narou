@@ -114,7 +114,10 @@ module Command
     end
 
     def execute(argv)
+      # タグの色がすでに決まっていた場合は変更しない隠しオプション
+      no_overwrite_color = !!argv.delete("--no-overwrite-color")
       super
+      @options["no-overwrite-color"] = no_overwrite_color   # super で @options.clear されるのでここで代入
       color_changed = change_colors
       @options["mode"] ||= :list
       if argv.empty?
@@ -213,6 +216,9 @@ module Command
 
     def set_color(tagname, color)
       tag_colors = Inventory.load("tag_colors", :local)
+      if @options["no-overwrite-color"]
+        return if tag_colors.include?(tagname)
+      end
       tag_colors[tagname] = color
       tag_colors.save
     end
