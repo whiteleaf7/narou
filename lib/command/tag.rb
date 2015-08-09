@@ -115,14 +115,21 @@ module Command
 
     def execute(argv)
       super
+      color_changed = change_colors
       @options["mode"] ||= :list
       if argv.empty?
         if @options["mode"] == :list
           display_taglist
           return
         end
-        error "対象の小説を指定して下さい"
-        exit Narou::EXIT_ERROR_CODE
+        if color_changed
+          puts "タグの色を変更しました"
+          display_taglist
+          return
+        else
+          error "対象の小説を指定して下さい"
+          exit Narou::EXIT_ERROR_CODE
+        end
       else
         if @options["mode"] == :list
           search_novel_by_tag(argv)
@@ -146,6 +153,17 @@ module Command
       List.execute!(["--tag", argv.join(" ")])
     end
 
+    def change_colors
+      changed = false
+      if @options["color"] && @options["tags"]
+        @options["tags"].each do |tag|
+          set_color(tag, @options["color"])
+        end
+        changed = true
+      end
+      changed
+    end
+
     def edit_tags(argv)
       database = Database.instance
       tagname_to_ids(argv)
@@ -167,11 +185,6 @@ module Command
         when :clear
           tags.clear
           puts "#{title} のタグをすべて外しました"
-        end
-        if @options["color"] && @options["tags"]
-          @options["tags"].each do |tag|
-            set_color(tag, @options["color"])
-          end
         end
         if tags.size > 0
           print "現在のタグは "
