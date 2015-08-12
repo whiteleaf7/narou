@@ -31,7 +31,8 @@ Narou.rb ― 「小説家になろう」「小説を読もう！」ダウンロ�
 
 詳細な説明やインストール方法は **[Narou.rb 説明書](https://github.com/whiteleaf7/narou/wiki)** を御覧ください。
 
-![ScreenCapture](https://raw.github.com/wiki/whiteleaf7/narou/images/narou_cap.gif)
+![WEB UI ScreenCapture](https://raw.github.com/wiki/whiteleaf7/narou/images/webui_cap.png)
+![Console ScreenCapture](https://raw.github.com/wiki/whiteleaf7/narou/images/narou_cap.gif)
 
 更新履歴 - ChangeLog
 --------------------
