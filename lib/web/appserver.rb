@@ -527,6 +527,14 @@ class Narou::AppServer < Sinatra::Base
     haml :diff_list, layout: false
   end
 
+  post "/api/diff_clean" do
+    target = params["target"] or pass
+    id = Downloader.get_id_by_target(target) or pass
+    Narou::Worker.push do
+      CommandLine.run!(%W(diff --clean #{id}))
+    end
+  end
+
   post "/api/inspect" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
