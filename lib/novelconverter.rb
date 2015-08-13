@@ -316,7 +316,7 @@ class NovelConverter
     return mobi_path
   end
 
-  def initialize(setting, output_filename = nil, display_inspector = false)
+  def initialize(setting, output_filename = nil, display_inspector = false, output_text_dir = nil)
     @setting = setting
     @novel_id = setting.id
     @novel_author = setting.author
@@ -327,6 +327,7 @@ class NovelConverter
     @display_inspector = display_inspector
     @use_dakuten_font = false
     @converter = create_converter
+    @converter.output_text_dir = output_text_dir
   end
 
   #

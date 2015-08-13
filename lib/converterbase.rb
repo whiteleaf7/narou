@@ -18,6 +18,7 @@ class ConverterBase
   ENGLISH_SENTENCES_MIN_LENGTH = 8   # この文字数以上アルファベットが続くと半角のまま
 
   attr_reader :use_dakuten_font
+  attr_accessor :output_text_dir
 
   def before(io, text_type)
     data = io.string
@@ -38,6 +39,7 @@ class ConverterBase
     @inspector = inspector
     @illustration = illustration
     @use_dakuten_font = false
+    @output_text_dir = nil
     initialize_member_values
   end
 
@@ -1268,6 +1270,7 @@ class ConverterBase
 
   def convert(text, text_type)
     return "" if text == ""
+    output_text_dir = @output_text_dir || @setting.archive_path
     @text_type = text_type
     io = StringIO.new(rstrip_all_lines(text))
     (io = before_convert(io)).rewind
@@ -1275,7 +1278,7 @@ class ConverterBase
     (io = after_convert(io)).rewind
     data = replace_by_replace_txt(io.read)
     data = insert_separator_for_selection(data)
-    data = double_dash_to_image(data)
+    data = double_dash_to_image(data, output_text_dir)
     return data
   end
 
@@ -1389,18 +1392,18 @@ class ConverterBase
 
   DASH_FILES = %w(singledash.png doubledash.png)
 
-  def double_dash_to_image(text)
+  def double_dash_to_image(text, output_text_dir)
     return text unless @setting.enable_double_dash_to_image
     begin
       # AozoraEpub3 は相対パスじゃないとエラーになるので相対パスに変換
-      dash_paths = dash_image_relative_paths(Narou.get_preset_dir)
+      dash_paths = dash_image_relative_paths(Narou.get_preset_dir, output_text_dir)
     rescue ArgumentError => e
       if e.message =~ /^different prefix/
         # Windowsにおいて、スクリプト本体のあるドライブと小説フォルダがあるドライブが
         # 違う場合、相対パスを計算できなくなる。そのための対処として、.narou ディレクトリ
         # に画像データをコピーし、同一ドライブ内で相対パスを取れるようにする
         copy_dash_images_to_local_setting_dir
-        dash_paths = dash_image_relative_paths(Narou.get_local_setting_dir)
+        dash_paths = dash_image_relative_paths(Narou.get_local_setting_dir, output_text_dir)
       else
         raise
       end
@@ -1415,10 +1418,10 @@ class ConverterBase
     end
   end
 
-  def dash_image_relative_paths(base_dir)
+  def dash_image_relative_paths(base_dir, output_text_dir)
     DASH_FILES.map do |name|
       pathname = Pathname(File.join(base_dir, name))
-      pathname.relative_path_from(Pathname(@setting.archive_path)).to_s
+      pathname.relative_path_from(Pathname(output_text_dir)).to_s
     end
   end
 

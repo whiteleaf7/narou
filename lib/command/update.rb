@@ -325,7 +325,8 @@ module Command
       hotentry.each do |id, subtitles|
         setting = NovelSetting.load(id, ignore_force, ignore_default)
         setting.enable_illust = false   # 挿絵はパス解決が煩雑なので強制無効
-        novel_converter = NovelConverter.new(setting, output_filename, display_inspector)
+        novel_converter = NovelConverter.new(setting, output_filename,
+                                             display_inspector, Update.hotentry_dirname)
         last_num = 0
         novel_converter.on(:"convert_main.loop") do |i|
           progressbar.output(total_progress + i)
