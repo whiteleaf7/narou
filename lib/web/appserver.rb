@@ -428,7 +428,7 @@ class Narou::AppServer < Sinatra::Base
 
   post "/api/download" do
     targets = params["targets"] or pass
-    targets = targets.split
+    targets = targets.kind_of?(Array) ? targets : targets.split
     pass if targets.size == 0
     Narou::Worker.push do
       CommandLine.run!(["download"] + targets)
@@ -646,8 +646,10 @@ class Narou::AppServer < Sinatra::Base
   # ウィジット関係
   # -------------------------------------------------------------------------------
 
+  WIDGET_MODE = %w(download drag_and_drop)
+
   get "/js/widget.js" do
-    if %w(download).include?(params["mode"])
+    if WIDGET_MODE.include?(params["mode"])
       content_type :js
       erb :"js/widget"
     else
@@ -666,9 +668,6 @@ class Narou::AppServer < Sinatra::Base
     from = params["from"]
     if ALLOW_HOSTS.include?(from)
       headers "X-Frame-Options" => "ALLOW-FROM http://#{from}/"
-    else
-      headers "X-Frame-Options" => "DENY"
-      halt
     end
   end
 
@@ -678,7 +677,11 @@ class Narou::AppServer < Sinatra::Base
       CommandLine.run!(["download", target])
       @@push_server.send_all(:"table.reload")
     end
-    haml :widget, :layout => nil
+    haml :"widget/download", layout: nil
+  end
+
+  get "/widget/drag_and_drop" do
+    haml :"widget/drag_and_drop", layout: nil
   end
 end
 
