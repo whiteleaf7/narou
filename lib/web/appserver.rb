@@ -642,6 +642,13 @@ class Narou::AppServer < Sinatra::Base
     @@push_server.send_all(:"tag.updateCanvas")
   end
 
+  get "/api/csv/download" do
+    content_type "application/csv"
+    attachment "novels.csv"
+
+    Command::Csv.new.generate
+  end
+
   # -------------------------------------------------------------------------------
   # ウィジット関係
   # -------------------------------------------------------------------------------
