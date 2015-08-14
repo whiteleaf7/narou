@@ -36,6 +36,7 @@ module Command
     "web" => Web,
     "mail" => Mail,
     "backup" => Backup,
+    "csv" => Csv,
     "help" => Help,
     "version" => Version,
     "init" => Init
