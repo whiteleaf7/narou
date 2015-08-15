@@ -134,8 +134,8 @@ class DiffViewer
           end
         end
       end
-      result = "<bold><red>-#{old_str}</red>\n" \
-               "<green>+#{new_str}</green></bold>"
+      result = "<bold><red>-#{old_str}</red></bold>\n" \
+               "<bold><green>+#{new_str}</green></bold>"
     when "-"
       result = "<bold><red>-#{TermColorLight.escape(old_element)}</red></bold>"
     when "+"
