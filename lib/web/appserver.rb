@@ -649,6 +649,19 @@ class Narou::AppServer < Sinatra::Base
     Command::Csv.new.generate
   end
 
+  get "/api/csv/view/import" do
+    haml :csv_import, layout: false
+  end
+
+  post "/api/csv/import" do
+    files = params["files"] or pass
+    csv = Command::Csv.new
+    files.each do |file|
+      csv.import(file[:tempfile])
+    end
+    ""
+  end
+
   # -------------------------------------------------------------------------------
   # ウィジット関係
   # -------------------------------------------------------------------------------

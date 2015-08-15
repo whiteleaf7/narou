@@ -1,0 +1,68 @@
+:javascript
+  var $here = $("#csv-drop-here");
+  var form_data = new FormData;
+
+  var appendFiles = function(files) {
+    $.each(files, function(i, file) {
+      form_data.append("files[]", file);
+      $("#csv-file-list").append($("<div>" + file.name + "</div>"));
+    });
+  };
+
+  $("#csv-drop-cover").hide();
+  $here.on("dragenter", function(e) {
+    $("#csv-drop-cover").show();
+  });
+
+  $("#csv-drop-cover")
+    .on("dragenter", function(e) {
+      $here.addClass("dragover");
+    })
+    .on("dragover", function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+      return false;
+    })
+    .on("dragleave", function(e) {
+      $here.removeClass("dragover");
+      $(this).hide();
+    })
+    .on("drop", function(e) {
+      e.preventDefault();
+      $here.removeClass("dragover");
+      $(this).hide();
+      appendFiles(e.dataTransfer.files);
+    });
+
+  $("#csv-select-file-button").on("click", function(e) {
+    $("#csv-select-file-input").click();
+  });
+
+  $("#csv-select-file-input").on("change", function(e) {
+    appendFiles(this.files);
+  });
+
+  $("#csv-import-files").on("click", function(e) {
+    $.ajax({
+      url: "/api/csv/import",
+      type: "post",
+      data: form_data,
+      processData: false,
+      contentType: false
+    });
+  });
+
+#csv-drop-here
+  .inner
+    %div
+      %div ここにCSVファイルをドラッグ＆ドロップ
+      %div.else もしくは…
+      %div
+        %input#csv-select-file-input.hidden(type="file" multiple="multiple")
+        %button#csv-select-file-button.btn.btn-warning.btn-xs
+          ファイルを選択
+  #csv-drop-cover.drop-cover(effectAllowed="all")
+#csv-file-list
+
+-# インポートダイアログの「インポート」ボタンから処理を移譲されてくる
+#csv-import-files.hidden

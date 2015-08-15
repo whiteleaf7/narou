@@ -52,10 +52,10 @@
     #queue-text.navbar-text.navbar-right
       %span.glyphicon.glyphicon-inbox
       %span#queue 0
-    #drop-here
+    #link-drop-here
       .inner
         .glyphicon.glyphicon-download-alt
-      #drop-cover(effectAllowed="all")
+      #link-drop-cover.drop-cover(effectAllowed="all")
 
     %script{:src => "//code.jquery.com/jquery-1.11.1.min.js"}
     %script{:src => "//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"}
@@ -64,7 +64,7 @@
     %script{:src => "/resources/narou.queue.js"}
     :javascript
       $(document).ready(function($) {
-        $("#drop-here").hide();
+        $("#link-drop-here").hide();
 
         var action = new Narou.Action(null);
         var notification = new Narou.Notification;
@@ -74,24 +74,24 @@
         var dnd = new Narou.DragDrop;
 
         $(window).on("dragenter", function(e) {
-          $("#drop-here").show();
+          $("#link-drop-here").show();
         });
 
-        $("#drop-cover")
+        $("#link-drop-cover")
           .on("dragover", function(e) {
             e.preventDefault();
             e.dataTransfer.dropEffect = "link";
             return false;
           })
           .on("dragleave", function(e) {
-            $("#drop-here").hide();
+            $("#link-drop-here").hide();
           })
           .on("drop", function(e) {
             e.preventDefault();
             dnd.getLinkText(e, function(link) {
               action.download(link);
             });
-            $("#drop-here").hide();
+            $("#link-drop-here").hide();
           });
       });
 

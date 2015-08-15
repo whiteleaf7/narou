@@ -89,6 +89,10 @@
               %a(href="#")
                 %span
                   CSV形式でリストをダウンロード
+            %li#action-tool-csv-import
+              %a(href="#")
+                %span
+                  CSVファイルからインポート
       %ul.nav.navbar-nav.navbar-right
         %li.dropdown
           %a.dropdown-toggle(data-toggle="dropdown" href="#")
@@ -295,7 +299,7 @@
       %big
         %span.label.label-white.label-fixed-width White
 
-#drop-here
+#link-drop-here
   .inner
     .glyphicon.glyphicon-download-alt
-  #drop-cover(effectAllowed="all")
+  #link-drop-cover.drop-cover(effectAllowed="all")

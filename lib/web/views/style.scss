@@ -901,7 +901,7 @@ $console-color: white;
 }
 
 /* D&D関係 */
-#drop-here {
+#link-drop-here {
   position: fixed;
   top: 0;
   display: none;
@@ -914,7 +914,7 @@ $console-color: white;
   background-color: rgba(0, 0, 0, 0.7);
   z-index: 2000;
 }
-#drop-here .inner {
+#link-drop-here .inner {
   position: absolute;
   display: table;
   width: 95%;
@@ -923,14 +923,50 @@ $console-color: white;
   left: 2.5%;
   border: 6px dashed white;
 }
-#drop-here .inner .glyphicon {
+#link-drop-here .inner .glyphicon {
   display: table-cell;
   vertical-align: middle;
 }
-#drop-cover {
+.drop-cover {
   position: absolute;
   top: 0;
   width: 100%;
   height: 100%;
   background-color: transparent;
+}
+
+/* CSVインポート関係 */
+#csv-drop-here {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  border: 4px dashed lightgray;
+  background-color: white;
+  color: lightgray;
+
+  &.dragover {
+    border: 4px dashed #ada;
+    background-color: #efe;
+    color: #5cb85c;
+  }
+
+  .inner {
+    position: absolute;
+    display: table;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+
+    & > div {
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    .else {
+      color: lightgray;
+      font-size: 0.6em;
+    }
+  }
 }
