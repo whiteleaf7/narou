@@ -3,7 +3,7 @@
   background-color: rgba(248,248,248,0.93);
 }
 @media (max-width:767px) {
-  .navbar.navbar-collapse {
+  .navbar .navbar-collapse {
     background-color: rgba(248,248,248,0.93);
   }
 }
