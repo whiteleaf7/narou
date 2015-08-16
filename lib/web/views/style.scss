@@ -833,6 +833,16 @@ $console-color: white;
       width: 100%;
     }
   }
+  #ss-bookmarklet1, #ss-bookmarklet2 {
+    @media (min-width: 601px) {
+      float: right;
+      width: 300px;
+      margin-left: 15px;
+    }
+    @media (max-width: 600px) {
+      width: 100%;
+    }
+  }
 
   h4 {
     margin-top: 25px;
@@ -860,12 +870,7 @@ $console-color: white;
     margin: 0 0 1.0em;
     padding: 0.5em 0.5em 0.5em 1.7em;
     border-bottom: 3px solid #d94A4C;
-    @media (min-width: 768px) {
-      width: 70%;
-    }
-    @media (max-width: 767px) {
-      width: 100%;
-    }
+    width: 100%;
   }
   h3:before {
     content: "";
