@@ -33,9 +33,10 @@ module Narou
 
   def get_root_dir
     root_dir = nil
-    path = File.expand_path(File.dirname("."))
+    path = Dir.pwd
     drive_letter = ""
     if Helper.os_windows?
+      path.encode!(Encoding::UTF_8)
       path.gsub!(/^[a-z]:/i, "")
       drive_letter = $&
     end
