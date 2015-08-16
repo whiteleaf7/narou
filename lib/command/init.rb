@@ -118,7 +118,6 @@ module Command
         print "(現在の場所:#{@global_setting["aozoraepub3dir"]}"
       end
       print ")\n>"
-      #while input = $stdin.gets.rstrip.gsub(/"/, "")
       while input = $stdin.gets
         if Helper.os_windows?
           input.force_encoding(Encoding::Windows_31J).encode!(Encoding::UTF_8)
