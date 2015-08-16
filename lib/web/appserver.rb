@@ -662,16 +662,25 @@ class Narou::AppServer < Sinatra::Base
     ""
   end
 
+  # ダウンロード登録すると同時にグレーのボタン画像を返す
+  get "/api/download4ie" do
+    Narou::Worker.push do
+      CommandLine.run!(%W(download #{params["target"]}))
+      @@push_server.send_all(:"table.reload")
+    end
+    redirect "/resources/images/dl_button1.gif"
+  end
+
   # -------------------------------------------------------------------------------
   # ウィジット関係
   # -------------------------------------------------------------------------------
 
-  WIDGET_MODE = %w(download drag_and_drop)
+  BOOKMARKLET_MODE = %w(download insert_button)
 
   get "/js/widget.js" do
-    if WIDGET_MODE.include?(params["mode"])
+    if BOOKMARKLET_MODE.include?(params["mode"])
       content_type :js
-      erb :"js/widget"
+      erb :"bookmarklet/#{params['mode']}.js"
     else
       error("invaid mode")
     end

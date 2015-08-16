@@ -35,54 +35,8 @@
     }
 
     $("#bookmarklet-download").attr("href", createBookmarkletStrings(bookmarklet, "download"));
+    $("#bookmarklet-insert-button").attr("href", createBookmarkletStrings(bookmarklet, "insert_button"));
   });
-
-:css
-  h2 {
-    margin-bottom: 25px;
-  }
-  h3 {
-    position: relative;
-    color: #111;
-    font-size: 1.143em;
-    font-weight: bold;
-    margin: 0 0 1.0em;
-    padding: 0.5em 0.5em 0.5em 1.7em;
-    border-bottom: 3px solid #d94A4C;
-    width: 50%;
-  }
-  h3:before {
-    content: "";
-    position: absolute;
-    background: #d48789;
-    top: 0;
-    left: 0.4em;
-    height: 12px;
-    width: 12px;
-    transform: rotate(45deg);
-    -moz-transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-    -o-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-  }
-  h3:after {
-    content: "";
-    position: absolute;
-    background:#d26466;
-    top: 1.0em;
-    left: 0;
-    height: 8px;
-    width: 8px;
-    transform: rotate(15deg);
-    -moz-transform: rotate(15deg);
-    -webkit-transform: rotate(15deg);
-    -o-transform: rotate(15deg);
-    -ms-transform: rotate(15deg);
-  }
-
-  p {
-    margin-bottom: 2px !important;
-  }
 
 .navbar.navbar-default.navbar-fixed-top(role="navigation")
   .container
@@ -112,11 +66,22 @@
     %p 下記のリンクをブックマークに登録して、ダウンロードしたい小説のページで実行して下さい。（WEB UIサーバ起動中に限ります）
     %p ブックマークバーにドラッグ＆ドロップしたり、右クリックからブックマークにいれると簡単です。
     %p
-      %a#bookmarklet-download(onclick="return false")
-        %big
+      %span.glyphicon.glyphicon-bookmark
+      %big
+        %a#bookmarklet-download(onclick="return false")
           %u Narou.rbでダウンロード
     %p
       %small 基本的に小説ページ内にダウンロード中の表示が出ますが、IEを使っていてかつ小説家になろうの小説をダウンロードしようとした場合のみ、技術的制約から別ウィンドウが開きます。
+
+  %h3 ページ内の小説へのリンクにダウンロードボタンを付ける
+  %div
+    %p 小説投稿サイト内の、各小説へのリンクの横にダウンロード用のボタンを埋め込みます。
+    %p ランキングページや一覧ページなどで実行するとダウンロードが一発で出来るようになったり、どれがダウンロード済みなのかが一目瞭然になります。
+    %p
+      %span.glyphicon.glyphicon-bookmark
+      %big
+        %a#bookmarklet-insert-button(onclick="return false")
+          %u DLボタン設置(Narou.rb)
 
   %hr
 

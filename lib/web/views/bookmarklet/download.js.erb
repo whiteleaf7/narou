@@ -32,7 +32,7 @@
   var url, div, iframe, btn_close;
 
   url = '<%= "#{request.scheme}://#{env["SERVER_NAME"]}:#{env["SERVER_PORT"]}" %>' +
-        "/widget/<%= params['mode'] %>?from=" + location.hostname + "&target=" +
+        "/widget/download?from=" + location.hostname + "&target=" +
         encodeURIComponent(location.href) + "&t=" + Date.now();
 
   // IE の場合、iframe は親のドキュメントモードが汚染して動かない可能性があるので対処
