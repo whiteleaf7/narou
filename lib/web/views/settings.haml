@@ -127,7 +127,8 @@
                         - need_clear = true
                       - when :multiple
                         %div.input-style
-                          %select{name: "#{name}[]", class: "selectpicker", multiple: true, title: "未設定"}
+                          %select{name: "#{name}[]", class: "selectpicker", multiple: true,
+                                  title: "未設定", "data-selected-text-format" => "count"}
                             - selected_items = item.to_s.split(",")
                             - value[:select_keys].each_with_index do |key, index|
                               %option{selected: selected_items.include?(key), value: key}

@@ -431,6 +431,15 @@ module Command
           type: :string, help:  "--multiple指定時の区切り文字",
           tab: :detail
         },
+        "economy" => {
+          type: :multiple, help: "容量節約に関する設定。カンマ区切りで設定\n" \
+            "(cleanup_temp:変換後に作業ファイルを削除 send_delete:送信後に書籍ファイルを削除 " \
+            "nosave_diff:差分ファイルを保存しない nosave_raw:rawデータを保存しない)",
+          select_keys: %w(cleanup_temp send_delete nosave_diff nosave_raw),
+          select_summaries: %w(変換後に作業ファイルを削除 送信後に書籍ファイルを削除
+                               差分ファイルを保存しない rawデータを保存しない),
+          tab: :detail
+        },
         "theme" => {
           type: :select, help: "WEB UI 用テーマ選択",
           invisible: true,

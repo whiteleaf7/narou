@@ -238,5 +238,10 @@ module Narou
     end.compact
   end
   memoize :get_theme_names
+
+  def economy?(mode)
+    eco_modes = Inventory.load("local_setting", :local)["economy"].to_s.split(",").map(&:strip)
+    eco_modes.include?(mode)
+  end
  end
 end

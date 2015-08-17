@@ -273,10 +273,12 @@ class NovelConverter
       verbose: false,
       no_epub: false,
       no_mobi: false,
-      no_strip: false
+      no_strip: false,
+      no_cleanup_txt: false,
     }.merge(options)
 
     device = options[:device]
+    clean_up_file_list = []
 
     return false if options[:no_epub]
     # epub
@@ -289,6 +291,7 @@ class NovelConverter
       epub_ext = ".epub"
     end
     epub_path = txt_path.sub(/.txt$/, epub_ext)
+    clean_up_file_list << txt_path unless options[:no_cleanup_txt]
 
     if !device || !device.kindle? || options[:no_mobi]
       puts File.basename(epub_path) + " を出力しました"
@@ -300,6 +303,7 @@ class NovelConverter
     status = NovelConverter.epub_to_mobi(epub_path, options[:verbose])
     return nil if status != :success
     mobi_path = epub_path.sub(/\.epub$/, device.ebook_file_ext)
+    clean_up_file_list << epub_path
 
     # strip
     unless options[:no_strip]
@@ -314,6 +318,17 @@ class NovelConverter
     puts "<bold><green>MOBIファイルを出力しました</green></bold>".termcolor
 
     return mobi_path
+  ensure
+    if Narou.economy?("cleanup_temp")
+      # 作業用ファイルを削除
+      clean_up_temp_files(clean_up_file_list)
+    end
+  end
+
+  def self.clean_up_temp_files(path_list)
+    path_list.each do |path|
+      FileUtils.rm_f(path)
+    end
   end
 
   def initialize(setting, output_filename = nil, display_inspector = false, output_text_dir = nil)

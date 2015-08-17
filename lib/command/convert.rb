@@ -262,7 +262,8 @@ module Command
         verbose: @options["verbose"],
         no_epub: @options["no-epub"],
         no_mobi: @options["no-mobi"],
-        no_strip: @options["no-strip"]
+        no_strip: @options["no-strip"],
+        no_cleanup_txt: @argument_target_type == :file
       })
     end
 

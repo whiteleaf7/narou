@@ -51,6 +51,10 @@ module Device::Ibunko
     end
     puts File.basename(zipfile_path) + " を出力しました"
     puts "<bold><green>#{@device.display_name}用ファイルを出力しました</green></bold>".termcolor
+    if Narou.economy?("cleanup_temp") && @argument_target_type == :novel
+      # 作業用ファイルを削除
+      FileUtils.rm_f(@converted_txt_path)
+    end
     zipfile_path
   end
 

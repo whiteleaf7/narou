@@ -138,6 +138,9 @@ class Device
           raise SendFailure, res[1].rstrip
         end
       end
+      if Narou.economy?("send_delete")
+        FileUtils.rm_f(src_file)
+      end
       dst_path
     else
       nil

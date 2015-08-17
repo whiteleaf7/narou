@@ -176,8 +176,10 @@ module Helper
       "整数        "
     when :float
       "小数点数    "
-    when :string, :select, :multiple
+    when :string, :select
       "文字列      "
+    when :multiple
+      "文字列(複数)"
     when :directory
       "フォルダパス"
     when :file

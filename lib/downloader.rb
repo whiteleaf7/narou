@@ -294,6 +294,8 @@ class Downloader
     if @setting["is_narou"] && (@download_wait_steps > 10 || @download_wait_steps == 0)
       @download_wait_steps = 10
     end
+    @nosave_diff = Narou.economy?("nosave_diff")
+    @nosave_raw = Narou.economy?("nosave_raw")
     initialize_wait_counter
   end
 
@@ -524,6 +526,7 @@ class Downloader
   # 差分用キャッシュ保存ディレクトリ作成
   #
   def create_cache_dir
+    return nil if @nosave_diff
     now = Time.now
     name = now.strftime("%Y.%m.%d@%H.%M.%S")
     cache_dir = File.join(get_novel_data_dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME, name)
@@ -992,6 +995,7 @@ class Downloader
   # 差分用のキャッシュとして保存
   #
   def move_to_cache_dir(relative_path)
+    return if @nosave_diff
     path = File.join(get_novel_data_dir, relative_path)
     if File.exist?(path) && @cache_dir
       FileUtils.mv(path, @cache_dir)
@@ -1091,6 +1095,7 @@ class Downloader
   end
 
   def init_raw_dir
+    return if @nosave_raw
     path = get_raw_dir
     FileUtils.mkdir_p(path) unless File.exist?(path)
   end
@@ -1099,6 +1104,7 @@ class Downloader
   # テキストデータの生データを保存
   #
   def save_raw_data(raw_data, subtitle_info, ext = ".txt")
+    return if @nosave_raw
     index = subtitle_info["index"]
     file_subtitle = subtitle_info["file_subtitle"]
     path = File.join(get_raw_dir, "#{index} #{file_subtitle}#{ext}")
