@@ -288,6 +288,24 @@ module Helper
   end
 
   #
+  # 伏せ字にする
+  #
+  # 数字やスペース、句読点、感嘆符はそのままにする
+  #
+  def to_unprintable_words(string, mask = "●")
+    result = ""
+    string.each_char do |char|
+      result += case char
+                when /[0-9０-９ 　、。!?！？]/
+                  char
+                else
+                  mask
+                end
+    end
+    result
+  end
+
+  #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #
   # response = Helper::AsyncCommand.exec("処理に時間がかかる外部コマンド") do

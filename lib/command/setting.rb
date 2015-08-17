@@ -441,6 +441,11 @@ module Command
                                差分ファイルを保存しない rawデータを保存しない),
           tab: :detail
         },
+        "guard-spoiler" => {
+          type: :boolean,
+          help: "ネタバレ防止機能。ダウンロード時の各話タイトルを伏せ字で表示する",
+          tab: :detail
+        },
         "theme" => {
           type: :select, help: "WEB UI 用テーマ選択",
           invisible: true,

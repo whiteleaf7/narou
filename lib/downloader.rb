@@ -296,6 +296,7 @@ class Downloader
     end
     @nosave_diff = Narou.economy?("nosave_diff")
     @nosave_raw = Narou.economy?("nosave_raw")
+    @gurad_spoiler = Inventory.load("local_setting", :local)["guard-spoiler"]
     initialize_wait_counter
   end
 
@@ -948,7 +949,8 @@ class Downloader
       else
         @stream.print "短編　"
       end
-      @stream.print "#{subtitle} (#{i+1}/#{max})"
+      printable_subtitle = @gurad_spoiler ? Helper.to_unprintable_words(subtitle) : subtitle
+      @stream.print "#{printable_subtitle} (#{i+1}/#{max})"
 
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)

@@ -19,6 +19,9 @@
 		- send_delete : 送信後に書籍ファイルを削除
 		- nosave_diff : 差分ファイルを保存しない
 		- nosave_raw : rawデータを保存しない
+- ネタバレ防止設定 `guard-spoiler` を追加しました。ダウンロード時に各話タイトル
+  を伏せ字で表示します
+	+ 設定は `narou s guard-spoiler=true` or WEB UI の環境設定＞詳細
 
 #### WEB UI
 - タグの色を変更出来るようにしました
