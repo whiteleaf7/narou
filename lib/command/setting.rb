@@ -433,6 +433,7 @@ module Command
         },
         "theme" => {
           type: :select, help: "WEB UI 用テーマ選択",
+          invisible: true,
           select_keys: Narou.get_theme_names,
           select_summaries: Narou.get_theme_names,
           tab: :general
