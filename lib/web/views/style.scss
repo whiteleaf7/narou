@@ -68,6 +68,13 @@ body {
 }
 
 /*
+ * プログレスバー
+ */
+.progress-bar {
+  @include css3(transition-duration, 0);   // アニメーションを切る
+}
+
+/*
  * テーブル関連
  */
 table#novel-list {
