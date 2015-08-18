@@ -289,14 +289,14 @@ class Downloader
     @id = id || @@database.create_new_id
     @new_novel = @@database[@id].!
     @section_download_cache = {}
-    @download_wait_steps = Inventory.load("local_setting", :local)["download.wait-steps"] || 0
+    @download_wait_steps = Inventory.load("local_setting")["download.wait-steps"] || 0
     @download_use_subdirectory = use_subdirectory?
     if @setting["is_narou"] && (@download_wait_steps > 10 || @download_wait_steps == 0)
       @download_wait_steps = 10
     end
     @nosave_diff = Narou.economy?("nosave_diff")
     @nosave_raw = Narou.economy?("nosave_raw")
-    @gurad_spoiler = Inventory.load("local_setting", :local)["guard-spoiler"]
+    @gurad_spoiler = Inventory.load("local_setting")["guard-spoiler"]
     initialize_wait_counter
   end
 
@@ -310,7 +310,7 @@ class Downloader
       @@__wait_counter = 0
       @@__last_download_time = Time.now - 20
     end
-    @@interval_sleep_time = Inventory.load("local_setting", :local)["download.interval"] || 0
+    @@interval_sleep_time = Inventory.load("local_setting")["download.interval"] || 0
     @@interval_sleep_time = 0 if @@interval_sleep_time < 0
     @@max_steps_wait_time = [STEPS_WAIT_TIME, @@interval_sleep_time].max
   end
@@ -321,7 +321,7 @@ class Downloader
   def use_subdirectory?
     if @new_novel
       # 新規DLする小説
-      Inventory.load("local_setting", :local)["download.use-subdirectory"] || false
+      Inventory.load("local_setting")["download.use-subdirectory"] || false
     else
       # すでにDL済みの小説
       @@database[@id]["use_subdirectory"] || false
@@ -790,7 +790,7 @@ class Downloader
   # 更新された subtitle だけまとまった配列を返す
   #
   def update_body_check(old_subtitles, latest_subtitles)
-    strong_update = Inventory.load("local_setting", :local)["update.strong"]
+    strong_update = Inventory.load("local_setting")["update.strong"]
     latest_subtitles.select do |latest|
       index = latest["index"]
       index_in_old_toc = __search_index_in_subtitles(old_subtitles, index)

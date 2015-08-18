@@ -60,7 +60,7 @@ module Device::Ibooks
   end
 
   def get_epubdir_path_in_ibooks_container
-    list = Inventory.load("ibooks_epubdir_path_list", :local)
+    list = Inventory.load("ibooks_epubdir_path_list")
     if list[@toc_url]
       list[@toc_url]
     else
@@ -106,7 +106,7 @@ module Device::Ibooks
   end
 
   def regist_epubdir_path_to_setting(path)
-    list = Inventory.load("ibooks_epubdir_path_list", :local)
+    list = Inventory.load("ibooks_epubdir_path_list")
     list[@toc_url] = path
     list.save
   end

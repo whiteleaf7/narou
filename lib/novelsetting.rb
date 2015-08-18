@@ -101,7 +101,7 @@ class NovelSetting
   # { name: value, ... } 形式のハッシュとして返す
   #
   def self.load_settings_by_pattern(pattern)
-    res = Inventory.load("local_setting", :local).map { |name, value|
+    res = Inventory.load("local_setting").map { |name, value|
       if name =~ /^#{pattern}\.(.+)$/
         [$1, value]
       else

@@ -32,7 +32,7 @@ module Command
     def execute(argv)
       super
       if argv.empty?
-        latest_id = Inventory.load("latest_convert", :local)["id"]
+        latest_id = Inventory.load("latest_convert")["id"]
         if latest_id
           data = Downloader.get_data_by_target(latest_id)
           display_log(data["title"])

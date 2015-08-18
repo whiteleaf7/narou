@@ -10,9 +10,10 @@ require_relative "narou"
 # Narou.rbのシステムが記録するデータ単位
 #
 # .narou ディレクトリにYAMLファイルとして保存される
+# scope に :global を指定するとユーザーディレクトリ/.narousetting に保存される
 #
 module Inventory
-  def self.load(name, scope)
+  def self.load(name, scope = :local)
     @@cache ||= {}
     return @@cache[name] if @@cache[name]
     {}.tap { |h|

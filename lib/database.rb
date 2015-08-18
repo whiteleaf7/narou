@@ -52,7 +52,7 @@ class Database
   end
 
   def refresh
-    @database = Inventory.load(DATABASE_NAME, :local)
+    @database = Inventory.load(DATABASE_NAME)
   end
 
   #

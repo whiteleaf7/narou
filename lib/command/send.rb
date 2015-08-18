@@ -75,7 +75,7 @@ module Command
         exit Narou::EXIT_ERROR_CODE
       end
 
-      @options["hotentry"] = Inventory.load("local_setting", :local)["hotentry"]
+      @options["hotentry"] = Inventory.load("local_setting")["hotentry"]
       send_all = false
       titles = {}
       if argv.empty?

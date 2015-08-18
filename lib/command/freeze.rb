@@ -51,7 +51,7 @@ module Command
         return
       end
       tagname_to_ids(argv)
-      frozen_list = Inventory.load("freeze", :local)
+      frozen_list = Inventory.load("freeze")
       argv.each do |target|
         data = Downloader.get_data_by_target(target)
         unless data

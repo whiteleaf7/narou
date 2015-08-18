@@ -62,7 +62,7 @@ module CommandLine
   end
 
   def load_default_arguments(cmd)
-    default_arguments_list = Inventory.load("local_setting", :local)
+    default_arguments_list = Inventory.load("local_setting")
     (default_arguments_list["default_args.#{cmd}"] || "").split
   end
 
@@ -70,7 +70,7 @@ module CommandLine
   # 引数をスペース以外による区切り文字で展開する
   #
   def multiple_argument_extract(argv)
-    delimiter = Inventory.load("local_setting", :local)["multiple-delimiter"] || ","
+    delimiter = Inventory.load("local_setting")["multiple-delimiter"] || ","
     argv.map! { |arg|
       arg.split(delimiter)
     }.flatten!

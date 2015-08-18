@@ -635,7 +635,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/change_tag_color" do
     tag = params["tag"] or pass
     color = params["color"] or pass
-    tag_colors = Inventory.load("tag_colors", :local)
+    tag_colors = Inventory.load("tag_colors")
     tag_colors[tag] = color
     tag_colors.save
     @@push_server.send_all(:"table.reload")

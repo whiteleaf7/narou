@@ -38,7 +38,7 @@ module Command
     end
 
     def output_aliases_list
-      aliases = Inventory.load("alias", :local)
+      aliases = Inventory.load("alias")
       database = Database.instance
       aliases.each do |name, id|
         title = database[id]["title"] rescue "(すでに削除されています)"
@@ -52,7 +52,7 @@ module Command
         puts @opt.help
         return
       end
-      aliases = Inventory.load("alias", :local)
+      aliases = Inventory.load("alias")
       argv.each_with_index do |arg, i|
         Helper.print_horizontal_rule if i > 0
         alias_name, target = arg.split("=", 2)

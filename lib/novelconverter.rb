@@ -604,7 +604,7 @@ class NovelConverter
   #
   def update_latest_convert_novel
     id = Downloader.get_id_by_target(@novel_title)
-    Inventory.load("latest_convert", :local).tap { |inv|
+    Inventory.load("latest_convert").tap { |inv|
       inv["id"] = id
       inv.save
     }

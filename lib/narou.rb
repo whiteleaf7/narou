@@ -87,7 +87,7 @@ module Narou
   end
 
   def alias_to_id(target)
-    aliases = Inventory.load("alias", :local)
+    aliases = Inventory.load("alias")
     if aliases[target]
       return aliases[target]
     end
@@ -96,7 +96,7 @@ module Narou
 
   def novel_frozen?(target)
     id = Downloader.get_id_by_target(target) or return false
-    Inventory.load("freeze", :local).include?(id)
+    Inventory.load("freeze").include?(id)
   end
 
   def get_preset_dir
@@ -202,7 +202,7 @@ module Narou
   require_relative "device"
 
   def get_device(device_name = nil)
-    device_name = Inventory.load("local_setting", :local)["device"] unless device_name
+    device_name = Inventory.load("local_setting")["device"] unless device_name
     if device_name && Device.exists?(device_name)
       return Device.create(device_name)
     end
@@ -224,7 +224,7 @@ module Narou
   end
 
   def get_theme
-    Inventory.load("local_setting", :local)["theme"]
+    Inventory.load("local_setting")["theme"]
   end
 
   def get_theme_dir(name = nil)
@@ -240,7 +240,7 @@ module Narou
   memoize :get_theme_names
 
   def economy?(mode)
-    eco_modes = Inventory.load("local_setting", :local)["economy"].to_s.split(",").map(&:strip)
+    eco_modes = Inventory.load("local_setting")["economy"].to_s.split(",").map(&:strip)
     eco_modes.include?(mode)
   end
  end

@@ -134,7 +134,7 @@ module Command
       end
       flush_cache    # memoist のキャッシュ削除
 
-      inv = Inventory.load("local_setting", :local)
+      inv = Inventory.load("local_setting")
       @options["hotentry"] = inv["hotentry"]
       @options["hotentry.auto-mail"] = inv["hotentry.auto-mail"]
       hotentry = {}

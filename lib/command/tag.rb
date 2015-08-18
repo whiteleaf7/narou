@@ -203,7 +203,7 @@ module Command
     end
 
     def self.get_color(tagname)
-      tag_colors = Inventory.load("tag_colors", :local)
+      tag_colors = Inventory.load("tag_colors")
       color = tag_colors[tagname]
       return color if color
       last_color = tag_colors.values.last || COLORS.last
@@ -215,7 +215,7 @@ module Command
     end
 
     def set_color(tagname, color)
-      tag_colors = Inventory.load("tag_colors", :local)
+      tag_colors = Inventory.load("tag_colors")
       if @options["no-overwrite-color"]
         return if tag_colors.include?(tagname)
       end

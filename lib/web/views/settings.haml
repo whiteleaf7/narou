@@ -51,7 +51,7 @@
 
   .container.container-main.theme-showcase(role="main")
     .container-settings
-      - inventory = Inventory.load("local_setting", :local).merge(Inventory.load("global_setting", :global))
+      - inventory = Inventory.load("local_setting").merge(Inventory.load("global_setting", :global))
       - local_and_global_variables = @setting_variables[:local].merge(@setting_variables[:global])
       - tab_info = Command::Setting.get_setting_tab_info
       - error_tabs = @error_list.map { |name, _| local_and_global_variables[name][:tab] }.uniq
