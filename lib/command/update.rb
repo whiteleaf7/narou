@@ -241,6 +241,7 @@ module Command
     end
 
     def update_general_lastup(through_frozen_novel: true)
+      completed = false
       database = Database.instance
       puts "最新話掲載日を更新しています..."
       progressbar = ProgressBar.new(database.get_object.size - 1)
@@ -265,7 +266,7 @@ module Command
         else
           # 小説情報ページがない場合は目次から取得する
           begin
-            dates = get_latest_dates(setting)
+            dates = get_latest_dates(id)
           rescue OpenURI::HTTPError, Errno::ECONNRESET => e
             setting.clear
             next
@@ -275,8 +276,10 @@ module Command
         setting.clear
       end
       database.save_database
+      completed = true
+    ensure
       progressbar.clear
-      puts "更新が完了しました"
+      puts "更新が完了しました" if completed
     end
 
     # オンラインの目次からgeneral_lastupを取得する
