@@ -116,6 +116,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'sass', '~> 3.4', '>= 3.4.4'
   gem.add_runtime_dependency 'haml', '~> 4.0', '>= 4.0.5'
   gem.add_runtime_dependency 'memoist', '~> 0.11.0'
-  gem.add_runtime_dependency 'systemu', '~> 2.6.5'
+  gem.add_runtime_dependency 'systemu', '~> 2.6', '>= 2.6.5'
 end
 
