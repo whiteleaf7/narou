@@ -4,6 +4,7 @@
 #
 
 require "optparse"
+require_relative "web/worker"
 
 module Command
   class CommandBase

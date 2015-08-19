@@ -152,7 +152,7 @@ module Command
       end
     rescue Device::SendFailure, Interrupt
       puts "送信を中断しました"
-      exit Narou::EXIT_ERROR_CODE
+      exit Narou::EXIT_INTERRUPT
     end
 
     def process_backup_bookmark(device)

@@ -114,12 +114,12 @@ module Command
       super
       mistook_count = 0
       update_target_list = argv.dup
-      no_open = false
+      @options["no-open"] = false
       if update_target_list.empty?
         Database.instance.each_key do |id|
           update_target_list << id
         end
-        no_open = true
+        @options["no-open"] = true
       end
       tagname_to_ids(update_target_list)
 
@@ -138,6 +138,8 @@ module Command
       @options["hotentry"] = inv["hotentry"]
       @options["hotentry.auto-mail"] = inv["hotentry.auto-mail"]
       hotentry = {}
+
+      failure_list_last_time = get_failure_list_last_time
 
       update_log = $stdout.capture(quiet: false) do
         sort_by_key(sort_key, update_target_list).each_with_index do |target, i|
@@ -173,8 +175,18 @@ module Command
             unless @options["no-convert"] ||
                    (@options["convert-only-new-arrival"] && !result.new_arrivals)
               convert_argv = [target]
-              convert_argv << "--no-open" if no_open
-              Convert.execute!(convert_argv)
+              convert_argv << "--no-open" if @options["no-open"]
+              convert_status = Convert.execute!(convert_argv)
+              if convert_status > 0
+                # 変換が失敗したか、中断された
+                data["_convert_failure"] = true
+                # 中断された場合には残りのアップデートも中止する
+                raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
+              else
+                # 変換に成功した
+                data.delete["_convert_failure"]
+                failure_list_last_time.delete(data["id"])
+              end
             end
           when :failed
             puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
@@ -186,15 +198,18 @@ module Command
             puts "#{data["title"]} に更新はありません"
           end
         end
-      end
 
-      process_hotentry(hotentry)
-      save_log(update_log)
+        process_hotentry(hotentry)
+        convert_failure_last_time(failure_list_last_time)
+      end
 
       exit mistook_count if mistook_count > 0
     rescue Interrupt
       puts "アップデートを中断しました"
-      exit Narou::EXIT_ERROR_CODE
+      exit Narou::EXIT_INTERRUPT
+    ensure
+      save_log(update_log)
+      Database.instance.save_database
     end
 
     def get_log_paths
@@ -278,7 +293,7 @@ module Command
       database.save_database
       completed = true
     ensure
-      progressbar.clear
+      progressbar.clear if progressbar
       puts "更新が完了しました" if completed
     end
 
@@ -325,25 +340,28 @@ module Command
       progressbar = ProgressBar.new(subtitles_size)
       total_progress = 0
 
-      hotentry.each do |id, subtitles|
-        setting = NovelSetting.load(id, ignore_force, ignore_default)
-        setting.enable_illust = false   # 挿絵はパス解決が煩雑なので強制無効
-        novel_converter = NovelConverter.new(setting, output_filename,
-                                             display_inspector, Update.hotentry_dirname)
-        last_num = 0
-        novel_converter.on(:"convert_main.loop") do |i|
-          progressbar.output(total_progress + i)
-          last_num = i
-        end
-        converted_text_array << {
-          setting: setting,
-          text: novel_converter.convert_main_for_novel(subtitles, true)
-        }
-        use_dakuten_font |= novel_converter.use_dakuten_font
+      begin
+        hotentry.each do |id, subtitles|
+          setting = NovelSetting.load(id, ignore_force, ignore_default)
+          setting.enable_illust = false   # 挿絵はパス解決が煩雑なので強制無効
+          novel_converter = NovelConverter.new(setting, output_filename,
+                                               display_inspector, Update.hotentry_dirname)
+          last_num = 0
+          novel_converter.on(:"convert_main.loop") do |i|
+            progressbar.output(total_progress + i)
+            last_num = i
+          end
+          converted_text_array << {
+            setting: setting,
+            text: novel_converter.convert_main_for_novel(subtitles, true)
+          }
+          use_dakuten_font |= novel_converter.use_dakuten_font
 
-        total_progress += last_num + 1
+          total_progress += last_num + 1
+        end
+      ensure
+        progressbar.clear
       end
-      progressbar.clear
       puts "縦書用の変換が終了しました"
 
       device = Narou.get_device
@@ -399,6 +417,35 @@ module Command
     def self.get_newest_hotentry_file_path(device)
       pattern = File.join(Update.hotentry_dirname, "hotentry_*#{device.ebook_file_ext}")
       Dir.glob(pattern).sort.last
+    end
+
+    def get_failure_list_last_time
+      list = []
+      Database.instance.each do |id, data|
+        list << id if data["_convert_failure"]
+      end
+      list
+    end
+
+    #
+    # 前回のアップデート時に変換に失敗した小説を再度変換する
+    #
+    def convert_failure_last_time(id_list)
+      return if @options["no-convert"] || id_list.empty?
+      db = Database.instance
+      puts "<yellow>前回のアップデート時に変換出来なかった小説を変換します</yellow>".termcolor
+      id_list.each do |id|
+        convert_argv = [id]
+        convert_argv << "--no-open" if @options["no-open"]
+        convert_status = Convert.execute!(convert_argv)
+        if convert_status > 0
+          # 変換に失敗したか、中断した場合はその後の変換は全てスキップ
+          break
+        else
+          # 変換に成功したら失敗フラグは削除
+          db.get_data("id", id).delete("_convert_failure")
+        end
+      end
     end
   end
 end

@@ -136,7 +136,14 @@ module Command
           next
         end
         unless @options["no-convert"]
-          Convert.execute!([download_target])
+          convert_status = Convert.execute!([download_target])
+          if convert_status > 0
+            # 変換に失敗したか、中断された
+            data = Downloader.get_data_by_target(download_target)   # 新規はDL後に取得しないとデータが存在しない
+            data["_convert_failure"] = true
+            # 中断された場合には残りのダウンロードも中止する
+            raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
+          end
         end
         if @options["freeze"]
           Freeze.execute!([download_target])
@@ -146,6 +153,11 @@ module Command
         end
       end
       exit mistook_count if mistook_count > 0
+    rescue Interrupt
+      puts "ダウンロードを中断しました"
+      exit Narou::EXIT_INTERRUPT
+    ensure
+      Database.instance.save_database
     end
 
     def self.oneline_help

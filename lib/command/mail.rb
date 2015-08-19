@@ -111,7 +111,7 @@ module Command
       end
     rescue Interrupt
       puts "メール送信を中断しました"
-      exit Narou::EXIT_ERROR_CODE
+      exit Narou::EXIT_INTERRUPT
     ensure
       database.save_database if database
     end

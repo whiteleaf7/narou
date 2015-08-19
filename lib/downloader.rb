@@ -413,8 +413,7 @@ class Downloader
           end
         rescue Interrupt
           remove_cache_dir
-          @stream.puts "ダウンロードを中断しました"
-          exit Narou::EXIT_ERROR_CODE
+          raise
         end
         update_database
         :ok

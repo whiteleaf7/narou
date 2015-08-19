@@ -5,6 +5,7 @@
 
 require "open3"
 require "time"
+require "systemu"
 
 #
 # 雑多なお助けメソッド群
@@ -308,6 +309,8 @@ module Helper
   #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #
+  # 返り値：[標準出力のキャプチャ, 標準エラーのキャプチャ, Process::Status]
+  #
   # response = Helper::AsyncCommand.exec("処理に時間がかかる外部コマンド") do
   #   print "*"
   # end
@@ -317,30 +320,33 @@ module Helper
   #
   class AsyncCommand
     def self.exec(command, sleep_time = 0.5, &block)
-      Thread.new {
+      looper = Thread.new do
         loop do
           block.call if block
           sleep(sleep_time)
         end
-      }.tap { |th|
-        begin
-          if Helper.engine_jruby?
-            # MEMO:
-            #   Open3.capture3 - 全く動かない
-            #   `` バッククウォート - 出力が文字化けする
-            res = Open3.popen3(command) { |i, o, e|
-              i.close
-              `cd`   # create dummy Process::Status object to $?
-              [o.read, e.read, $?]
-            }
-          else
-            res = Open3.capture3(command)
-          end
-        ensure
-          th.kill
-        end
-        return res
-      }
+      end
+      _pid = nil
+      status, stdout, stderr = systemu(command) do |pid|
+        _pid = pid
+        looper.join
+      end
+      if Helper.os_windows?
+        stdout.force_encoding(Encoding::Windows_31J).encode(Encoding::UTF_8)
+        stderr.force_encoding(Encoding::Windows_31J).encode(Encoding::UTF_8)
+      else
+        stdout.force_encoding(Encoding::UTF_8)
+        stderr.force_encoding(Encoding::UTF_8)
+      end
+      return [stdout, stderr, status]
+    rescue Interrupt
+      if _pid
+        Process.kill 9, _pid
+        Process.waitpid _pid    # 死亡確認しないとゾンビ化する
+      end
+      raise
+    ensure
+      looper.kill
     end
   end
 

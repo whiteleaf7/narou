@@ -220,9 +220,8 @@ module Command
         end
       end
     rescue Interrupt
-      puts
       puts "変換を中断しました"
-      exit Narou::EXIT_ERROR_CODE
+      exit Narou::EXIT_INTERRUPT
     end
 
     #

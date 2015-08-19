@@ -41,13 +41,32 @@ describe Narou::Worker do
       end
 
       it do
-        Thread.pass   # 確実にWorkerスレッドが実行されるように
+        # 確実にWorkerスレッドが実行されるように
+        Thread.pass
+        sleep 0.001
         expect(@result1).to be true
         expect(@result2).to be true
       end
     end
 
-    it do
+    it "canceling" do
+      @worker.stop
+      expect(@worker.canceled?).to be_falsey
+      _execute = false
+      expect(@worker.size).to be 0
+      @worker.push(&->{ _execute = true })
+      expect(@worker.size).to be 1
+      @worker.cancel
+      expect(@worker.canceled?).to be_truthy
+      @worker.start
+      Thread.pass
+      expect(@worker.running?).to be_truthy
+      expect(@worker.canceled?).to be_falsey
+      expect(_execute).to be false
+      expect(@worker.size).to be 0
+    end
+
+    it "stoping" do
       @worker.stop
       expect(@worker.running?).to be false
     end

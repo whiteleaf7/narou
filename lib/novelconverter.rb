@@ -376,10 +376,10 @@ class NovelConverter
       progressbar = ProgressBar.new(subtitles.size)
     end
     on(:"convert_main.loop") do |i|
-      progressbar.output(i)
+      progressbar.output(i) if progressbar
     end
     one(:"convert_main.finish") do
-      progressbar.clear
+      progressbar.clear if progressbar
     end
   end
 
@@ -557,9 +557,10 @@ class NovelConverter
       section["subtitle"] = @converter.convert(section["subtitle"], "subtitle")
       sections << section
     end
-    trigger(:"convert_main.finish")
     @use_dakuten_font = @converter.use_dakuten_font
     sections
+  ensure
+    trigger(:"convert_main.finish")
   end
 
   #

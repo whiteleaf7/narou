@@ -1307,6 +1307,7 @@ class ConverterBase
     end
     initialize_member_values
     convert_for_all_data(data)
+    progressbar = nil
     if @text_type == "textfile"
       # convert_for_all_data -> replace_narou_tag
       # で改行化を行わないと正確な改行数は分からない
@@ -1318,7 +1319,7 @@ class ConverterBase
       @write_fp.write(data)
     else
       @read_fp.each_with_index do |line, i|
-        progressbar.output(i) if @text_type == "textfile"
+        progressbar.output(i) if progressbar
         @request_skip_output_line = false
         zenkaku_rstrip(line)
         if @request_insert_blank_next_line
@@ -1375,8 +1376,11 @@ class ConverterBase
       data.replace(title_and_author + data)
     end
     data.rstrip!
-    progressbar.clear if @text_type == "textfile"
     @write_fp
+  ensure
+    if @text_type == "textfile" && progressbar
+      progressbar.clear
+    end
   end
 
   #

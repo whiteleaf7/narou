@@ -18,8 +18,9 @@ module Narou
   AOZORAEPUB3_DIR = "AozoraEpub3"
   PRESET_DIR = "preset"
   MISC_DIR = "misc"
-  EXIT_ERROR_CODE = 127
   GLOBAL_REPLACE_NAME = "replace.txt"
+  EXIT_ERROR_CODE = 127
+  EXIT_INTERRUPT = 126
 
   UPDATE_SORT_KEYS = {
     "id" => "ID", "last_update" => "更新日", "title" => "タイトル", "author" => "作者名",

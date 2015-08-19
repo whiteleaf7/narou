@@ -419,6 +419,10 @@ class Narou::AppServer < Sinatra::Base
     json json_objects
   end
 
+  post "/api/cancel" do
+    Narou::Worker.cancel
+  end
+
   post "/api/convert" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
