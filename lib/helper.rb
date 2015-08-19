@@ -331,18 +331,16 @@ module Helper
         _pid = pid
         looper.join
       end
-      if Helper.os_windows?
-        stdout.force_encoding(Encoding::Windows_31J).encode(Encoding::UTF_8)
-        stderr.force_encoding(Encoding::Windows_31J).encode(Encoding::UTF_8)
-      else
-        stdout.force_encoding(Encoding::UTF_8)
-        stderr.force_encoding(Encoding::UTF_8)
-      end
+      stdout.force_encoding(Encoding::UTF_8)
+      stderr.force_encoding(Encoding::UTF_8)
       return [stdout, stderr, status]
     rescue Interrupt
       if _pid
-        Process.kill 9, _pid
-        Process.waitpid _pid    # 死亡確認しないとゾンビ化する
+        begin
+          Process.kill 9, _pid
+          Process.waitpid _pid    # 死亡確認しないとゾンビ化する
+        rescue Errno::ESRCH
+        end
       end
       raise
     ensure
