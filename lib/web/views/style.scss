@@ -67,6 +67,10 @@ body {
   top: 100px;
 }
 
+button[disabled] {
+  cursor: default !important;
+}
+
 /*
  * プログレスバー
  */
