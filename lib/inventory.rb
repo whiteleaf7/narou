@@ -37,6 +37,7 @@ module Inventory
             raise "Unknown scope"
           end
     return nil unless dir
+    @mutex = Mutex.new
     @inventory_file_path = File.join(dir, name + ".yaml")
     if File.exist?(@inventory_file_path)
       self.merge!(Helper::CacheLoader.memo(@inventory_file_path) { |yaml|
@@ -49,7 +50,9 @@ module Inventory
     unless @inventory_file_path
       raise "not initialized setting dir yet"
     end
-    File.write(@inventory_file_path, YAML.dump(self))
+    @mutex.synchronize do
+      File.write(@inventory_file_path, YAML.dump(self))
+    end
   end
 end
 
