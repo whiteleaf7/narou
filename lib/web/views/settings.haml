@@ -120,7 +120,11 @@
                       - when :select
                         %div.input-style
                           %select{name: name, class: "selectpicker show-tick"}
-                            %option(value="") 未設定
+                            %option(value="")
+                              - if name == "theme"
+                                デフォルト
+                              - else
+                                未設定
                             - value[:select_keys].each_with_index do |key, index|
                               %option{selected: item == key, value: key}
                                 = value[:select_summaries][index]
