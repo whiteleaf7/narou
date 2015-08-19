@@ -281,6 +281,7 @@ class NovelConverter
     clean_up_file_list = []
 
     return false if options[:no_epub]
+    clean_up_file_list << txt_path unless options[:no_cleanup_txt]
     # epub
     status = NovelConverter.txt_to_epub(txt_path, options[:use_dakuten_font],
                                         options[:dst_dir], device, options[:verbose])
@@ -291,7 +292,6 @@ class NovelConverter
       epub_ext = ".epub"
     end
     epub_path = txt_path.sub(/.txt$/, epub_ext)
-    clean_up_file_list << txt_path unless options[:no_cleanup_txt]
 
     if !device || !device.kindle? || options[:no_mobi]
       puts File.basename(epub_path) + " を出力しました"
@@ -299,11 +299,11 @@ class NovelConverter
       return epub_path
     end
 
+    clean_up_file_list << epub_path
     # mobi
     status = NovelConverter.epub_to_mobi(epub_path, options[:verbose])
     return nil if status != :success
     mobi_path = epub_path.sub(/\.epub$/, device.ebook_file_ext)
-    clean_up_file_list << epub_path
 
     # strip
     unless options[:no_strip]
