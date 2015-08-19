@@ -433,6 +433,7 @@ module Command
     def convert_failure_last_time(id_list)
       return if @options["no-convert"] || id_list.empty?
       db = Database.instance
+      Helper.print_horizontal_rule
       puts "<yellow>前回のアップデート時に変換出来なかった小説を変換します</yellow>".termcolor
       id_list.each do |id|
         convert_argv = [id]
@@ -445,6 +446,7 @@ module Command
           # 変換に成功したら失敗フラグは削除
           db.get_data("id", id).delete("_convert_failure")
         end
+        Helper.print_horizontal_rule
       end
     end
   end
