@@ -80,7 +80,7 @@
         $("#link-drop-cover")
           .on("dragover", function(e) {
             e.preventDefault();
-            e.dataTransfer.dropEffect = "link";
+            e.dataTransfer.dropEffect = "copy";
             return false;
           })
           .on("dragleave", function(e) {
