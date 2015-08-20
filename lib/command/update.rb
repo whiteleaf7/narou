@@ -184,7 +184,7 @@ module Command
                 raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
               else
                 # 変換に成功した
-                data.delete["_convert_failure"]
+                data.delete("_convert_failure")
                 failure_list_last_time.delete(data["id"])
               end
             end
