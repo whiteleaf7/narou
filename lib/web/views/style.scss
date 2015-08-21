@@ -1009,6 +1009,7 @@ $console-color: white;
   height: 150px;
   border: 4px dashed lightgray;
   color: lightgray;
+  transition: border-color 0.4s ease, background-color 0.4s ease, color 0.4s ease;
 
   &.dragover {
     border: 4px dashed #ada;
