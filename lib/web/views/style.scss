@@ -75,7 +75,8 @@ button[disabled] {
  * プログレスバー
  */
 .progress-bar {
-  @include css3(transition-duration, 0);   // アニメーションを切る
+  // アニメーションを切る
+  @include css3(transition, none !important);
 }
 
 /*
