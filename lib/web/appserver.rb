@@ -653,10 +653,6 @@ class Narou::AppServer < Sinatra::Base
     Command::Csv.new.generate
   end
 
-  get "/api/csv/view/import" do
-    haml :csv_import, layout: false
-  end
-
   post "/api/csv/import" do
     files = params["files"] or pass
     csv = Command::Csv.new
@@ -684,6 +680,10 @@ class Narou::AppServer < Sinatra::Base
   # -------------------------------------------------------------------------------
   # 一部分に表示するためのHTMLを取得する
   # -------------------------------------------------------------------------------
+
+  get "/parts/csv_import" do
+    haml :"parts/csv_import", layout: false
+  end
 
   get "/parts/download_form" do
     haml :"parts/download_form", layout: false
