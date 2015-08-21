@@ -139,8 +139,6 @@ module Command
       @options["hotentry.auto-mail"] = inv["hotentry.auto-mail"]
       hotentry = {}
 
-      failure_list_last_time = get_failure_list_last_time
-
       update_log = $stdout.capture(quiet: false) do
         sort_by_key(sort_key, update_target_list).each_with_index do |target, i|
           display_message = nil
@@ -172,35 +170,41 @@ module Command
           result = downloader.start_download
           case result.status
           when :ok
-            unless @options["no-convert"] ||
-                   (@options["convert-only-new-arrival"] && !result.new_arrivals)
-              convert_argv = [target]
-              convert_argv << "--no-open" if @options["no-open"]
-              convert_status = Convert.execute!(convert_argv)
-              if convert_status > 0
-                # 変換が失敗したか、中断された
-                data["_convert_failure"] = true
-                # 中断された場合には残りのアップデートも中止する
-                raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
-              else
-                # 変換に成功した
-                data.delete("_convert_failure")
-                failure_list_last_time.delete(data["id"])
-              end
+            if @options["no-convert"] ||
+                 (@options["convert-only-new-arrival"] && !result.new_arrivals)
+              next
             end
           when :failed
             puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
             mistook_count += 1
+            next
           when :canceled
             puts "ID:#{data["id"]}　#{data["title"]} の更新はキャンセルされました"
             mistook_count += 1
+            next
           when :none
             puts "#{data["title"]} に更新はありません"
+            next unless data["_convert_failure"]
+          end
+
+          if data["_convert_failure"]
+            puts "<yellow>前回変換できなかったので再変換します</yellow>".termcolor
+          end
+          convert_argv = [target]
+          convert_argv << "--no-open" if @options["no-open"]
+          convert_status = Convert.execute!(convert_argv)
+          if convert_status > 0
+            # 変換が失敗したか、中断された
+            data["_convert_failure"] = true
+            # 中断された場合には残りのアップデートも中止する
+            raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
+          else
+            # 変換に成功した
+            data.delete("_convert_failure")
           end
         end
 
         process_hotentry(hotentry)
-        convert_failure_last_time(failure_list_last_time)
       end
 
       exit mistook_count if mistook_count > 0
@@ -417,37 +421,6 @@ module Command
     def self.get_newest_hotentry_file_path(device)
       pattern = File.join(Update.hotentry_dirname, "hotentry_*#{device.ebook_file_ext}")
       Dir.glob(pattern).sort.last
-    end
-
-    def get_failure_list_last_time
-      list = []
-      Database.instance.each do |id, data|
-        list << id if data["_convert_failure"]
-      end
-      list
-    end
-
-    #
-    # 前回のアップデート時に変換に失敗した小説を再度変換する
-    #
-    def convert_failure_last_time(id_list)
-      return if @options["no-convert"] || id_list.empty?
-      db = Database.instance
-      Helper.print_horizontal_rule
-      puts "<yellow>前回のアップデート時に変換出来なかった小説を変換します</yellow>".termcolor
-      id_list.each do |id|
-        convert_argv = [id]
-        convert_argv << "--no-open" if @options["no-open"]
-        convert_status = Convert.execute!(convert_argv)
-        if convert_status > 0
-          # 変換に失敗したか、中断した場合はその後の変換は全てスキップ
-          break
-        else
-          # 変換に成功したら失敗フラグは削除
-          db.get_data("id", id).delete("_convert_failure")
-        end
-        Helper.print_horizontal_rule
-      end
     end
   end
 end
