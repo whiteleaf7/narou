@@ -401,8 +401,7 @@ class Narou::AppServer < Sinatra::Base
           author: escape_html(data["author"]),
           sitename: data["sitename"],
           toc_url: %!<a href="#{escape_html(data["toc_url"])}" class="btn btn-default btn-xs" target="_blank" ! +
-                   %!data-toggle="tooltip" data-placement="top" title="#{data["toc_url"]}" ! +
-                   %!draggable="false" ondragstart="return false">! +
+                   %!data-toggle="tooltip" data-placement="top" title="#{data["toc_url"]}">! +
                    %!<span class="glyphicon glyphicon-link"></span></a>!,
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
           tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'),
@@ -674,6 +673,20 @@ class Narou::AppServer < Sinatra::Base
       @@push_server.send_all(:"table.reload")
     end
     redirect "/resources/images/dl_button1.gif"
+  end
+
+  get "/api/validate_url_regexp_list" do
+    json Downloader.load_settings.map { |setting|
+      "(#{setting["url"].gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\")})"
+    }
+  end
+
+  # -------------------------------------------------------------------------------
+  # 一部分に表示するためのHTMLを取得する
+  # -------------------------------------------------------------------------------
+
+  get "/parts/download_form" do
+    haml :"parts/download_form", layout: false
   end
 
   # -------------------------------------------------------------------------------

@@ -1,0 +1,89 @@
+:javascript
+  var $here = $("#download-link-drop-here");
+  var form_data = new FormData;
+  var dnd = new Narou.DragDrop;
+  var action = new Narou.Action(null);
+
+  var appendLinks = function(event) {
+    dnd.getLinkText(event, function(link) {
+      if (dnd.isValidNovelUrl(link)) {
+        action.download(link);
+      }
+      else {
+        $here.addClass("error").delay(1500).queue(function() {
+          $(this).removeClass("error").dequeue();
+        });
+      }
+    });
+  };
+
+  $("#download-link-drop-cover")
+    .on("dragenter", function(e) {
+      $here.addClass("dragover");
+    })
+    .on("dragover", function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+      return false;
+    })
+    .on("dragleave", function(e) {
+      $here.removeClass("dragover");
+    })
+    .on("drop", function(e) {
+      e.preventDefault();
+      $here.removeClass("dragover");
+      appendLinks(e);
+    });
+
+  $("#download-link-submit").on("click", function(e) {
+    var targets = $("#download-input").val();
+    $.post("/api/download", { targets: targets });
+  });
+
+:css
+  #download-link-drop-area {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+  #download-link-drop-here {
+    position: relative;
+    width: 100%;
+    height: 100px;
+    border: 4px dashed #ddd;
+    color: lightgray;
+    transition: border-color 0.4s ease, background-color 0.4s ease, color 0.4s ease;
+  }
+  #download-link-drop-here.dragover {
+    border-color: #ada;
+    background-color: #efe;
+    color: #5cb85c;
+  }
+  #download-link-drop-here.error {
+    border-color: #ebccd1;
+    background-color: #fff5f5;
+    color: #ebccc1;
+  }
+  #download-link-drop-here .inner {
+    position: absolute;
+    display: table;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+  #download-link-drop-here .inner > div {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+-# Downloadダイアログの「ダウンロード」ボタンから処理を移譲されてくる
+#download-link-submit.hidden
+
+%textarea#download-input.form-control(rows="4" placeholder="小説のURLを入力（複数入力する場合は半角スペースか改行で区切る）")
+
+#download-link-drop-area
+  #download-link-drop-here
+    .inner
+      %div ここにリンクかショートカットファイルをドラッグ
+    #download-link-drop-cover.drop-cover(effectAllowed="all")
