@@ -320,16 +320,23 @@ module Helper
   #
   class AsyncCommand
     def self.exec(command, sleep_time = 0.5, &block)
-      looper = Thread.new do
-        loop do
-          block.call if block
-          sleep(sleep_time)
-        end
-      end
+      looper = nil
       _pid = nil
       status, stdout, stderr = systemu(command) do |pid|
         _pid = pid
+        looper = Thread.new(pid) do |pid|
+          loop do
+            block.call if block
+            sleep(sleep_time)
+            if Narou::Worker.canceled?
+              Process.kill("KILL", pid)
+              Process.detach(pid)
+              break
+            end
+          end
+        end
         looper.join
+        looper = nil
       end
       stdout.force_encoding(Encoding::UTF_8)
       stderr.force_encoding(Encoding::UTF_8)
@@ -337,14 +344,14 @@ module Helper
     rescue Interrupt
       if _pid
         begin
-          Process.kill 9, _pid
-          Process.waitpid _pid    # 死亡確認しないとゾンビ化する
-        rescue Errno::ESRCH
+          Process.kill("KILL", _pid)
+          Process.detach(_pid)    # 死亡確認しないとゾンビ化する
+        rescue
         end
       end
       raise
     ensure
-      looper.kill
+      looper.kill if looper
     end
   end
 
