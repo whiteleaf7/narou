@@ -40,10 +40,14 @@ class ConverterBase
     @illustration = illustration
     @use_dakuten_font = false
     @output_text_dir = nil
-    initialize_member_values
+    reset_member_values
   end
 
-  def initialize_member_values
+  #
+  # .convert が実行されるたびに呼ばれるメンバ変数リセット用メソッド
+  # インスタンス作成時に一度だけ初期化したい場合は initialize で初期化する
+  #
+  def reset_member_values
     @request_insert_blank_next_line = false
     @request_skip_output_line = false
     @before_line = ""
@@ -1305,7 +1309,7 @@ class ConverterBase
     else
       data = io.read
     end
-    initialize_member_values
+    reset_member_values
     convert_for_all_data(data)
     progressbar = nil
     if @text_type == "textfile"
