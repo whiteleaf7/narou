@@ -2,7 +2,7 @@
 更新履歴 - ChangeLog
 ====================
 
-2.7.0 : master
+2.7.0 : 2015/08/23
 ------------------
 #### 追加機能
 - setting.ini に `enable_double_dash_to_image` を追加しました
