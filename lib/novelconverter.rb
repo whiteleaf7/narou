@@ -516,6 +516,8 @@ class NovelConverter
   #
   def convert_main_for_novel(subtitles = nil, is_hotentry = false)
     toc = Downloader.get_toc_data(@setting.archive_path)
+    subtitles ||= toc["subtitles"]
+    @converter.subtitles = subtitles
     toc["story"] = @converter.convert(toc["story"], "story")
     html = HTML.new
     html.strip_decoration_tag = @setting.enable_strip_decoration_tag
@@ -523,7 +525,6 @@ class NovelConverter
     html.set_illust_setting({current_url: site_setting["illust_current_url"],
                              grep_pattern: site_setting["illust_grep_pattern"]})
 
-    subtitles ||= toc["subtitles"]
     sections = subtitles_to_sections(subtitles, html)
     converted_text = create_novel_text_by_template(sections, toc, is_hotentry)
 
@@ -540,6 +541,7 @@ class NovelConverter
     trigger(:"convert_main.init", subtitles)
     subtitles.each_with_index do |subinfo, i|
       trigger(:"convert_main.loop", i)
+      @converter.current_index = i
       section = load_novel_section(subinfo, section_save_dir)
       if section["chapter"].length > 0
         section["chapter"] = @converter.convert(section["chapter"], "chapter")
