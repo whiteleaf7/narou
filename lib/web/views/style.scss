@@ -451,7 +451,8 @@ input::-ms-clear {
   background-color: #d9534f;
 }
 .label-white, .select-color-button .white {
-  background-color: #e3e3e3;
+  border: 1px solid #ddd;
+  background-color: white;
   color: #666;
 }
 
