@@ -799,6 +799,13 @@ class Downloader
       if old["chapter"] != latest["chapter"]
         next true
       end
+      # 前回ダウンロードしたはずの本文ファイルが存在するか
+      section_file_name = "#{index} #{old["file_subtitle"]}.yaml"
+      section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
+      unless File.exist?(File.join(get_novel_data_dir, section_file_relative_path))
+        # あるはずのファイルが存在しなかったので、再ダウンロードが必要
+        next true
+      end
       # 更新日チェック
       # subdate : 初稿投稿日
       # subupdate : 改稿日
@@ -812,8 +819,6 @@ class Downloader
       latest["download_time"] = old["download_time"]
       if strong_update
         latest_section_timestamp_ymd = __strdate_to_ymd(get_section_file_timestamp(old, latest))
-        section_file_name = "#{index} #{old["file_subtitle"]}.yaml"
-        section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
         different_check = lambda do
           latest_info_dummy = latest.dup
           latest_info_dummy["element"] = a_section_download(latest)

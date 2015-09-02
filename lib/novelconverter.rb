@@ -396,6 +396,10 @@ class NovelConverter
     file_subtitle = subtitle_info["file_subtitle"] || subtitle_info["subtitle"]   # 互換性維持のため
     path = File.join(section_save_dir, "#{subtitle_info["index"]} #{file_subtitle}.yaml")
     YAML.load_file(path)
+  rescue Errno::ENOENT => e
+    error "#{path} を見つけることが出来ませんでした。narou update #{@novel_id} を実行することで、" \
+          "削除されてしまったファイルを再ダウンロードすることが出来ます"
+    exit Narou::EXIT_ERROR_CODE
   end
 
   # is_hotentry を有効にすると、テンプレートで作成するテキストファイルに
