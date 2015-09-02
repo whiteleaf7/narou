@@ -10,8 +10,8 @@ if $debug
   require "sinatra/reloader"
   require "pry"
 end
-require "haml"
-require "sass"
+require "tilt/haml"
+require "tilt/sass"
 require_relative "../logger"
 require_relative "../commandline"
 require_relative "../inventory"
