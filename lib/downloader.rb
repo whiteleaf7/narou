@@ -136,7 +136,6 @@ class Downloader
   # target のIDを取得
   #
   def self.get_id_by_target(target)
-    target = Narou.alias_to_id(target)
     toc_url = get_toc_url(target) or return nil
     @@database.get_id("toc_url", toc_url)
   end
@@ -145,7 +144,6 @@ class Downloader
   # target からデータベースのデータを取得
   #
   def self.get_data_by_target(target)
-    target = Narou.alias_to_id(target)
     toc_url = get_toc_url(target) or return nil
     @@database.get_data("toc_url", toc_url)
   end
@@ -186,13 +184,11 @@ class Downloader
   end
 
   def self.novel_exists?(target)
-    target = Narou.alias_to_id(target)
     id = get_id_by_target(target) or return nil
     @@database.novel_exists?(id)
   end
 
   def self.remove_novel(target, with_file = false)
-    target = Narou.alias_to_id(target)
     data = get_data_by_target(target) or return nil
     data_dir = get_novel_data_dir_by_target(target)
     if with_file
