@@ -87,12 +87,17 @@ module Narou
     Database.init
   end
 
+  #
+  # target が alias だった場合はIDに変換する
+  #
+  # 全てのtarget照合系はこのメソッドを通過するので、ここで小文字にしてしまう
+  #
   def alias_to_id(target)
     aliases = Inventory.load("alias")
     if aliases[target]
       return aliases[target]
     end
-    target
+    target.kind_of?(Numeric) ? target : target.downcase
   end
 
   def novel_frozen?(target)
