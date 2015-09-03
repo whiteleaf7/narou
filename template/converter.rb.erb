@@ -13,14 +13,26 @@ converter "<%= file_title.gsub('"', '\"') %>" do
   # 各種変換処理がされる「前」の生データに対しての変換処理を記述
   def before(io, text_type)
     super
-    # io.string.gsub!("こんばんわ", "こんばんは")
     io
   end
 
   # 各種変換処理がされた「後」のデータに対しての変換処理を記述
   def after(io, text_type)
     super
-    # io.string.gsub!("百％", "１００％")
+
+    # サンプル１：ダブルダッシュで囲まれた部分を太字にする
+    # io.string.gsub!(/^(　――.+?――)$/, "［＃太字］\\1［＃太字終わり］")
+
+    # サンプル２：漢数字化したけど、特定の部分はアラビア数字にしたい場合
+    # io.string.gsub!(/([〇一二三四五六七八九]+)メートル/) do |match|
+    #   match.tr("〇一二三四五六七八九", "０１２３４５６７８９")
+    # end
+
+    # サンプル３：最新話以外の挿絵を削除する
+    # if @current_index < @subtitles.size - 1
+    #  io.string.gsub!(/［＃挿絵（.+?）入る］/, "")
+    # end
+
     io
   end
 end
