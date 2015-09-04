@@ -16,7 +16,7 @@
         <%- when "www.akatsuki-novels.com" -%>
           add_tail: "",
         <%- end -%>
-        url: '(<%= setting["url"].gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\\\\\") %>)'
+        url: new RegExp('(<%= setting["url"].gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\\\\\") %>)')
       }
       <%= i == Downloader.load_settings.length - 1 ? "" : "," %>
     <%- end -%>
@@ -125,7 +125,7 @@
   //for (var i = 0; i < 3; i++) {
     var link = links[i];
     var setting = site_settings[link.hostname];
-    if (setting && link.href.match(setting.url)) {
+    if (setting && link.href.toLowerCase().match(setting.url)) {
       var download_button = createButtonElement(RegExp.$1 + setting.add_tail);
       link.parentNode.insertBefore(download_button, link);
     }
