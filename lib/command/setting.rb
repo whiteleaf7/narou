@@ -337,7 +337,7 @@ module Command
           tab: :detail
         },
         "update.strong" => {
-          type: :boolean, help: "更新漏れが無い様に改稿日の分は必ずDLする",
+          type: :boolean, help: "改稿日当日の連続更新でも更新漏れが起きないように、中身もチェックして更新を検知する(やや処理が重くなる)",
           tab: :general
         },
         "update.logging" => {
