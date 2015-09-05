@@ -679,15 +679,15 @@ class Narou::AppServer < Sinatra::Base
   end
 
   # -------------------------------------------------------------------------------
-  # 一部分に表示するためのHTMLを取得する
+  # 一部分に表示するためのHTMLを取得する(パーシャル)
   # -------------------------------------------------------------------------------
 
-  get "/parts/csv_import" do
-    haml :"parts/csv_import", layout: false
+  get "/partial/csv_import" do
+    haml :"partial/csv_import", layout: false
   end
 
-  get "/parts/download_form" do
-    haml :"parts/download_form", layout: false
+  get "/partial/download_form" do
+    haml :"partial/download_form", layout: false
   end
 
   # -------------------------------------------------------------------------------
