@@ -1,11 +1,85 @@
+:javascript
+  $result = $("#result-of-version-checking");
+  $result.children("div").hide();
+  $result.children(".checking").show();
+
+  function getCurrentVersion() {
+    var dfd = jQuery.Deferred();
+    $.ajax({
+      type: "GET",
+      url: "/api/version/current.json",
+      dataType: "json",
+      success: function(json) {
+        $("#current-version").text(json.version);
+        dfd.resolve(json.version);
+      },
+      error: function() {
+        dfd.reject();
+      }
+    });
+    return dfd;
+  }
+
+  function getLatestVersion() {
+    var dfd = jQuery.Deferred();
+    $.ajax({
+      type: "GET",
+      url: "/api/version/latest.json",
+      dataType: "json",
+      success: function(json) {
+        $("#latest-version").text(json.version);
+        dfd.resolve(json.version);
+      },
+      error: function() {
+        dfd.reject();
+      }
+    });
+    return dfd;
+  }
+
+  $.when(
+    getCurrentVersion(),
+    getLatestVersion()
+  )
+  .done(function(current_version, latest_version) {
+    $result.children(".checking").hide();
+    if (latest_version > current_version) {
+      $("#latest-version").text(latest_version);
+      $result.children(".need-an-update").show();
+    }
+    else {
+      $result.children(".version-is-latest").show();
+    }
+  })
+  .fail(function() {
+    $result.children(".checking").hide();
+    $result.children(".error").show();
+  });
+
 %div(style="text-align:center")
   %h1
     %strong Narou.rb
   %div
-    Version #{@narourb_version}<br>
+    Version #{@narourb_version}
+  %div
     Copyright 2013 whiteleaf. All rights reserved.
-  .well.well-sm(style="font-size:80%")
+  #result-of-version-checking(style="margin-top:10px")
+    .checking
+      %span#version-checking-icon
+      %span(style="padding-left:23px")
+        アップデートを確認しています...
+    .version-is-latest
+      %span.glyphicon.glyphicon-thumbs-up.text-primary
+      Narou.rb は最新版です。
+    .need-an-update
+      %span.glyphicon.glyphicon-exclamation-sign.text-danger
+      新しいバージョン(<span id="latest-version"></span>)が見つかりました。<br>
+      <kbd>gem update narou</kbd> で更新出来ます。<br>
+      %a(href="https://github.com/whiteleaf7/narou#%E6%9B%B4%E6%96%B0%E5%B1%A5%E6%AD%B4---changelog" target="_blank")
+        更新履歴を確認する。
+    .error
+      %span.text-danger
+        バージョンの取得に失敗しました。
+  .well.well-sm(style="font-size:80%; margin-top: 10px")
     #{@ruby_version}<br>
     #{env["HTTP_USER_AGENT"]}
-
-

@@ -678,6 +678,16 @@ class Narou::AppServer < Sinatra::Base
     }
   end
 
+  get "/api/version/current.json" do
+    json({ version: ::Version })
+  end
+
+  get "/api/version/latest.json" do
+    open("https://rubygems.org/api/v1/versions/narou/latest.json?#{Time.now.to_i}") do |fp|
+      fp.read
+    end
+  end
+
   # -------------------------------------------------------------------------------
   # 一部分に表示するためのHTMLを取得する(パーシャル)
   # -------------------------------------------------------------------------------
