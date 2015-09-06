@@ -100,7 +100,7 @@ Gem::Specification.new do |gem|
   EOS
   gem.post_install_message = install_message.gsub("\t", "  ")
 
-  gem.required_ruby_version = ">=1.9.3"
+  gem.required_ruby_version = ">=2.1.0"
 
   gem.files         = `git ls-files`.split("\n") << Narou.create_git_commit_version
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
