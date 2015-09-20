@@ -683,7 +683,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   get "/api/version/latest.json" do
-    open("https://rubygems.org/api/v1/versions/narou/latest.json?#{Time.now.to_i}") do |fp|
+    open("http://rubygems.org/api/v1/versions/narou/latest.json?#{Time.now.to_i}") do |fp|
       fp.read
     end
   end
