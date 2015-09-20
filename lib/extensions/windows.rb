@@ -25,3 +25,14 @@ module WinAPI
   extern "long GetLastError()"
   extern "unsigned long _getch()"
 end
+
+require "tmpdir"
+
+# テンポラリディレクトリのパスにASCII以外が含まれていると、systemu が
+# エラーになる問題に対処するモンキーパッチ。
+# テンポラリディレクトリをユーザーディレクトリからシステムに切り替える
+if Dir.tmpdir !~ /\A[ -~]+\z/
+  def Dir.tmpdir
+    File.expand_path(File.join(ENV["SystemRoot"], "Temp"))
+  end
+end
