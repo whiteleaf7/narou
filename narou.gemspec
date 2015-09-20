@@ -74,5 +74,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'haml', '~> 4.0', '>= 4.0.7'
   gem.add_runtime_dependency 'memoist', '~> 0.11.0'
   gem.add_runtime_dependency 'systemu', '~> 2.6', '>= 2.6.5'
+  gem.add_runtime_dependency 'erubis', '~> 2.7'
 end
 
