@@ -376,7 +376,7 @@ class NovelSetting
       name: "title_date_format",
       type: :string,
       value: "(%-m/%-d)",
-      help: "enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照"
+      help: "enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照。Narou.rb専用の書式として $s (2170年まで残り何秒か)も使用可能"
     },
     {
       name: "title_date_align",
@@ -435,6 +435,12 @@ class NovelSetting
       type: :boolean,
       value: false,
       help: "２倍ダッシュ（――）を画像に差し替える。Kindleのデフォルトフォントみたいにダッシュが太くて気になる人用"
+    },
+    {
+      name: "enable_add_end_to_title",
+      type: :boolean,
+      value: false,
+      help: "完結済み小説のタイトルに(完結)と表示する"
     },
   ]
 
