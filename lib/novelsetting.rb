@@ -436,6 +436,12 @@ class NovelSetting
       value: false,
       help: "２倍ダッシュ（――）を画像に差し替える。Kindleのデフォルトフォントみたいにダッシュが太くて気になる人用"
     },
+    {
+      name: "enable_add_end_to_title",
+      type: :boolean,
+      value: false,
+      help: "完結済み小説のタイトルに(完結)と表示する"
+    },
   ]
 
   ORIGINAL_SETTINGS_KEY_INDEXES = {}.tap { |hash|

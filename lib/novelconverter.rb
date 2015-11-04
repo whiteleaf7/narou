@@ -428,9 +428,11 @@ class NovelConverter
       end
     end
     # タイトルに完結したかどうかを付加する
-    tags = data["tags"] || []
-    if tags.include?("end")
-      processed_title += " (完結)"
+    if @setting.enable_add_end_to_title
+      tags = data["tags"] || []
+      if tags.include?("end")
+        processed_title += " (完結)"
+      end
     end
     # タイトルがルビ化されてしまうのを抑制
     processed_title = processed_title.gsub("《", "※［＃始め二重山括弧］")
