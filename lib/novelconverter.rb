@@ -408,12 +408,19 @@ class NovelConverter
     cover_chuki = create_cover_chuki
     device = Narou.get_device
     setting = @setting
-    processed_title = toc["title"]
+    processed_title = decorate_title(toc["title"])
+    tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
+    Template.get(tempalte_name, binding, 1.1)
+  end
+
+  def decorate_title(title)
+    processed_title = title
     data = Database.instance.get_data("id", @novel_id)
     # タイトルに新着更新日を付加する
     if @setting.enable_add_date_to_title
       new_arrivals_date = data[@setting.title_date_target] || Time.now
-      date_str = new_arrivals_date.strftime(@setting.title_date_format)
+      reverse_time = (3153600000 - new_arrivals_date.to_i).to_s
+      date_str = new_arrivals_date.strftime(@setting.title_date_format).gsub("$s", reverse_time)
       if @setting.title_date_align == "left"
         processed_title = date_str + processed_title
       else  # right
@@ -421,15 +428,16 @@ class NovelConverter
       end
     end
     # タイトルに完結したかどうかを付加する
-    tags = data["tags"] || []
-    if tags.include?("end")
-      processed_title += " (完結)"
+    if @setting.enable_add_end_to_title
+      tags = data["tags"] || []
+      if tags.include?("end")
+        processed_title += " (完結)"
+      end
     end
     # タイトルがルビ化されてしまうのを抑制
     processed_title = processed_title.gsub("《", "※［＃始め二重山括弧］")
                                      .gsub("》", "※［＃終わり二重山括弧］")
-    tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
-    Template.get(tempalte_name, binding, 1.1)
+    processed_title
   end
 
   #
