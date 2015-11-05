@@ -442,6 +442,13 @@ class NovelSetting
       value: false,
       help: "完結済み小説のタイトルに(完結)と表示する"
     },
+    {
+      name: "cut_old_subtitles",
+      type: :integer,
+      value: 0,
+      help: "１話目から指定した話数分、変換の対象外にする。" \
+            "全話数分以上の数値を指定した場合、最新話だけ変換する"
+    },
   ]
 
   ORIGINAL_SETTINGS_KEY_INDEXES = {}.tap { |hash|

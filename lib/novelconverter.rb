@@ -551,7 +551,19 @@ class NovelConverter
     section_save_dir = Downloader.get_novel_section_save_dir(@setting.archive_path)
 
     trigger(:"convert_main.init", subtitles)
-    subtitles.each_with_index do |subinfo, i|
+
+    case cut_size = @setting.cut_old_subtitles
+    when 0
+      cut_subtitles = subtitles
+    when 1...subtitles.size
+      puts "#{cut_size}話分カットして変換します"
+      cut_subtitles = subtitles[cut_size..-1]
+    else
+      puts "最新話のみ変換します"
+      cut_subtitles = [subtitles[-1]]
+    end
+
+    cut_subtitles.each_with_index do |subinfo, i|
       trigger(:"convert_main.loop", i)
       @converter.current_index = i
       section = load_novel_section(subinfo, section_save_dir)
