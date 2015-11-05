@@ -528,7 +528,9 @@ class NovelConverter
   #
   def convert_main_for_novel(subtitles = nil, is_hotentry = false)
     toc = Downloader.get_toc_data(@setting.archive_path)
-    subtitles ||= toc["subtitles"]
+    unless subtitles
+      subtitles = cut_subtitles(toc["subtitles"])
+    end
     @converter.subtitles = subtitles
     toc["story"] = @converter.convert(toc["story"], "story")
     html = HTML.new
@@ -543,6 +545,20 @@ class NovelConverter
     converted_text
   end
 
+  def cut_subtitles(subtitles)
+    case cut_size = @setting.cut_old_subtitles
+    when 0
+      result = subtitles
+    when 1...subtitles.size
+      puts "#{cut_size}話分カットして変換します"
+      result = subtitles[cut_size..-1]
+    else
+      puts "最新話のみ変換します"
+      result = [subtitles[-1]]
+    end
+    result
+  end
+
   #
   # subtitle info から変換処理をする
   #
@@ -552,18 +568,7 @@ class NovelConverter
 
     trigger(:"convert_main.init", subtitles)
 
-    case cut_size = @setting.cut_old_subtitles
-    when 0
-      cut_subtitles = subtitles
-    when 1...subtitles.size
-      puts "#{cut_size}話分カットして変換します"
-      cut_subtitles = subtitles[cut_size..-1]
-    else
-      puts "最新話のみ変換します"
-      cut_subtitles = [subtitles[-1]]
-    end
-
-    cut_subtitles.each_with_index do |subinfo, i|
+    subtitles.each_with_index do |subinfo, i|
       trigger(:"convert_main.loop", i)
       @converter.current_index = i
       section = load_novel_section(subinfo, section_save_dir)
