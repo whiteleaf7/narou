@@ -456,6 +456,23 @@ class Downloader
     @setting.clear
   end
 
+  CHOICES = {
+    "1" => "このまま更新する",
+    "2" => "更新をキャンセル",
+    "3" => "更新をキャンセルして小説を凍結する",
+    "4" => "バックアップを作成する",
+    "5" => "最新のあらすじを表示する",
+    "6" => "小説ページをブラウザで開く",
+    "7" => "保存フォルダを開く",
+    default: "2"
+  }.freeze
+
+  def self.choices_to_string(width: 0)
+    CHOICES.dup.tap { |h| h.delete(:default) }.map { |key, summary|
+      "#{key.rjust(width)}: #{summary}"
+    }.join("\n")
+  end
+
   #
   # ダイジェスト化に関する処理
   #
@@ -475,18 +492,21 @@ class Downloader
 更新後の話数: #{latest_subtitles_count}
 
       EOS
-      choices = {
-        "1" => "このまま更新する",
-        "2" => "更新をキャンセル",
-        "3" => "更新をキャンセルして小説を凍結する",
-        "4" => "バックアップを作成する",
-        "5" => "最新のあらすじを表示する",
-        "6" => "小説ページをブラウザで開く",
-        "7" => "保存フォルダを開く",
-        default: "2"
-      }
+
+      auto_choices = Inventory.load("local_setting")["download.choices-of-digest-options"]
+      auto_choices &&= auto_choices.split(",")
+
       loop do
-        choice = Narou::Input.choose(title, message, choices)
+        if auto_choices
+          # 自動入力
+          choice = auto_choices.shift || CHOICES[:default]
+          puts title
+          puts message
+          puts self.class.choices_to_string
+          puts "> #{choice}"
+        else
+          choice = Narou::Input.choose(title, message, CHOICES)
+        end
         case choice
         when "1"
           return false

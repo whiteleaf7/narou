@@ -12,6 +12,10 @@
 - setting.ini に `cut_old_subtitles` という項目を追加しました。指定した話数分
   変換の対象外にすることで変換速度を上げることが出来ます。（カットした分栞が
   後ろにずれると思うので注意して下さい）
+- ダイジェスト化時の選択肢を自動で選んでくれる
+  `download.choices-of-digest-options` という設定を追加しました
+	+ `narou s download.choices-of-digest-options=4,1` のようにカンマ区切りで
+	  選択したい項目を順番に設定して下さい。詳細は `narou s` コマンドを参照
 
 #### 仕様変更
 - `enable_add_end_to_title` の追加に伴い、タイトルへの完結表示はデフォルトでは
