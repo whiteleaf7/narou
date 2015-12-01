@@ -24,7 +24,7 @@ error_message: 投稿者が削除、もしくは間違ったアドレスを指�
 # 本文取得設定
 
 body_pattern: |-
-  <font size=\+1>.+?</font><BR><BR>
+  <span style="font-size:120%">.+?</span><BR><BR>
   (?<body>.+?)
   (?:<div id=atogaki><BR><HR><BR>(?<postscript>.+?)</div>)?
 
