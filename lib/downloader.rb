@@ -888,6 +888,10 @@ class Downloader
     download_time
   end
 
+  def title_to_filename(title)
+    Helper.replace_filename_special_chars(Helper.truncate_path(title))
+  end
+
   #
   # 各話の情報を取得
   #
@@ -917,7 +921,7 @@ class Downloader
         "href" => @setting["href"],
         "chapter" => @setting["chapter"],
         "subtitle" => @setting["subtitle"].gsub("\n", ""),
-        "file_subtitle" => Helper.replace_filename_special_chars(@setting["subtitle"]),
+        "file_subtitle" => title_to_filename(@setting["subtitle"]),
         "subdate" => subdate,
         "subupdate" => @setting["subupdate"]
       }
@@ -934,7 +938,7 @@ class Downloader
       "href" => @setting.replace_group_values("href", "index" => "1"),
       "chapter" => "",
       "subtitle" => @setting["title"],
-      "file_subtitle" => Helper.replace_filename_special_chars(@setting["title"]),
+      "file_subtitle" => title_to_filename(@setting["title"]),
       "subdate" => info["general_firstup"],
       "subupdate" => info["novelupdated_at"]
     }

@@ -14,6 +14,7 @@ module Helper
   module_function
 
   HOST_OS = RbConfig::CONFIG["host_os"]
+  FILENAME_LENGTH_LIMIT = 40
 
   def os_windows?
     @@os_is_windows ||= HOST_OS =~ /mswin(?!ce)|mingw|bccwin/i
@@ -304,6 +305,23 @@ module Helper
                 end
     end
     result
+  end
+
+  #
+  # 長過ぎるファイルパスを詰める
+  # ファイル名部分のみを詰める。拡張子は維持する
+  #
+  def truncate_path(path, limit = FILENAME_LENGTH_LIMIT)
+    dirname = File.dirname(path)
+    extname = File.extname(path)
+    basename = File.basename(path, extname)
+    if basename.length > limit
+      basename = basename[0...limit]
+      dirname = nil if dirname == "."
+      [dirname, "#{basename}#{extname}"].compact.join("/")
+    else
+      path
+    end
   end
 
   #
