@@ -187,7 +187,7 @@ module Narou
     filename_to_ncode = Inventory.load("local_setting")["convert.filename-to-ncode"]
     if filename_to_ncode && novel_data["ncode"]
       serialized_domain = novel_data["domain"].to_s.gsub(".", "_")
-      %!#{serialized_domain}_#{novel_data["ncode"]}!
+      %!#{serialized_domain}_#{novel_data["ncode"]}#{ext}!
     else
       if filename_to_ncode
         puts "<yellow>ファイル名をNコードにするには一度以上小説を更新して下さい</yellow>".termcolor
