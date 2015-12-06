@@ -449,6 +449,14 @@ class NovelSetting
       help: "１話目から指定した話数分、変換の対象外にする。" \
             "全話数分以上の数値を指定した場合、最新話だけ変換する"
     },
+    {
+      name: "author_comment_style",
+      type: :select,
+      value: "css",
+      help: "作者コメント(前書き・後書き)の装飾方法を指定する。KoboやAdobe Digital Editionでは「CSSで装飾」にするとデザインが崩れるのでそれ以外を推奨。css:CSSで装飾、simple:シンプルに段落、plain:装飾しない",
+      select_keys: %w(css simple plain),
+      select_summaries: %w(CSSで装飾 シンプルに段落 装飾しない)
+    },
   ]
 
   ORIGINAL_SETTINGS_KEY_INDEXES = {}.tap { |hash|

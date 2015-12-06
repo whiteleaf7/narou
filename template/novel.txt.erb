@@ -31,14 +31,22 @@
 ［＃３字下げ］［＃中見出し］<%= section["subtitle"].rstrip %>［＃中見出し終わり］
 <% if section["element"]["introduction"] != "" -%>
 <% introduction, illust_chuki_array = Helper.extract_illust_chuki(section["element"]["introduction"]) -%>
-<% if device && device.kobo? -%>
-<%# koboだと前書き・後書き注記がうまくレイアウト出来ないため %>
+<% if setting.author_comment_style == "simple" -%>
 
 ［＃ここから８字下げ］
 ［＃ここから２段階小さな文字］
 <%= introduction %>
 ［＃ここで小さな文字終わり］
 ［＃ここで字下げ終わり］
+<% elsif setting.author_comment_style == "plain" -%>
+
+
+<%= introduction %>
+
+
+［＃区切り線］
+
+
 <% else -%>
 ［＃ここから前書き］
 <%= introduction %>
@@ -53,13 +61,20 @@
 <%= section["element"]["body"] %>
 <% if section["element"]["postscript"] != "" -%>
 <% postscript, illust_chuki_array = Helper.extract_illust_chuki(section["element"]["postscript"]) -%>
-<% if device && device.kobo? -%>
+<% if setting.author_comment_style == "simple" -%>
 
 ［＃ここから８字下げ］
 ［＃ここから２段階小さな文字］
 <%= postscript %>
 ［＃ここで小さな文字終わり］
 ［＃ここで字下げ終わり］
+<% elsif setting.author_comment_style == "plain" -%>
+
+
+［＃区切り線］
+
+
+<%= postscript %>
 <% else -%>
 ［＃ここから後書き］
 <%= postscript %>
