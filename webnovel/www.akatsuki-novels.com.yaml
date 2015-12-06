@@ -32,7 +32,7 @@ error_message: この小説は作者の諸事情により非公開にしてい�
 # ------------------------------------------------------------
 # 本文取得設定
 body_pattern: |-
-  </h2>(?:<div> </div><div><b>前書き</b></div><div class="body-novel">(?<introduction>.+?) </div><hr width="100%"><div> </div>)?<div class="body-novel">(?<body>.+?) </div>(?:<div> </div><hr width="100%"><div> </div><div><b>後書き</b></div><div class="body-novel">(?<postscript>.+?) </div>)?
+  </h2>(?:<div>&nbsp;</div><div><b>前書き</b></div><div class="body-novel">(?<introduction>.+?)&nbsp;</div><hr width="100%"><div>&nbsp;</div>)?<div class="body-novel">(?<body>.+?)&nbsp;</div>(?:<div>&nbsp;</div><hr width="100%"><div>&nbsp;</div><div><b>後書き</b></div><div class="body-novel">(?<postscript>.+?)&nbsp;</div>)?
 
 introduction_pattern: null
 postscript_pattern: null
