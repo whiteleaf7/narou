@@ -414,12 +414,20 @@ class NovelConverter
     Template.get(tempalte_name, binding, 1.1)
   end
 
+  #
+  # 2045年くらいまでの残り時間を10分単位の36進数で取得する
+  # hyff のような文字列が取得可能
+  #
+  def calc_reverse_short_time(time)
+    ((2396736000 - time.to_i) / (10 * 60)).to_s(36).rjust(4, "0")
+  end
+
   def decorate_title(title)
     processed_title = title
     # タイトルに新着更新日を付加する
     if @setting.enable_add_date_to_title
       new_arrivals_date = @data[@setting.title_date_target] || Time.now
-      reverse_time = (3153600000 - new_arrivals_date.to_i).to_s
+      reverse_time = calc_reverse_short_time
       date_str = new_arrivals_date.strftime(@setting.title_date_format).gsub("$s", reverse_time)
       if @setting.title_date_align == "left"
         processed_title = date_str + processed_title
