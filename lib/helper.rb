@@ -14,7 +14,7 @@ module Helper
   module_function
 
   HOST_OS = RbConfig::CONFIG["host_os"]
-  FILENAME_LENGTH_LIMIT = 40
+  FILENAME_LENGTH_LIMIT = 50
 
   def os_windows?
     @@os_is_windows ||= HOST_OS =~ /mswin(?!ce)|mingw|bccwin/i

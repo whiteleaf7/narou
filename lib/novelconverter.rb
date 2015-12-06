@@ -343,6 +343,7 @@ class NovelConverter
     @use_dakuten_font = false
     @converter = create_converter
     @converter.output_text_dir = output_text_dir
+    @data = @novel_id ? Database.instance.get_data("id", @novel_id) : {}
   end
 
   #
@@ -415,10 +416,9 @@ class NovelConverter
 
   def decorate_title(title)
     processed_title = title
-    data = Database.instance.get_data("id", @novel_id)
     # タイトルに新着更新日を付加する
     if @setting.enable_add_date_to_title
-      new_arrivals_date = data[@setting.title_date_target] || Time.now
+      new_arrivals_date = @data[@setting.title_date_target] || Time.now
       reverse_time = (3153600000 - new_arrivals_date.to_i).to_s
       date_str = new_arrivals_date.strftime(@setting.title_date_format).gsub("$s", reverse_time)
       if @setting.title_date_align == "left"
@@ -429,7 +429,7 @@ class NovelConverter
     end
     # タイトルに完結したかどうかを付加する
     if @setting.enable_add_end_to_title
-      tags = data["tags"] || []
+      tags = @data["tags"] || []
       if tags.include?("end")
         processed_title += " (完結)"
       end
@@ -490,8 +490,13 @@ class NovelConverter
     else
       if is_text_file_mode
         info = get_title_and_author_by_text(converted_text)
+        info["ncode"] = info["title"]
+        info["domain"] = "text"
       else
-        info = { "author" => @novel_author, "title" => @novel_title }
+        info = {
+          "author" => @novel_author, "title" => @novel_title,
+          "ncode" => @data["ncode"], "domain" => @data["domain"]
+        }
       end
       filename = Narou.create_novel_filename(info)
       output_path = File.join(@setting.archive_path, filename)

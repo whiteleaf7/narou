@@ -400,7 +400,11 @@ module Command
           tab: :general
         },
         "convert.copy-to-grouping" => {
-          type: :boolean, help: "copy-toで指定したフォルダの中で更にdevice毎にフォルダを振り分ける",
+          type: :boolean, help: "copy-toで指定したフォルダの中で更に端末毎にフォルダを振り分ける",
+          tab: :general
+        },
+        "convert.filename-to-ncode" => {
+          type: :boolean, help: "書籍ファイル名をNコードで出力する(ドメイン_Nコードの形式)",
           tab: :general
         },
         "download.interval" => {
