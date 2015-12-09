@@ -422,19 +422,38 @@ class NovelConverter
     ((2396736000 - time.to_i) / (10 * 60)).to_s(36).rjust(4, "0")
   end
 
-  def decorate_title(title)
-    processed_title = title
-    # タイトルに新着更新日を付加する
+  #
+  # タイトルに日付を付与する。
+  # 日付の種類は title_date_target で指定する
+  #
+  # strftime の書式の他に拡張書式として $s, $t をサポートする
+  # $s: 2045年くらいまでの残り時間を10分単位の36進数（4桁）
+  # $t: タイトル自身。書式の中で自由な位置にタイトルを埋め込める
+  #
+  # ※ $t を使用した場合、title_date_align を無視する
+  #
+  def add_date_to_title(title)
+    result = title
     if @setting.enable_add_date_to_title
       new_arrivals_date = @data[@setting.title_date_target] || Time.now
-      reverse_time = calc_reverse_short_time
+      reverse_time = calc_reverse_short_time(new_arrivals_date)
       date_str = new_arrivals_date.strftime(@setting.title_date_format).gsub("$s", reverse_time)
-      if @setting.title_date_align == "left"
-        processed_title = date_str + processed_title
-      else  # right
-        processed_title += date_str
+      if date_str.include?("$t")
+        # $t で任意の位置にタイトルを埋め込むために title_date_align は無視する
+        result = date_str.gsub("$t", title)
+      else
+        if @setting.title_date_align == "left"
+          result = date_str + result
+        else  # right
+          result = title + date_str
+        end
       end
     end
+    result
+  end
+
+  def decorate_title(title)
+    processed_title = add_date_to_title(title)
     # タイトルに完結したかどうかを付加する
     if @setting.enable_add_end_to_title
       tags = @data["tags"] || []

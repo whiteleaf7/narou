@@ -376,13 +376,13 @@ class NovelSetting
       name: "title_date_format",
       type: :string,
       value: "(%-m/%-d)",
-      help: "enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照。Narou.rb専用の書式として $s (2170年まで残り何秒か)も使用可能"
+      help: "enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照。Narou.rb専用の書式として $s (2045年までの残り時間(10分単位の4桁の36進数))、$t (小説のタイトル) も使用可能"
     },
     {
       name: "title_date_align",
       type: :select,
       value: "right",
-      help: "enable_add_date_to_title で付与する日付の位置。left(タイトルの前) か right(タイトルの後)",
+      help: "enable_add_date_to_title が有効な場合に付与される日付の位置。left(タイトルの前) か right(タイトルの後)。title_date_format で $t を使用した場合この設定は無視される",
       select_keys: %w(left right),
       select_summaries: %w(タイトルの前 タイトルの後)
     },
