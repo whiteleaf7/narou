@@ -270,5 +270,10 @@ module Narou
     eco_modes = Inventory.load("local_setting")["economy"].to_s.split(",").map(&:strip)
     eco_modes.include?(mode)
   end
+
+  def novel_type_text(type)
+    type == 2 ? "短編" : "連載"
+  end
+
  end
 end
