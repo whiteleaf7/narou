@@ -613,8 +613,6 @@ class Downloader
       "general_firstup" => info["general_firstup"],
       "novelupdated_at" => get_novelupdated_at,
       "general_lastup" => get_general_lastup,
-      "ncode" => @setting["ncode"],
-      "domain" => @setting["domain"],
     }
     if @@database[@id]
       @@database[@id].merge!(data)

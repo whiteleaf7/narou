@@ -183,15 +183,27 @@ module Narou
   end
   memoize :get_aozoraepub3_path
 
+  #
+  # 書籍ファイル名を生成する
+  # convert.filename-to-ncode を設定している場合に novel_data に ncode、domain を
+  # 設定しない場合は id カラムが必須
+  #
   def create_novel_filename(novel_data, ext = "")
     filename_to_ncode = Inventory.load("local_setting")["convert.filename-to-ncode"]
-    if filename_to_ncode && novel_data["ncode"]
-      serialized_domain = novel_data["domain"].to_s.gsub(".", "_")
-      %!#{serialized_domain}_#{novel_data["ncode"]}#{ext}!
-    else
-      if filename_to_ncode
-        puts "<yellow>ファイル名をNコードにするには一度以上小説を更新して下さい</yellow>".termcolor
+    if filename_to_ncode
+      ncode, domain = novel_data["ncode"], novel_data["domain"]
+      if !ncode || !domain
+        id = novel_data["id"]
+        unless id
+          raise ArgumentError, %!novel_data["id"] を設定して下さい!
+        end
+        site_setting = Downloader.get_sitesetting_by_target(id)
+        ncode = site_setting["ncode"]
+        domain = site_setting["domain"]
       end
+      serialized_domain = domain.to_s.gsub(".", "_")
+      %!#{serialized_domain}_#{ncode}#{ext}!
+    else
       author, title = %w(author title).map { |k|
         Helper.replace_filename_special_chars(novel_data[k], true)
       }

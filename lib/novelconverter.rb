@@ -521,8 +521,8 @@ class NovelConverter
         info["domain"] = "text"
       else
         info = {
-          "author" => @novel_author, "title" => @novel_title,
-          "ncode" => @data["ncode"], "domain" => @data["domain"]
+          "id" => @novel_id,
+          "author" => @novel_author, "title" => @novel_title
         }
       end
       filename = Narou.create_novel_filename(info)
