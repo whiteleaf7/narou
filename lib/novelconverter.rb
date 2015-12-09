@@ -427,20 +427,35 @@ class NovelConverter
   # 日付の種類は title_date_target で指定する
   #
   # strftime の書式の他に拡張書式として $s, $t をサポートする
-  # $s: 2045年くらいまでの残り時間を10分単位の36進数（4桁）
-  # $t: タイトル自身。書式の中で自由な位置にタイトルを埋め込める
+  # $s 2045年くらいまでの残り時間を10分単位の36進数（4桁）
+  # $t タイトル自身。書式の中で自由な位置にタイトルを埋め込める
+  # $ns 小説が掲載されているサイト名
+  # $nt 小説種別（短編 or 連載）
   #
   # ※ $t を使用した場合、title_date_align を無視する
   #
   def add_date_to_title(title)
     result = title
+
     if @setting.enable_add_date_to_title
       new_arrivals_date = @data[@setting.title_date_target] || Time.now
-      reverse_time = calc_reverse_short_time(new_arrivals_date)
-      date_str = new_arrivals_date.strftime(@setting.title_date_format).gsub("$s", reverse_time)
-      if date_str.include?("$t")
+      special_format_chars = [
+        ["$s", calc_reverse_short_time(new_arrivals_date)],
+        ["$ns", @data["sitename"]],
+        ["$nt", Narou.novel_type_text(@data["novel_type"])],
+        ["$t", title]
+      ]
+
+      date_str = new_arrivals_date.strftime(@setting.title_date_format)
+      doller_t_included = date_str.include?("$t")
+
+      special_format_chars.each do |(symbol, replace_text)|
+        date_str.gsub!(symbol, replace_text)
+      end
+
+      if doller_t_included
         # $t で任意の位置にタイトルを埋め込むために title_date_align は無視する
-        result = date_str.gsub("$t", title)
+        result = date_str
       else
         if @setting.title_date_align == "left"
           result = date_str + result
@@ -521,8 +536,8 @@ class NovelConverter
         info["domain"] = "text"
       else
         info = {
-          "author" => @novel_author, "title" => @novel_title,
-          "ncode" => @data["ncode"], "domain" => @data["domain"]
+          "id" => @novel_id,
+          "author" => @novel_author, "title" => @novel_title
         }
       end
       filename = Narou.create_novel_filename(info)

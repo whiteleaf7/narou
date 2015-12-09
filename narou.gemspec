@@ -88,6 +88,18 @@ Gem::Specification.new do |gem|
 #### Bug Fix
 - 暁の小説で前書き・後書きがあった場合に正常に取得できなくなっていたのを修正
 
+
+2.8.1 : 2015/12/10
+------------------
+#### 追加機能
+- setting.ini の `title_date_format` に下記の拡張書式を追加しました
+	+ $ns : 小説が掲載されているサイト名
+	+ $nt : 小説種別（短編 or 連載）
+
+#### 仕様変更
+- `convert.filename-to-ncode` でファイル名をNコード化するのに、更新をしなくても
+  変換出来るようにしました
+
 #{"*" * 79}
   EOS
   gem.post_install_message = install_message.gsub("\t", "  ")
