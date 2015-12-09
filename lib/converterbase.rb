@@ -334,6 +334,7 @@ class ConverterBase
     convert_tatechuyoko(data)
     convert_novel_rule(data)
     convert_arrow(data)
+    convert_head_half_spaces(data)
   end
 
   #
@@ -414,6 +415,16 @@ class ConverterBase
     # Kindle PW でしか確認してないのでとりあえず device=kindle の場合のみ変換
     if @device && @device.kindle?
       data.tr!("⇒⇐", "→←")
+    end
+  end
+
+  #
+  # 間違えて行頭字下げに半角スペースを使ってるっぽいのを全角スペースにする
+  #
+  def convert_head_half_spaces(data)
+    data.gsub!(/^ +/) do |match|
+      # 半角スペースの数に応じて全角スペースの数も調整してみる
+      "　" * (match.count(" ") / 2.0).ceil
     end
   end
 

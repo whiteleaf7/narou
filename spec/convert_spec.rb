@@ -17,6 +17,8 @@ describe "convert" do
     test_text_dir = File.join(File.dirname(__FILE__), "data/convert_test")
     @pwd = Dir.pwd
     Dir.chdir(test_text_dir)
+
+    Inventory.load("local_setting")["convert.filename-to-ncode"] = false
   end
 
   after :all do

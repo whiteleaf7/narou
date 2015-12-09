@@ -400,7 +400,11 @@ module Command
           tab: :general
         },
         "convert.copy-to-grouping" => {
-          type: :boolean, help: "copy-toで指定したフォルダの中で更にdevice毎にフォルダを振り分ける",
+          type: :boolean, help: "copy-toで指定したフォルダの中で更に端末毎にフォルダを振り分ける",
+          tab: :general
+        },
+        "convert.filename-to-ncode" => {
+          type: :boolean, help: "書籍ファイル名をNコードで出力する(ドメイン_Nコードの形式)",
           tab: :general
         },
         "download.interval" => {
@@ -417,6 +421,14 @@ module Command
           type: :boolean,
           help: "小説を一定数ごとにサブフォルダへ分けて保存する\n" \
                 "      ※注意：小説を大量に同一フォルダに保存するとパフォーマンスが劣化する回避策",
+          tab: :detail
+        },
+        "download.choices-of-digest-options" => {
+          type: :string,
+          help: "ダイジェスト化選択肢が出た場合に、自動で項目を選択する。" \
+                "カンマ区切りで選択したい順番に数字で記入する。" \
+                "最終的に更新かキャンセルが選択されなかった場合はキャンセル扱いになる\n" \
+                "#{Downloader.choices_to_string(width: 27)}",
           tab: :detail
         },
         "send.without-freeze" => {

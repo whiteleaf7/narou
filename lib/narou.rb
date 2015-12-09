@@ -184,10 +184,19 @@ module Narou
   memoize :get_aozoraepub3_path
 
   def create_novel_filename(novel_data, ext = "")
-    author, title = %w(author title).map { |k|
-      Helper.replace_filename_special_chars(novel_data[k], true)
-    }
-    "[#{author}] #{title}#{ext}"
+    filename_to_ncode = Inventory.load("local_setting")["convert.filename-to-ncode"]
+    if filename_to_ncode && novel_data["ncode"]
+      serialized_domain = novel_data["domain"].to_s.gsub(".", "_")
+      %!#{serialized_domain}_#{novel_data["ncode"]}#{ext}!
+    else
+      if filename_to_ncode
+        puts "<yellow>ファイル名をNコードにするには一度以上小説を更新して下さい</yellow>".termcolor
+      end
+      author, title = %w(author title).map { |k|
+        Helper.replace_filename_special_chars(novel_data[k], true)
+      }
+      "[#{author}] #{title}#{ext}"
+    end
   end
 
   def get_mobi_path(target)

@@ -343,6 +343,7 @@ class NovelConverter
     @use_dakuten_font = false
     @converter = create_converter
     @converter.output_text_dir = output_text_dir
+    @data = @novel_id ? Database.instance.get_data("id", @novel_id) : {}
   end
 
   #
@@ -408,28 +409,62 @@ class NovelConverter
     cover_chuki = create_cover_chuki
     device = Narou.get_device
     setting = @setting
-    processed_title = toc["title"]
-    data = Database.instance.get_data("id", @novel_id)
-    # タイトルに新着更新日を付加する
+    processed_title = decorate_title(toc["title"])
+    tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
+    Template.get(tempalte_name, binding, 1.1)
+  end
+
+  #
+  # 2045年くらいまでの残り時間を10分単位の36進数で取得する
+  # hyff のような文字列が取得可能
+  #
+  def calc_reverse_short_time(time)
+    ((2396736000 - time.to_i) / (10 * 60)).to_s(36).rjust(4, "0")
+  end
+
+  #
+  # タイトルに日付を付与する。
+  # 日付の種類は title_date_target で指定する
+  #
+  # strftime の書式の他に拡張書式として $s, $t をサポートする
+  # $s: 2045年くらいまでの残り時間を10分単位の36進数（4桁）
+  # $t: タイトル自身。書式の中で自由な位置にタイトルを埋め込める
+  #
+  # ※ $t を使用した場合、title_date_align を無視する
+  #
+  def add_date_to_title(title)
+    result = title
     if @setting.enable_add_date_to_title
-      new_arrivals_date = data[@setting.title_date_target] || Time.now
-      date_str = new_arrivals_date.strftime(@setting.title_date_format)
-      if @setting.title_date_align == "left"
-        processed_title = date_str + processed_title
-      else  # right
-        processed_title += date_str
+      new_arrivals_date = @data[@setting.title_date_target] || Time.now
+      reverse_time = calc_reverse_short_time(new_arrivals_date)
+      date_str = new_arrivals_date.strftime(@setting.title_date_format).gsub("$s", reverse_time)
+      if date_str.include?("$t")
+        # $t で任意の位置にタイトルを埋め込むために title_date_align は無視する
+        result = date_str.gsub("$t", title)
+      else
+        if @setting.title_date_align == "left"
+          result = date_str + result
+        else  # right
+          result = title + date_str
+        end
       end
     end
+    result
+  end
+
+  def decorate_title(title)
+    processed_title = add_date_to_title(title)
     # タイトルに完結したかどうかを付加する
-    tags = data["tags"] || []
-    if tags.include?("end")
-      processed_title += " (完結)"
+    if @setting.enable_add_end_to_title
+      tags = @data["tags"] || []
+      if tags.include?("end")
+        processed_title += " (完結)"
+      end
     end
     # タイトルがルビ化されてしまうのを抑制
     processed_title = processed_title.gsub("《", "※［＃始め二重山括弧］")
                                      .gsub("》", "※［＃終わり二重山括弧］")
-    tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
-    Template.get(tempalte_name, binding, 1.1)
+    processed_title
   end
 
   #
@@ -482,8 +517,13 @@ class NovelConverter
     else
       if is_text_file_mode
         info = get_title_and_author_by_text(converted_text)
+        info["ncode"] = info["title"]
+        info["domain"] = "text"
       else
-        info = { "author" => @novel_author, "title" => @novel_title }
+        info = {
+          "author" => @novel_author, "title" => @novel_title,
+          "ncode" => @data["ncode"], "domain" => @data["domain"]
+        }
       end
       filename = Narou.create_novel_filename(info)
       output_path = File.join(@setting.archive_path, filename)
@@ -520,7 +560,9 @@ class NovelConverter
   #
   def convert_main_for_novel(subtitles = nil, is_hotentry = false)
     toc = Downloader.get_toc_data(@setting.archive_path)
-    subtitles ||= toc["subtitles"]
+    unless subtitles
+      subtitles = cut_subtitles(toc["subtitles"])
+    end
     @converter.subtitles = subtitles
     toc["story"] = @converter.convert(toc["story"], "story")
     html = HTML.new
@@ -535,6 +577,20 @@ class NovelConverter
     converted_text
   end
 
+  def cut_subtitles(subtitles)
+    case cut_size = @setting.cut_old_subtitles
+    when 0
+      result = subtitles
+    when 1...subtitles.size
+      puts "#{cut_size}話分カットして変換します"
+      result = subtitles[cut_size..-1]
+    else
+      puts "最新話のみ変換します"
+      result = [subtitles[-1]]
+    end
+    result
+  end
+
   #
   # subtitle info から変換処理をする
   #
@@ -543,6 +599,7 @@ class NovelConverter
     section_save_dir = Downloader.get_novel_section_save_dir(@setting.archive_path)
 
     trigger(:"convert_main.init", subtitles)
+
     subtitles.each_with_index do |subinfo, i|
       trigger(:"convert_main.loop", i)
       @converter.current_index = i

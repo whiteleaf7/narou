@@ -376,13 +376,13 @@ class NovelSetting
       name: "title_date_format",
       type: :string,
       value: "(%-m/%-d)",
-      help: "enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照"
+      help: "enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照。Narou.rb専用の書式として $s (2045年までの残り時間(10分単位の4桁の36進数))、$t (小説のタイトル) も使用可能"
     },
     {
       name: "title_date_align",
       type: :select,
       value: "right",
-      help: "enable_add_date_to_title で付与する日付の位置。left(タイトルの前) か right(タイトルの後)",
+      help: "enable_add_date_to_title が有効な場合に付与される日付の位置。left(タイトルの前) か right(タイトルの後)。title_date_format で $t を使用した場合この設定は無視される",
       select_keys: %w(left right),
       select_summaries: %w(タイトルの前 タイトルの後)
     },
@@ -435,6 +435,27 @@ class NovelSetting
       type: :boolean,
       value: false,
       help: "２倍ダッシュ（――）を画像に差し替える。Kindleのデフォルトフォントみたいにダッシュが太くて気になる人用"
+    },
+    {
+      name: "enable_add_end_to_title",
+      type: :boolean,
+      value: false,
+      help: "完結済み小説のタイトルに(完結)と表示する"
+    },
+    {
+      name: "cut_old_subtitles",
+      type: :integer,
+      value: 0,
+      help: "１話目から指定した話数分、変換の対象外にする。" \
+            "全話数分以上の数値を指定した場合、最新話だけ変換する"
+    },
+    {
+      name: "author_comment_style",
+      type: :select,
+      value: "css",
+      help: "作者コメント(前書き・後書き)の装飾方法を指定する。KoboやAdobe Digital Editionでは「CSSで装飾」にするとデザインが崩れるのでそれ以外を推奨。css:CSSで装飾、simple:シンプルに段落、plain:装飾しない",
+      select_keys: %w(css simple plain),
+      select_summaries: %w(CSSで装飾 シンプルに段落 装飾しない)
     },
   ]
 

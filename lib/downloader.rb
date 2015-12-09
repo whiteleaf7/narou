@@ -456,6 +456,23 @@ class Downloader
     @setting.clear
   end
 
+  CHOICES = {
+    "1" => "このまま更新する",
+    "2" => "更新をキャンセル",
+    "3" => "更新をキャンセルして小説を凍結する",
+    "4" => "バックアップを作成する",
+    "5" => "最新のあらすじを表示する",
+    "6" => "小説ページをブラウザで開く",
+    "7" => "保存フォルダを開く",
+    default: "2"
+  }.freeze
+
+  def self.choices_to_string(width: 0)
+    CHOICES.dup.tap { |h| h.delete(:default) }.map { |key, summary|
+      "#{key.rjust(width)}: #{summary}"
+    }.join("\n")
+  end
+
   #
   # ダイジェスト化に関する処理
   #
@@ -475,18 +492,21 @@ class Downloader
 更新後の話数: #{latest_subtitles_count}
 
       EOS
-      choices = {
-        "1" => "このまま更新する",
-        "2" => "更新をキャンセル",
-        "3" => "更新をキャンセルして小説を凍結する",
-        "4" => "バックアップを作成する",
-        "5" => "最新のあらすじを表示する",
-        "6" => "小説ページをブラウザで開く",
-        "7" => "保存フォルダを開く",
-        default: "2"
-      }
+
+      auto_choices = Inventory.load("local_setting")["download.choices-of-digest-options"]
+      auto_choices &&= auto_choices.split(",")
+
       loop do
-        choice = Narou::Input.choose(title, message, choices)
+        if auto_choices
+          # 自動入力
+          choice = auto_choices.shift || CHOICES[:default]
+          puts title
+          puts message
+          puts self.class.choices_to_string
+          puts "> #{choice}"
+        else
+          choice = Narou::Input.choose(title, message, CHOICES)
+        end
         case choice
         when "1"
           return false
@@ -593,6 +613,8 @@ class Downloader
       "general_firstup" => info["general_firstup"],
       "novelupdated_at" => get_novelupdated_at,
       "general_lastup" => get_general_lastup,
+      "ncode" => @setting["ncode"],
+      "domain" => @setting["domain"],
     }
     if @@database[@id]
       @@database[@id].merge!(data)
@@ -868,6 +890,10 @@ class Downloader
     download_time
   end
 
+  def title_to_filename(title)
+    Helper.replace_filename_special_chars(Helper.truncate_path(title))
+  end
+
   #
   # 各話の情報を取得
   #
@@ -897,7 +923,7 @@ class Downloader
         "href" => @setting["href"],
         "chapter" => @setting["chapter"],
         "subtitle" => @setting["subtitle"].gsub("\n", ""),
-        "file_subtitle" => Helper.replace_filename_special_chars(@setting["subtitle"]),
+        "file_subtitle" => title_to_filename(@setting["subtitle"]),
         "subdate" => subdate,
         "subupdate" => @setting["subupdate"]
       }
@@ -914,7 +940,7 @@ class Downloader
       "href" => @setting.replace_group_values("href", "index" => "1"),
       "chapter" => "",
       "subtitle" => @setting["title"],
-      "file_subtitle" => Helper.replace_filename_special_chars(@setting["title"]),
+      "file_subtitle" => title_to_filename(@setting["title"]),
       "subdate" => info["general_firstup"],
       "subupdate" => info["novelupdated_at"]
     }
