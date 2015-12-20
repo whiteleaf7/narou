@@ -6,6 +6,8 @@
     });
 
     var bookmarklet = function(d,e,u,o,s) {
+      u='#{request.scheme}://#{env["SERVER_NAME"]}:#{env["SERVER_PORT"]}'+
+        '/js/widget.js?mode=%MODE%&_='+Date.now();
       o=d.createElement("div");
       o.innerHTML="WEB UI Server: OFFLINE";
       o.id="narourb-offline";
@@ -21,8 +23,6 @@
         s.top=0
       },1000);
 
-      u='#{request.scheme}://#{env["SERVER_NAME"]}:#{env["SERVER_PORT"]}'+
-        '/js/widget.js?mode=%MODE%&t='+Date.now();
       e=d.createElement('script');
       e.charset='utf-8';
       e.src=u;
