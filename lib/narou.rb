@@ -275,5 +275,18 @@ module Narou
     type == 2 ? "短編" : "連載"
   end
 
+  #
+  # Narou.rb gem の最新バージョン番号を取得する
+  #
+  # rubygems公式APIによる取得は、WindowsでのSSL証明書問題で取得出来ない
+  # 環境があるため、gemコマンド経由で取得する
+  #
+  def latest_version
+    response = `gem search ^narou$`.split("\n")
+    if response.last =~ /\Anarou \((.+?)\)\z/
+      $1
+    end
+  end
+
  end
 end
