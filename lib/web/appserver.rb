@@ -108,6 +108,8 @@ class Narou::AppServer < Sinatra::Base
   register Sinatra::Reloader if $debug
   helpers Narou::ServerHelpers
 
+  @@request_reboot = false
+
   configure do
     set :app_file, __FILE__
     set :erb, trim: "-"
@@ -123,6 +125,18 @@ class Narou::AppServer < Sinatra::Base
 
   def self.push_server=(server)
     @@push_server = server
+  end
+
+  def self.push_server
+    @@push_server
+  end
+
+  def self.request_reboot
+    @@request_reboot = true
+  end
+
+  def self.request_reboot?
+    @@request_reboot
   end
 
   #
@@ -296,6 +310,12 @@ class Narou::AppServer < Sinatra::Base
   post "/shutdown" do
     self.class.quit!
     "シャットダウンしました。再起動するまで操作は出来ません"
+  end
+
+  post "/reboot" do
+    self.class.request_reboot
+    self.class.quit!
+    haml :_rebooting, layout: false
   end
 
   before "/novels/:id/*" do

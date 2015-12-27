@@ -21,6 +21,7 @@ module Narou
   GLOBAL_REPLACE_NAME = "replace.txt"
   EXIT_ERROR_CODE = 127
   EXIT_INTERRUPT = 126
+  EXIT_REQUEST_REBOOT = 125
 
   UPDATE_SORT_KEYS = {
     "id" => "ID", "last_update" => "更新日", "title" => "タイトル", "author" => "作者名",

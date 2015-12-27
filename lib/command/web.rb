@@ -69,7 +69,34 @@ module Command
     end
 
     def execute(argv)
-      super
+      if argv.delete("--boot")
+        @rebooted = !!argv.delete("--reboot")
+        super
+        boot
+      else
+        argv << "--backtrace" if $display_backtrace
+        argv << "--no-color" if $disable_color
+        argv << "--boot"
+        argv_copy = argv.dup
+        begin
+          loop do
+            if $development
+              system(*%W(ruby -x #{$0} web --boot), *argv)
+            else
+              system(*%w(narou web --boot), *argv)
+            end
+            break unless $?.exitstatus == Narou::EXIT_REQUEST_REBOOT
+            argv = argv_copy.dup
+            argv.push("--no-browser", "--reboot")
+          end
+        rescue Interrupt => e
+          # WEBrick が終了するまで少し待つ
+          sleep 2
+        end
+      end
+    end
+
+    def boot
       require_relative "../web/all"
       confirm_of_first
       params = Narou::AppServer.create_address(@options["port"])
@@ -83,18 +110,18 @@ module Command
       puts
 
       push_server.run
-      unless @options["no-browser"]
-        Thread.new do
-          sleep 0.2 until Narou::AppServer.running?
-          Helper.open_browser(address)
-        end
-      end
+      open_browser_when_server_boot(address)
+      send_rebooted_event_when_connection_recover(push_server)
+
       $stdout = Narou::StreamingLogger.new(push_server)
       ProgressBar.push_server = push_server
       Narou::AppServer.push_server = push_server
       Narou::Worker.instance.start
       Narou::AppServer.run!
       push_server.quit
+      if Narou::AppServer.request_reboot?
+        exit Narou::EXIT_REQUEST_REBOOT
+      end
     rescue Errno::EADDRINUSE => e
       Helper.open_browser(address) unless @options["no-browser"]
       STDOUT.puts <<-EOS
@@ -107,6 +134,29 @@ module Command
       EOS
       exit Narou::EXIT_ERROR_CODE
     end
+
+    def open_browser_when_server_boot(address)
+      return if @options["no-browser"]
+      Thread.new do
+        sleep 0.2 until Narou::AppServer.running?
+        Helper.open_browser(address)
+      end
+    end
+
+    def send_rebooted_event_when_connection_recover(push_server)
+      return unless @rebooted
+      Thread.new do |th|
+        timeout = Time.now + 20
+        # WebSocketのコネクションが回復するまで待つ
+        until push_server.connections.count != 0
+          sleep 0.2
+          th.kill if Time.now > timeout
+        end
+        puts "<yellow>再起動が完了しました。</yellow>".termcolor
+        push_server.send_all(:"server.rebooted")
+      end
+    end
+
   end
 end
 

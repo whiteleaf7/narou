@@ -1,0 +1,18 @@
+:javascript
+  var busy = $("#rebooting-busy");
+  busy.text(".");
+  setInterval(function() {
+    busy.text(busy.text() + ".");
+    if (busy.text().length == 6) {
+      busy.text(".");
+    }
+  }, 500);
+
+%p
+  サーバーを再起動しています<span id="rebooting-busy"></span>
+%p
+  再起動が完了したら自動的にページがリロードされます。
+%p
+  しばらく待ってもリロードされない場合は
+  %a(href="/") こちら
+  をクリックするかブラウザのリロードボタンを押してみてください。
