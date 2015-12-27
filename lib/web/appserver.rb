@@ -304,7 +304,7 @@ class Narou::AppServer < Sinatra::Base
   get "/about" do
     @narourb_version = settings.version
     @ruby_version = build_ruby_version
-    haml :about, layout: false
+    haml :_about, layout: false
   end
 
   post "/shutdown" do
@@ -548,7 +548,7 @@ class Narou::AppServer < Sinatra::Base
     target = params["target"] or return ""
     id = Downloader.get_id_by_target(target) or return ""
     @list = Command::Diff.new.get_diff_list(id)
-    haml :diff_list, layout: false
+    haml :_diff_list, layout: false
   end
 
   post "/api/diff_clean" do
