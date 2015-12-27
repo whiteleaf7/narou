@@ -31,14 +31,6 @@ require_relative "lib/commandline"
 
 rescue_level = $debug ? Exception : StandardError
 
-if !global["dismiss-notice"] && RUBY_VERSION < "2.1.0"
-  puts <<-EOS.termcolor
-<cyan><bold>[Notice]
-ご使用のRubyのバージョンが#{RUBY_VERSION}と古いままです。近い将来Ruby2.1.0以上を必須とする予定なので準備をお願いします
-このお知らせを消すには narou s dismiss-notice=true を実行して下さい</bold></cyan>
-  EOS
-end
-
 begin
   CommandLine.run(ARGV.map { |v| v.dup })
 rescue SystemExit => e
