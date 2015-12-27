@@ -1110,6 +1110,9 @@ class Downloader
         end
         sleep(WAITING_TIME_FOR_503)
         retry
+      elsif e.message =~ /^404/
+        @stream.error "#{url} がダウンロード出来ませんでした。時間をおいて再度試してみてください"
+        exit Narou::EXIT_ERROR_CODE
       else
         raise
       end
