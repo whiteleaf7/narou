@@ -6,9 +6,8 @@
 require "socket"
 require "sinatra/base"
 require "sinatra/json"
-if $debug
+if $development
   require "sinatra/reloader"
-  require "pry"
 end
 require "tilt/erubis"
 require "tilt/haml"

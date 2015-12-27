@@ -288,5 +288,11 @@ module Narou
     end
   end
 
+  def commit_version
+    cv_path = File.expand_path("commitversion", get_script_dir)
+    File.read(cv_path) if File.exist?(cv_path)
+  end
+  memoize :commit_version
+
  end
 end

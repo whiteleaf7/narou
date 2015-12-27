@@ -19,6 +19,13 @@ if ARGV.delete("--time")
 end
 
 require_relative "lib/inventory"
+
+$development = Narou.commit_version.!
+begin
+  require "pry" if $development
+rescue LoadError
+end
+
 global = Inventory.load("global_setting", :global)
 $display_backtrace = ARGV.delete("--backtrace")
 $display_backtrace ||= $debug
