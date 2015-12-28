@@ -81,9 +81,9 @@ module Command
         begin
           loop do
             if $development
-              system(*%W(ruby -x #{$0} web --boot), *argv)
+              system(RbConfig.ruby, "-x", $0, "web", *argv)
             else
-              system(*%w(narou web --boot), *argv)
+              system("narou", "web", *argv)
             end
             break unless $?.exitstatus == Narou::EXIT_REQUEST_REBOOT
             argv = argv_copy.dup
