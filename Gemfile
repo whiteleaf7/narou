@@ -8,4 +8,5 @@ gemspec
 gem "rspec"
 gem "rspec-core"
 gem "pry"
-
+gem "better_errors"
+gem "binding_of_caller"

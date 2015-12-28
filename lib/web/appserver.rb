@@ -6,9 +6,8 @@
 require "socket"
 require "sinatra/base"
 require "sinatra/json"
-if $development
-  require "sinatra/reloader"
-end
+require "sinatra/reloader" if $development
+require "better_errors" if $debug
 require "tilt/erubis"
 require "tilt/haml"
 require "tilt/sass"
@@ -105,7 +104,7 @@ module Narou::ServerHelpers
 end
 
 class Narou::AppServer < Sinatra::Base
-  register Sinatra::Reloader if $debug
+  register Sinatra::Reloader if $development
   helpers Narou::ServerHelpers
 
   @@request_reboot = false
@@ -120,7 +119,12 @@ class Narou::AppServer < Sinatra::Base
       Command::Version.create_version_string
     end
 
-    set :environment, :production unless $debug
+    set :environment, :production unless $development
+
+    if $debug
+      use BetterErrors::Middleware
+      BetterErrors.application_root = Narou.get_script_dir
+    end
   end
 
   def self.push_server=(server)
