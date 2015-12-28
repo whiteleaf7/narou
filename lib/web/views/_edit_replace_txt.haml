@@ -24,11 +24,11 @@
     $("[data-toggle=remove-tooltip]").tooltip(tooltip_opt);
   });
 
-#replace-panel.panel.panel-settings{ class: @replace_panel_var[:panel_class] }
+#replace-panel.panel.panel-settings{ class: replace_panel_var[:panel_class] }
   .panel-heading
-    = @replace_panel_var[:title]
-  .panel-body{ class: @replace_panel_var[:body_class] }
-    = @replace_panel_var[:body].join("<br>")
+    = replace_panel_var[:title]
+  .panel-body{ class: replace_panel_var[:body_class] }
+    = replace_panel_var[:body].join("<br>")
   .list-group
     .list-group-item.form-group
       .list-group-item-text
