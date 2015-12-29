@@ -434,7 +434,7 @@ class Narou::AppServer < Sinatra::Base
             tags.include?("end") ? "完結" : nil,
             tags.include?("404") ? "削除" : nil,
           ].compact.join(", "),
-          download: %!<a href="/novels/#{id}/download" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-book"></span></a>!,
+          download: %!<a href="/novels/#{id}/download" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-circle-arrow-down"></span></a>!,
           frozen: Narou.novel_frozen?(id),
           new_arrivals_date: data["new_arrivals_date"].tap { |m| break m.to_i if m },
           general_lastup: data["general_lastup"].tap { |m| break m.to_i if m }
