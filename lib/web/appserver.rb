@@ -11,6 +11,7 @@ require "better_errors" if $debug
 require "tilt/erubis"
 require "tilt/haml"
 require "tilt/sass"
+require "open3"
 require_relative "../logger"
 require_relative "../commandline"
 require_relative "../inventory"
@@ -108,6 +109,8 @@ class Narou::AppServer < Sinatra::Base
   helpers Narou::ServerHelpers
 
   @@request_reboot = false
+  @@already_update_system = false
+  @@gem_update_last_log = ""
 
   configure do
     set :app_file, __FILE__
@@ -320,6 +323,36 @@ class Narou::AppServer < Sinatra::Base
     self.class.request_reboot
     self.class.quit!
     haml :_rebooting, layout: false
+  end
+
+  post "/update_system" do
+    Thread.new do
+      buffer = "".dup
+      Open3.popen3("gem update --no-document narou") do |i, o, e, w|
+        i.close
+        o.each do |str|
+          buffer << str
+        end
+      end
+      @@gem_update_last_log = buffer.strip!
+      if buffer =~ /Nothing to update\z/
+        @@push_server.send_all("server.update.nothing" => buffer)
+      elsif buffer.include?("Gems updated: narou")
+        @@already_update_system = true
+        @@push_server.send_all("server.update.success" => buffer)
+      else
+        @@push_server.send_all("server.update.failure" => buffer)
+      end
+    end
+  end
+
+  post "/gem_update_last_log" do
+    content_type "text/plain"
+    @@gem_update_last_log
+  end
+
+  post "/check_already_update_system" do
+    json({ result: @@already_update_system })
   end
 
   before "/novels/:id/*" do

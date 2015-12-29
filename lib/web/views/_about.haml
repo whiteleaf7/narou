@@ -1,60 +1,148 @@
 :javascript
-  $result = $("#result-of-version-checking");
-  $result.children("div").hide();
-  $result.children(".checking").show();
+  +function() {
+    var action = new Narou.Action;
 
-  function getCurrentVersion() {
-    var dfd = jQuery.Deferred();
-    $.ajax({
-      type: "GET",
-      url: "/api/version/current.json",
-      dataType: "json",
-      success: function(json) {
-        $("#current-version").text(json.version);
-        dfd.resolve(json.version);
+    function getCurrentVersion() {
+      var dfd = jQuery.Deferred();
+      $.ajax({
+        type: "GET",
+        url: "/api/version/current.json",
+        dataType: "json",
+        success: function(json) {
+          $("#current-version").text(json.version);
+          dfd.resolve(json.version);
+        },
+        error: function() {
+          dfd.reject();
+        }
+      });
+      return dfd;
+    }
+
+    function getLatestVersion() {
+      var dfd = jQuery.Deferred();
+      $.ajax({
+        type: "GET",
+        url: "/api/version/latest.json",
+        dataType: "json",
+        success: function(json) {
+          $("#latest-version").text(json.version);
+          dfd.resolve(json.version);
+        },
+        error: function() {
+          dfd.reject();
+        }
+      });
+      return dfd;
+    }
+
+    function updateButtonHandler() {
+      var dfd = jQuery.Deferred();
+      $("#version-update-button").one("click", function(e) {
+        e.preventDefault();
+        $(this).hide();
+        $("#fail-update-system").hide();
+        dfd.resolve();
+      });
+      return dfd;
+    }
+
+    function callUpdateSystem() {
+      var dfd = jQuery.Deferred();
+      $("#version-updating").show();
+      $("#gem-result-log").hide();
+      action.updateSystem(function(result, log) {
+        $("#version-updating").hide();
+        $("#gem-result-log").text(log);
+        if (result == "success")
+          dfd.resolve();
+        else
+          dfd.reject(result);
+      });
+      return dfd;
+    }
+
+    function rebootButtonHandler() {
+      $("#gem-result-log").addClass("large").show();
+      $("#reboot-button")
+        .show()
+        .on("click", function(e) {
+          action.rebootDialog();
+        });
+    }
+
+    function failUpdateSystem(result) {
+      if (result == "failure") {
+        $("#fail-update-system").show();
+        $("#gem-result-log").show();
+        updateSysmteProcess();
+      }
+      else if (result == "nothing") {
+        $("#nothing-to-update").show();
+      }
+    }
+
+    function updateSysmteProcess() {
+      $("#version-update-button").show();
+      updateButtonHandler()
+      .then(callUpdateSystem)
+      .then(rebootButtonHandler)
+      .fail(failUpdateSystem);
+    }
+
+    $result = $("#result-of-version-checking");
+    $result.children("div").hide();
+
+    $("#version-update-button").hide();
+    $("#reboot-button").hide();
+    $("#version-updating").hide();
+    $("#fail-update-system").hide();
+    $("#nothing-to-update").hide();
+    $("#gem-result-log").hide();
+
+    action.checkUpdatedSystem({
+      // まだgemのアップデートは行われていないので、バージョンチェックからはじめる
+      not_updated: function() {
+        $result.children(".checking").show();
+
+        $.when(
+          getCurrentVersion(),
+          getLatestVersion()
+        )
+        .done(function(current_version, latest_version) {
+          $result.children(".checking").hide();
+          if (latest_version > current_version) {
+            $("#latest-version").text(latest_version);
+            $result.children(".need-an-update").show();
+          }
+          else {
+            $result.children(".version-is-latest").show();
+          }
+        })
+        .fail(function() {
+          $result.children(".checking").hide();
+          $result.children(".error").show();
+        });
+
+        updateSysmteProcess();
       },
-      error: function() {
-        dfd.reject();
+
+      // すでにgemをアップデート済みなので、再起動ボタンを最初から表示する
+      already_updated: function(log) {
+        $result.children(".need-an-update").show();
+        $("#latest-version-found").hide();
+        $("#reboot-button").show();
+        $("#gem-result-log").text(log);
+        rebootButtonHandler();
       }
     });
-    return dfd;
-  }
 
-  function getLatestVersion() {
-    var dfd = jQuery.Deferred();
-    $.ajax({
-      type: "GET",
-      url: "/api/version/latest.json",
-      dataType: "json",
-      success: function(json) {
-        $("#latest-version").text(json.version);
-        dfd.resolve(json.version);
-      },
-      error: function() {
-        dfd.reject();
-      }
-    });
-    return dfd;
-  }
+  }();
 
-  $.when(
-    getCurrentVersion(),
-    getLatestVersion()
-  )
-  .done(function(current_version, latest_version) {
-    $result.children(".checking").hide();
-    if (latest_version > current_version) {
-      $("#latest-version").text(latest_version);
-      $result.children(".need-an-update").show();
-    }
-    else {
-      $result.children(".version-is-latest").show();
-    }
-  })
-  .fail(function() {
-    $result.children(".checking").hide();
-    $result.children(".error").show();
-  });
+%div.link-to-changelog-in-about
+  %a.btn.btn-default.btn-sm(href="https://github.com/whiteleaf7/narou/blob/master/ChangeLog.md" target="_blank")
+    更新履歴
+    %span.glyphicon.glyphicon-new-window
 
 %div(style="text-align:center")
   %h1
@@ -65,21 +153,36 @@
     Copyright 2013 whiteleaf. All rights reserved.
   #result-of-version-checking(style="margin-top:10px")
     .checking
-      %span#version-checking-icon
-      %span(style="padding-left:23px")
-        アップデートを確認しています...
+      %span.rotate-progress
+        %span.icon
+        %span.text アップデートを確認しています...
     .version-is-latest
-      %span.glyphicon.glyphicon-thumbs-up.text-primary
-      Narou.rb は最新版です。
+      %p
+        %span.glyphicon.glyphicon-thumbs-up.text-primary
+        Narou.rb は最新版です。
     .need-an-update
-      %span.glyphicon.glyphicon-exclamation-sign.text-danger
-      新しいバージョン(<span id="latest-version"></span>)が見つかりました。<br>
-      <kbd>gem update narou</kbd> で更新出来ます。<br>
-      %a(href="https://github.com/whiteleaf7/narou#%E6%9B%B4%E6%96%B0%E5%B1%A5%E6%AD%B4---changelog" target="_blank")
-        更新履歴を確認する。
+      %p
+        %span#latest-version-found
+          %span.glyphicon.glyphicon-exclamation-sign.text-primary
+          新しいバージョン(<span id="latest-version"></span>)が見つかりました。<br>
+        %a#version-update-button.btn.btn-primary.btn-sm
+          %b Narou.rb を更新する
+        %span#version-updating
+          %span.rotate-progress
+            %span.icon
+            %span.text 更新しています。
+        %a#reboot-button.btn.btn-success.btn-sm
+          %b 再起動して更新を反映する
+        %span#nothing-to-update.text-success
+          Narou.rb はすでに最新版です。
+      %p#fail-update-system.text-danger
+        Narou.rb の更新に失敗しました。
     .error
       %span.text-danger
         最新バージョンの取得に失敗しました。
+
+  %pre#gem-result-log.log-box
+
   .well.well-sm(style="font-size:80%; margin-top: 10px")
     #{@ruby_version}<br>
     #{env["HTTP_USER_AGENT"]}
