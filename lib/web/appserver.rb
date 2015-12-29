@@ -11,7 +11,6 @@ require "better_errors" if $debug
 require "tilt/erubis"
 require "tilt/haml"
 require "tilt/sass"
-require "open3"
 require_relative "../logger"
 require_relative "../commandline"
 require_relative "../inventory"
@@ -327,13 +326,7 @@ class Narou::AppServer < Sinatra::Base
 
   post "/update_system" do
     Thread.new do
-      buffer = "".dup
-      Open3.popen3("gem update --no-document narou") do |i, o, e, w|
-        i.close
-        o.each do |str|
-          buffer << str
-        end
-      end
+      buffer = `gem update --no-document narou`
       @@gem_update_last_log = buffer.strip!
       if buffer =~ /Nothing to update\z/
         @@push_server.send_all("server.update.nothing" => buffer)
