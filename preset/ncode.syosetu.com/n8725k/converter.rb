@@ -9,7 +9,7 @@
 converter "n8725k ログ・ホライズン" do
   def before(io, element_type)
     super
-    io.string.gsub!("ルビ：", "")
+    io.string.gsub!(/ルビ[:：]/, "")
     io
   end
 
