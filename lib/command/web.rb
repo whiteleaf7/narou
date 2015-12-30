@@ -90,8 +90,9 @@ module Command
             argv.push("--no-browser", "--reboot")
           end
         rescue Interrupt => e
-          # WEBrick が終了するまで少し待つ
-          sleep 2
+          # 中断されてコンソールへの入力が可能になってから、WEBrick が終了するまで
+          # タイムラグがあって表示がごちゃまぜになるので、終わるのを少し待つ
+          sleep 3
         end
       end
     end
@@ -117,6 +118,8 @@ module Command
       ProgressBar.push_server = push_server
       Narou::AppServer.push_server = push_server
       Narou::Worker.instance.start
+      send_hello_message
+
       Narou::AppServer.run!
       push_server.quit
       if Narou::AppServer.request_reboot?
@@ -155,6 +158,10 @@ module Command
         puts "<yellow>再起動が完了しました。</yellow>".termcolor
         push_server.send_all(:"server.rebooted")
       end
+    end
+
+    def send_hello_message
+      puts "<white>Narou.rb version #{::Version}</white>".termcolor
     end
 
   end
