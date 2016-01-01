@@ -19,7 +19,7 @@ module Narou
     attr_reader :accepted_domains, :connections
 
     def accepted_domains=(domains)
-      @accepted_domains = domains.kind_of?(Array) ? domains : [domains]
+      @accepted_domains = Array(domains)
     end
 
     def initialize
