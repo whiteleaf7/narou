@@ -781,7 +781,7 @@ class Downloader
         $stdout.silence do
           Command::Tag.execute!(%W(#{@id} --add 404 --color white --no-overwrite-color))
         end
-        Command::Freeze.execute!([@id])
+        Command::Freeze.execute!([@id, "--on"])
       end
     else
       @stream.error "何らかの理由により目次が取得できませんでした(#{e.message})"
