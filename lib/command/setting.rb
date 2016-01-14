@@ -38,11 +38,17 @@ module Command
 
       @opt.separator <<-EOS
 
+    これ以外にも設定出来る項目があります。確認する場合は
+    narou setting -a コマンドを参照して下さい
+
   Examples:
-    narou setting --list
-    narou setting convert.no-open=true
-    narou setting convert.no-epub=   # 右辺に何も書かないとその設定を削除できる
-    narou setting convert.copy-to=C:/dropbox/mobi
+    narou setting --list                 # 現在の設置値一覧を表示
+    narou setting convert.no-open=true   # 値を設定する
+    narou setting convert.no-epub=       # 右辺に何も書かないとその設定を削除出来る
+    narou setting device                 # 変数名だけ書くと現在の値を確認出来る
+
+    narou s convert.copy-to=C:/dropbox/mobi
+    # パスにスペースが含まれる場合はダブルクウォーテーションで囲う
     narou s convert.copy-to="C:\\Documents and Settings\\user\\epub"
 
   Options:
@@ -134,6 +140,15 @@ module Command
       deleted
     end
 
+    def output_value(name, settings)
+      scope = get_scope_of_variable_name(name)
+      if scope
+        puts settings[scope][name]
+      else
+        output_error("#{name} という変数は存在しません", name)
+      end
+    end
+
     def execute(argv)
       super
       if @options["burn"]
@@ -158,7 +173,7 @@ module Command
           next
         end
         if value.nil?
-          output_error("書式が間違っています。#{name}=値 のように書いて下さい", name)
+          output_value(name, settings)
           next
         end
         scope = get_scope_of_variable_name(name)
