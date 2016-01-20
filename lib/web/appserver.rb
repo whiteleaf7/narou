@@ -23,7 +23,7 @@ module Narou::ServerHelpers
   # タグをHTMLで装飾する
   #
   def decorate_tags(tags)
-    tags.map do |tag|
+    tags.sort.map do |tag|
       %!<span class="tag label label-#{Command::Tag.get_color(tag)}" data-tag="#{escape_html(tag)}">#{escape_html(tag)}</span>!
     end.join(" ")
   end
@@ -619,7 +619,7 @@ class Narou::AppServer < Sinatra::Base
   get "/api/tag_list" do
     result = '<div><span class="tag label label-default" data-tag="">タグ検索を解除</span></div>'
     tagname_list = Command::Tag.get_tag_list.keys
-    tagname_list.each do |tagname|
+    tagname_list.sort.each do |tagname|
       result << "<div>#{decorate_tags([tagname])} " \
                 "<span class='select-color-button' data-target-tag='#{h tagname}'>" \
                 "<span class='#{Command::Tag.get_color(tagname)}'>a</span></span></div>"
