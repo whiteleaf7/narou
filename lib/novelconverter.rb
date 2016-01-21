@@ -623,6 +623,7 @@ class NovelConverter
         section["chapter"] = @converter.convert(section["chapter"], "chapter")
       end
       @inspector.subtitle = section["subtitle"]
+      section["subtitle"] = @converter.convert(section["subtitle"], "subtitle")
       element = section["element"]
       data_type = element.delete("data_type") || "text"
       element.each do |text_type, elm_text|
@@ -632,7 +633,6 @@ class NovelConverter
         end
         element[text_type] = @converter.convert(elm_text, text_type)
       end
-      section["subtitle"] = @converter.convert(section["subtitle"], "subtitle")
       sections << section
     end
     @use_dakuten_font = @converter.use_dakuten_font
