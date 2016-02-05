@@ -36,3 +36,9 @@ if Dir.tmpdir !~ /\A[ -~]+\z/
     File.expand_path(File.join(ENV["SystemRoot"], "Temp"))
   end
 end
+
+require "openssl"
+
+def make_open_uri_options(add)
+  add.merge(ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
+end
