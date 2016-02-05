@@ -51,7 +51,7 @@ class Illustration
     if path = search_image(basename)
       return path
     end
-    open(url) do |fp|
+    open(url, make_open_uri_options(allow_redirections: :safe)) do |fp|
       content_type = fp.meta["content-type"]
       ext = MIME[content_type] or raise UnknownMIMEType, content_type
       illust_abs_path = create_illust_path(basename) + "." + ext

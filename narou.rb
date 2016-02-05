@@ -6,6 +6,13 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require "open-uri"
+require "open_uri_redirections"
+
+def make_open_uri_options(add)
+  add
+end
+
 script_dir = File.expand_path(File.dirname(__FILE__))
 $debug = File.exist?(File.join(script_dir, "debug"))
 
