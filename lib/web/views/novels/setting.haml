@@ -6,6 +6,7 @@
       restore: false, buttons: false
     });
     var action = new Narou.Action(null);
+    var storage = new Narou.Storage;
 
     // 小説変換ボタン
     $("#console-dialog").on("shown.bs.modal", function() {
@@ -34,6 +35,16 @@
       container: "body",
       width: "100%"
     });
+
+    // 変換設定ページを新規タブで開く様に設定している場合、
+    // 「戻る」リンクを「閉じる」に書き換える
+    if (storage.get("open_new_tab_setting_pages")) {
+      $("#back-to")
+        .html('<a href="#">閉じる</a>')
+        .on("click", function() {
+          window.close();
+        });
+    }
   });
 
 %form(action="/novels/#{@id}/setting" method="POST")
@@ -50,7 +61,7 @@
         %ul.nav.navbar-nav
           %li.active
             %a(href="/novels/#{@id}/setting") 小説設定
-          %li
+          %li#back-to
             %a(href="/") 戻る
         .navbar-form.navbar-left
           %input.btn.btn-info(type="submit" value="設定を保存" style="margin-left: 50px")
