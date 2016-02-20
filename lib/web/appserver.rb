@@ -122,6 +122,7 @@ class Narou::AppServer < Sinatra::Base
     end
 
     set :environment, :production unless $development
+    set :server, :webrick
 
     if $debug
       use BetterErrors::Middleware
