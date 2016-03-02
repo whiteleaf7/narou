@@ -1,0 +1,43 @@
+# ------------------------------------------------------------
+# 小説サイト定義
+name: カクヨム
+scheme: https
+domain: kakuyomu.jp
+top_url: \\k<scheme>://\\k<domain>
+url: \\k<top_url>/works/(?<ncode>\d+)
+encoding: UTF-8
+confirm_over18: no
+append_title_to_folder_name: no
+title_strip_pattern: null
+
+# ------------------------------------------------------------
+# 書籍情報取得設定
+title: <h1 id="workTitle"><a href=".+?">(?<title>.+?)</a></h1>
+author: <span id="catchphrase-authorLabel">(?<author>.+?)</span>
+story: |-
+  <p id="introduction" class="ui-truncateText js-work-introduction">(?<story>.+?)</p>
+
+# ------------------------------------------------------------
+# 目次取得設定
+toc_url: \\k<top_url>/works/\\k<ncode>
+subtitles: |-2
+            (?:<li class="widget-toc-chapter widget-toc-level1">
+              <span>(?<chapter>.+?)</span>
+            </li>
+            )?<li class="widget-toc-episode">
+              <a href="(?<href>/works/\d+/episodes/(?<index>\d+))">
+                <span class="widget-toc-episode-titleLabel">(?<subtitle>.+?)</span>
+                <time class="widget-toc-episode-datePublished" datetime="(?<subupdate>.+?)">.+?</time>
+              </a>
+            </li>
+
+# ------------------------------------------------------------
+# 本文取得設定
+
+body_pattern: <div class="widget-episodeBody">(?<body>.+?)</div>
+introduction_pattern: null
+postscript_pattern: null
+
+# ------------------------------------------------------------
+# 小説情報からパースするための設定
+novel_info_url: null

@@ -34,6 +34,7 @@ class HTML
   #
   def to_aozora
     @string = br_to_aozora
+    @string = p_to_aozora
     @string = ruby_to_aozora
     unless @strip_decoration_tag
       @string = b_to_aozora
@@ -52,6 +53,11 @@ class HTML
 
   def br_to_aozora(text = @string)
     text.gsub(/[\r\n]+/, "").gsub(/<br.*?>/i, "\n")
+  end
+
+  # p タグで段落を作ってる場合（brタグが無い場合）に改行されるように
+  def p_to_aozora(text = @string)
+    text.gsub(/<\/p>/i, "\n")
   end
 
   def ruby_to_aozora(text = @string)
