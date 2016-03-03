@@ -61,6 +61,9 @@ module Command
       @opt.on("-l", "--latest", "最近更新のあった順に小説を表示する") {
         @options["latest"] = true
       }
+      @opt.on("--general-lastup", "更新日ではなく最新話掲載日を使用する") {
+        @options["general-lastup"] = true
+      }
       @opt.on("-r", "--reverse", "逆順に表示する") {
         @options["reverse"] = true
       }
@@ -135,7 +138,8 @@ module Command
 
     def header
       [
-         " ID ", " 更新日 ",
+         " ID ",
+         @options["general-lastup"] ? " 掲載日 " : " 更新日 ",
          @options["kind"] ? "種別" : nil,
          @options["author"] ? "作者名" : nil,
          @options["site"] ? "サイト名" : nil,
@@ -143,11 +147,16 @@ module Command
       ].compact.join(" | ")
     end
 
+    def view_date_type
+      @options["general-lastup"] ? "general_lastup" : "last_update"
+    end
+
     def output_list(novels)
       now = Time.now
       today = now.strftime("%y/%m/%d")
       filters = @options["filters"] || []
       selected_lines = {}
+      view_date_type_key = view_date_type
       novels.each do |novel|
         novel_type = novel["novel_type"].to_i
         id = novel["id"]
@@ -165,7 +174,7 @@ module Command
         tags = novel["tags"] || []
         selected_lines[id] = [
           disp_id,
-          novel["last_update"].strftime("%y/%m/%d").tap { |s|
+          novel[view_date_type_key].strftime("%y/%m/%d").tap { |s|
             new_arrivals_date = novel["new_arrivals_date"]
             last_update = novel["last_update"]
             if new_arrivals_date && new_arrivals_date >= last_update \
@@ -229,7 +238,7 @@ module Command
         num = database_values.size
       end
       if @options["latest"]
-        database_values = Database.instance.sort_by_last_update
+        database_values = Database.instance.sort_by(view_date_type)
       end
       database_values.reverse! if @options["reverse"]
       novels = database_values[0, num]
