@@ -13,7 +13,7 @@ title_strip_pattern: null
 # ------------------------------------------------------------
 # 書籍情報取得設定
 title: <h1 id="workTitle"><a href=".+?">(?<title>.+?)</a></h1>
-author: <span id="catchphrase-authorLabel">(?<author>.+?)</span>
+author: <span class="activityName" itemprop="author">(?<author>.+?)</span>
 story: |-
   <p id="introduction" class="ui-truncateText js-work-introduction">(?<story>.+?)</p>
 
