@@ -736,7 +736,11 @@ class Downloader
       end
     rescue DownloaderForceRedirect
       max_retry -= 1
-      retry if max_retry >= 0
+      if max_retry >= 0
+        retry
+      else
+        raise
+      end
     end
     toc_source
   end
