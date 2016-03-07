@@ -36,6 +36,12 @@
                   %span.active-ok.glyphicon.glyphicon-ok
                   変換設定ページは新規タブで開く
             %li.divider
+            %li#action-view-toggle-buttons-fix-footer
+              %a(href="#")
+                %span
+                  %span.active-ok.glyphicon.glyphicon-ok
+                  ボタンを画面下部に固定する
+            %li.divider
             %li#action-view-reset
               %a(href="/") 表示設定を全てリセット
         %li.dropdown
@@ -150,6 +156,9 @@
             %input#myFilter.form-control(placeholder="Filter" type="text")/
             %span#myFilter-clear.glyphicon.glyphicon-remove-circle
 
+%nav#footer-navbar.navbar.navbar-default.navbar-fixed-bottom.hide
+  .container
+
 .container.container-main.theme-showcase(role="main")
   -# 初めて表示した時のメッセージ
   - if @is_first_access
@@ -174,68 +183,69 @@
 
   -# 操作パネル
   #control-panel
-    .btn-group
-      %button#button-download.btn.btn-primary(type="button" data-toggle="tooltip" |
-                              title="新規ダウンロード") Download |
-      %button.btn.btn-primary.dropdown-toggle(type="button" data-toggle="dropdown")
-        %span.caret
-        %span.sr-only Toggle Dropdown
-      %ul.dropdown-menu(role="menu")
-        %li
-          %a#button-download-force(href="#") 選択した小説を強制再ダウンロード
-    .btn-group
-      %button#button-update.btn.btn-success(type="button") Update
-      %button.btn.btn-success.dropdown-toggle(type="button" data-toggle="dropdown")
-        %span.caret
-        %span.sr-only Toggle Dropdown
-      %ul.dropdown-menu(role="menu")
-        %li
-          %a#button-update-view(href="#") 表示されている小説を更新
-        %li
-          %a#button-update-force(href="#") 凍結済みでも更新
-        %li
-          %a#button-update-general-lastup(href="#") 最新話掲載日を更新
-    .btn-group
-      %button#button-send.btn.btn-warning(type="button") Send
-      - if Inventory.load("local_setting")["hotentry"]
-        %button.btn.btn-warning.dropdown-toggle(type="button" data-toggle="dropdown")
+    .control-panel-inner
+      .btn-group
+        %button#button-download.btn.btn-primary(type="button" data-toggle="tooltip" |
+                                title="新規ダウンロード") Download |
+        %button.btn.btn-primary.dropdown-toggle(type="button" data-toggle="dropdown")
           %span.caret
           %span.sr-only Toggle Dropdown
         %ul.dropdown-menu(role="menu")
           %li
-            %a#button-send-hotentry(href="#") hotentry を送信
-    .btn-group
-      %button.btn.btn-info.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
-        Freeze
-        %span.caret
-        %span.sr-only Toggle Dropdown
-      %ul.dropdown-menu(role="menu")
-        %li
-          %a#button-freeze-on(href="#") 選択した小説を凍結
-        %li
-          %a#button-freeze-off(href="#") 選択した小説の凍結を解除
-    .btn-group
-      %button#button-remove.btn.btn-danger.enable-selected(type="button" data-toggle="tooltip" |
-                            title="選択した小説を削除") Remove |
-    .btn-group
-      %button#button-convert.btn.btn-default.enable-selected(type="button" data-toggle="tooltip" |
-                            title="選択した小説を変換") Convert |
-    .btn-group
-      %button.btn.btn-default.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
-        Other
-        %span.caret
-        %span.sr-only Toggle Dropdown
-      %ul.dropdown-menu(role="menu")
-        %li
-          %a#button-diff(href="#") 選択した小説の最新の差分を表示
-        %li
-          %a#button-inspect(href="#") 選択した小説の調査状況ログを表示
-        %li
-          %a#button-folder(href="#") 選択した小説の保存フォルダを開く
-        %li
-          %a#button-backup(href="#") 選択した小説のバックアップを作成
-        %li
-          %a#button-setting-burn(href="#") 選択した小説の設定の未設定項目に共通設定を焼付ける
+            %a#button-download-force(href="#") 選択した小説を強制再ダウンロード
+      .btn-group
+        %button#button-update.btn.btn-success(type="button" data-toggle="tooltip") Update
+        %button.btn.btn-success.dropdown-toggle(type="button" data-toggle="dropdown")
+          %span.caret
+          %span.sr-only Toggle Dropdown
+        %ul.dropdown-menu(role="menu")
+          %li
+            %a#button-update-view(href="#") 表示されている小説を更新
+          %li
+            %a#button-update-force(href="#") 凍結済みでも更新
+          %li
+            %a#button-update-general-lastup(href="#") 最新話掲載日を更新
+      .btn-group
+        %button#button-send.btn.btn-warning(type="button" data-toggle="tooltip") Send
+        - if Inventory.load("local_setting")["hotentry"]
+          %button.btn.btn-warning.dropdown-toggle(type="button" data-toggle="dropdown")
+            %span.caret
+            %span.sr-only Toggle Dropdown
+          %ul.dropdown-menu(role="menu")
+            %li
+              %a#button-send-hotentry(href="#") hotentry を送信
+      .btn-group
+        %button.btn.btn-info.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
+          Freeze
+          %span.caret
+          %span.sr-only Toggle Dropdown
+        %ul.dropdown-menu(role="menu")
+          %li
+            %a#button-freeze-on(href="#") 選択した小説を凍結
+          %li
+            %a#button-freeze-off(href="#") 選択した小説の凍結を解除
+      .btn-group
+        %button#button-remove.btn.btn-danger.enable-selected(type="button" data-toggle="tooltip" |
+                              title="選択した小説を削除") Remove |
+      .btn-group
+        %button#button-convert.btn.btn-default.enable-selected(type="button" data-toggle="tooltip" |
+                              title="選択した小説を変換") Convert |
+      .btn-group
+        %button.btn.btn-default.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
+          Other
+          %span.caret
+          %span.sr-only Toggle Dropdown
+        %ul.dropdown-menu(role="menu")
+          %li
+            %a#button-diff(href="#") 選択した小説の最新の差分を表示
+          %li
+            %a#button-inspect(href="#") 選択した小説の調査状況ログを表示
+          %li
+            %a#button-folder(href="#") 選択した小説の保存フォルダを開く
+          %li
+            %a#button-backup(href="#") 選択した小説のバックアップを作成
+          %li
+            %a#button-setting-burn(href="#") 選択した小説の設定の未設定項目に共通設定を焼付ける
 
   %input#tag-search(type="text")
 

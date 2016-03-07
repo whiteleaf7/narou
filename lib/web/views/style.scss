@@ -574,7 +574,7 @@ input::-ms-clear {
 /*
  * コントロールパネル
  */
-#control-panel {
+.control-panel-inner {
   @media (min-width:768px) {
     width: 100%;
   }
@@ -586,6 +586,11 @@ input::-ms-clear {
 
   button {
     margin-bottom: 5px;
+  }
+
+  &.in-footer {
+    margin-top: 7px;
+    margin-bottom: 6px !important;
   }
 }
 
@@ -1099,4 +1104,8 @@ $console-color: white;
   &.large {
     height: 270px;
   }
+}
+
+#footer-navbar {
+  min-height: 30px;
 }
