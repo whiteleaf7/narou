@@ -61,7 +61,7 @@ module Command
       @opt.on("-l", "--latest", "最近更新のあった順に小説を表示する") {
         @options["latest"] = true
       }
-      @opt.on("--general-lastup", "更新日ではなく最新話掲載日を使用する") {
+      @opt.on("--gl", "更新日ではなく最新話掲載日を使用する") {
         @options["general-lastup"] = true
       }
       @opt.on("-r", "--reverse", "逆順に表示する") {
