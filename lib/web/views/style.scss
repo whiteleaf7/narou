@@ -1109,3 +1109,14 @@ $console-color: white;
 #footer-navbar {
   min-height: 30px;
 }
+
+.notepad-container {
+  position: relative;
+
+  span {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    color: darkseagreen;
+  }
+}

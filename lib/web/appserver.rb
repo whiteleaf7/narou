@@ -101,6 +101,10 @@ module Narou::ServerHelpers
       value
     end
   end
+
+  def notepad_text_path
+    File.join(Narou.get_local_setting_dir, "notepad.txt")
+  end
 end
 
 class Narou::AppServer < Sinatra::Base
@@ -432,6 +436,10 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  get "/notepad" do
+    haml :notepad
+  end
+
   not_found do
     "not found"
   end
@@ -738,6 +746,23 @@ class Narou::AppServer < Sinatra::Base
 
   get "/api/version/latest.json" do
     json({ version: Narou.latest_version })
+  end
+
+  get "/api/notepad/read" do
+    content_type "text/plain"
+    if File.exist?(notepad_text_path)
+      File.read(notepad_text_path)
+    else
+      ""
+    end
+  end
+
+  post "/api/notepad/save" do
+    File.write(notepad_text_path, params["text"])
+    @@push_server.send_all("notepad.change" => {
+      text: params["text"], object_id: params["object_id"]
+    })
+    ""
   end
 
   # -------------------------------------------------------------------------------
