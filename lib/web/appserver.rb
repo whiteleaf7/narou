@@ -437,6 +437,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   get "/notepad" do
+    @title = "メモ帳"
     haml :notepad
   end
 
