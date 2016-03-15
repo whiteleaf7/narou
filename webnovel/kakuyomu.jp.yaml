@@ -34,7 +34,7 @@ subtitles: |-2
 # ------------------------------------------------------------
 # 本文取得設定
 
-body_pattern: <div class="widget-episodeBody">(?<body>.+?)</div>
+body_pattern: <div class="widget-episodeBody js-episode-body".*?>(?<body>.+?)</div>
 introduction_pattern: null
 postscript_pattern: null
 
