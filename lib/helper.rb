@@ -111,8 +111,10 @@ module Helper
   # ダウンロードしてきたデータを使いやすいように処理
   #
   def pretreatment_source(src, encoding = Encoding::UTF_8)
-    src.force_encoding(encoding).gsub("\r", "")
-       .encode("UTF-16BE", encoding, :invalid => :replace, :undef => :replace, :replace => "?").encode("UTF-8")
+    src.force_encoding(encoding)
+       .encode("UTF-16BE", encoding, :invalid => :replace, :undef => :replace, :replace => "?")
+       .encode("UTF-8")
+       .gsub("\r", "")
   end
 
   ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)", "#39" => "'" }
