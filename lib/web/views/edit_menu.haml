@@ -124,7 +124,10 @@
                 :plain
                   <% _.each(menu.items, function(item) { %>
                     <tr data-menu-label="<%- item.label %>" data-menu-command="<%- item.command %>">
-                      <td><%- item.label %></td>
+                      <td>
+                        <%- item.label %>
+                        <span class="label label-white pull-right"><%= item.command %></span>
+                      </td>
                     </tr>
                   <% }) %>
       .col-sm-1
