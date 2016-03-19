@@ -5,10 +5,16 @@
       container: "body",
     });
 
-    var menu = new Narou.ContextMenu(null, null);
+    Narou.Notepad.replace("notepad", { rows: 7 });
+
+    var menu = new Narou.ContextMenu;
     Narou.Template.replaceAll({ menu: menu });
     var menu_items = $("#menu_items tr");
     var input_box = $("#input_box");
+    var preview = $("#preview");
+
+    preview.append(menu.object);
+    menu.object.show();
 
     var clearActiveColumns = function() {
       menu_items.removeClass("active");
@@ -24,13 +30,46 @@
       });
     };
 
+    var refreshPreview = function() {
+      menu.object.remove();
+      menu.initializeMenuObject(input_box.val());
+      menu.initializeMenuEvents();
+      preview.append(menu.object);
+      menu.object.show();
+    };
+
+    var attachChangeEvents = function(textarea) {
+      var timer_id = null;
+
+      textarea
+        .on("focus", function() {
+          this._old_value = this.value;
+        })
+        .on("blur", function() {
+          if (this.value !== this._old_value) {
+            refreshPreview();
+          }
+        })
+        .on("keyup paste cut", function() {
+          setTimeout(function() {
+            clearTimeout(timer_id);
+            timer_id = setTimeout(function(value, old_value) {
+              if (value !== old_value) {
+                refreshPreview();
+              }
+            }.bind(this), 500, this.value, this._old_value);
+          }.bind(this), 10);
+        });
+    };
+
     menu_items.on("click", function(e) {
       $(this).toggleClass("active");
     });
 
-    $("#move_button").on("click", function(e) {
+    $("#button_move").on("click", function(e) {
       appendLineToTextbox();
       clearActiveColumns();
+      refreshPreview();
     });
 
     $("#button_clear_active").on("click", function(e) {
@@ -39,6 +78,7 @@
 
     $("#button_save").on("click", function(e) {
       menu.save(input_box.val().trim());
+      refreshPreview();
       Narou.Flash.show("保存が完了しました", "success");
     });
 
@@ -48,7 +88,10 @@
 
     $("#button_reset_to_default").on("click", function(e) {
       input_box.val(menu.createDefaultMenuText());
+      refreshPreview();
     });
+
+    attachChangeEvents(input_box);
   });
 
 :scss
@@ -62,7 +105,7 @@
     box-shadow: 2px 2px 1px rgba(0,0,0,0.1);;
   }
 
-  #move_button {
+  #button_move {
     position: relative;
     @media (min-width:768px) {
       height: $height;
@@ -80,6 +123,10 @@
 
   #input_box {
     height: $height;
+  }
+
+  #preview .dropdown-menu {
+    position: relative;
   }
 
 %script#edit_menu_template(type="text/template")
@@ -107,7 +154,7 @@
 
 .container.theme-showcase(role="main")
   %h1 個別メニューの編集
-  %ul
+  %ul.text-muted
     %li
       編集内容はブラウザに保存されます。他のPCのブラウザでも同じ内容にしたい場合は
       下部にあるメモ帳を使ってコピペして下さい。
@@ -117,6 +164,8 @@
   #edit_menu_container
     .row
       .col-sm-4
+        %span.label.label-default
+          メニュー項目一覧
         #menu_items
           %table.table.table-hover.table-bordered
             %tbody
@@ -131,13 +180,20 @@
                     </tr>
                   <% }) %>
       .col-sm-1
-        #move_button
+        #button_move
           %button.btn.btn-default
             %span.glyphicon.glyphicon-arrow-right
       .col-sm-4
+        %span.label.label-default
+          メニュー編集欄
         %script(type="text/plain" role="template")
           %textarea#input_box.form-control
             <%- menu.text %>
+      .col-sm-2
+        %div
+          %span.label.label-default
+            プレビュー
+        #preview
     .row
       &nbsp;
     .row
@@ -152,3 +208,14 @@
           消去
         %button#button_reset_to_default.btn.btn-default
           デフォに戻す
+    .row
+      &nbsp;
+    .row
+      .col-sm-4
+        %div
+          %span.label.label-default
+            メモ帳
+          &nbsp;
+          %span.text-muted
+            %small ※自動でサーバに保存されます
+        #notepad
