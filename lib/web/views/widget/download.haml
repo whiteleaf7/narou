@@ -45,8 +45,7 @@
     %script{:src => "/resources/narou.queue.js?_=#{Version}"}
     :javascript
       $(document).ready(function($) {
-        var notification = new Narou.Notification();
-        var stream_console = new Narou.Console(notification, {
+        var stream_console = new Narou.Console({
           restore: false, buttons: false
         });
       });

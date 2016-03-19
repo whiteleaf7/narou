@@ -69,8 +69,7 @@
         $("#link-drop-here").hide();
 
         var action = new Narou.Action(null);
-        var notification = new Narou.Notification;
-        var stream_console = new Narou.Console(notification, {
+        var stream_console = new Narou.Console({
           restore: false, buttons: false
         });
         var dnd = new Narou.DragDrop;
