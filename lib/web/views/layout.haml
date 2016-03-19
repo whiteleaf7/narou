@@ -33,7 +33,7 @@
       - message, type = session[:alert]
       - session[:alert] = nil
       .container
-        #fadeout-alert.alert(class="alert-#{type}")
+        .fadeout-alert.alert(class="alert-#{type}")
           &= message
     != yield
     %script{:src => "//code.jquery.com/jquery-1.11.1.min.js"}

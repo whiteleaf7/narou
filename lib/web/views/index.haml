@@ -42,6 +42,11 @@
                   %span.active-ok.glyphicon.glyphicon-ok
                   ボタンを画面下部に固定
             %li.divider
+            %li#action-view-link-to-edit-menu
+              %a(href="/edit_menu")
+                %span
+                  個別メニューを編集...
+            %li.divider
             %li#action-view-reset
               %a(href="/") 表示設定を全てリセット
         %li.dropdown
@@ -128,13 +133,13 @@
               %a(href="/settings")
                 %span
                   %span.glyphicon.glyphicon-wrench
-                  環境設定
+                  環境設定...
             %li.divider
             %li#action-option-help
               %a(href="/help")
                 %span
                   %span.glyphicon.glyphicon-question-sign
-                  ヘルプ
+                  ヘルプ...
             %li#action-option-about
               %a(href="#")
                 %span

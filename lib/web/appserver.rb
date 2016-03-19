@@ -441,6 +441,11 @@ class Narou::AppServer < Sinatra::Base
     haml :notepad
   end
 
+  get "/edit_menu" do
+    @title = "個別メニューの編集"
+    haml :edit_menu
+  end
+
   not_found do
     "not found"
   end
