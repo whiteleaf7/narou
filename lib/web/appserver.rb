@@ -824,5 +824,9 @@ class Narou::AppServer < Sinatra::Base
   get "/widget/drag_and_drop" do
     haml :"widget/drag_and_drop", layout: nil
   end
+
+  get "/widget/notepad" do
+    haml :"widget/notepad", layout: nil
+  end
 end
 
