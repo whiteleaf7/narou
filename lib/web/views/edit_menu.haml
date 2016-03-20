@@ -48,6 +48,7 @@
         .on("blur", function() {
           if (this.value !== this._old_value) {
             refreshPreview();
+            this._old_value = this.value;
           }
         })
         .on("keyup paste cut", function() {
@@ -56,8 +57,9 @@
             timer_id = setTimeout(function(value, old_value) {
               if (value !== old_value) {
                 refreshPreview();
+                this._old_value = this.value;
               }
-            }.bind(this), 500, this.value, this._old_value);
+            }.bind(this), 300, this.value, this._old_value);
           }.bind(this), 10);
         });
     };
