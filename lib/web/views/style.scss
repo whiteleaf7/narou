@@ -369,7 +369,7 @@ table.dataTable {
  * フォーム関係
  */
 #myFilter {
-  width: 200px;
+  width: 250px;
   border-radius: 18px;
   padding-left: 29px;
   padding-right: 23px;
@@ -381,7 +381,10 @@ table.dataTable {
     width: 100px;
   }
   @media (min-width:992px){
-    width: 250px;
+    width: 300px;
+  }
+  @media (min-width:1200px){
+    width: 350px;
   }
 }
 @mixin placeholder { color: #bbb !important }
@@ -926,11 +929,6 @@ $console-color: white;
   p {
     margin-bottom: 2px;
   }
-}
-
-/* タグ検索用ボックス */
-#tag-search {
-  display: none;
 }
 
 /* 差分表示用ダイアログ */
