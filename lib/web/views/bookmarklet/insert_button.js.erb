@@ -122,7 +122,6 @@
 
   var links = document.getElementsByTagName("a");
   for (var i = 0; i < links.length; i++) {
-  //for (var i = 0; i < 3; i++) {
     var link = links[i];
     var setting = site_settings[link.hostname];
     if (setting && link.href.toLowerCase().match(setting.url)) {

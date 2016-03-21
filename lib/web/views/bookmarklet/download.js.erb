@@ -24,7 +24,7 @@
     }
   }
   if (guard) {
-    alert("対応サイトではありません");
+    alert("対応ページではありません");
     return;
   }
   if (document.getElementById("narourb-console")) return;
@@ -38,7 +38,7 @@
   // IE の場合、iframe は親のドキュメントモードが汚染して動かない可能性があるので対処
   var docmode = document.documentMode || 10;
   if (docmode < 10) {
-    window.open(url, "widget_window", "width=400,height=250,menubar=no,toolbar=no,scrollbars=no,resizable=yes");
+    window.open(url, "dl_window", "width=400,height=250,menubar=no,toolbar=no,scrollbars=no,resizable=yes");
     return;
   }
 
