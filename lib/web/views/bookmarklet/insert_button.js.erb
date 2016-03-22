@@ -7,6 +7,7 @@
   // 対応小説投稿サイトに関する情報
   var site_settings = {
     <%- Downloader.load_settings.each.with_index do |setting, i| -%>
+      <%- next if setting["top_url"] == "http://novel.syosetu.org" -%>
       "<%= setting["domain"] %>": {
         <%- case setting["domain"] -%>
         <%- when "www.mai-net.net" -%>
