@@ -108,11 +108,12 @@ module Helper
   end
 
   #
-  # ダウンロードしてきたデータを使いやすいように処理
+  # ダウンロードした文字列をエンコード及び不正な文字列除去、改行コード統一
   #
   def pretreatment_source(src, encoding = Encoding::UTF_8)
-    src.force_encoding(encoding).gsub("\r", "")
-       .encode("UTF-16BE", encoding, :invalid => :replace, :undef => :replace, :replace => "?").encode("UTF-8")
+    src.force_encoding(encoding)
+       .scrub("?")
+       .gsub("\r", "")
   end
 
   ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)", "#39" => "'" }

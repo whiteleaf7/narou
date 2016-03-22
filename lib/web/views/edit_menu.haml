@@ -1,0 +1,223 @@
+:javascript
+  local_initialize_functions.push(function($) {
+    $("[data-toggle=tooltip]").tooltip({
+      animation: false,
+      container: "body",
+    });
+
+    Narou.Notepad.replace("notepad", { rows: 7 });
+
+    var menu = new Narou.ContextMenu;
+    Narou.Template.replaceAll({ menu: menu });
+    var menu_items = $("#menu_items tr");
+    var input_box = $("#input_box");
+    var preview = $("#preview");
+
+    preview.append(menu.object);
+    menu.object.show();
+
+    var clearActiveColumns = function() {
+      menu_items.removeClass("active");
+    };
+
+    var appendLineToTextbox = function() {
+      menu_items.each(function() {
+        if (!$(this).is(".active")) return;
+        var label = $(this).data("menuLabel");
+        var command = $(this).data("menuCommand");
+        var line = sprintf("\n%s<>%s", label, command);
+        input_box.val((input_box.val() + line).trim());
+      });
+    };
+
+    var refreshPreview = function() {
+      menu.object.remove();
+      menu.initializeMenuObject(input_box.val());
+      menu.initializeMenuEvents();
+      preview.append(menu.object);
+      menu.object.show();
+    };
+
+    var attachChangeEvents = function(textarea) {
+      var timer_id = null;
+
+      textarea
+        .on("focus", function() {
+          this._old_value = this.value;
+        })
+        .on("blur", function() {
+          if (this.value !== this._old_value) {
+            refreshPreview();
+            this._old_value = this.value;
+          }
+        })
+        .on("keyup paste cut", function() {
+          setTimeout(function() {
+            clearTimeout(timer_id);
+            timer_id = setTimeout(function(value, old_value) {
+              if (value !== old_value) {
+                refreshPreview();
+                this._old_value = this.value;
+              }
+            }.bind(this), 300, this.value, this._old_value);
+          }.bind(this), 10);
+        });
+    };
+
+    menu_items.on("click", function(e) {
+      $(this).toggleClass("active");
+    });
+
+    $("#button_move").on("click", function(e) {
+      appendLineToTextbox();
+      clearActiveColumns();
+      refreshPreview();
+    });
+
+    $("#button_clear_active").on("click", function(e) {
+      clearActiveColumns();
+    });
+
+    $("#button_save").on("click", function(e) {
+      menu.save(input_box.val().trim());
+      refreshPreview();
+      Narou.Flash.show("保存が完了しました", "success");
+    });
+
+    $("#button_clear").on("click", function(e) {
+      input_box.val("");
+    });
+
+    $("#button_reset_to_default").on("click", function(e) {
+      input_box.val(menu.createDefaultMenuText());
+      refreshPreview();
+    });
+
+    attachChangeEvents(input_box);
+  });
+
+:scss
+  $height: 430px;
+
+  #menu_items {
+    height: $height;
+    max-height: $height;
+    overflow-y: auto;
+    cursor: pointer;
+    box-shadow: 2px 2px 1px rgba(0,0,0,0.1);;
+  }
+
+  #button_move {
+    position: relative;
+    @media (min-width:768px) {
+      height: $height;
+    }
+    @media (max-width:767px) {
+      height: 70px;
+    }
+    button {
+      position: absolute;
+      top: 50%;
+      left: 25%;
+      margin-top: -0.5em;
+    }
+  }
+
+  #input_box {
+    height: $height;
+  }
+
+  #preview .dropdown-menu {
+    position: relative;
+  }
+
+%script#edit_menu_template(type="text/template")
+
+.navbar.navbar-default.navbar-fixed-top(role="navigation")
+  .container
+    .navbar-header
+      %button.navbar-toggle(type="button")
+        %span.sr-only Toggle navigation
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      %a.navbar-brand(href="#" data-move-to="top") Narou.rb WEB UI
+    #bs-navbar-collapse-1.collapse.navbar-collapse
+      %ul.nav.navbar-nav
+        %li
+          %a(href="/settings") 環境設定
+        %li
+          %a(href="/help") ヘルプ
+        %li
+          %a(href="/") 戻る
+      %p#queue-text.navbar-text.navbar-right(data-toggle="tooltip" title="キューに積まれた処理の数" data-placement="bottom")
+        %span.glyphicon.glyphicon-inbox
+        %span#queue 0
+
+.container.theme-showcase(role="main")
+  %h1 個別メニューの編集
+  %ul.text-muted
+    %li
+      編集内容はブラウザに保存されます。他のPCのブラウザでも同じ内容にしたい場合は
+      下部にあるメモ帳を使ってコピペして下さい。
+    %li
+      書式は「ラベル&lt;&gt;コマンド」になっています。空行や不正な書式の場合は無視されます。
+      また、ラベル部分は自由に設定出来ます。
+  #edit_menu_container
+    .row
+      .col-sm-4
+        %span.label.label-default
+          項目一覧
+        #menu_items
+          %table.table.table-hover.table-bordered
+            %tbody
+              %script(type="text/plain" role="template")
+                :plain
+                  <% _.each(menu.items, function(item) { %>
+                    <tr data-menu-label="<%- item.label %>" data-menu-command="<%- item.command %>">
+                      <td>
+                        <%- item.label %>
+                        <span class="label label-white pull-right"><%= item.command %></span>
+                      </td>
+                    </tr>
+                  <% }) %>
+      .col-sm-1
+        #button_move
+          %button.btn.btn-default
+            %span.glyphicon.glyphicon-arrow-right
+      .col-sm-4
+        %span.label.label-default
+          編集欄
+        %script(type="text/plain" role="template")
+          %textarea#input_box.form-control
+            <%- menu.text %>
+      .col-sm-2
+        %div
+          %span.label.label-default
+            プレビュー
+        #preview
+    .row
+      &nbsp;
+    .row
+      .col-sm-4.text-center
+        %button#button_clear_active.btn.btn-default
+          選択を解除
+      .col-sm-1
+      .col-sm-4.text-center
+        %button#button_save.btn.btn-info
+          保存
+        %button#button_clear.btn.btn-default
+          消去
+        %button#button_reset_to_default.btn.btn-default
+          デフォに戻す
+    .row
+      &nbsp;
+    .row
+      .col-sm-4
+        %div
+          %span.label.label-default
+            メモ帳
+          &nbsp;
+          %span.text-muted
+            %small ※自動でサーバに保存されます
+        #notepad

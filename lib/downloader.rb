@@ -695,6 +695,8 @@ class Downloader
     end
   end
 
+  class DownloaderForceRedirect < StandardError; end
+
   #
   # HTMLの中から小説が削除されたか非公開なことを示すメッセージを検出する
   #
@@ -707,22 +709,38 @@ class Downloader
   def get_toc_source
     toc_url = @setting["toc_url"]
     return nil unless toc_url
+    max_retry = 5
     toc_source = ""
     cookie = @setting["cookie"] || ""
     open_uri_options = make_open_uri_options("Cookie" => cookie, allow_redirections: :safe)
-    open(toc_url, open_uri_options) do |toc_fp|
-      if toc_fp.base_uri.to_s != toc_url
-        # リダイレクトされた場合。
-        # ノクターン・ムーンライトのNコードを ncode.syosetu.com に渡すと、novel18.syosetu.com に飛ばされる
-        # 目次の定義が微妙に ncode.syosetu.com と違うので、設定を取得し直す
-        s = Downloader.get_sitesetting_by_target(toc_fp.base_uri.to_s)
-        raise DownloaderNotFoundError unless s   # 非公開や削除等でトップページへリダイレクトされる場合がある
-        @setting.clear   # 今まで使っていたのは一旦クリア
-        @setting = s
-        toc_url = @setting["toc_url"]
+    begin
+      open(toc_url, open_uri_options) do |toc_fp|
+        if toc_fp.base_uri.to_s != toc_url
+          # リダイレクトされた場合。
+          # ノクターン・ムーンライトのNコードを ncode.syosetu.com に渡すと、年齢認証のクッションページに飛ばされる
+          # 転送先を取得し再度ページを取得し直す
+          uri = URI.parse(toc_fp.base_uri.to_s)
+          if uri.host == "nl.syosetu.com"
+            decode = Hash[URI.decode_www_form(uri.query)]
+            toc_url = decode["url"]   # 年齢認証確認ページからの転送先
+            raise DownloaderForceRedirect
+          end
+          s = Downloader.get_sitesetting_by_target(toc_fp.base_uri.to_s)
+          raise DownloaderNotFoundError unless s   # 非公開や削除等でトップページへリダイレクトされる場合がある
+          @setting.clear   # 今まで使っていたのは一旦クリア
+          @setting = s
+          toc_url = @setting["toc_url"]
+        end
+        toc_source = Helper.restor_entity(Helper.pretreatment_source(toc_fp.read, @setting["encoding"]))
+        raise DownloaderNotFoundError if Downloader.detect_error_message(@setting, toc_source)
       end
-      toc_source = Helper.restor_entity(Helper.pretreatment_source(toc_fp.read, @setting["encoding"]))
-      raise DownloaderNotFoundError if Downloader.detect_error_message(@setting, toc_source)
+    rescue DownloaderForceRedirect
+      max_retry -= 1
+      if max_retry >= 0
+        retry
+      else
+        raise
+      end
     end
     toc_source
   end

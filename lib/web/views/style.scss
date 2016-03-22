@@ -58,7 +58,7 @@ body {
   display: none;
 }
 
-#fadeout-alert {
+.fadeout-alert {
   position: fixed;
   z-index: 1000;
   width: 350px;
@@ -369,7 +369,7 @@ table.dataTable {
  * フォーム関係
  */
 #myFilter {
-  width: 200px;
+  width: 250px;
   border-radius: 18px;
   padding-left: 29px;
   padding-right: 23px;
@@ -381,7 +381,10 @@ table.dataTable {
     width: 100px;
   }
   @media (min-width:992px){
-    width: 250px;
+    width: 300px;
+  }
+  @media (min-width:1200px){
+    width: 350px;
   }
 }
 @mixin placeholder { color: #bbb !important }
@@ -574,7 +577,7 @@ input::-ms-clear {
 /*
  * コントロールパネル
  */
-#control-panel {
+.control-panel-inner {
   @media (min-width:768px) {
     width: 100%;
   }
@@ -586,6 +589,11 @@ input::-ms-clear {
 
   button {
     margin-bottom: 5px;
+  }
+
+  &.in-footer {
+    margin-top: 7px;
+    margin-bottom: 6px !important;
   }
 }
 
@@ -790,7 +798,7 @@ $console-color: white;
 /*
  * 個別メニュー
  */
-#context-menu {
+.context-menu {
   z-index: 102;
 }
 
@@ -921,11 +929,6 @@ $console-color: white;
   p {
     margin-bottom: 2px;
   }
-}
-
-/* タグ検索用ボックス */
-#tag-search {
-  display: none;
 }
 
 /* 差分表示用ダイアログ */
@@ -1098,5 +1101,20 @@ $console-color: white;
 
   &.large {
     height: 270px;
+  }
+}
+
+#footer-navbar {
+  min-height: 30px;
+}
+
+.notepad-container {
+  position: relative;
+
+  span {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    color: darkseagreen;
   }
 }

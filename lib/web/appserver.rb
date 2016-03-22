@@ -101,6 +101,10 @@ module Narou::ServerHelpers
       value
     end
   end
+
+  def notepad_text_path
+    File.join(Narou.get_local_setting_dir, "notepad.txt")
+  end
 end
 
 class Narou::AppServer < Sinatra::Base
@@ -432,6 +436,16 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  get "/notepad" do
+    @title = "メモ帳"
+    haml :notepad
+  end
+
+  get "/edit_menu" do
+    @title = "個別メニューの編集"
+    haml :edit_menu
+  end
+
   not_found do
     "not found"
   end
@@ -618,7 +632,9 @@ class Narou::AppServer < Sinatra::Base
   end
 
   get "/api/tag_list" do
-    result = '<div><span class="tag label label-default" data-tag="">タグ検索を解除</span></div>'
+    result =
+      '<div><span class="tag label label-default" data-tag="">タグ検索を解除</span></div>' \
+      '<div class="text-muted" style="font-size:10px">Altキーを押しながらで除外検索</div>'
     tagname_list = Command::Tag.get_tag_list.keys
     tagname_list.sort.each do |tagname|
       result << "<div>#{decorate_tags([tagname])} " \
@@ -740,6 +756,23 @@ class Narou::AppServer < Sinatra::Base
     json({ version: Narou.latest_version })
   end
 
+  get "/api/notepad/read" do
+    content_type "text/plain"
+    if File.exist?(notepad_text_path)
+      File.read(notepad_text_path)
+    else
+      ""
+    end
+  end
+
+  post "/api/notepad/save" do
+    File.write(notepad_text_path, params["text"])
+    @@push_server.send_all("notepad.change" => {
+      text: params["text"], object_id: params["object_id"]
+    })
+    ""
+  end
+
   # -------------------------------------------------------------------------------
   # 一部分に表示するためのHTMLを取得する(パーシャル)
   # -------------------------------------------------------------------------------
@@ -792,6 +825,10 @@ class Narou::AppServer < Sinatra::Base
 
   get "/widget/drag_and_drop" do
     haml :"widget/drag_and_drop", layout: nil
+  end
+
+  get "/widget/notepad" do
+    haml :"widget/notepad", layout: nil
   end
 end
 

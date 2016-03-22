@@ -60,6 +60,8 @@
     %script{:src => "//code.jquery.com/jquery-1.11.1.min.js"}
     %script{:src => "//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"}
     %script{:src => "/resources/perfect-scrollbar.min.js"}
+    %script{:src => "//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.min.js"}
+    %script{:src => "/resources/sprintf.js"}
     %script{:src => "/resources/narou.library.js?_=#{Version}"}
     %script{:src => "/resources/narou.queue.js?_=#{Version}"}
     :javascript
@@ -67,8 +69,7 @@
         $("#link-drop-here").hide();
 
         var action = new Narou.Action(null);
-        var notification = new Narou.Notification;
-        var stream_console = new Narou.Console(notification, {
+        var stream_console = new Narou.Console({
           restore: false, buttons: false
         });
         var dnd = new Narou.DragDrop;

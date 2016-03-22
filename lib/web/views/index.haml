@@ -1,4 +1,4 @@
-.navbar.navbar-default.navbar-fixed-top(role="navigation")
+%nav#header-navbar.navbar.navbar-default.navbar-fixed-top(role="navigation")
   .container
     .navbar-header
       %button.navbar-toggle(type="button")
@@ -35,6 +35,17 @@
                 %span
                   %span.active-ok.glyphicon.glyphicon-ok
                   変換設定ページは新規タブで開く
+            %li.divider
+            %li#action-view-toggle-buttons-fix-footer
+              %a(href="#")
+                %span
+                  %span.active-ok.glyphicon.glyphicon-ok
+                  ボタンを画面下部に固定
+            %li.divider
+            %li#action-view-link-to-edit-menu
+              %a(href="/edit_menu")
+                %span
+                  個別メニューを編集...
             %li.divider
             %li#action-view-reset
               %a(href="/") 表示設定を全てリセット
@@ -105,6 +116,15 @@
               %a(href="#")
                 %span
                   CSVファイルからインポート
+            %li.divider
+            %li#action-tool-notepad
+              %a(href="/notepad")
+                %span
+                  メモ帳（別ページ）
+            %li#action-tool-notepad-window
+              %a(href="#")
+                %span
+                  メモ帳（ポップアップ）
       %ul.nav.navbar-nav.navbar-right
         %li.dropdown
           %a.dropdown-toggle(data-toggle="dropdown" href="#")
@@ -117,13 +137,13 @@
               %a(href="/settings")
                 %span
                   %span.glyphicon.glyphicon-wrench
-                  環境設定
+                  環境設定...
             %li.divider
             %li#action-option-help
               %a(href="/help")
                 %span
                   %span.glyphicon.glyphicon-question-sign
-                  ヘルプ
+                  ヘルプ...
             %li#action-option-about
               %a(href="#")
                 %span
@@ -150,6 +170,9 @@
             %input#myFilter.form-control(placeholder="Filter" type="text")/
             %span#myFilter-clear.glyphicon.glyphicon-remove-circle
 
+%nav#footer-navbar.navbar.navbar-default.navbar-fixed-bottom.hide
+  .container
+
 .container.container-main.theme-showcase(role="main")
   -# 初めて表示した時のメッセージ
   - if @is_first_access
@@ -174,70 +197,69 @@
 
   -# 操作パネル
   #control-panel
-    .btn-group
-      %button#button-download.btn.btn-primary(type="button" data-toggle="tooltip" |
-                              title="新規ダウンロード") Download |
-      %button.btn.btn-primary.dropdown-toggle(type="button" data-toggle="dropdown")
-        %span.caret
-        %span.sr-only Toggle Dropdown
-      %ul.dropdown-menu(role="menu")
-        %li
-          %a#button-download-force(href="#") 選択した小説を強制再ダウンロード
-    .btn-group
-      %button#button-update.btn.btn-success(type="button") Update
-      %button.btn.btn-success.dropdown-toggle(type="button" data-toggle="dropdown")
-        %span.caret
-        %span.sr-only Toggle Dropdown
-      %ul.dropdown-menu(role="menu")
-        %li
-          %a#button-update-view(href="#") 表示されている小説を更新
-        %li
-          %a#button-update-force(href="#") 凍結済みでも更新
-        %li
-          %a#button-update-general-lastup(href="#") 最新話掲載日を更新
-    .btn-group
-      %button#button-send.btn.btn-warning(type="button") Send
-      - if Inventory.load("local_setting")["hotentry"]
-        %button.btn.btn-warning.dropdown-toggle(type="button" data-toggle="dropdown")
+    .control-panel-inner
+      .btn-group
+        %button#button-download.btn.btn-primary(type="button" data-toggle="tooltip" |
+                                title="新規ダウンロード") Download |
+        %button.btn.btn-primary.dropdown-toggle(type="button" data-toggle="dropdown")
           %span.caret
           %span.sr-only Toggle Dropdown
         %ul.dropdown-menu(role="menu")
           %li
-            %a#button-send-hotentry(href="#") hotentry を送信
-    .btn-group
-      %button.btn.btn-info.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
-        Freeze
-        %span.caret
-        %span.sr-only Toggle Dropdown
-      %ul.dropdown-menu(role="menu")
-        %li
-          %a#button-freeze-on(href="#") 選択した小説を凍結
-        %li
-          %a#button-freeze-off(href="#") 選択した小説の凍結を解除
-    .btn-group
-      %button#button-remove.btn.btn-danger.enable-selected(type="button" data-toggle="tooltip" |
-                            title="選択した小説を削除") Remove |
-    .btn-group
-      %button#button-convert.btn.btn-default.enable-selected(type="button" data-toggle="tooltip" |
-                            title="選択した小説を変換") Convert |
-    .btn-group
-      %button.btn.btn-default.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
-        Other
-        %span.caret
-        %span.sr-only Toggle Dropdown
-      %ul.dropdown-menu(role="menu")
-        %li
-          %a#button-diff(href="#") 選択した小説の最新の差分を表示
-        %li
-          %a#button-inspect(href="#") 選択した小説の調査状況ログを表示
-        %li
-          %a#button-folder(href="#") 選択した小説の保存フォルダを開く
-        %li
-          %a#button-backup(href="#") 選択した小説のバックアップを作成
-        %li
-          %a#button-setting-burn(href="#") 選択した小説の設定の未設定項目に共通設定を焼付ける
-
-  %input#tag-search(type="text")
+            %a#button-download-force(href="#") 選択した小説を強制再ダウンロード
+      .btn-group
+        %button#button-update.btn.btn-success(type="button" data-toggle="tooltip") Update
+        %button.btn.btn-success.dropdown-toggle(type="button" data-toggle="dropdown")
+          %span.caret
+          %span.sr-only Toggle Dropdown
+        %ul.dropdown-menu(role="menu")
+          %li
+            %a#button-update-view(href="#") 表示されている小説を更新
+          %li
+            %a#button-update-force(href="#") 凍結済みでも更新
+          %li
+            %a#button-update-general-lastup(href="#") 最新話掲載日を更新
+      .btn-group
+        %button#button-send.btn.btn-warning(type="button" data-toggle="tooltip") Send
+        - if Inventory.load("local_setting")["hotentry"]
+          %button.btn.btn-warning.dropdown-toggle(type="button" data-toggle="dropdown")
+            %span.caret
+            %span.sr-only Toggle Dropdown
+          %ul.dropdown-menu(role="menu")
+            %li
+              %a#button-send-hotentry(href="#") hotentry を送信
+      .btn-group
+        %button.btn.btn-info.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
+          Freeze
+          %span.caret
+          %span.sr-only Toggle Dropdown
+        %ul.dropdown-menu(role="menu")
+          %li
+            %a#button-freeze-on(href="#") 選択した小説を凍結
+          %li
+            %a#button-freeze-off(href="#") 選択した小説の凍結を解除
+      .btn-group
+        %button#button-remove.btn.btn-danger.enable-selected(type="button" data-toggle="tooltip" |
+                              title="選択した小説を削除") Remove |
+      .btn-group
+        %button#button-convert.btn.btn-default.enable-selected(type="button" data-toggle="tooltip" |
+                              title="選択した小説を変換") Convert |
+      .btn-group
+        %button.btn.btn-default.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
+          Other
+          %span.caret
+          %span.sr-only Toggle Dropdown
+        %ul.dropdown-menu(role="menu")
+          %li
+            %a#button-diff(href="#") 選択した小説の最新の差分を表示
+          %li
+            %a#button-inspect(href="#") 選択した小説の調査状況ログを表示
+          %li
+            %a#button-folder(href="#") 選択した小説の保存フォルダを開く
+          %li
+            %a#button-backup(href="#") 選択した小説のバックアップを作成
+          %li
+            %a#button-setting-burn(href="#") 選択した小説の設定の未設定項目に共通設定を焼付ける
 
   -# 小説の一覧テーブル
   %div
@@ -254,31 +276,6 @@
     %a(href="#") 反転
   %li#rect-select-menu-cancel
     %a(href="#") キャンセル
-
--# 個別メニュー
-%ul#context-menu.dropdown-menu(role="menu")
-  %li#context-menu-setting
-    %a(href="#") 小説の変換設定
-  %li#context-menu-diff
-    %a(href="#" data-move-to="top") 差分を表示
-  %li#context-menu-edit-tag
-    %a(href="#") タグを編集
-  %li#context-menu-freeze-toggle
-    %a(href="#") 凍結 or 解凍
-  %li#context-menu-update
-    %a(href="#") 更新
-  %li#context-menu-send
-    %a(href="#") 送信
-  %li#context-menu-remove
-    %a(href="#") 削除
-  %li#context-menu-convert
-    %a(href="#") 変換
-  %li#context-menu-inspect
-    %a(href="#") 調査状況ログを表示
-  %li#context-menu-folder
-    %a(href="#") 保存フォルダを開く
-  %li#context-menu-backup
-    %a(href="#") バックアップを作成
 
 -# 個別表示用コンソール
 #console-dialog.modal.fade(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true")

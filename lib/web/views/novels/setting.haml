@@ -1,8 +1,7 @@
 -# このページ内専用のjavascriptでjQueryオブジェクトを参照したい場合この関数に記述
 :javascript
   local_initialize_functions.push(function($) {
-    var notification = new Narou.Notification();
-    var stream_console = new Narou.Console(notification, {
+    var stream_console = new Narou.Console({
       restore: false, buttons: false
     });
     var action = new Narou.Action(null);
