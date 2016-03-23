@@ -16,7 +16,7 @@ title: <h1 id="workTitle"><a href=".+?">(?<title>.+?)</a></h1>
 author: |-
   (?:<span class="activityName" itemprop="author">(?<author>.+?)</span>)|(?:<span class="screenName.*?">(?<author>.+?)</span>)
 story: |-
-  <p id="introduction" class="ui-truncateText js-work-introduction">(?<story>.+?)</p>
+  <p id="introduction" class="ui-truncateText js-work-introduction">(?<story>.+?)(?:</span>|</p>)
 
 # ------------------------------------------------------------
 # 目次取得設定
