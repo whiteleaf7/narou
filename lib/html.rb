@@ -57,7 +57,7 @@ class HTML
 
   # p タグで段落を作ってる場合（brタグが無い場合）に改行されるように
   def p_to_aozora(text = @string)
-    text.gsub(/<\/p>/i, "\n")
+    text.gsub(/\n?<\/p>/i, "\n")
   end
 
   def ruby_to_aozora(text = @string)
