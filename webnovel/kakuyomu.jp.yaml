@@ -25,6 +25,9 @@ subtitles: |-2
             (?:<li class="widget-toc-chapter widget-toc-level1">
               <span>(?<chapter>.+?)</span>
             </li>
+            )?(?:<li class="widget-toc-chapter widget-toc-level2">
+              <span>(?<subchapter>.+?)</span>
+            </li>
             )?<li class="widget-toc-episode">
               <a href="(?<href>/works/\d+/episodes/(?<index>\d+))">
                 <span class="widget-toc-episode-titleLabel">(?<subtitle>.+?)</span>

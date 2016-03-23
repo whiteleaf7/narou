@@ -939,6 +939,7 @@ class Downloader
         "index" => @setting["index"],
         "href" => @setting["href"],
         "chapter" => @setting["chapter"],
+        "subchapter" => @setting["subchapter"],
         "subtitle" => @setting["subtitle"].gsub("\n", ""),
         "file_subtitle" => title_to_filename(@setting["subtitle"]),
         "subdate" => subdate,
@@ -975,15 +976,16 @@ class Downloader
     @stream.puts "<bold><green>#{"ID:#{@id}　#{get_title}".escape} のDL開始</green></bold>".termcolor
     save_least_one = false
     subtitles.each_with_index do |subtitle_info, i|
-      index, subtitle, file_subtitle, chapter = %w(index subtitle file_subtitle chapter).map { |k|
-        subtitle_info[k]
-      }
+      index, subtitle, file_subtitle, chapter, subchapter =
+        %w(index subtitle file_subtitle chapter subchapter).map { |k|
+          subtitle_info[k]
+        }
       info = subtitle_info.dup
       info["element"] = a_section_download(subtitle_info)
 
-      unless chapter.empty?
-        @stream.puts "#{chapter}"
-      end
+      @stream.puts "#{chapter}" unless chapter.empty?
+      @stream.puts "#{subchapter}" unless subchapter.empty?
+
       if get_novel_type == NOVEL_TYPE_SERIES
         if index.to_s.length <= DISPLAY_LIMIT_DIGITS
           # indexの数字がでかいと見た目がみっともないので特定の桁以内だけ表示する

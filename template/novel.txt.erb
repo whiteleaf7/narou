@@ -27,6 +27,9 @@
 ［＃３字下げ］［＃大見出し］<%= section["chapter"] %>［＃大見出し終わり］
 ［＃改ページ］
 <% end -%>
+<% if section["subchapter"].to_s != "" -%>
+［＃１字下げ］［＃１段階大きな文字］<%= section["subchapter"].rstrip %>［＃大きな文字終わり］
+<% end -%>
 
 ［＃３字下げ］［＃中見出し］<%= section["subtitle"].rstrip %>［＃中見出し終わり］
 <% if section["element"]["introduction"] != "" -%>
