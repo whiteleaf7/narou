@@ -983,8 +983,8 @@ class Downloader
       info = subtitle_info.dup
       info["element"] = a_section_download(subtitle_info)
 
-      @stream.puts "#{chapter}" unless chapter.empty?
-      @stream.puts "#{subchapter}" unless subchapter.empty?
+      @stream.puts "#{chapter}" unless chapter.to_s.empty?
+      @stream.puts "#{subchapter}" unless subchapter.to_s.empty?
 
       if get_novel_type == NOVEL_TYPE_SERIES
         if index.to_s.length <= DISPLAY_LIMIT_DIGITS
