@@ -42,6 +42,7 @@ class HTML
       @string = s_to_aozora
     end
     @string = img_to_aozora
+    @string = em_to_sesame
     @string = delete_tag
     @string = Helper.restor_entity(@string)
     @string
@@ -92,5 +93,9 @@ class HTML
     else
       text
     end
+  end
+
+  def em_to_sesame(text = @string)
+    text.gsub(%r!<em class="emphasisDots">(.+?)</em>!, "［＃傍点］\\1［＃傍点終わり］")
   end
 end
