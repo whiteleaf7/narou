@@ -14,8 +14,8 @@ module Command
     end
 
     def self.create_version_string
-      commitversion = Narou.commit_version || `git describe --always`.strip + "(develop)"
-      "#{::Version} build #{commitversion}"
+      postfix = (Narou.commit_version ? "" : " (develop)")
+      "#{::Version}#{postfix}"
     end
   end
 end
