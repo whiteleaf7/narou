@@ -44,4 +44,39 @@ postscript_pattern: null
 
 # ------------------------------------------------------------
 # 小説情報からパースするための設定
-novel_info_url: null
+novel_info_url: \\k<toc_url>
+
+# タイトル
+t: <h1 id="workTitle"><a href=".+?">(?<title>.+?)</a></h1>
+
+# novel_type 小説種別
+nt: <dt><span>執筆状況</span></dt>\n          <dd>(?<novel_type>.+?)</dd>
+novel_type_string:
+  連載中: 1
+  完結済: 3
+
+# general_all_no 掲載話数
+ga: <dt><span>エピソード</span></dt>\n          <dd>(?<general_all_no>\d+)話</dd>
+
+# story あらすじ
+s: |-
+  <p id="introduction" class="ui-truncateText js-work-introduction">(?<story>.+?)(?:</span>|</p>)
+
+# general_firstup 初回掲載日
+gf: |-2
+            <dt><span>公開日</span></dt>
+            <dd><time itemprop="datePublished" datetime="(?<general_firstup>.+?)">.+?</time>
+
+# novelupdated_at 小説の更新時刻。最終掲載日で代用
+nu: |-2
+            <dt><span>最終更新日</span></dt>
+            <dd><time itemprop="dateModified" datetime="(?<novelupdated_at>.+?)">.+?</time>
+
+# general_lastup 最終掲載日
+gl: |-2
+            <dt><span>最終更新日</span></dt>
+            <dd><time itemprop="dateModified" datetime="(?<general_lastup>.+?)">.+?</time>
+
+# writer 作者名
+w: |-
+  (?:<span class="activityName" itemprop="author">(?<writer>.+?)</span>)|(?:<span class="screenName.*?">(?<writer>.+?)</span>)

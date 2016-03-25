@@ -757,7 +757,7 @@ class Downloader
       # なろうAPIの出力がおかしいので直るまで使用中止
       info = Narou::API.new(@setting, "t-s-gf-gl-nu-w")
     else
-      info = NovelInfo.load(@setting)
+      info = NovelInfo.load(@setting, toc_source)
     end
     if info
       raise DownloaderNotFoundError unless info["title"]
