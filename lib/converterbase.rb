@@ -18,7 +18,7 @@ class ConverterBase
   ENGLISH_SENTENCES_MIN_LENGTH = 8   # この文字数以上アルファベットが続くと半角のまま
 
   attr_reader :use_dakuten_font
-  attr_accessor :output_text_dir, :subtitles
+  attr_accessor :output_text_dir, :subtitles, :data_type
   attr_accessor :current_index   # 現在処理してる subtitles 内でのインデックス
 
   def before(io, text_type)
@@ -42,6 +42,7 @@ class ConverterBase
     @use_dakuten_font = false
     @output_text_dir = nil
     @subtitles = nil
+    @data_type = "text"
     @current_index = 0
     reset_member_values
   end
@@ -869,9 +870,11 @@ class ConverterBase
       data.gsub!(/(.+?)≪([^≪]+?)≫/) do |match|
         to_ruby(match, $1, $2, ["≪", "≫"])
       end
-      # （）なルビの対処
-      data.gsub!(/(.+?)（#{AUTO_RUBY_CHARACTERS}）/) do |match|
-        to_ruby(match, $1, $2, ["（", "）"])
+      if @data_type == "text"
+        # （）なルビの対処
+        data.gsub!(/(.+?)（#{AUTO_RUBY_CHARACTERS}）/) do |match|
+          to_ruby(match, $1, $2, ["（", "）"])
+        end
       end
     end
     data.replace(replace_tatesen(data))
