@@ -213,7 +213,7 @@ class Narou::AppServer < Sinatra::Base
       loop do
         if @@push_server.connections.count > 0
           device = Narou.get_device
-          @@push_server.send_all(:"device.ejectable" => device.ejectable?)
+          @@push_server.send_all(:"device.ejectable" => device && device.ejectable?)
         end
 
         sleep 2
@@ -799,7 +799,7 @@ class Narou::AppServer < Sinatra::Base
 
   post "/api/eject" do
     device = Narou.get_device
-    device.eject
+    device.eject if device
     ""
   end
 
