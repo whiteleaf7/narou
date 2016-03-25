@@ -197,6 +197,30 @@ class Narou::AppServer < Sinatra::Base
     }.call
   end
 
+  def initialize
+    super
+    puts_hello_messages
+    start_device_ejectable_event
+  end
+
+  def puts_hello_messages
+    puts "<white>Narou.rb version #{::Version}</white>".termcolor
+  end
+
+  def start_device_ejectable_event
+    return unless Device.support_eject?
+    Thread.new do
+      loop do
+        if @@push_server.connections.count > 0
+          device = Narou.get_device
+          @@push_server.send_all(:"device.ejectable" => device.ejectable?)
+        end
+
+        sleep 2
+      end
+    end
+  end
+
   # ===================================================================
   # ルーティング
   # ===================================================================
@@ -770,6 +794,12 @@ class Narou::AppServer < Sinatra::Base
     @@push_server.send_all("notepad.change" => {
       text: params["text"], object_id: params["object_id"]
     })
+    ""
+  end
+
+  post "/api/eject" do
+    device = Narou.get_device
+    device.eject
     ""
   end
 
