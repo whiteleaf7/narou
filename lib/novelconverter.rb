@@ -628,6 +628,7 @@ class NovelConverter
       section["subtitle"] = @converter.convert(section["subtitle"], "subtitle")
       element = section["element"]
       data_type = element.delete("data_type") || "text"
+      @converter.data_type = data_type
       element.each do |text_type, elm_text|
         if data_type == "html"
           html.string = elm_text
