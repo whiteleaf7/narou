@@ -36,7 +36,7 @@ illust_grep_pattern: <a href="(?<src>.+?)" alt="挿絵" name='img'>【挿絵表�
 
 # ------------------------------------------------------------
 # 小説情報からパースするための設定
-novel_info_url: \\k<top_url>/?mode=ss_detail&nid=\\k<ncode>&volume=1
+novel_info_url: \\k<scheme>://syosetu.org/?mode=ss_detail&nid=\\k<ncode>
 
 # タイトル
 t: タイトル</td><td bgcolor=#FFFFFF><a href=.+?>(?<title>.+?)</a>

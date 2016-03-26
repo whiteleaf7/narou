@@ -938,8 +938,8 @@ class Downloader
       subtitles << {
         "index" => @setting["index"],
         "href" => @setting["href"],
-        "chapter" => @setting["chapter"],
-        "subchapter" => @setting["subchapter"],
+        "chapter" => @setting["chapter"].to_s,
+        "subchapter" => @setting["subchapter"].to_s,
         "subtitle" => @setting["subtitle"].gsub("\n", ""),
         "file_subtitle" => title_to_filename(@setting["subtitle"]),
         "subdate" => subdate,

@@ -7,13 +7,18 @@ require "uri"
 require_relative "helper"
 
 class HTML
-  attr_accessor :string, :strip_decoration_tag
+  attr_reader :string
+  attr_accessor :strip_decoration_tag
 
   def initialize(string = "")
-    @string = string
+    self.string = string
     @illust_current_url = nil
     @illust_grep_pattern = /<img.+?src=\"(?<src>.+?)\".*?>/i
     @strip_decoration_tag = false
+  end
+
+  def string=(str)
+    @string = str.to_s
   end
 
   #
