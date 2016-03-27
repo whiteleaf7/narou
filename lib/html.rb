@@ -7,13 +7,18 @@ require "uri"
 require_relative "helper"
 
 class HTML
-  attr_accessor :string, :strip_decoration_tag
+  attr_reader :string
+  attr_accessor :strip_decoration_tag
 
   def initialize(string = "")
-    @string = string
+    self.string = string
     @illust_current_url = nil
     @illust_grep_pattern = /<img.+?src=\"(?<src>.+?)\".*?>/i
     @strip_decoration_tag = false
+  end
+
+  def string=(str)
+    @string = str.to_s
   end
 
   #
@@ -34,6 +39,7 @@ class HTML
   #
   def to_aozora
     @string = br_to_aozora
+    @string = p_to_aozora
     @string = ruby_to_aozora
     unless @strip_decoration_tag
       @string = b_to_aozora
@@ -41,6 +47,7 @@ class HTML
       @string = s_to_aozora
     end
     @string = img_to_aozora
+    @string = em_to_sesame
     @string = delete_tag
     @string = Helper.restor_entity(@string)
     @string
@@ -52,6 +59,11 @@ class HTML
 
   def br_to_aozora(text = @string)
     text.gsub(/[\r\n]+/, "").gsub(/<br.*?>/i, "\n")
+  end
+
+  # p タグで段落を作ってる場合（brタグが無い場合）に改行されるように
+  def p_to_aozora(text = @string)
+    text.gsub(/\n?<\/p>/i, "\n")
   end
 
   def ruby_to_aozora(text = @string)
@@ -86,5 +98,9 @@ class HTML
     else
       text
     end
+  end
+
+  def em_to_sesame(text = @string)
+    text.gsub(%r!<em class="emphasisDots">(.+?)</em>!, "［＃傍点］\\1［＃傍点終わり］")
   end
 end

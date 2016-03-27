@@ -58,7 +58,7 @@ body {
   display: none;
 }
 
-#fadeout-alert {
+.fadeout-alert {
   position: fixed;
   z-index: 1000;
   width: 350px;
@@ -369,7 +369,7 @@ table.dataTable {
  * フォーム関係
  */
 #myFilter {
-  width: 200px;
+  width: 250px;
   border-radius: 18px;
   padding-left: 29px;
   padding-right: 23px;
@@ -381,7 +381,10 @@ table.dataTable {
     width: 100px;
   }
   @media (min-width:992px){
-    width: 250px;
+    width: 300px;
+  }
+  @media (min-width:1200px){
+    width: 350px;
   }
 }
 @mixin placeholder { color: #bbb !important }
@@ -574,7 +577,7 @@ input::-ms-clear {
 /*
  * コントロールパネル
  */
-#control-panel {
+.control-panel-inner {
   @media (min-width:768px) {
     width: 100%;
   }
@@ -586,6 +589,11 @@ input::-ms-clear {
 
   button {
     margin-bottom: 5px;
+  }
+
+  &.in-footer {
+    margin-top: 7px;
+    margin-bottom: 6px !important;
   }
 }
 
@@ -606,6 +614,7 @@ $console-color: white;
   margin-bottom: 20px !important;
 }
 .console {
+  text-align: left;
   position: relative;
   overflow: hidden;
   padding: 5px 15px 5px 15px;
@@ -789,7 +798,7 @@ $console-color: white;
 /*
  * 個別メニュー
  */
-#context-menu {
+.context-menu {
   z-index: 102;
 }
 
@@ -922,11 +931,6 @@ $console-color: white;
   }
 }
 
-/* タグ検索用ボックス */
-#tag-search {
-  display: none;
-}
-
 /* 差分表示用ダイアログ */
 .diff-list-container {
   .title {
@@ -1040,17 +1044,23 @@ $console-color: white;
 }
 
 /* くるくるまわるアイコン */
-#version-checking-icon {
-  display: inline-block;
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 4px solid #17cddd;
-  border-right-color: transparent;
-  -webkit-animation: spin 1s linear infinite;
-  -moz-animation: spin 1s linear infinite;
-  animation: spin 1s linear infinite;
+.rotate-progress {
+  .icon {
+    display: inline-block;
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 4px solid #17cddd;
+    border-right-color: transparent;
+    -webkit-animation: spin 1s linear infinite;
+    -moz-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+  }
+
+  .text {
+    padding-left: 23px;
+  }
 }
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); opacity: 0.4; }
@@ -1066,4 +1076,45 @@ $console-color: white;
   0% { transform: rotate(0deg); opacity: 0.4; }
   50% { transform: rotate(180deg); opacity: 1; }
   100% { transform: rotate(360deg); opacity: 0.4; }
+}
+
+.link-to-changelog-in-about {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+}
+
+.log-box {
+  position: relative;
+  text-align: left;
+  width: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+  height: 100px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  border-radius: 4px;
+  border: 1px solid lightgray;
+  font-size: 85%;
+  padding: 5px;
+
+  &.large {
+    height: 270px;
+  }
+}
+
+#footer-navbar {
+  min-height: 30px;
+}
+
+.notepad-container {
+  position: relative;
+
+  span {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    color: darkseagreen;
+  }
 }

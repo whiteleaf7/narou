@@ -695,6 +695,8 @@ class Downloader
     end
   end
 
+  class DownloaderForceRedirect < StandardError; end
+
   #
   # HTMLの中から小説が削除されたか非公開なことを示すメッセージを検出する
   #
@@ -707,22 +709,38 @@ class Downloader
   def get_toc_source
     toc_url = @setting["toc_url"]
     return nil unless toc_url
+    max_retry = 5
     toc_source = ""
     cookie = @setting["cookie"] || ""
     open_uri_options = make_open_uri_options("Cookie" => cookie, allow_redirections: :safe)
-    open(toc_url, open_uri_options) do |toc_fp|
-      if toc_fp.base_uri.to_s != toc_url
-        # リダイレクトされた場合。
-        # ノクターン・ムーンライトのNコードを ncode.syosetu.com に渡すと、novel18.syosetu.com に飛ばされる
-        # 目次の定義が微妙に ncode.syosetu.com と違うので、設定を取得し直す
-        s = Downloader.get_sitesetting_by_target(toc_fp.base_uri.to_s)
-        raise DownloaderNotFoundError unless s   # 非公開や削除等でトップページへリダイレクトされる場合がある
-        @setting.clear   # 今まで使っていたのは一旦クリア
-        @setting = s
-        toc_url = @setting["toc_url"]
+    begin
+      open(toc_url, open_uri_options) do |toc_fp|
+        if toc_fp.base_uri.to_s != toc_url
+          # リダイレクトされた場合。
+          # ノクターン・ムーンライトのNコードを ncode.syosetu.com に渡すと、年齢認証のクッションページに飛ばされる
+          # 転送先を取得し再度ページを取得し直す
+          uri = URI.parse(toc_fp.base_uri.to_s)
+          if uri.host == "nl.syosetu.com"
+            decode = Hash[URI.decode_www_form(uri.query)]
+            toc_url = decode["url"]   # 年齢認証確認ページからの転送先
+            raise DownloaderForceRedirect
+          end
+          s = Downloader.get_sitesetting_by_target(toc_fp.base_uri.to_s)
+          raise DownloaderNotFoundError unless s   # 非公開や削除等でトップページへリダイレクトされる場合がある
+          @setting.clear   # 今まで使っていたのは一旦クリア
+          @setting = s
+          toc_url = @setting["toc_url"]
+        end
+        toc_source = Helper.restor_entity(Helper.pretreatment_source(toc_fp.read, @setting["encoding"]))
+        raise DownloaderNotFoundError if Downloader.detect_error_message(@setting, toc_source)
       end
-      toc_source = Helper.restor_entity(Helper.pretreatment_source(toc_fp.read, @setting["encoding"]))
-      raise DownloaderNotFoundError if Downloader.detect_error_message(@setting, toc_source)
+    rescue DownloaderForceRedirect
+      max_retry -= 1
+      if max_retry >= 0
+        retry
+      else
+        raise
+      end
     end
     toc_source
   end
@@ -739,7 +757,7 @@ class Downloader
       # なろうAPIの出力がおかしいので直るまで使用中止
       info = Narou::API.new(@setting, "t-s-gf-gl-nu-w")
     else
-      info = NovelInfo.load(@setting)
+      info = NovelInfo.load(@setting, toc_source)
     end
     if info
       raise DownloaderNotFoundError unless info["title"]
@@ -782,7 +800,7 @@ class Downloader
         $stdout.silence do
           Command::Tag.execute!(%W(#{@id} --add 404 --color white --no-overwrite-color))
         end
-        Command::Freeze.execute!([@id])
+        Command::Freeze.execute!([@id, "--on"])
       end
     else
       @stream.error "何らかの理由により目次が取得できませんでした(#{e.message})"
@@ -920,7 +938,8 @@ class Downloader
       subtitles << {
         "index" => @setting["index"],
         "href" => @setting["href"],
-        "chapter" => @setting["chapter"],
+        "chapter" => @setting["chapter"].to_s,
+        "subchapter" => @setting["subchapter"].to_s,
         "subtitle" => @setting["subtitle"].gsub("\n", ""),
         "file_subtitle" => title_to_filename(@setting["subtitle"]),
         "subdate" => subdate,
@@ -957,15 +976,16 @@ class Downloader
     @stream.puts "<bold><green>#{"ID:#{@id}　#{get_title}".escape} のDL開始</green></bold>".termcolor
     save_least_one = false
     subtitles.each_with_index do |subtitle_info, i|
-      index, subtitle, file_subtitle, chapter = %w(index subtitle file_subtitle chapter).map { |k|
-        subtitle_info[k]
-      }
+      index, subtitle, file_subtitle, chapter, subchapter =
+        %w(index subtitle file_subtitle chapter subchapter).map { |k|
+          subtitle_info[k]
+        }
       info = subtitle_info.dup
       info["element"] = a_section_download(subtitle_info)
 
-      unless chapter.empty?
-        @stream.puts "#{chapter}"
-      end
+      @stream.puts "#{chapter}" unless chapter.to_s.empty?
+      @stream.puts "#{subchapter}" unless subchapter.to_s.empty?
+
       if get_novel_type == NOVEL_TYPE_SERIES
         if index.to_s.length <= DISPLAY_LIMIT_DIGITS
           # indexの数字がでかいと見た目がみっともないので特定の桁以内だけ表示する
@@ -1112,6 +1132,9 @@ class Downloader
         end
         sleep(WAITING_TIME_FOR_503)
         retry
+      elsif e.message =~ /^404/
+        @stream.error "#{url} がダウンロード出来ませんでした。時間をおいて再度試してみてください"
+        exit Narou::EXIT_ERROR_CODE
       else
         raise
       end

@@ -19,7 +19,7 @@ module Narou
     attr_reader :accepted_domains, :connections
 
     def accepted_domains=(domains)
-      @accepted_domains = domains.kind_of?(Array) ? domains : [domains]
+      @accepted_domains = Array(domains)
     end
 
     def initialize
@@ -100,12 +100,23 @@ module Narou
       # echo 以外のイベントは履歴に保存しない
       message = data[:echo]
       if message
-        @history.push(message)
-        @history.shift
+        stack_to_history(message)
       end
     rescue JSON::GeneratorError => e
       STDERR.puts $@.shift + ": #{e.message} (#{e.class})"
     end
+
+    def stack_to_history(message)
+      if message == "." && @history[-1] =~ /\A\.+\z/
+        # 進行中を表す .... の出力でヒストリーが消費されるのを防ぐため、
+        # 連続した . は一つにまとめる
+        @history[-1] << "."
+      else
+        @history.push(message)
+        @history.shift
+      end
+    end
+
   end
 end
 

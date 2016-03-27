@@ -189,24 +189,24 @@ module Command
         end
 
         if File.file?(target.to_s)
-          res = convert_txt(target)
+          converted_txt_path = convert_txt(target)
         else
           @argument_target_type = :novel
           unless Downloader.novel_exists?(target)
             error "#{target} は存在しません"
             next
           end
-          res = NovelConverter.convert(target, {
-                  output_filename: @output_filename,
-                  display_inspector: @options["inspect"],
-                  ignore_force: @options["ignore-force"],
-                  ignore_default: @options["ignore-default"],
-                })
+          converted_txt_path =
+            NovelConverter.convert(target, {
+              output_filename: @output_filename,
+              display_inspector: @options["inspect"],
+              ignore_force: @options["ignore-force"],
+              ignore_default: @options["ignore-default"],
+            })
           @novel_data = Downloader.get_data_by_target(target)
         end
-        next unless res
-        @converted_txt_path = res[:converted_txt_path]
-        @use_dakuten_font = res[:use_dakuten_font]
+        next unless converted_txt_path
+        @converted_txt_path = converted_txt_path
 
         ebook_file = hook_call(:convert_txt_to_ebook_file)
         next if ebook_file.nil?
@@ -256,7 +256,6 @@ module Command
     #
     def convert_txt_to_ebook_file
       return NovelConverter.convert_txt_to_ebook_file(@converted_txt_path, {
-        use_dakuten_font: @use_dakuten_font,
         device: @device,
         verbose: @options["verbose"],
         no_epub: @options["no-epub"],

@@ -21,6 +21,7 @@ module Narou
   GLOBAL_REPLACE_NAME = "replace.txt"
   EXIT_ERROR_CODE = 127
   EXIT_INTERRUPT = 126
+  EXIT_REQUEST_REBOOT = 125
 
   UPDATE_SORT_KEYS = {
     "id" => "ID", "last_update" => "更新日", "title" => "タイトル", "author" => "作者名",
@@ -274,6 +275,25 @@ module Narou
   def novel_type_text(type)
     type == 2 ? "短編" : "連載"
   end
+
+  #
+  # Narou.rb gem の最新バージョン番号を取得する
+  #
+  # rubygems公式APIによる取得は、WindowsでのSSL証明書問題で取得出来ない
+  # 環境があるため、gemコマンド経由で取得する
+  #
+  def latest_version
+    response = `gem search ^narou$`.split("\n")
+    if response.last =~ /\Anarou \((.+?)\)\z/
+      $1
+    end
+  end
+
+  def commit_version
+    cv_path = File.expand_path("commitversion", get_script_dir)
+    File.read(cv_path) if File.exist?(cv_path)
+  end
+  memoize :commit_version
 
  end
 end

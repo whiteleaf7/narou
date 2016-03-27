@@ -335,7 +335,6 @@ module Command
       ignore_default = false
 
       converted_text_array = []
-      use_dakuten_font = false
 
       Helper.print_horizontal_rule
       puts "hotentry の変換を開始"
@@ -359,7 +358,6 @@ module Command
             setting: setting,
             text: novel_converter.convert_main_for_novel(subtitles, true)
           }
-          use_dakuten_font |= novel_converter.use_dakuten_font
 
           total_progress += last_num + 1
         end
@@ -380,7 +378,6 @@ module Command
       # テキストを書籍データに変換
       relay_proc = -> {
         NovelConverter.convert_txt_to_ebook_file(txt_output_path, {
-          use_dakuten_font: use_dakuten_font,
           device: device
         })
       }

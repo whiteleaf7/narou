@@ -12,8 +12,7 @@ module Device::Ibunko
   DISPLAY_NAME = "i文庫"
 
   RELATED_VARIABLES = {
-    "default.enable_half_indent_bracket" => false,
-    "default.enable_dakuten_font" => false
+    "default.enable_half_indent_bracket" => false
   }
 
   #

@@ -6,10 +6,8 @@
 require "socket"
 require "sinatra/base"
 require "sinatra/json"
-if $debug
-  require "sinatra/reloader"
-  require "pry"
-end
+require "sinatra/reloader" if $development
+require "better_errors" if $debug
 require "tilt/erubis"
 require "tilt/haml"
 require "tilt/sass"
@@ -25,7 +23,7 @@ module Narou::ServerHelpers
   # タグをHTMLで装飾する
   #
   def decorate_tags(tags)
-    tags.map do |tag|
+    tags.sort.map do |tag|
       %!<span class="tag label label-#{Command::Tag.get_color(tag)}" data-tag="#{escape_html(tag)}">#{escape_html(tag)}</span>!
     end.join(" ")
   end
@@ -103,11 +101,19 @@ module Narou::ServerHelpers
       value
     end
   end
+
+  def notepad_text_path
+    File.join(Narou.get_local_setting_dir, "notepad.txt")
+  end
 end
 
 class Narou::AppServer < Sinatra::Base
-  register Sinatra::Reloader if $debug
+  register Sinatra::Reloader if $development
   helpers Narou::ServerHelpers
+
+  @@request_reboot = false
+  @@already_update_system = false
+  @@gem_update_last_log = ""
 
   configure do
     set :app_file, __FILE__
@@ -119,11 +125,29 @@ class Narou::AppServer < Sinatra::Base
       Command::Version.create_version_string
     end
 
-    set :environment, :production unless $debug
+    set :environment, :production unless $development
+    set :server, :webrick
+
+    if $debug
+      use BetterErrors::Middleware
+      BetterErrors.application_root = Narou.get_script_dir
+    end
   end
 
   def self.push_server=(server)
     @@push_server = server
+  end
+
+  def self.push_server
+    @@push_server
+  end
+
+  def self.request_reboot
+    @@request_reboot = true
+  end
+
+  def self.request_reboot?
+    @@request_reboot
   end
 
   #
@@ -171,6 +195,30 @@ class Narou::AppServer < Sinatra::Base
       udp.close
       adrs
     }.call
+  end
+
+  def initialize
+    super
+    puts_hello_messages
+    start_device_ejectable_event
+  end
+
+  def puts_hello_messages
+    puts "<white>Narou.rb version #{::Version}</white>".termcolor
+  end
+
+  def start_device_ejectable_event
+    return unless Device.support_eject?
+    Thread.new do
+      loop do
+        if @@push_server.connections.count > 0
+          device = Narou.get_device
+          @@push_server.send_all(:"device.ejectable" => device && device.ejectable?)
+        end
+
+        sleep 2
+      end
+    end
   end
 
   # ===================================================================
@@ -291,12 +339,42 @@ class Narou::AppServer < Sinatra::Base
   get "/about" do
     @narourb_version = settings.version
     @ruby_version = build_ruby_version
-    haml :about, layout: false
+    haml :_about, layout: false
   end
 
   post "/shutdown" do
     self.class.quit!
     "シャットダウンしました。再起動するまで操作は出来ません"
+  end
+
+  post "/reboot" do
+    self.class.request_reboot
+    self.class.quit!
+    haml :_rebooting, layout: false
+  end
+
+  post "/update_system" do
+    Thread.new do
+      buffer = `gem update --no-document narou`
+      @@gem_update_last_log = buffer.strip!
+      if buffer =~ /Nothing to update\z/
+        @@push_server.send_all("server.update.nothing" => buffer)
+      elsif buffer.include?("Gems updated: narou")
+        @@already_update_system = true
+        @@push_server.send_all("server.update.success" => buffer)
+      else
+        @@push_server.send_all("server.update.failure" => buffer)
+      end
+    end
+  end
+
+  post "/gem_update_last_log" do
+    content_type "text/plain"
+    @@gem_update_last_log
+  end
+
+  post "/check_already_update_system" do
+    json({ result: @@already_update_system })
   end
 
   before "/novels/:id/*" do
@@ -376,10 +454,24 @@ class Narou::AppServer < Sinatra::Base
     ext = device ? device.ebook_file_ext : ".epub"
     path = Narou.get_ebook_file_path(@id, ext)
     if File.exist?(path)
-      send_file(path, filename: File.basename(path))
+      send_file(path, filename: File.basename(path), type: "application/octet-stream")
     else
       not_found
     end
+  end
+
+  get "/notepad" do
+    @title = "メモ帳"
+    haml :notepad
+  end
+
+  get "/edit_menu" do
+    @title = "個別メニューの編集"
+    haml :edit_menu
+  end
+
+  not_found do
+    "not found"
   end
 
   # -------------------------------------------------------------------------------
@@ -411,7 +503,7 @@ class Narou::AppServer < Sinatra::Base
             tags.include?("end") ? "完結" : nil,
             tags.include?("404") ? "削除" : nil,
           ].compact.join(", "),
-          download: %!<a href="/novels/#{id}/download" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-book"></span></a>!,
+          download: %!<a href="/novels/#{id}/download" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-download-alt"></span></a>!,
           frozen: Narou.novel_frozen?(id),
           new_arrivals_date: data["new_arrivals_date"].tap { |m| break m.to_i if m },
           general_lastup: data["general_lastup"].tap { |m| break m.to_i if m }
@@ -529,7 +621,7 @@ class Narou::AppServer < Sinatra::Base
     target = params["target"] or return ""
     id = Downloader.get_id_by_target(target) or return ""
     @list = Command::Diff.new.get_diff_list(id)
-    haml :diff_list, layout: false
+    haml :_diff_list, layout: false
   end
 
   post "/api/diff_clean" do
@@ -564,9 +656,11 @@ class Narou::AppServer < Sinatra::Base
   end
 
   get "/api/tag_list" do
-    result = '<div><span class="tag label label-default" data-tag="">タグ検索を解除</span></div>'
+    result =
+      '<div><span class="tag label label-default" data-tag="">タグ検索を解除</span></div>' \
+      '<div class="text-muted" style="font-size:10px">Altキーを押しながらで除外検索</div>'
     tagname_list = Command::Tag.get_tag_list.keys
-    tagname_list.each do |tagname|
+    tagname_list.sort.each do |tagname|
       result << "<div>#{decorate_tags([tagname])} " \
                 "<span class='select-color-button' data-target-tag='#{h tagname}'>" \
                 "<span class='#{Command::Tag.get_color(tagname)}'>a</span></span></div>"
@@ -683,9 +777,30 @@ class Narou::AppServer < Sinatra::Base
   end
 
   get "/api/version/latest.json" do
-    open("https://rubygems.org/api/v1/versions/narou/latest.json?#{Time.now.to_i}") do |fp|
-      fp.read
+    json({ version: Narou.latest_version })
+  end
+
+  get "/api/notepad/read" do
+    content_type "text/plain"
+    if File.exist?(notepad_text_path)
+      File.read(notepad_text_path)
+    else
+      ""
     end
+  end
+
+  post "/api/notepad/save" do
+    File.write(notepad_text_path, params["text"])
+    @@push_server.send_all("notepad.change" => {
+      text: params["text"], object_id: params["object_id"]
+    })
+    ""
+  end
+
+  post "/api/eject" do
+    device = Narou.get_device
+    device.eject if device
+    ""
   end
 
   # -------------------------------------------------------------------------------
@@ -740,6 +855,10 @@ class Narou::AppServer < Sinatra::Base
 
   get "/widget/drag_and_drop" do
     haml :"widget/drag_and_drop", layout: nil
+  end
+
+  get "/widget/notepad" do
+    haml :"widget/notepad", layout: nil
   end
 end
 

@@ -23,8 +23,6 @@ class NovelConverter
   NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
   NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO = "ibunko_novel.txt"
 
-  attr_reader :use_dakuten_font
-
   if Narou.already_init?
     @@site_settings = Downloader.load_settings
   end
@@ -41,10 +39,7 @@ class NovelConverter
     setting = NovelSetting.load(target, options[:ignore_force], options[:ignore_default])
     if setting
       novel_converter = new(setting, options[:output_filename], options[:display_inspector])
-      return {
-        converted_txt_path: novel_converter.convert_main,
-        use_dakuten_font: novel_converter.use_dakuten_font
-      }
+      return novel_converter.convert_main
     end
     nil
   end
@@ -72,22 +67,8 @@ class NovelConverter
     if options[:encoding]
       text.force_encoding(options[:encoding]).encode!(Encoding::UTF_8)
     end
-    {
-      converted_txt_path: novel_converter.convert_main(text),
-      use_dakuten_font: novel_converter.use_dakuten_font
-    }
-  end
 
-  def self.stash_aozora_fonts_directory
-    fonts_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "template/OPS/fonts")
-    return unless File.exist?(fonts_path)
-    FileUtils.mv(fonts_path, fonts_path + "_hide")
-  end
-
-  def self.visible_aozora_fonts_directory
-    fonts_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "template/OPS/fonts")
-    return unless File.exist?(fonts_path + "_hide")
-    FileUtils.mv(fonts_path + "_hide", fonts_path)
+    novel_converter.convert_main(text)
   end
 
   #
@@ -100,7 +81,7 @@ class NovelConverter
   #
   # 返り値：正常終了 :success、エラー終了 :error、AozoraEpub3が見つからなかった nil
   #
-  def self.txt_to_epub(filename, use_dakuten_font = false, dst_dir = nil, device = nil, verbose = false)
+  def self.txt_to_epub(filename, dst_dir = nil, device = nil, verbose = false)
     abs_srcpath = File.expand_path(filename)
     src_dir = File.dirname(abs_srcpath)
 
@@ -149,14 +130,12 @@ class NovelConverter
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
-    stash_aozora_fonts_directory unless use_dakuten_font
     print "AozoraEpub3でEPUBに変換しています"
     begin
       res = Helper::AsyncCommand.exec(command) do
         print "."
       end
     ensure
-      visible_aozora_fonts_directory unless use_dakuten_font
       Dir.chdir(pwd)
     end
 
@@ -267,7 +246,6 @@ class NovelConverter
   #
   def self.convert_txt_to_ebook_file(txt_path, options)
     options = {
-      use_dakuten_font: false,
       dst_dir: nil,
       device: nil,
       verbose: false,
@@ -283,8 +261,7 @@ class NovelConverter
     return false if options[:no_epub]
     clean_up_file_list << txt_path unless options[:no_cleanup_txt]
     # epub
-    status = NovelConverter.txt_to_epub(txt_path, options[:use_dakuten_font],
-                                        options[:dst_dir], device, options[:verbose])
+    status = NovelConverter.txt_to_epub(txt_path, options[:dst_dir], device, options[:verbose])
     return nil if status != :success
     if device && device.kobo?
       epub_ext = device.ebook_file_ext
@@ -340,7 +317,6 @@ class NovelConverter
     @inspector = Inspector.new(@setting)
     @illustration = Illustration.new(@setting, @inspector)
     @display_inspector = display_inspector
-    @use_dakuten_font = false
     @converter = create_converter
     @converter.output_text_dir = output_text_dir
     @data = @novel_id ? Database.instance.get_data("id", @novel_id) : {}
@@ -415,11 +391,13 @@ class NovelConverter
   end
 
   #
-  # 2045年くらいまでの残り時間を10分単位の36進数で取得する
+  # 2035年くらいまでの残り時間を10分単位の36進数で取得する
   # hyff のような文字列が取得可能
+  # 小説家になろうで、もっとも古い作品が2004年5月1日11時49分なので、
+  # その小説がちょうど4桁の zzzz となるように調整してある
   #
   def calc_reverse_short_time(time)
-    ((2396736000 - time.to_i) / (10 * 60)).to_s(36).rjust(4, "0")
+    ((2091149000 - time.to_i) / (10 * 60)).to_s(36).rjust(4, "0")
   end
 
   #
@@ -427,7 +405,7 @@ class NovelConverter
   # 日付の種類は title_date_target で指定する
   #
   # strftime の書式の他に拡張書式として $s, $t をサポートする
-  # $s 2045年くらいまでの残り時間を10分単位の36進数（4桁）
+  # $s 2035年くらいまでの残り時間を10分単位の36進数（4桁）
   # $t タイトル自身。書式の中で自由な位置にタイトルを埋め込める
   # $ns 小説が掲載されているサイト名
   # $nt 小説種別（短編 or 連載）
@@ -562,8 +540,6 @@ class NovelConverter
     # 表紙の挿絵注記を3行目に挟み込む
     converted_text = [splited[0], splited[1], create_cover_chuki, splited[2]].join("\n")
 
-    @use_dakuten_font = @converter.use_dakuten_font
-
     converted_text
   end
 
@@ -623,8 +599,10 @@ class NovelConverter
         section["chapter"] = @converter.convert(section["chapter"], "chapter")
       end
       @inspector.subtitle = section["subtitle"]
+      section["subtitle"] = @converter.convert(section["subtitle"], "subtitle")
       element = section["element"]
       data_type = element.delete("data_type") || "text"
+      @converter.data_type = data_type
       element.each do |text_type, elm_text|
         if data_type == "html"
           html.string = elm_text
@@ -632,10 +610,8 @@ class NovelConverter
         end
         element[text_type] = @converter.convert(elm_text, text_type)
       end
-      section["subtitle"] = @converter.convert(section["subtitle"], "subtitle")
       sections << section
     end
-    @use_dakuten_font = @converter.use_dakuten_font
     sections
   ensure
     trigger(:"convert_main.finish")

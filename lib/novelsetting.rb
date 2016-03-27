@@ -355,12 +355,6 @@ class NovelSetting
       help: "ここで設定した値が `enable_convert_page_break` に反映される"
     },
     {
-      name: "enable_dakuten_font",
-      type: :boolean,
-      value: true,
-      help: "濁点フォントを使用する。false の場合は縦中横による擬似表現を使用する"
-    },
-    {
       name: "enable_display_end_of_book",
       type: :boolean,
       value: true,
