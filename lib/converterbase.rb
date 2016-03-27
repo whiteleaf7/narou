@@ -17,7 +17,6 @@ class ConverterBase
   ENGLISH_SENTENCES_CHARACTERS = /[\w.,!?'" &:;_-]+/
   ENGLISH_SENTENCES_MIN_LENGTH = 8   # この文字数以上アルファベットが続くと半角のまま
 
-  attr_reader :use_dakuten_font
   attr_accessor :output_text_dir, :subtitles, :data_type
   attr_accessor :current_index   # 現在処理してる subtitles 内でのインデックス
 
@@ -39,7 +38,6 @@ class ConverterBase
     @setting = setting
     @inspector = inspector
     @illustration = illustration
-    @use_dakuten_font = false
     @output_text_dir = nil
     @subtitles = nil
     @data_type = "text"
@@ -451,23 +449,6 @@ class ConverterBase
   #
   def rebuild_kome_to_gaiji(data)
     data.gsub!("※※", "※［＃米印、1-2-8］")
-  end
-
-  #
-  # 濁点のついてない文字に濁点をつける表現を対応
-  #
-  # 濁点つきフォントに部分的に切り替える
-  #
-  def convert_dakuten_char_to_font(data)
-    data.gsub!(/(.)[゛ﾞ]/) do
-      m1 = $1
-      if m1 =~ /[ぁ-んァ-ヶι]/ && @setting.enable_dakuten_font
-        @use_dakuten_font = true
-        "［＃濁点］#{m1}［＃濁点終わり］"
-      else
-        tcy(m1 + "゛")
-      end
-    end
   end
 
   #
@@ -1150,7 +1131,6 @@ class ConverterBase
     convert_special_characters(data)
     convert_fraction_and_date(data)
     modify_kana_ni_to_kanji_ni(data)
-    convert_dakuten_char_to_font(data)
   end
 
   def before_convert(io)

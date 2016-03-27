@@ -25,16 +25,6 @@ rt { font-size: 0.6em; }
 	font-size: 0.8em;
 }
 
-/* 濁点フォント */
-@font-face {
-	font-family: "DakutenAokinMincho";
-	src: url(../fonts/DMincho.ttf) format("truetype");
-}
-
-.dakuten {
-	font-family: "DakutenAokinMincho" !important;
-}
-
 /* 二分アキ */
 .half_em_space { padding-top: 0.5em; }
 
