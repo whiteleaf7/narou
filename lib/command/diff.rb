@@ -82,7 +82,7 @@ module Command
       super
       @options["number"] = 1 unless @options["number"]
       if argv.empty?
-        latest = Database.instance.sort_by_last_update.first
+        latest = Database.instance.sort_by("last_update").first
         return unless latest
         id = latest["id"]
       else
