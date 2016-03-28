@@ -35,7 +35,7 @@ module Command
         latest_id = Inventory.load("latest_convert")["id"]
         if latest_id
           data = Downloader.get_data_by_target(latest_id)
-          display_log(data["title"])
+          display_log(data)
         end
         return
       end
@@ -47,13 +47,13 @@ module Command
           error "#{target} は存在しません"
           next
         end
-        display_log(data["title"])
+        display_log(data)
       end
     end
 
-    def display_log(title)
-      puts "(#{title} の小説状態調査状況ログ)"
-      novel_setting = NovelSetting.load(title, false, false)
+    def display_log(data)
+      puts "(#{data["title"]} の小説状態調査状況ログ)"
+      novel_setting = NovelSetting.load(data["id"], false, false)
       puts Inspector.read_messages(novel_setting) || "調査ログがまだ無いようです"
     end
   end
