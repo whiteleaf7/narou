@@ -46,6 +46,15 @@ body {
   }
 }
 
+// FireFox リンク選択時の点線を消す
+a:link,
+a:visited,
+a:active,
+a:hover {
+  overflow: hidden;
+  outline: none;
+}
+
 .centering {
   left: 0;
   right: 0;
