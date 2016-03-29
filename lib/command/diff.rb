@@ -80,14 +80,16 @@ module Command
     def execute(argv)
       short_number_option_parse(argv)
       super
-      @options["number"] = 1 unless @options["number"]
+      @options["number"] ||= 1
       if argv.empty?
-        latest = Database.instance.sort_by_last_update.first
+        latest = Database.instance.sort_by("last_update").first
         return unless latest
         id = latest["id"]
+        @novel_data = latest
       else
         target = argv.shift
-        id = Downloader.get_id_by_target(target)
+        @novel_data = Downloader.get_data_by_target(target)
+        id = @novel_data["id"]
       end
       unless id
         error "#{target} は存在しません"
@@ -132,7 +134,7 @@ module Command
 
     def clean_diff(id)
       cache_root_dir = Downloader.get_cache_root_dir(id)
-      print Database.instance.get_data("id", id)["title"] + " の"
+      print @novel_data["title"] + " の"
       unless File.exist?(cache_root_dir)
         puts "差分はひとつもありません"
         return
@@ -193,14 +195,14 @@ module Command
         cache_dir = list ? list[nth - 1] : nil
       end
       unless cache_dir
-        puts "差分データがありません"
+        puts "#{@novel_data["title"]} の差分データがありません"
         return nil
       end
       cache_section_list = Dir.glob("#{cache_dir}/*.yaml").sort_by { |path|
         File.basename(path, ".yaml").split(" ", 2)[0].to_i
       }
       if cache_section_list.length == 0
-        puts "最新話のみのアップデートのようです"
+        puts "#{@novel_data["title"]} は最新話のみのアップデートのようです"
         return nil
       end
       novel_dir = Downloader.get_novel_section_save_dir(Downloader.get_novel_data_dir_by_target(id))
@@ -241,7 +243,7 @@ module Command
     def get_diff_list(id)
       list = {
         id: id,
-        title: Database.instance.get_data("id", id)["title"],
+        title: @novel_data["title"],
         list: []
       }
       cache_list = get_sorted_cache_list(id)
@@ -303,8 +305,7 @@ module Command
     def display_diff_on_oneself(id)
       require_relative "../diffviewer"
       temp_paths = create_temp_files(id) or return
-      title = Database.instance.get_data("id", id)["title"]
-      puts "#{title} の差分を表示します"
+      puts "#{@novel_data["title"]} の差分を表示します"
       DiffViewer.new(*temp_paths).view
     ensure
       temp_paths.map(&:delete) if temp_paths
