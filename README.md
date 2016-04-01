@@ -3,13 +3,6 @@ Narou.rb ― 「小説家になろう」「小説を読もう！」ダウンロ�
 
 [![Gem Version](https://badge.fury.io/rb/narou.svg)](http://badge.fury.io/rb/narou)
 
-お知らせ
---------
-	Narou.rb の動作環境において、Ruby 2.0.0 でのサポートは2015年8月31日で打ち切ります。
-	すでに Ruby 2.0.0 はセキュリティフィックスのみ提供されており、保守は2016年2月24日に終了すると予告されています。
-	Ruby 2.1.0 以上へのバージョンアップをお願いします
-
-
 概要 - Summary
 --------------
 このアプリは[小説家になろう](http://syosetu.com/)、[小説を読もう！](http://yomou.syosetu.com/)で公開されている小説の管理、
@@ -18,12 +11,14 @@ Narou.rb ― 「小説家になろう」「小説を読もう！」ダウンロ�
 また、校正機能もありますので、小説としての一般的な整形ルールに矯正します。（例：感嘆符のあとにはスペースが必ずくる）
 
 対応小説サイト：
-+ 小説家になろう（小説を読もう） http://syosetu.com/
++ 小説家になろう http://syosetu.com/
 + ノクターンノベルズ http://noc.syosetu.com/
 + ムーンライトノベルズ http://mnlt.syosetu.com/
-+ ハーメルン http://syosetu.org/
++ ミッドナイトノベルズ http://mid.syosetu.com/
++ ハーメルン https://syosetu.org/
 + Arcadia http://www.mai-net.net/
-+ 暁 http://www.akatsuki-novels.com/
++ 暁 http://www.akatsuki-novels.com/ （※300話以上ある作品は未対応）
++ カクヨム https://kakuyomu.jp/
 
 コンソールで操作するアプリケーションですが、ブラウザを使って直感的に操作することができる WEB UI も搭載！（[デモページ](http://whiteleaf7.github.io/narou/demo/)）
 
