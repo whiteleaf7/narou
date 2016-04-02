@@ -204,6 +204,7 @@ module Command
               ignore_default: @options["ignore-default"],
             })
           @novel_data = Downloader.get_data_by_target(target)
+          @options["yokogaki"] = NovelSetting.load(target)["enable_yokogaki"]
         end
         next unless converted_txt_path
         @converted_txt_path = converted_txt_path
@@ -261,7 +262,8 @@ module Command
         no_epub: @options["no-epub"],
         no_mobi: @options["no-mobi"],
         no_strip: @options["no-strip"],
-        no_cleanup_txt: @argument_target_type == :file
+        no_cleanup_txt: @argument_target_type == :file,
+        yokogaki: @options["yokogaki"]
       })
     end
 

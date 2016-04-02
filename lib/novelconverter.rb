@@ -81,7 +81,7 @@ class NovelConverter
   #
   # 返り値：正常終了 :success、エラー終了 :error、AozoraEpub3が見つからなかった nil
   #
-  def self.txt_to_epub(filename, dst_dir = nil, device = nil, verbose = false)
+  def self.txt_to_epub(filename, dst_dir: nil, device: nil, verbose: false, yokogaki: false)
     abs_srcpath = File.expand_path(filename)
     src_dir = File.dirname(abs_srcpath)
 
@@ -108,6 +108,8 @@ class NovelConverter
       end
     end
 
+    yokogaki_option = yokogaki ? "-hor" : ""
+
     pwd = Dir.pwd
 
     aozoraepub3_path = Narou.get_aozoraepub3_path
@@ -126,7 +128,7 @@ class NovelConverter
     end
     Dir.chdir(aozoraepub3_dir)
     command = %!java #{java_encoding} -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 -of #{device_option} ! +
-              %!#{cover_option} #{dst_option} #{ext_option} "#{abs_srcpath}"!
+              %!#{cover_option} #{dst_option} #{ext_option} #{yokogaki_option} "#{abs_srcpath}"!
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
@@ -253,6 +255,7 @@ class NovelConverter
       no_mobi: false,
       no_strip: false,
       no_cleanup_txt: false,
+      yokogaki: false,
     }.merge(options)
 
     device = options[:device]
@@ -261,7 +264,9 @@ class NovelConverter
     return false if options[:no_epub]
     clean_up_file_list << txt_path unless options[:no_cleanup_txt]
     # epub
-    status = NovelConverter.txt_to_epub(txt_path, options[:dst_dir], device, options[:verbose])
+    status = NovelConverter.txt_to_epub(txt_path,
+                                        dst_dir: options[:dst_dir], device: device,
+                                        verbose: options[:verbose], yokogaki: options[:yokogaki])
     return nil if status != :success
     if device && device.kobo?
       epub_ext = device.ebook_file_ext

@@ -17,7 +17,7 @@ class NovelSetting
   #
   # データベースに登録されている小説の設定を取得する
   #
-  def self.load(target, ignore_force, ignore_default)
+  def self.load(target, ignore_force = false, ignore_default = false)
     setting = create(target, ignore_force, ignore_default)
     data = Downloader.get_data_by_target(target)
     setting.id = data["id"]
@@ -222,6 +222,12 @@ class NovelSetting
     # type: 変数の型
     # value: 初期値
     # help: 説明(setting.ini に書き出される)
+    {
+      name: "enable_yokogaki",
+      type: :boolean,
+      value: false,
+      help: "横書きにする"
+    },
     {
       name: "enable_inspect",
       type: :boolean,

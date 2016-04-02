@@ -28,7 +28,10 @@
 ［＃１字下げ］［＃１段階大きな文字］<%= section["subchapter"].rstrip %>［＃大きな文字終わり］
 <% end -%>
 
-［＃３字下げ］［＃中見出し］<%= section["subtitle"].rstrip %>［＃中見出し終わり］
+<% if @setting.enable_yokogaki -%>
+［＃１字下げ］<% else -%>
+［＃３字下げ］<% end -%>
+［＃中見出し］<%= section["subtitle"].rstrip %>［＃中見出し終わり］
 
 <% if section["element"]["introduction"] != "" -%>
 ［＃ここから６字下げ］
