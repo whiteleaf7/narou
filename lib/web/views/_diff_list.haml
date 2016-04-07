@@ -1,11 +1,15 @@
 .diff-list-container
   .title #{@list[:title]}
   .list{ "data-diff-target" => @list[:id] }
-    - @list[:list].each do |data|
-      - next if data[:objects].empty?
-      .item{ "data-diff-item-number" => data[:number] }
-        .date #{data[:time].strftime("%Y/%m/%d %H:%M")}
-        %ul.subtitles
-          - data[:objects].each do |object|
-            %li
-              第#{object[:index]}部分　#{object[:subtitle]}
+    - if @list[:list].empty?
+      %i
+        （差分がまだ存在しません）
+    - else
+      - @list[:list].each do |data|
+        - next if data[:objects].empty?
+        .item{ "data-diff-item-number" => data[:number] }
+          .date #{data[:time].strftime("%Y/%m/%d %H:%M")}
+          %ul.subtitles
+            - data[:objects].each do |object|
+              %li
+                第#{object[:index]}部分　#{object[:subtitle]}
