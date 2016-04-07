@@ -241,6 +241,7 @@ module Command
     end
 
     def get_diff_list(id)
+      @novel_data ||= Database.instance.get_data("id", id)
       list = {
         id: id,
         title: @novel_data["title"],
