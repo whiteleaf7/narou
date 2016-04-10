@@ -678,6 +678,7 @@ class Narou::AppServer < Sinatra::Base
       tags.each do |tag|
         tag_info[tag] ||= {
           count: 0,
+          tag: tag,
           html: decorate_tags([tag])
         }
         if ids.include?(data["id"])
@@ -685,7 +686,7 @@ class Narou::AppServer < Sinatra::Base
         end
       end
     end
-    json tag_info
+    json Hash[tag_info.sort_by { |k, v| k }].values
   end
 
   post "/api/edit_tag" do
