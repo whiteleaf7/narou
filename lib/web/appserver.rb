@@ -493,9 +493,7 @@ class Narou::AppServer < Sinatra::Base
           title: escape_html(data["title"]),
           author: escape_html(data["author"]),
           sitename: data["sitename"],
-          toc_url: %!<a href="#{escape_html(data["toc_url"])}" class="btn btn-default btn-xs" target="_blank" ! +
-                   %!data-toggle="tooltip" data-placement="top" title="#{data["toc_url"]}">! +
-                   %!<span class="glyphicon glyphicon-link"></span></a>!,
+          toc_url: data["toc_url"],
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
           tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'),
           status: [
