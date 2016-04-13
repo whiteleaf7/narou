@@ -464,6 +464,7 @@ class Downloader
     "5" => "最新のあらすじを表示する",
     "6" => "小説ページをブラウザで開く",
     "7" => "保存フォルダを開く",
+    "8" => "変換する",
     default: "2"
   }.freeze
 
@@ -507,6 +508,7 @@ class Downloader
         else
           choice = Narou::Input.choose(title, message, CHOICES)
         end
+
         case choice
         when "1"
           return false
@@ -528,6 +530,8 @@ class Downloader
           Helper.open_browser(latest_toc["toc_url"])
         when "7"
           Helper.open_directory(Downloader.get_novel_data_dir_by_target(latest_toc["toc_url"]))
+        when "8"
+          Command::Convert.execute!([latest_toc["toc_url"]])
         end
         unless Narou.web?
           message = ""   # 長いので二度は表示しない
