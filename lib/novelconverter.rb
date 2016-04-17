@@ -23,6 +23,8 @@ class NovelConverter
   NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
   NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO = "ibunko_novel.txt"
 
+  attr_reader :use_dakuten_font
+
   if Narou.already_init?
     @@site_settings = Downloader.load_settings
   end
@@ -39,7 +41,10 @@ class NovelConverter
     setting = NovelSetting.load(target, options[:ignore_force], options[:ignore_default])
     if setting
       novel_converter = new(setting, options[:output_filename], options[:display_inspector])
-      return novel_converter.convert_main
+      return {
+        converted_txt_path: novel_converter.convert_main,
+        use_dakuten_font: novel_converter.use_dakuten_font
+      }
     end
     nil
   end
@@ -67,8 +72,33 @@ class NovelConverter
     if options[:encoding]
       text.force_encoding(options[:encoding]).encode!(Encoding::UTF_8)
     end
+    {
+      converted_txt_path: novel_converter.convert_main(text),
+      use_dakuten_font: novel_converter.use_dakuten_font
+    }
+  end
 
-    novel_converter.convert_main(text)
+  DAKUTEN_FROM = ["vertical_font_with_dakuten.css", "DMincho.ttf"]
+  DAKUTEN_TO = ["template/OPS/css_custom/vertical_font.css", "template/OPS/fonts/DMincho.ttf"]
+
+  def self.activate_dakuten_font_files
+    preset_dir = Narou.get_preset_dir
+    aozora_dir = File.dirname(Narou.get_aozoraepub3_path)
+
+    DAKUTEN_FROM.each_with_index do |name, i|
+      src = File.join(preset_dir, name)
+      dst = File.join(aozora_dir, DAKUTEN_TO[i])
+      FileUtils.copy(src, dst)
+    end
+  end
+
+  def self.inactivate_dakuten_font_files
+    preset_dir = Narou.get_preset_dir
+    aozora_dir = File.dirname(Narou.get_aozoraepub3_path)
+    path_normal_vertical_css = File.join(preset_dir, "vertical_font.css")
+
+    FileUtils.copy(path_normal_vertical_css, File.join(aozora_dir, DAKUTEN_TO[0]))
+    FileUtils.remove(File.join(aozora_dir, DAKUTEN_TO[1]))
   end
 
   #
@@ -81,7 +111,7 @@ class NovelConverter
   #
   # 返り値：正常終了 :success、エラー終了 :error、AozoraEpub3が見つからなかった nil
   #
-  def self.txt_to_epub(filename, dst_dir: nil, device: nil, verbose: false, yokogaki: false)
+  def self.txt_to_epub(filename, dst_dir: nil, device: nil, verbose: false, yokogaki: false, use_dakuten_font: false)
     abs_srcpath = File.expand_path(filename)
     src_dir = File.dirname(abs_srcpath)
 
@@ -132,6 +162,7 @@ class NovelConverter
     if Helper.os_windows?
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
+    activate_dakuten_font_files if use_dakuten_font
     print "AozoraEpub3でEPUBに変換しています"
     begin
       res = Helper::AsyncCommand.exec(command) do
@@ -139,6 +170,7 @@ class NovelConverter
       end
     ensure
       Dir.chdir(pwd)
+      inactivate_dakuten_font_files if use_dakuten_font
     end
 
     # AozoraEpub3はエラーだとしてもexitコードは0なので、
@@ -256,6 +288,7 @@ class NovelConverter
       no_strip: false,
       no_cleanup_txt: false,
       yokogaki: false,
+      use_dakuten_font: false,
     }.merge(options)
 
     device = options[:device]
@@ -264,9 +297,12 @@ class NovelConverter
     return false if options[:no_epub]
     clean_up_file_list << txt_path unless options[:no_cleanup_txt]
     # epub
-    status = NovelConverter.txt_to_epub(txt_path,
-                                        dst_dir: options[:dst_dir], device: device,
-                                        verbose: options[:verbose], yokogaki: options[:yokogaki])
+    status = NovelConverter.txt_to_epub(
+      txt_path,
+      dst_dir: options[:dst_dir], device: device,
+      verbose: options[:verbose], yokogaki: options[:yokogaki],
+      use_dakuten_font: options[:use_dakuten_font]
+    )
     return nil if status != :success
     if device && device.kobo?
       epub_ext = device.ebook_file_ext
@@ -322,6 +358,7 @@ class NovelConverter
     @inspector = Inspector.new(@setting)
     @illustration = Illustration.new(@setting, @inspector)
     @display_inspector = display_inspector
+    @use_dakuten_font = false
     @converter = create_converter
     @converter.output_text_dir = output_text_dir
     @data = @novel_id ? Database.instance.get_data("id", @novel_id) : {}
@@ -545,6 +582,8 @@ class NovelConverter
     # 表紙の挿絵注記を3行目に挟み込む
     converted_text = [splited[0], splited[1], create_cover_chuki, splited[2]].join("\n")
 
+    @use_dakuten_font = @converter.use_dakuten_font
+
     converted_text
   end
 
@@ -617,6 +656,7 @@ class NovelConverter
       end
       sections << section
     end
+    @use_dakuten_font = @converter.use_dakuten_font
     sections
   ensure
     trigger(:"convert_main.finish")
