@@ -60,6 +60,7 @@ class Device
   class UnknownDevice < StandardError; end
   class SendFailure < StandardError; end
   class DontConneting < StandardError; end
+  class CantEject < StandardError; end
 
   def self.exists?(device)
     DEVICES.include?(device.downcase)
@@ -90,7 +91,11 @@ class Device
 
   def eject
     if ejectable?
-      Device.eject(@device_module::VOLUME_NAME)
+      begin
+        Device.eject(@device_module::VOLUME_NAME)
+      rescue CantEject => e
+        error e.message
+      end
     end
   end
 

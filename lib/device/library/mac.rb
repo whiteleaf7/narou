@@ -18,7 +18,7 @@ module Device::Library
     def eject(volume_name)
       status, stdio, stderr = systemu("diskutil eject #{volume_name}")
       unless status.success?
-        raise DontConneting, stderr.strip
+        raise Device::CantEject, stderr.strip
       end
     end
   end
