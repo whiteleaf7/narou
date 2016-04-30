@@ -9,7 +9,7 @@ require_relative "../input"
 
 module Command
   class Download < CommandBase
-    SUPPORT_NOVEL_SITES = %w(小説家になろう(小説を読もう) ノクターンノベルズ ムーンライトノベルズ Arcadia ハーメルン 暁)
+    SUPPORT_NOVEL_SITES = %w(小説家になろう(小説を読もう) ノクターンノベルズ ムーンライトノベルズ Arcadia ハーメルン 暁 カクヨム)
 
     def initialize
       super("[<target> <target2> ...] [options]")
