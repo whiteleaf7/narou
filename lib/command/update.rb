@@ -159,7 +159,6 @@ module Command
 
       update_log = $stdout.capture(quiet: false) do
         sort_by_key(sort_key, update_target_list).each_with_index do |target, i|
-          interval.wait
           display_message = nil
           data = Downloader.get_data_by_target(target)
           if !data
@@ -177,6 +176,7 @@ module Command
             mistook_count += 1
             next
           end
+          interval.wait
           downloader = Downloader.new(target)
 
           if @options["hotentry"]
