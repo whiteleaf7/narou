@@ -14,6 +14,22 @@ module Command
   class Update < CommandBase
     extend Memoist
 
+    class Interval
+      MIN = 2.5   # 作品間ウェイトの最低秒数(処理時間含む)
+
+      def initialize(interval)
+        @time = Time.now - MIN
+        interval = interval.to_f
+        @interval_time = interval >= MIN ? interval : MIN
+      end
+
+      def wait
+        wait_time = Time.now - @time
+        sleep(@interval_time - wait_time) if wait_time < @interval_time
+        @time = Time.now
+      end
+    end
+
     LOG_DIR_NAME = "log"
     LOG_NUM_LIMIT = 30   # ログの保存する上限数
     LOG_FILENAME_FORMAT = "update_log_%s.txt"
@@ -139,8 +155,11 @@ module Command
       @options["hotentry.auto-mail"] = inv["hotentry.auto-mail"]
       hotentry = {}
 
+      interval = Interval.new(@options["interval"])
+
       update_log = $stdout.capture(quiet: false) do
         sort_by_key(sort_key, update_target_list).each_with_index do |target, i|
+          interval.wait
           display_message = nil
           data = Downloader.get_data_by_target(target)
           if !data

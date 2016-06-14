@@ -6,6 +6,7 @@
 require_relative "../inventory"
 require_relative "../novelsetting"
 require_relative "../eventable"
+require_relative "update"
 
 module Command
   class Setting < CommandBase
@@ -350,6 +351,10 @@ module Command
         "hotentry.auto-mail" => {
           type: :boolean, help: "hotentryをメールで送る(mail設定済みの場合)",
           tab: :detail
+        },
+        "update.interval" => {
+          type: :float, help: "更新時に各作品間で指定した秒数待機する(処理時間を含む)。最低#{Update::Interval::MIN}秒以上",
+          tab: :general
         },
         "update.strong" => {
           type: :boolean, help: "改稿日当日の連続更新でも更新漏れが起きないように、中身もチェックして更新を検知する(やや処理が重くなる)",
