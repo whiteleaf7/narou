@@ -283,12 +283,14 @@ module Command
       database = Database.instance
       puts "最新話掲載日を更新しています..."
       progressbar = ProgressBar.new(database.get_object.size - 1)
+      interval = Interval.new(@options["interval"])
       database.each.with_index do |(id, data), i|
         progressbar.output(i)
         if through_frozen_novel
           next if Narou.novel_frozen?(id)
         end
         setting =  Downloader.get_sitesetting_by_target(id)
+        interval.wait
         begin
           info = NovelInfo.load(setting)
         rescue OpenURI::HTTPError, Errno::ECONNRESET => e
