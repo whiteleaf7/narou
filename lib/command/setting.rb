@@ -428,12 +428,12 @@ module Command
           tab: :general
         },
         "download.interval" => {
-          type: :float, help: "各話DL時に指定した秒数待機する。デフォルト0",
+          type: :float, help: "各話DL時に指定秒数待機する。デフォルト#{Downloader::DEFAULT_INTERVAL_WAIT}秒",
           tab: :detail
         },
         "download.wait-steps" => {
           type: :integer,
-          help: "この値で指定した話数ごとにウェイトを入れる\n" \
+          help: "指定した話数ごとに長めのウェイトが入る\n" \
                 "      ※注意：11以上を設定してもなろうの場合は10話ごとにウェイトが入ります",
           tab: :detail
         },
