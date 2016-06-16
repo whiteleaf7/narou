@@ -1106,6 +1106,26 @@ class Downloader
     element
   end
 
+  def display_hint
+    @stream.warn <<-EOS
+ヒント:
+503 がでた場合はしばらくアクセスが規制される場合があります。
+設定を変更してサーバーに対する負荷を軽減させましょう。
+（メンテナンス等でも503になる場合があります）
+
+下記の設定のどれか、もしくは全てを変更することで調整できます。
+
+# Update時の作品間の待機時間を変更する
+narou s update.interval=3.0
+
+# 1話ごとに入るウェイトを変更する
+narou s download.interval=1.0
+
+# 5話ごとに通常より長いウェイトを入れる
+narou s download.wait-steps=5
+    EOS
+  end
+
   #
   # 指定したURLからデータをダウンロード
   #
@@ -1130,8 +1150,7 @@ class Downloader
         @stream.warn "リトライ待機中……"
         @@display_hint_once ||= false
         unless @@display_hint_once
-          @stream.warn "ヒント: narou s download.wait-steps=10 とすることで、" \
-                       "10話ごとにウェイトをいれられます"
+          display_hint
           @@display_hint_once = true
         end
         sleep(WAITING_TIME_FOR_503)
