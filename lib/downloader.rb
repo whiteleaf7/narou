@@ -34,6 +34,7 @@ class Downloader
   NOVEL_TYPE_SERIES = 1   # 連載
   NOVEL_TYPE_SS = 2       # 短編
   DISPLAY_LIMIT_DIGITS = 4   # indexの表示桁数限界
+  DEFAULT_INTERVAL_WAIT = 0.7   # download.interval のデフォルト値(秒)
 
   attr_reader :id
 
@@ -306,7 +307,7 @@ class Downloader
       @@__wait_counter = 0
       @@__last_download_time = Time.now - 20
     end
-    @@interval_sleep_time = Inventory.load("local_setting")["download.interval"] || 0
+    @@interval_sleep_time = Inventory.load("local_setting")["download.interval"] || DEFAULT_INTERVAL_WAIT
     @@interval_sleep_time = 0 if @@interval_sleep_time < 0
     @@max_steps_wait_time = [STEPS_WAIT_TIME, @@interval_sleep_time].max
   end
