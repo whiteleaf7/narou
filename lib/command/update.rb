@@ -15,7 +15,7 @@ module Command
     extend Memoist
 
     class Interval
-      MIN = 2.5   # 作品間ウェイトの最低秒数(処理時間含む)
+      MIN = 2.5               # 作品間ウェイトの最低秒数(処理時間含む)
       FORCE_WAIT_TIME = 2.0   # 強制待機時間
 
       def initialize(interval)
