@@ -5,6 +5,10 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
+AllCops:
+  Exclude:
+    - "小説データ/**/**/**"
+
 # Offense count: 2
 Lint/AmbiguousOperator:
   Enabled: false
@@ -117,8 +121,8 @@ Style/BlockComments:
 
 # Offense count: 89
 # Cop supports --auto-correct.
-Style/Blocks:
-  Enabled: false
+#Style/Blocks:
+#  Enabled: false
 
 # Offense count: 5
 # Cop supports --auto-correct.
@@ -417,3 +421,4 @@ Style/VariableName:
 # Cop supports --auto-correct.
 Style/WordArray:
   MinSize: 3
+
