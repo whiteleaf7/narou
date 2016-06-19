@@ -15,8 +15,8 @@ module Command
     extend Memoist
 
     class Interval
-      MIN = 2.5   # 作品間ウェイトの最低秒数(処理時間含む)
-      FORCE_WAIT_TIME = 2.0   # 強制待機時間
+      MIN = 2.5 # 作品間ウェイトの最低秒数(処理時間含む)
+      FORCE_WAIT_TIME = 2.0 # 強制待機時間
 
       def initialize(interval)
         @time = Time.now - MIN
@@ -35,14 +35,14 @@ module Command
       end
     end
 
-    LOG_DIR_NAME = "log"
-    LOG_NUM_LIMIT = 30   # ログの保存する上限数
-    LOG_FILENAME_FORMAT = "update_log_%s.txt"
+    LOG_DIR_NAME = "log".freeze
+    LOG_NUM_LIMIT = 30 # ログの保存する上限数
+    LOG_FILENAME_FORMAT = "update_log_%s.txt".freeze
 
-    HOTENTRY_DIR_NAME = "hotentry"
-    HOTENTRY_TEMPLATE_NAME = "hotentry.txt"
-    HOTENTRY_TITLE_PATTERN = "hotentry %y/%m/%d %H:%M"
-    HOTENTRY_FILE_PATTERN = "hotentry_%y-%m-%d_%H%M.txt"
+    HOTENTRY_DIR_NAME = "hotentry".freeze
+    HOTENTRY_TEMPLATE_NAME = "hotentry.txt".freeze
+    HOTENTRY_TITLE_PATTERN = "hotentry %y/%m/%d %H:%M".freeze
+    HOTENTRY_FILE_PATTERN = "hotentry_%y-%m-%d_%H%M.txt".freeze
 
     def self.oneline_help
       "小説を更新します"
@@ -68,29 +68,29 @@ module Command
 
   Options:
       EOS
-      @opt.on("-n", "--no-convert", "変換をせずアップデートのみ実行する") {
+      @opt.on("-n", "--no-convert", "変換をせずアップデートのみ実行する") do
         @options["no-convert"] = true
-      }
-      @opt.on("-a", "--convert-only-new-arrival", "新着のみ変換を実行する") {
+      end
+      @opt.on("-a", "--convert-only-new-arrival", "新着のみ変換を実行する") do
         @options["convert-only-new-arrival"] = true
-      }
-      @opt.on("-l", "--log [N]", "最新からN番目のログを表示する(デフォ1)") { |n|
+      end
+      @opt.on("-l", "--log [N]", "最新からN番目のログを表示する(デフォ1)") do |n|
         n = n.to_i
         n -= 1 if n > 0
         @options["log"] = n
         view_log
         exit 0
-      }
-      @opt.on("--gl", "データベースに最新話掲載日を反映させる") {
+      end
+      @opt.on("--gl", "データベースに最新話掲載日を反映させる") do
         update_general_lastup
         exit 0
-      }
-      @opt.on("-f", "--force", "凍結済みも更新する") {
+      end
+      @opt.on("-f", "--force", "凍結済みも更新する") do
         @options["force"] = true
-      }
-      @opt.on("-s", "--sort-by KEY", "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries}") { |key|
+      end
+      @opt.on("-s", "--sort-by KEY", "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries}") do |key|
         @options["sort-by"] = key
-      }
+      end
     end
 
     def get_data_value(target, key)
@@ -107,10 +107,10 @@ module Command
     #
     def sort_by_key(key, list)
       return list unless key
-      list.sort { |a, b|
-        value_a, value_b = [a, b].map { |target|
+      list.sort do |a, b|
+        value_a, value_b = [a, b].map do |target|
           get_data_value(target, key)
-        }
+        end
         if value_a.nil? && !value_b.nil?
           next 1
         elsif !value_a.nil? && value_b.nil?
@@ -124,7 +124,7 @@ module Command
         else
           value_a <=> value_b
         end
-      }
+      end
     end
 
     def valid_sort_key?(key)
@@ -153,7 +153,7 @@ module Command
           exit Narou::EXIT_ERROR_CODE
         end
       end
-      flush_cache    # memoist のキャッシュ削除
+      flush_cache # memoist のキャッシュ削除
 
       inv = Inventory.load("local_setting")
       @options["hotentry"] = inv["hotentry"]
@@ -169,8 +169,8 @@ module Command
           if !data
             display_message = "<bold><red>[ERROR]</red></bold> #{target} は管理小説の中に存在しません".termcolor
           elsif Narou.novel_frozen?(target) && !@options["force"]
-            if argv.length > 0
-              display_message = "ID:#{data["id"]}　#{data["title"]} は凍結中です"
+            if !argv.empty?
+              display_message = "ID:#{data['id']}　#{data['title']} は凍結中です"
             else
               next
             end
@@ -195,20 +195,20 @@ module Command
           case result.status
           when :ok
             if @options["no-convert"] ||
-                 (@options["convert-only-new-arrival"] && !result.new_arrivals)
+               (@options["convert-only-new-arrival"] && !result.new_arrivals)
               interval.force_wait
               next
             end
           when :failed
-            puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
+            puts "ID:#{data['id']}　#{data['title']} の更新は失敗しました"
             mistook_count += 1
             next
           when :canceled
-            puts "ID:#{data["id"]}　#{data["title"]} の更新はキャンセルされました"
+            puts "ID:#{data['id']}　#{data['title']} の更新はキャンセルされました"
             mistook_count += 1
             next
           when :none
-            puts "#{data["title"]} に更新はありません"
+            puts "#{data['title']} に更新はありません"
             next unless data["_convert_failure"]
           end
 
@@ -261,7 +261,7 @@ module Command
       now = Time.now
       logname = File.join(log_dirname, LOG_FILENAME_FORMAT % now.strftime("%Y%m%d_%H%M%S"))
       File.open(logname, "w:UTF-8") do |fp|
-        fp.puts "--- ログ出力日時 #{now.strftime("%Y/%m/%d %H:%M:%S")} ---"
+        fp.puts "--- ログ出力日時 #{now.strftime('%Y/%m/%d %H:%M:%S')} ---"
         fp.puts log
       end
       remove_old_log
@@ -290,12 +290,12 @@ module Command
       puts "最新話掲載日を更新しています..."
       progressbar = ProgressBar.new(database.get_object.size - 1)
       interval = Interval.new(@options["interval"])
-      database.each.with_index do |(id, data), i|
+      database.each.with_index do |(id, _data), i|
         progressbar.output(i)
         if through_frozen_novel
           next if Narou.novel_frozen?(id)
         end
-        setting =  Downloader.get_sitesetting_by_target(id)
+        setting = Downloader.get_sitesetting_by_target(id)
         interval.wait
         begin
           info = NovelInfo.load(setting)
@@ -374,7 +374,7 @@ module Command
       begin
         hotentry.each do |id, subtitles|
           setting = NovelSetting.load(id, ignore_force, ignore_default)
-          setting.enable_illust = false   # 挿絵はパス解決が煩雑なので強制無効
+          setting.enable_illust = false # 挿絵はパス解決が煩雑なので強制無効
           novel_converter = NovelConverter.new(setting, output_filename,
                                                display_inspector, Update.hotentry_dirname)
           last_num = 0
@@ -405,22 +405,22 @@ module Command
       create_inclusive_directory(txt_output_path)
       File.write(txt_output_path, hotentry_text)
       # テキストを書籍データに変換
-      relay_proc = -> {
+      relay_proc = lambda do
         NovelConverter.convert_txt_to_ebook_file(txt_output_path, {
           use_dakuten_font: use_dakuten_font,
           device: device
         })
-      }
+      end
       if device
         cmd_convert.extend(device.get_hook_module)
         cmd_convert.converted_txt_path = txt_output_path
         cmd_convert.hook_call(:change_settings)
       end
-      if cmd_convert.respond_to?(:hook_convert_txt_to_ebook_file)
-        ebook_path = cmd_convert.hook_convert_txt_to_ebook_file(&relay_proc)
-      else
-        ebook_path = relay_proc.call
-      end
+      ebook_path = if cmd_convert.respond_to?(:hook_convert_txt_to_ebook_file)
+                     cmd_convert.hook_convert_txt_to_ebook_file(&relay_proc)
+                   else
+                     relay_proc.call
+                   end
       ebook_path
     end
 
