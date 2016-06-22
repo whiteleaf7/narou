@@ -52,6 +52,7 @@ module Narou
     root_dir
   end
   memoize :get_root_dir
+  alias get_root_dir root
 
   def get_local_setting_dir
     local_setting_dir = nil
