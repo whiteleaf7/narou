@@ -8,7 +8,7 @@
 require "win32ole"
 require_relative "../../extensions/windows"
 
-module Device
+class Device
   module Library
     module Windows
       def get_device_root_dir(volume_name)
@@ -16,7 +16,7 @@ module Device
         drives.each do |drive_letter|
           drive_info = @@FileSystemObject.GetDrive(drive_letter)
           vol = drive_info.VolumeName rescue ""
-          if vol.casecmp(volume_name)
+          if vol.casecmp(volume_name) == 0
             return File.expand_path(drive_letter)
           end
         end
@@ -36,7 +36,7 @@ module Device
 
       def eject(volume_name)
         device_root = get_device_root_dir(volume_name)
-        status, _stdio, stderr = systemu(%!#{File.join(Narou.root, "eject.exe")} #{device_root}!)
+        status, _stdio, stderr = systemu(%!#{File.join(Narou.get_root_dir, "bin/eject.exe")} #{device_root}!)
         unless status.success?
           raise Device::CantEject, stderr.strip
         end
