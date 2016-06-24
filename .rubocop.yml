@@ -162,7 +162,7 @@ Style/SpaceInsideRangeLiteral:
 Style/SpecialGlobalVars:
   Enabled: false
 
-StringLiterals:
+Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/SymbolProc:
