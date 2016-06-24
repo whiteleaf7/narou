@@ -29,6 +29,9 @@ Metrics/LineLength:
     - http
     - https
 
+Style/GuardClause:
+  MinBodyLength: 5
+
 Metrics/MethodLength:
   Max: 50
 
@@ -87,6 +90,9 @@ Style/HashSyntax:
     - "Rakefile"
 
 Style/Lambda:
+  Enabled: false
+
+Style/RescueModifier:
   Enabled: false
     
 # 1_000_000 と区切り文字が 2 個以上必要になる場合のみ _ 区切りを必須にする
