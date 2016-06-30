@@ -8,6 +8,15 @@
 class Device
   module Library
     module Windows
+      def eject(volume_name)
+        device_root = get_device_root_dir(volume_name)
+        unless ejectVolume(device_root)
+          raise Device::CantEject, "端末を取り外せませんでした"
+        end
+      end
+
+      private
+
       FSCTL_LOCK_VOLUME = 0x00090018
       FSCTL_DISMOUNT_VOLUME = 0x00090020
       IOCTL_STORAGE_MEDIA_REMOVAL = 0x002d4804
@@ -22,17 +31,8 @@ class Device
       DRIVE_CDROM = 5
       NULL = 0
       WIN_FALSE = 0
-      LOCK_TIMEOUT = 10.0 # Seconds
+      LOCK_TIMEOUT = 3.0 # Seconds
       LOCK_RETRIES = 20
-
-      def eject(volume_name)
-        device_root = get_device_root_dir(volume_name)
-        unless ejectVolume(device_root)
-          raise Device::CantEject, "Cannot eject"
-        end
-      end
-
-      private
 
       def openVolume(cDriveLetter)
         szVolumeFormat = "\\\\.\\%s:"
@@ -70,7 +70,7 @@ class Device
 
         # Do this in a loop until a timeout period has expired
         LOCK_RETRIES.times do
-          res = DeviceIoControl(
+          res = WinAPI.DeviceIoControl(
             hVolume,
             FSCTL_LOCK_VOLUME,
             NULL, 0,
@@ -81,12 +81,12 @@ class Device
           return true if res != 0
           sleep(dwSleepAmount)
         end
-        false
+        raise Device::CantEject, "端末が使用中なため取り外せませんでした"
       end
 
       def dismountVolume(hVolume)
         dwBytesReturned = "    ".dup
-        DeviceIoControl(
+        WinAPI.DeviceIoControl(
           hVolume,
           FSCTL_DISMOUNT_VOLUME,
           NULL, 0,
@@ -98,10 +98,10 @@ class Device
 
       def preventRemovalOfVolume(hVolume, fPreventRemoval)
         dwBytesReturned = "    ".dup
-        DeviceIoControl(
+        WinAPI.DeviceIoControl(
           hVolume,
           IOCTL_STORAGE_MEDIA_REMOVAL,
-          fPreventRemoval, 1,
+          [fPreventRemoval.to_s].pack("b"), 1,
           NULL, 0,
           dwBytesReturned,
           NULL
@@ -110,7 +110,7 @@ class Device
 
       def autoEjectVolume(hVolume)
         dwBytesReturned = "    ".dup
-        DeviceIoControl(
+        WinAPI.DeviceIoControl(
           hVolume,
           IOCTL_STORAGE_EJECT_MEDIA,
           NULL, 0,
@@ -123,6 +123,7 @@ class Device
       def ejectVolume(cDriveLetter)
         fRemoveSafely = false
         fAutoEject = false
+        hVolume = INVALID_HANDLE_VALUE
 
         cDriveLetter = cDriveLetter[0]
         unless cDriveLetter
@@ -145,18 +146,20 @@ class Device
           end
         end
 
-        # Close the volume so other processes can use the drive.
-        return false unless WinAPI.CloseHandle(hVolume) != 0
-
         if fAutoEject
-          puts "Media in Drive %s has been ejected safely." % cDriveLetter
+          # puts "Media in Drive %s has been ejected safely." % cDriveLetter
         elsif fRemoveSafely
-          puts "Media in Drive %s can be safely removed." % cDriveLetter
+          # puts "Media in Drive %s can be safely removed." % cDriveLetter
         else
           return false
         end
 
         true
+      ensure
+        if hVolume != INVALID_HANDLE_VALUE
+          # Close the volume so other processes can use the drive.
+          WinAPI.CloseHandle(hVolume)
+        end
       end
     end
   end
