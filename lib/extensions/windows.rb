@@ -24,6 +24,10 @@ module WinAPI
   extern "unsigned long GetStdHandle(unsigned long)"
   extern "long GetLastError()"
   extern "unsigned long _getch()"
+  extern "unsigned long GetDriveType(void*)"
+  extern "unsigned long DeviceIoControl(unsigned long, unsigned long, void*, unsigned long, void*, unsigned long, void*, void*)"
+  extern "unsigned long CreateFile(void*, unsigned long, unsigned long, void*, unsigned long, unsigned long, unsigned long)"
+  extern "unsigned long CloseHandle(unsigned long)"
 end
 
 require "tmpdir"

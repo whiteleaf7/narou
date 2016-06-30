@@ -7,6 +7,7 @@
 
 require "win32ole"
 require_relative "../../extensions/windows"
+require_relative "windows/eject"
 
 class Device
   module Library
@@ -32,14 +33,6 @@ class Device
           end
         end
         result
-      end
-
-      def eject(volume_name)
-        device_root = get_device_root_dir(volume_name)
-        status, _stdio, stderr = systemu(%!#{File.join(Narou.get_script_dir, "bin/eject.exe")} #{device_root}!)
-        unless status.success?
-          raise Device::CantEject, stderr.strip
-        end
       end
     end
   end
