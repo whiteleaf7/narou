@@ -8,16 +8,18 @@ AllCops:
   DisplayCopNames: true
 
 Metrics/ClassLength:
-  Enabled: false
+  CountComments: false
+  Max: 300
+
+Metrics/ModuleLength:
+  CountComments: false
+  Max: 300
 
 Metrics/AbcSize:
   Max: 30
 
 Metrics/BlockNesting:
   Max: 3
-
-metrics/classlength:
-  Enabled: false
 
 Metrics/CyclomaticComplexity:
   Max: 10
