@@ -628,7 +628,7 @@ class Downloader
   end
 
   def get_novel_status
-    novel_status = if false # @setting["narou_api_url"]
+    novel_status = if @setting["narou_api_url"]
                      Narou::API.new(@setting, "nt-e")
                    else
                      NovelInfo.load(@setting)
@@ -757,13 +757,12 @@ class Downloader
     toc_source = get_toc_source
     return nil unless toc_source
     @setting.multi_match(toc_source, "tcode")
-    #if @setting["narou_api_url"]
-    if false
-      # なろうAPIの出力がおかしいので直るまで使用中止
-      info = Narou::API.new(@setting, "t-s-gf-gl-nu-w")
-    else
-      info = NovelInfo.load(@setting, toc_source)
-    end
+    info =
+      if @setting["narou_api_url"]
+        Narou::API.new(@setting, "t-s-gf-gl-nu-w")
+      else
+        NovelInfo.load(@setting, toc_source)
+      end
     if info
       raise DownloaderNotFoundError unless info["title"]
       @setting["title"] = info["title"]

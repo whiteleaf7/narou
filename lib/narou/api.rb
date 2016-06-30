@@ -4,6 +4,7 @@
 #
 
 require "open-uri"
+require "zlib"
 require "yaml"
 require_relative "../novelinfo"
 
@@ -30,17 +31,20 @@ module Narou
     end
 
     def request_api(of, gzip = 5)
-      # Ruby 2.0 以上だと gzip 自動デコード
+      # TODO: of で指定された項目ごとにキャッシュ
       gzip_opt = RUBY_VERSION >= "2.0.0" ? "gzip=#{gzip}&" : ""
-      url = "#{@api_url}?#{gzip_opt}ncode=#{@ncode}&of=#{of}"
+      url = "#{@api_url}?#{gzip_opt}ncode=#{@ncode}&of=#{of}&out=json"
       open(url) do |fp|
-        result = YAML.load(fp.read.force_encoding(Encoding::UTF_8))
+        data = Zlib::GzipReader.wrap(fp).read.force_encoding(Encoding::UTF_8)
+        result = JSON.load(data)
         if result[0]["allcount"] == 1
           @api_result = result[1]
           if of.length > 0
             @api_result["novel_type"] = @api_result["noveltype"]
-            # なろうAPIが返すデータが数値の場合があるため強制変換
             @api_result["writer"] = @api_result["writer"].to_s
+            %w(general_firstup general_lastup novelupdated_at).each do |key|
+              @api_result[key] &&= Time.parse(@api_result[key])
+            end
             stat_end = @api_result["end"]
             if stat_end
               @api_result["end"] = stat_end == 0
