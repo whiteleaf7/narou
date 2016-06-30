@@ -36,7 +36,7 @@ class Device
 
       def eject(volume_name)
         device_root = get_device_root_dir(volume_name)
-        status, _stdio, stderr = systemu(%!#{File.join(Narou.get_root_dir, "bin/eject.exe")} #{device_root}!)
+        status, _stdio, stderr = systemu(%!#{File.join(Narou.get_script_dir, "bin/eject.exe")} #{device_root}!)
         unless status.success?
           raise Device::CantEject, stderr.strip
         end
