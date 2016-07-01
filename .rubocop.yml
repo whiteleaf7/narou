@@ -205,3 +205,6 @@ Style/MutableConstant:
 
 Lint/UnderscorePrefixedVariableName:
   Enabled: false
+
+Style/EmptyLinesAroundClassBody:
+  Enabled: false

@@ -295,5 +295,11 @@ module Narou
   end
   memoize :commit_version
 
+  def kindlegen_path
+    postfix = Helper.os_windows? ? ".exe" : ""
+    File.join(File.dirname(Narou.get_aozoraepub3_path), "kindlegen#{postfix}")
+  end
+  memoize :kindlegen_path
+
  end
 end

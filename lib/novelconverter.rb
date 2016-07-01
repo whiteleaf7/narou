@@ -230,8 +230,8 @@ class NovelConverter
   # 返り値：正常終了 :success、エラー終了 :error、中断終了 :abort
   #
   def self.epub_to_mobi(epub_path, verbose = false)
-    kindlegen_path = File.join(File.dirname(Narou.get_aozoraepub3_path), "kindlegen")
-    if Dir.glob(kindlegen_path + "*").empty?
+    kindlegen_path = Narou.kindlegen_path
+    unless File.exist?(kindlegen_path)
       error "kindlegenが見つかりませんでした。AozoraEpub3と同じディレクトリにインストールして下さい"
       return :error
     end
