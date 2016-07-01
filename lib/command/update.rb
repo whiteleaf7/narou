@@ -15,7 +15,8 @@ module Command
     extend Memoist
 
     class Interval
-      MIN = 2.5   # 作品間ウェイトの最低秒数(処理時間含む)
+      MIN = 2.5               # 作品間ウェイトの最低秒数(処理時間含む)
+      FORCE_WAIT_TIME = 2.0   # 強制待機時間
 
       def initialize(interval)
         @time = Time.now - MIN
@@ -27,6 +28,10 @@ module Command
         wait_time = Time.now - @time
         sleep(@interval_time - wait_time) if wait_time < @interval_time
         @time = Time.now
+      end
+
+      def force_wait
+        sleep(FORCE_WAIT_TIME)
       end
     end
 
@@ -191,6 +196,7 @@ module Command
           when :ok
             if @options["no-convert"] ||
                  (@options["convert-only-new-arrival"] && !result.new_arrivals)
+              interval.force_wait
               next
             end
           when :failed
