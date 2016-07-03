@@ -17,9 +17,8 @@ describe Command::Update do
     end
 
     it "should not be blank" do
-      frozen_id = Inventory.load("freeze").keys.first
       cap = $stdout.capture(quiet: true) {
-        CommandLine.run!(["update", "--ignore-all", frozen_id])
+        CommandLine.run!(["update", "--ignore-all", 22])
       }.strip
       expect(cap).to eq "ID:22　もう一度ナデシコへ は凍結中です"
     end
