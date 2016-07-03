@@ -88,5 +88,22 @@ describe Narou::Logger do
         $stdout.capture { expect($stdout.capturing).to eq true }
       end
     end
+
+    context "キャプチャ中に exit された場合" do
+      it "exit 直前までの出力はキャプチャ出来る" do
+        dummy = proc do
+          print "hello"
+          exit 1
+        end
+        dummy_caller = proc do
+          begin
+            dummy.call
+          rescue SystemExit => e
+            e.status
+          end
+        end
+        expect($stdout.capture { dummy_caller.call }).to eq "hello"
+      end
+    end
   end
 end
