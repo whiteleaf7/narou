@@ -71,11 +71,18 @@ describe Narou::Logger do
     end
 
     context "多段 capture" do
-      it do
+      it "quiet 中の出力は外側では取得できない" do
         expect($stdout.capture {
           print "foo"
-          expect($stdout.capture { print "bar" }).to eq "bar"
+          expect($stdout.capture(quiet: true) { print "bar" }).to eq "bar"
         }).to eq "foo"
+      end
+
+      it "quiet: false なら外側でも取得できる" do
+        expect($stdout.capture {
+          print "foo"
+          expect($stdout.capture(quiet: false) { print "bar" }).to eq "bar"
+        }).to eq "foobar"
       end
     end
 
@@ -86,6 +93,17 @@ describe Narou::Logger do
 
       it "キャプチャ中なら真" do
         $stdout.capture { expect($stdout.capturing).to eq true }
+      end
+
+      it "多段中にも真" do
+        $stdout.capture do
+          expect($stdout.capturing).to be_truthy
+          $stdout.capture do
+            expect($stdout.capturing).to be_truthy
+          end
+          expect($stdout.capturing).to be_truthy
+        end
+        expect($stdout.capturing).to be_falsey
       end
     end
 
