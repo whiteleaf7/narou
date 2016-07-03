@@ -65,7 +65,7 @@ class Database
   # 小説格納用のルートディレクトリを取得
   #
   def self.archive_root_path
-    @@archive_root_path ||= File.expand_path(File.join(Narou.get_root_dir, ARCHIVE_ROOT_DIR_PATH))
+    @archive_root_path ||= File.expand_path(File.join(Narou.get_root_dir, ARCHIVE_ROOT_DIR_PATH))
   end
 
   def save_database

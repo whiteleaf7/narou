@@ -20,7 +20,7 @@ Narou.flush_cache
 def install_fixtures
   root_dir = File.expand_path("../..", __dir__)
   local_dir = File.join(root_dir, ".test_dot_narou")
-  global_dir = File.join(root_dir, ".test_dot_narousetting")
+  _global_dir = File.join(root_dir, ".test_dot_narousetting")
   fixture_narou = File.expand_path("../fixtures/.test_dot_narou", __dir__)
   fixture_novel_data = File.expand_path("../fixtures/.test_novel_data", __dir__)
 

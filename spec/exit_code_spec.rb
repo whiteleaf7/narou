@@ -33,14 +33,14 @@ describe "exit code" do
       context "when novel is alrady existed" do
         # 事前に凍結されていない小説を３つ用意しておく
         it "got 3" do
-          expect(CommandLine.run!(["download"] + nonfrozen_ids[0,3])).to eq 3
+          expect(CommandLine.run!(["download"] + nonfrozen_ids[0, 3])).to eq 3
         end
       end
 
       context "when novel is alrady frozen" do
         # 事前に凍結済み小説を２つ用意しておく
         it "got 2" do
-          expect(CommandLine.run!(["download"] + frozen_ids[0,2])).to eq 2
+          expect(CommandLine.run!(["download"] + frozen_ids[0, 2])).to eq 2
         end
       end
     end
@@ -56,7 +56,7 @@ describe "exit code" do
 
       context "when novel is alrady frozen" do
         it "got 2" do
-          expect(CommandLine.run!(["update"] + frozen_ids[0,2])).to eq 2
+          expect(CommandLine.run!(["update"] + frozen_ids[0, 2])).to eq 2
         end
       end
     end

@@ -5,6 +5,7 @@ AllCops:
   Exclude:
     - "小説データ/**/*"
     - "trash/**/*"
+    - "narou.gemspec"
   DisplayCopNames: true
 
 Metrics/ClassLength:
