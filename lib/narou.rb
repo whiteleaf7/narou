@@ -12,8 +12,8 @@ if Helper.engine_jruby?
 end
 
 module Narou
-  LOCAL_SETTING_DIR = ".narou"
-  GLOBAL_SETTING_DIR = ".narousetting"
+  LOCAL_SETTING_DIR_NAME = ".narou"
+  GLOBAL_SETTING_DIR_NAME = ".narousetting"
   AOZORAEPUB3_JAR_NAME = "AozoraEpub3.jar"
   AOZORAEPUB3_DIR = "AozoraEpub3"
   PRESET_DIR = "preset"
@@ -43,7 +43,7 @@ module Narou
       drive_letter = $&
     end
     while path != ""
-      if File.directory?("#{drive_letter}#{path}/#{LOCAL_SETTING_DIR}")
+      if File.directory?("#{drive_letter}#{path}/#{LOCAL_SETTING_DIR_NAME}")
         root_dir = drive_letter + path
         break
       end
@@ -53,24 +53,24 @@ module Narou
   end
   memoize :get_root_dir
 
-  def get_local_setting_dir
+  def local_setting_dir
     local_setting_dir = nil
     root_dir = get_root_dir
     if root_dir
-      local_setting_dir = File.join(root_dir, LOCAL_SETTING_DIR)
+      local_setting_dir = File.join(root_dir, LOCAL_SETTING_DIR_NAME)
     end
     local_setting_dir
   end
-  memoize :get_local_setting_dir
+  memoize :local_setting_dir
 
-  def get_global_setting_dir
-    global_setting_dir = File.expand_path(File.join("~", GLOBAL_SETTING_DIR))
-    unless File.exist?(global_setting_dir)
-      FileUtils.mkdir(global_setting_dir)
-    end
-    global_setting_dir
+  def global_setting_dir
+    dir = File.join(get_root_dir, GLOBAL_SETTING_DIR_NAME)
+    return dir if File.directory?(dir)
+    dir = File.expand_path(GLOBAL_SETTING_DIR_NAME, "~")
+    FileUtils.mkdir(dir) unless File.exist?(dir)
+    dir
   end
-  memoize :get_global_setting_dir
+  memoize :global_setting_dir
 
   def get_script_dir
     File.expand_path(File.join(File.dirname(__FILE__), ".."))
@@ -83,8 +83,8 @@ module Narou
 
   def init
     return nil if already_init?
-    FileUtils.mkdir(LOCAL_SETTING_DIR)
-    puts LOCAL_SETTING_DIR + "/ を作成しました"
+    FileUtils.mkdir(LOCAL_SETTING_DIR_NAME)
+    puts "#{LOCAL_SETTING_DIR}/ を作成しました"
     Database.init
   end
 

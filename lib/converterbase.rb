@@ -1425,7 +1425,7 @@ class ConverterBase
         # 違う場合、相対パスを計算できなくなる。そのための対処として、.narou ディレクトリ
         # に画像データをコピーし、同一ドライブ内で相対パスを取れるようにする
         copy_dash_images_to_local_setting_dir
-        dash_paths = dash_image_relative_paths(Narou.get_local_setting_dir, output_text_dir)
+        dash_paths = dash_image_relative_paths(Narou.local_setting_dir, output_text_dir)
       else
         raise
       end
@@ -1449,7 +1449,7 @@ class ConverterBase
 
   def copy_dash_images_to_local_setting_dir
     DASH_FILES.each do |name|
-      path = File.join(Narou.get_local_setting_dir, name)
+      path = File.join(Narou.local_setting_dir, name)
       unless File.exist?(path)
         FileUtils.copy(File.join(Narou.get_preset_dir, name), path)
       end
