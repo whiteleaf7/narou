@@ -1,0 +1,7 @@
+# vim: set ft=yaml :
+---
+TooManyStatements:
+  enabled: true
+  exclude:
+  - initialize
+  max_statements: 15
