@@ -5,3 +5,6 @@ TooManyStatements:
   exclude:
   - initialize
   max_statements: 15
+
+DuplicateMethodCall:
+  max_calls: 2
