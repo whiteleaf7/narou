@@ -64,8 +64,11 @@ module Narou
   memoize :local_setting_dir
 
   def global_setting_dir
-    dir = File.join(get_root_dir, GLOBAL_SETTING_DIR_NAME)
-    return dir if File.directory?(dir)
+    root_dir = get_root_dir
+    if root_dir
+      dir = File.join(root_dir, GLOBAL_SETTING_DIR_NAME)
+      return dir if File.directory?(dir)
+    end
     dir = File.expand_path(GLOBAL_SETTING_DIR_NAME, "~")
     FileUtils.mkdir(dir) unless File.exist?(dir)
     dir

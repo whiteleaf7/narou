@@ -34,6 +34,9 @@ tags
 archive
 commitversion
 
+.test_dot_narou/
+.test_novel_data/
+
 #
 # for gem
 #

@@ -10,10 +10,6 @@ describe Narou do
     Narou.flush_cache
   end
 
-  describe ".local_setting_dir" do
-    it { expect(Narou.local_setting_dir).to eq File.expand_path(".narou", Narou.get_root_dir) }
-  end
-
   describe ".global_setting_dir" do
     before :all do
       @original_name = Narou::GLOBAL_SETTING_DIR_NAME.replace(".narousetting_dummy")
