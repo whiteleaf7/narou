@@ -6,16 +6,6 @@
 require_relative "../lib/logger"
 
 describe Narou::Logger do
-  before :all do
-    $stdout = Narou::Logger.new
-    $stderr = Narou::LoggerError.new
-  end
-
-  after :all do
-    $stdout = STDOUT
-    $stderr = STDERR
-  end
-
   describe "#capture" do
     context "when non block" do
       it "raise error" do
@@ -71,11 +61,18 @@ describe Narou::Logger do
     end
 
     context "多段 capture" do
-      it do
+      it "quiet 中の出力は外側では取得できない" do
         expect($stdout.capture {
           print "foo"
           expect($stdout.capture { print "bar" }).to eq "bar"
         }).to eq "foo"
+      end
+
+      it "quiet: false なら外側でも取得できる" do
+        expect($stdout.capture {
+          print "foo"
+          expect($stdout.capture(quiet: false) { print "bar" }).to eq "bar"
+        }).to eq "foobar"
       end
     end
 
@@ -86,6 +83,34 @@ describe Narou::Logger do
 
       it "キャプチャ中なら真" do
         $stdout.capture { expect($stdout.capturing).to eq true }
+      end
+
+      it "多段中でも真" do
+        $stdout.capture do
+          expect($stdout.capturing).to be_truthy
+          $stdout.capture do
+            expect($stdout.capturing).to be_truthy
+          end
+          expect($stdout.capturing).to be_truthy
+        end
+        expect($stdout.capturing).to be_falsey
+      end
+    end
+
+    context "キャプチャ中に exit された場合" do
+      it "exit 直前までの出力はキャプチャ出来る" do
+        dummy = proc do
+          print "hello"
+          exit 1
+        end
+        dummy_caller = proc do
+          begin
+            dummy.call
+          rescue SystemExit => e
+            e.status
+          end
+        end
+        expect($stdout.capture { dummy_caller.call }).to eq "hello"
       end
     end
   end
