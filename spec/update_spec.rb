@@ -18,7 +18,7 @@ describe Command::Update do
 
     it "should not be blank" do
       cap = $stdout.capture(quiet: true) {
-        CommandLine.run!(["update", "--ignore-all", 22])
+        CommandLine.run!(%w(update --ignore-all 22))
       }.strip
       expect(cap).to eq "ID:22　もう一度ナデシコへ は凍結中です"
     end
