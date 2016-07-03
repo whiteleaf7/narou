@@ -5,15 +5,27 @@
 # ご自分の環境に適宜書き換えて下さい。
 # ------------------------------------------------------------
 # Send to Kindle で使う場合の注意点
-# ・同じファイル名だとしてもパーソナルドキュメントに別ファイルとしてどんどん溜まっていきます。
-#   更新のたびに送信していると恐ろしいことになるので注意して下さい。
+#   送ったファイルがどんどんパーソナル・ドキュメントに保存されていくので、
+#   hotentry を有効にした場合などは特に大量に溜まって管理が大変になるので、
+#   パーソナル・ドキュメントの保存は無効にしたほうがよいでしょう。
+#
+#   コンテンツと端末の管理＞設定
+#     https://www.amazon.co.jp/mn/dcw/myx.html/ref=kinw_myk_redirect#/home/settings/payment
+#     ＞ パーソナル・ドキュメント設定 ＞ パーソナル・ドキュメントの保存
+#     ＞ 保存設定を編集
+#
+#   上記で無効に出来ます（デフォルトでは有効になっています）
+#
+#   また、同じファイル名で送信したとしても Kindle には別の本として受信されます。
+#
 
 # toのアドレスは
-#   My Kindle > パーソナル・ドキュメント設定 > Send-to-Kindle Eメールアドレスの設定
-#   https://www.amazon.co.jp/gp/digital/fiona/manage/ref=gno_yam_myk?#pdocSettings
+#   https://www.amazon.co.jp/mn/dcw/myx.html/ref=kinw_myk_redirect#/home/settings/payment
+#   コンテンツと端末の管理 > パーソナル・ドキュメント設定 > Send-to-Kindle Eメールアドレスの設定
 # に書いてあります。
-# 自分のメールアドレスが承認済みEメールアドレス一覧にあることを確認して下さい。
-:to : your_account@kindle.com
+# 自分のメールアドレス(from)が承認済みEメールアドレス一覧にあることを確認して下さい。
+:from : youraccount@gmail.com
+:to   : youraccount@kindle.com
 
 # 件名を「変換」にすると Kindleフォーマット(.azw) に変換される
 :subject : ""
@@ -32,3 +44,25 @@
 
 # 設定が終わったらこの項目を true にして下さい
 :complete : false
+
+
+# 下記は Yahoo! メールで送るための参考設定です。
+#
+# # Yahoo! メールはFromを正しく設定しないと送信出来ない
+# :from : ヤフーID@yahoo.co.jp
+# :to : hogehoge@kindle.com
+#
+# :subject : ""
+#
+# :via : smtp
+# :via_options :
+#   :address              : smtp.mail.yahoo.co.jp
+#   :port                 : 587
+#   :enable_starttls_auto : true
+#   :user_name            : ヤフーID
+#   :password             : パスワード
+#   :authentication       : :plain
+#   :domain               : yahoo.co.jp
+#
+# # 設定が終わったらこの項目を true にして下さい
+# :complete : false
