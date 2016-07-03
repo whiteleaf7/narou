@@ -103,7 +103,7 @@ module Narou::ServerHelpers
   end
 
   def notepad_text_path
-    File.join(Narou.get_local_setting_dir, "notepad.txt")
+    File.join(Narou.local_setting_dir, "notepad.txt")
   end
 end
 

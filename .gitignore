@@ -11,6 +11,7 @@ AozoraEpub3*
 TODO.txt
 MEMO.txt
 .narou/
+.narousetting/
 *.zip
 debug
 .DS_Store
