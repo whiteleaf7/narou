@@ -33,7 +33,7 @@ describe Narou do
         expect(Narou.global_setting_dir).to eq File.expand_path(".narousetting_dummy", "~")
       end
     end
-    
+
     context ".narou があるディレクトリと同じ場所にある場合" do
       before do
         FileUtils.mkdir(@global_dir_in_root)
