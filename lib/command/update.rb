@@ -66,6 +66,13 @@ module Command
     narou update n9669bk 異世界迷宮で奴隷ハーレムを
     narou update http://ncode.syosetu.com/n9669bk/
 
+    # foo タグが付いた小説と bar タグが付いた小説を更新(タグのOR指定)
+    narou u foo bar
+
+    # foo タグ及び bar タグが両方付いた小説のみ更新(タグのAND指定)
+    narou tag foo bar | narou u
+    narou l -t "foo bar" | narou   # こっちでも同じ(覚えやすい方を使う)
+
   Options:
       EOS
       @opt.on("-n", "--no-convert", "変換をせずアップデートのみ実行する") {

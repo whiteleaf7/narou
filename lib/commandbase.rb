@@ -4,6 +4,7 @@
 #
 
 require "optparse"
+require "termcolorlight"
 require_relative "web/worker"
 
 module Command
@@ -69,27 +70,33 @@ module Command
     #
     def tagname_to_ids(array)
       database = Database.instance
-      tag_index = Hash.new { [] }
-      database.each do |id, data|
-        tags = data["tags"] || []
-        tags.each do |tag|
-          tag_index[tag] |= [id]
-        end
-      end
-      array.map! { |arg|
-        if arg =~ /^[0-9]+$/
+      tag_index = database.tag_indexies
+      all_ids = database.ids
+      expanded_array = array.map { |arg|
+        if arg =~ /\A\d+\z/
           # 優先度はID＞タグのため、数字のみ指定されたら
           # そのIDが存在した場合はIDとみなす
-          next arg if database[arg.to_i]
+          id = arg.to_i
+          next id if database[id]
         end
-        if arg =~ /^tag:(.+)$/
-          # tag:タグ名 は直接タグと指定できる形式
-          # (数字タグとIDがかぶった場合にタグを指定出来るようにするもの)
-          arg = $1
-        end
-        ids = tag_index[arg]
+        ids =
+          case arg
+          when /\Atag:(.+)\z/
+            # tag:タグ名 は直接タグと指定できる形式
+            # (数字タグとIDがかぶった場合にタグを指定出来るようにするもの)
+            arg = $1
+            tag_index[$1]
+          when /\A\^tag:(.+)\z/
+            # ^tag:タグ名 は除外タグ指定
+            arg = $1
+            indexies = tag_index[$1]
+            indexies.empty? ? [] : all_ids - indexies
+          else
+            tag_index[arg]
+          end
         ids.empty? ? arg : ids
-      }.flatten!
+      }.flatten.uniq
+      array.replace(expanded_array)
     end
 
     #

@@ -76,6 +76,10 @@ class Database
     @database
   end
 
+  def ids
+    @database.keys
+  end
+
   def novel_exists?(id)
     return nil if id.nil?
     @database.keys.include?(id.to_i)
@@ -109,5 +113,16 @@ class Database
     else
       values
     end
+  end
+
+  def tag_indexies
+    result = Hash.new { [] }
+    @database.each do |id, data|
+      tags = data["tags"] || []
+      tags.each do |tag|
+        result[tag.to_s] |= [id]
+      end
+    end
+    result
   end
 end
