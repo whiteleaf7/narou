@@ -1,10 +1,20 @@
 # vim: set ft=yaml :
 ---
+# クラスコメントはなくてもいい
+IrresponsibleModule:
+  enabled: false
+
 TooManyStatements:
   enabled: true
   exclude:
   - initialize
-  max_statements: 15
+  max_statements: 11
 
 DuplicateMethodCall:
   max_calls: 2
+
+NestedIterators:
+  max_allowed_nesting: 3
+
+TooManyMethods:
+  enabled: false
