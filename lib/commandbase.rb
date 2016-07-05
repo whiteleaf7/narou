@@ -4,6 +4,7 @@
 #
 
 require "optparse"
+require "termcolorlight"
 require_relative "web/worker"
 
 module Command
@@ -73,14 +74,15 @@ module Command
       database.each do |id, data|
         tags = data["tags"] || []
         tags.each do |tag|
-          tag_index[tag] |= [id]
+          tag_index[tag.to_s] |= [id]
         end
       end
-      array.map! { |arg|
-        if arg =~ /^[0-9]+$/
+      expanded_array = array.map { |arg|
+        if arg =~ /\A\d+\z/
           # 優先度はID＞タグのため、数字のみ指定されたら
           # そのIDが存在した場合はIDとみなす
-          next arg if database[arg.to_i]
+          id = arg.to_i
+          next id if database[id]
         end
         if arg =~ /^tag:(.+)$/
           # tag:タグ名 は直接タグと指定できる形式
@@ -89,7 +91,8 @@ module Command
         end
         ids = tag_index[arg]
         ids.empty? ? arg : ids
-      }.flatten!
+      }.flatten.uniq
+      array.replace(expanded_array)
     end
 
     #

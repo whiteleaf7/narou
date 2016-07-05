@@ -15,7 +15,8 @@
   novelupdated_at: 2016-06-18 21:50:00.000000000 +09:00
   general_lastup: 2016-06-18 21:50:00.000000000 +09:00
   last_mail_date: 2015-07-27 22:31:17.145486000 +09:00
-  tags: []
+  tags:
+  - modified
   ncode: n7975cr
   domain: ncode.syosetu.com
 7:
@@ -119,6 +120,8 @@
   general_firstup: 2016-03-20 15:19:00.000000000 +09:00
   novelupdated_at: 2016-04-06 20:32:00.000000000 +09:00
   general_lastup: 2016-04-06 20:32:00.000000000 +09:00
+  tags:
+  - 404
 127:
   id: 127
   author: "イスカリオテの湯葉"
@@ -136,7 +139,24 @@
   general_lastup: 2016-04-04 02:56:35.000000000 Z
   tags:
   - end
+  - modified
 134:
+  id: 134
+  author: "二ツ樹五輪(*´∀｀*)"
+  title: "その無限の先へ"
+  file_title: n6811ck その無限の先へ
+  toc_url: http://ncode.syosetu.com/n6811ck/
+  sitename: "小説家になろう"
+  novel_type: 1
+  end: false
+  last_update: 2016-07-01 00:28:09.674125000 +09:00
+  new_arrivals_date: 2016-06-15 02:13:05.878356000 +09:00
+  use_subdirectory: false
+  general_firstup: 2014-12-12 03:13:01.000000000 +09:00
+  novelupdated_at: 2016-06-25 19:58:31.000000000 +09:00
+  general_lastup: 2016-06-25 02:24:18.000000000 +09:00
+  last_mail_date: 2016-05-09 01:54:21.057393000 +09:00
+404:
   id: 134
   author: "二ツ樹五輪(*´∀｀*)"
   title: "その無限の先へ"
