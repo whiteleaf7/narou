@@ -76,6 +76,10 @@ class Database
     @database
   end
 
+  def ids
+    @database.keys
+  end
+
   def novel_exists?(id)
     return nil if id.nil?
     @database.keys.include?(id.to_i)
