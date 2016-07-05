@@ -114,4 +114,15 @@ class Database
       values
     end
   end
+
+  def tag_indexies
+    result = Hash.new { [] }
+    @database.each do |id, data|
+      tags = data["tags"] || []
+      tags.each do |tag|
+        result[tag.to_s] |= [id]
+      end
+    end
+    result
+  end
 end
