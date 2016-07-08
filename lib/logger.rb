@@ -156,8 +156,9 @@ class Narou::LoggerError < StringIO
   end
 end
 
-def warn(str)
+def warn(str, trace = nil)
   $stdout.warn str
+  $stdout.warn trace if trace
 end
 
 def error(str)
