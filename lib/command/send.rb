@@ -21,7 +21,8 @@ module Command
   ・<device>には現在 #{Device::DEVICES.keys.join(", ")} が指定出来ます
   ・narou setting device=<device>としておけば、<device>の入力を省略できます
     また、convertコマンドで変換時に(端末がPCに接続されていれば)自動でデータを送信するようになります
-  ・<target>を省略した場合、管理している小説全てのファイルのタイムスタンプを端末のものと比べて新しければ送信します
+  ・送信時はファイルのタイムスタンプを端末のものと比べて新しければ送信します
+  ・<target>を省略した場合、管理している小説全てが送信対象になります
   ・<target>にhotentryを指定した場合、最新のhotnetryを送信します
 
   Examples:
@@ -121,18 +122,16 @@ module Command
           error "まだファイル(#{File.basename(ebook_path)})が無いようです" unless send_all
           next
         end
-        if send_all
-          if device.ebook_file_old?(ebook_path)
-            if target == "hotentry"
-              display_target = target
-            else
-              display_target = "ID:#{target}　#{TermColorLight.escape(titles[target])}"
-            end
-            puts "<bold><green>#{display_target}</green></bold>".termcolor
+
+        next unless device.ebook_file_old?(ebook_path)
+        display_target =
+          if target == "hotentry"
+            target
           else
-            next
+            "ID:#{target}　#{TermColorLight.escape(titles[target])}"
           end
-        end
+        puts "<bold><green>#{display_target}</green></bold>".termcolor
+
         print "#{device.name}へ送信しています"
         exit_copy = false
         copy_to_path = nil
