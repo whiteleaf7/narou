@@ -39,7 +39,7 @@ module Command
   Options:
       EOS
 
-      @opt.on("--without-freeze", "一括送信時に凍結された小説は対象外にする") {
+      @opt.on("--without-freeze", "送信時に凍結された小説は対象外にする") {
         @options["without-freeze"] = true
       }
       @opt.on("-b", "--backup-bookmark", "端末の栞データを手動でバックアップする(KindlePW系用)") {
@@ -81,7 +81,6 @@ module Command
       if argv.empty?
         send_all = true
         Database.instance.each do |id, data|
-          next if @options["without-freeze"] && Narou.novel_frozen?(id)
           argv << id
           titles[id] = data["title"]
         end
@@ -102,6 +101,13 @@ module Command
 
       tagname_to_ids(argv)
       argv.each do |target|
+        # WEB UI 使用時は、send.without-freeze を設定して使うことを想定していて、
+        # コマンドのようにオプションを付けたり外したりするのが容易ではないため、
+        # 個別送信時はオプションに関わらず凍結済みでも送信出来るようにする
+        if @options["without-freeze"] && Narou.novel_frozen?(target) &&
+           (!Narou.web? || (Narou.web? && send_all))
+          next
+        end
         if target == "hotentry"
           ebook_path = Update.get_newest_hotentry_file_path(device)
         else

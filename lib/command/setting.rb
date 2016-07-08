@@ -452,7 +452,7 @@ module Command
           tab: :detail
         },
         "send.without-freeze" => {
-          type: :boolean, help: "一括送信時に凍結された小説は対象外にする",
+          type: :boolean, help: "送信時に凍結された小説は対象外にする",
           tab: :general
         },
         "send.backup-bookmark" => {
