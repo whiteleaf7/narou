@@ -43,6 +43,9 @@ module Command
       @opt.on("-w", "--without-freeze", "送信時に凍結された小説は対象外にする") {
         @options["without-freeze"] = true
       }
+      @opt.on("-f", "--force", "タイムスタンプを比較せずに必ず送信する") {
+        @options["force"] = true
+      }
       @opt.on("-b", "--backup-bookmark", "端末の栞データを手動でバックアップする(KindlePW系用)") {
         @options["command-backup-bookmark"] = true
       }
@@ -123,7 +126,9 @@ module Command
           next
         end
 
-        next unless device.ebook_file_old?(ebook_path)
+        if !@options["force"] && !device.ebook_file_old?(ebook_path)
+          next
+        end
         display_target =
           if target == "hotentry"
             target
