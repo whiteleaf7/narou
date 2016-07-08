@@ -39,7 +39,7 @@ module Command
   Options:
       EOS
 
-      @opt.on("--without-freeze", "送信時に凍結された小説は対象外にする") {
+      @opt.on("-w", "--without-freeze", "送信時に凍結された小説は対象外にする") {
         @options["without-freeze"] = true
       }
       @opt.on("-b", "--backup-bookmark", "端末の栞データを手動でバックアップする(KindlePW系用)") {
