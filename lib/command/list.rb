@@ -124,7 +124,7 @@ module Command
       apply_sum = filters.inject(0) do |sum, item|
         apply = case item
                 when "series"
-                  novel_type == 0 && novel_type == 1
+                  novel_type == 0 || novel_type == 1
                 when "ss"
                   novel_type == 2
                 when "frozen"
