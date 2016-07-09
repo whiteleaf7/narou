@@ -2,6 +2,9 @@ require "rspec"
 require "pry"
 
 Encoding.default_external = Encoding::UTF_8
+ENV["NAROU_ENV"] ||= "test"
+# 環境に依存しないようにタイムゾーンを固定してテストする
+ENV["TZ"] = "Asia/Tokyo"
 
 $LOAD_PATH.unshift File.expand_path("lib", __dir__)
 
