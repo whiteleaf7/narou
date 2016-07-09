@@ -148,10 +148,10 @@ module Command
     end
 
     def view_date_type
-      @options["general-lastup"] ? "general_lastup" : "last_update"
+      @_view_data_type ||= @options["general-lastup"] ? "general_lastup" : "last_update"
     end
 
-    def output_list(novels)
+    def output_list(novels, limit)
       now = Time.now
       today = now.strftime("%y/%m/%d")
       filters = @options["filters"] || []
@@ -214,6 +214,7 @@ module Command
           }
         end
       end
+      selected_lines = Hash[selected_lines.take(limit)]
       if STDOUT.tty?
         puts header
         puts selected_lines.values.join("\n").termcolor
@@ -232,17 +233,17 @@ module Command
     def execute(argv)
       super
       database_values = Database.instance.get_object.values
-      if !argv.empty? && argv.first =~ /^\d+$/
-        num = argv.first.to_i
-      else
-        num = database_values.size
-      end
+      limit =
+        if !argv.empty? && argv.first =~ /^\d+$/
+          argv.first.to_i
+        else
+          database_values.size
+        end
       if @options["latest"]
         database_values = Database.instance.sort_by(view_date_type)
       end
       database_values.reverse! if @options["reverse"]
-      novels = database_values[0, num]
-      output_list(novels)
+      output_list(database_values, limit)
     end
   end
 end
