@@ -7,7 +7,8 @@ require_relative "../database"
 
 module Command
   class List < CommandBase
-    ANNOTATION_COLOR_TIME_LIMIT = 6 * 60 * 60   # 更新してから何秒まで色を変更するか
+    # 更新してから何秒まで色を変更するか
+    ANNOTATION_COLOR_TIME_LIMIT = 6 * 60 * 60
 
     # MEMO: 0 は昔の小説を凍結したままな場合、novel_type が設定されていないので、
     #       nil.to_i → 0 という互換性維持のため
@@ -19,6 +20,7 @@ module Command
       "現在管理している小説の一覧を表示します"
     end
 
+    # rubocop:disable Metrics/MethodLength
     def initialize
       super("[<limit>] [options]")
       @opt.separator <<-EOS
@@ -81,7 +83,7 @@ module Command
       }
       @opt.on("-f", "--filter VAL", String,
               "表示を絞るためのフィルター。スペース区切りで複数可\n" \
-              "#{' '*25}#{filter_type_help}") { |filter|
+              "#{' ' * 25}#{filter_type_help}") { |filter|
         @options["filters"] = filter.downcase.split
       }
       @opt.on("-g", "--grep VAL", String,
@@ -138,12 +140,12 @@ module Command
 
     def header
       [
-         " ID ",
-         @options["general-lastup"] ? " 掲載日 " : " 更新日 ",
-         @options["kind"] ? "種別" : nil,
-         @options["author"] ? "作者名" : nil,
-         @options["site"] ? "サイト名" : nil,
-         "     タイトル"
+        " ID ",
+        @options["general-lastup"] ? " 掲載日 " : " 更新日 ",
+        @options["kind"] ? "種別" : nil,
+        @options["author"] ? "作者名" : nil,
+        @options["site"] ? "サイト名" : nil,
+        "     タイトル"
       ].compact.join(" | ")
     end
 
@@ -156,6 +158,11 @@ module Command
     end
 
     def output_list(novels, limit)
+      took_lines = Hash[decorate_lines(novels).take(limit)]
+      output_lines(took_lines)
+    end
+
+    def decorate_lines(novels)
       filters = @options["filters"] || []
       selected_lines = {}
       novels.each do |novel|
@@ -173,31 +180,35 @@ module Command
         end
         selected_lines[id] = novel_decorator.decorate_line
       end
-      if @options["grep"]
-        @options["grep"].each do |search_word|
-          selected_lines.keep_if { |_, line|
-            if search_word =~ /^-(.+)/
-              # NOT検索
-              !line.include?($1)
-            else
-              line.include?(search_word)
-            end
-          }
-        end
+      grep(selected_lines)
+    end
+
+    def grep(selected_lines)
+      return selected_lines unless @options["grep"]
+      @options["grep"].each do |search_word|
+        selected_lines.keep_if { |_, line|
+          if search_word =~ /^-(.+)/
+            # NOT検索
+            !line.include?($1)
+          else
+            line.include?(search_word)
+          end
+        }
       end
-      selected_lines = Hash[selected_lines.take(limit)]
+      selected_lines
+    end
+
+    def output_lines(took_lines)
       if STDOUT.tty?
         puts header
-        puts selected_lines.values.join("\n").termcolor
+        puts took_lines.values.join("\n").termcolor
+      elsif @options["echo"]
+        # pipeにそのまま出力するときはansicolorコードが邪魔なので削除
+        puts header
+        puts TermColorLight.strip_tag(took_lines.values.join("\n"))
       else
-        if @options["echo"]
-          # pipeにそのまま出力するときはansicolorコードが邪魔なので削除
-          puts header
-          puts TermColorLight.strip_tag(selected_lines.values.join("\n"))
-        else
-          # pipeに接続するときはIDを渡す
-          puts selected_lines.keys.join(" ")
-        end
+        # pipeに接続するときはIDを渡す
+        puts took_lines.keys.join(" ")
       end
     end
 

@@ -4,11 +4,9 @@
 IrresponsibleModule:
   enabled: false
 
+# メソッドの複雑さは rubocop でチェックする
 TooManyStatements:
-  enabled: true
-  exclude:
-  - initialize
-  max_statements: 11
+  enabled: false
 
 DuplicateMethodCall:
   max_calls: 2

@@ -23,7 +23,7 @@ Metrics/BlockNesting:
   Max: 3
 
 Metrics/CyclomaticComplexity:
-  Max: 10
+  Max: 8
 
 Metrics/LineLength:
   Max: 140
@@ -208,4 +208,7 @@ Lint/UnderscorePrefixedVariableName:
   Enabled: false
 
 Style/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
   Enabled: false
