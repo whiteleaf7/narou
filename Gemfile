@@ -7,6 +7,7 @@ gemspec
 
 gem "rspec"
 gem "rspec-core"
+gem "rspec-retry"
 gem "timecop"
 gem "pry"
 gem "pry-byebug"
