@@ -551,6 +551,17 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  post "/api/update_by_tag" do
+    tags = params["tags"] or pass
+    tag_params = tags.map do |tag|
+      "tag:#{tag}"
+    end
+    Narou::Worker.push do
+      CommandLine.run!(["update", tag_params])
+      @@push_server.send_all(:"table.reload")
+    end
+  end
+
   post "/api/send" do
     ids = select_valid_novel_ids(params["ids"]) || []
     Narou::Worker.push do
@@ -666,7 +677,7 @@ class Narou::AppServer < Sinatra::Base
     result
   end
 
-  post "/api/taginfo.json" do
+  get "/api/taginfo.json" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     ids.map!(&:to_i)
     database = Database.instance
