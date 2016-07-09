@@ -28,7 +28,7 @@ describe Command::CommandBase do
       context "tag: をつけたら" do
         let(:argv) { %w(tag:404) }
         it "404タグの小説を取得すべき" do
-          is_expected.to eq [118]
+          is_expected.to eq [40, 118]
         end
       end
     end
