@@ -2,6 +2,7 @@ require "rspec"
 require "pry"
 
 Encoding.default_external = Encoding::UTF_8
+ENV["NAROU_ENV"] ||= "test"
 
 $LOAD_PATH.unshift File.expand_path("lib", __dir__)
 

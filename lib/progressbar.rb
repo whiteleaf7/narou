@@ -15,7 +15,7 @@ class ProgressBar
   end
 
   def output(num)
-    return if $debug
+    return if silence?
     if num > @max
       raise OverRangeError, "`#{num}` over `#{@max}(max)`"
     end
@@ -28,11 +28,15 @@ class ProgressBar
   end
 
   def clear
-    return if $debug
+    return if silence?
     STDOUT.print " " * 79 + "\r"
   end
 
   def calc_ratio(num)
     num / @max
+  end
+
+  def silence?
+    $debug || ENV["NAROU_ENV"] == "test"
   end
 end
