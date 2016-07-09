@@ -25,7 +25,7 @@ describe Command::List do
 
   describe "#output_list" do
     def expect_receive_output_lines_with_be_size_of(size)
-      expect(list).to receive(:output_lines).with(be_size_of size)
+      expect(list).to receive(:output_lines).with(be_size_of(size))
     end
 
     it do

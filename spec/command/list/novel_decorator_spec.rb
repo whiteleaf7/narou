@@ -128,7 +128,7 @@ describe Command::List::NovelDecorator do
       it { is_expected.to eq "小説家になろう" }
     end
   end
-  
+
   describe "#decorate_title" do
     subject { decorator.decorate_title }
 
