@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-require 'etc'
+require "etc"
 
 module Device::Library
   module Linux
