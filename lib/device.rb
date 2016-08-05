@@ -104,7 +104,11 @@ class Device
   end
 
   def ejectable?
-    Device.support_eject? && connecting?
+    if Device.respond_to?(:ejectable?)
+      Device.ejectable?(@device_module::VOLUME_NAME)
+    else
+      Device.support_eject? && connecting?
+    end
   end
 
   def find_documents_directory(device_root_dir)

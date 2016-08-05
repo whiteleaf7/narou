@@ -19,5 +19,56 @@ module Device::Library
       end
       nil
     end
+
+    # 端末のデバイスファイル名と uhelper オプションの値を取得
+    def device_mount_info(volume_name)
+      device_root = get_device_root_dir(volume_name)
+      raise Device::CantEject, "端末が接続されていません" if device_root.nil?
+
+      pattern = %r!^(/dev/[^ ]+) .* #{device_root} .*\Wuhelper=(\w+)!
+      open("|mount") do |f|
+        while line = f.gets
+          if line =~ pattern
+            return [$1, $2]
+          end
+        end
+      end
+      [nil, nil]
+    end
+
+    def ejectable?(volume_name)
+      begin
+        case device_mount_info(volume_name)[1]
+        when "udisks", "udisks2"
+          true
+        else
+          false
+        end
+      rescue
+        false
+      end
+    end
+
+    def eject(volume_name)
+      device, uhelper = device_mount_info(volume_name)
+
+      case uhelper
+      when "udisks"
+        commands = ["udisks --unmount #{device}",
+                    "udisks --detach #{device.chop}"]
+      when "udisks2"
+        commands = ["udisksctl unmount -b #{device} --no-user-interaction",
+                    "udisksctl power-off -b #{device.chop} --no-user-interaction"]
+      else
+        raise Device::CantEject, "udisks または udisks2 によって自動マウントされたデバイスではありません。"
+      end
+
+      commands.each do |command|
+        status, stdout, stderr = systemu(command)
+        unless status.success?
+          raise Device::CantEject, "#{command}: #{stderr.strip}"
+        end
+      end
+    end
   end
 end
