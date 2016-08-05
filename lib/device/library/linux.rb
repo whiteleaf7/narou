@@ -6,7 +6,7 @@ require "etc"
 
 module Device::Library
   module Linux
-    username = (Etc.getlogin || Etc.getpwuid.name)
+    username = Etc.getpwuid(Process.euid).name
     @@mount_roots = %w(/media /mnt)
     @@mount_roots << "/run/media/" + username # udisks2 による自動マウント(デフォルトの場所)
     @@mount_roots << "/media/" + username # udisks2 による自動マウント(Ubuntuの場合)
