@@ -199,10 +199,16 @@ class Narou::AppServer < Sinatra::Base
   def self.my_ipaddress
     @@__ipaddress ||= -> {
       udp = UDPSocket.new
-      udp.connect("128.0.0.0", 7)
-      adrs = Socket.unpack_sockaddr_in(udp.getsockname)[1]
-      udp.close
-      adrs
+      begin
+        # 128.0.0.0 への送信に使用されるNICのアドレスを取得
+        udp.connect("128.0.0.0", 7)
+        Socket.unpack_sockaddr_in(udp.getsockname)[1]
+      rescue Errno::ENETUNREACH
+        # 128.0.0.0 へのルーティングがないとき
+        "127.0.0.1"
+      ensure
+        udp.close
+      end
     }.call
   end
 
