@@ -3,7 +3,6 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 # rubocop:disable Lint/AssignmentInCondition
-# rubocop:disable UtilityFunction
 
 require "etc"
 
@@ -14,6 +13,8 @@ class Device
       @@mount_roots = %w(/media /mnt)
       @@mount_roots << "/run/media/" + username # udisks2 による自動マウント(デフォルトの場所)
       @@mount_roots << "/media/" + username # udisks2 による自動マウント(Ubuntuの場合)
+
+      # :reek:UtilityFunction
       def get_device_root_dir(volume_name)
         @@mount_roots.each do |mount_root|
           path = File.join(mount_root, volume_name)
