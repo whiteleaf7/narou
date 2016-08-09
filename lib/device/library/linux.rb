@@ -3,6 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 # rubocop:disable Lint/AssignmentInCondition
+# rubocop:disable UtilityFunction
 
 require "etc"
 
