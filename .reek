@@ -20,3 +20,6 @@ TooManyMethods:
 # Narou.rb ではクラス変数は使用許可
 ClassVariable:
   enabled: false
+
+UtilityFunction:
+  enabled: false
