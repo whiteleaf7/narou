@@ -261,7 +261,8 @@ class Downloader
   # サブディレクトリ名を生成
   #
   def self.create_subdirecotry_name(title)
-    title.start_with?("n") ? title[1..2] : title[0..1]
+    name = title.start_with?("n") ? title[1..2] : title[0..1]
+    name.strip
   end
 
   if Narou.already_init?
