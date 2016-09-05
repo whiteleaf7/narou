@@ -111,7 +111,13 @@ module Helper
   # ダウンロードした文字列をエンコード及び不正な文字列除去、改行コード統一
   #
   def pretreatment_source(src, encoding = Encoding::UTF_8)
+    encoding_class = Encoding.find(encoding)
     src.force_encoding(encoding)
+       .tap do |this|
+         if encoding_class != Encoding::UTF_8
+           this.encode!(Encoding::UTF_8, invalid: :replace, undef: :replace)
+         end
+       end
        .scrub("?")
        .gsub("\r", "")
   end
