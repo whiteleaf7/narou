@@ -50,7 +50,7 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version = ">=2.1.0"
 
-  gem.files = `git ls-files`.split("\n").reject { |fn| fn =~ %r!^spec/! } << Narou.create_git_commit_version
+  gem.files = `git ls-files`.split("\n").reject { |fn| fn =~ %r!^spec/|^"spec! } << Narou.create_git_commit_version
   gem.executables = gem.files.grep(%r!^bin/!).map { |f| File.basename(f) }
 
   gem.add_runtime_dependency 'termcolorlight', '~> 1.0', '>= 1.1.1'
