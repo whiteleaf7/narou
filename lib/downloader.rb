@@ -214,10 +214,17 @@ class Downloader
   #
   # 小説サイトの定義ファイルを全部読み込む
   #
+  # スクリプト同梱の設定ファイルを読み込んだあと、ユーザの小説の管理ディレクトリ内にある
+  # webnovel ディレクトリからも定義ファイルを読み込む
+  #
   def self.load_settings
     settings = @@__settings_cache ||= []
     return settings unless settings.empty?
-    Dir.glob(File.join(Narou.get_script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")) do |path|
+    load_paths = [
+      File.join(Narou.get_script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml"),
+      File.join(Narou.get_root_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")
+    ].join("\0")
+    Dir.glob(load_paths) do |path|
       setting = SiteSetting.load_file(path)
       if setting["name"] == "小説家になろう"
         @@narou = setting
