@@ -1416,6 +1416,10 @@ class ConverterBase
 
   def double_dash_to_image(text, output_text_dir)
     return text unless @setting.enable_double_dash_to_image
+    # サブタイトルの中の場合は無視する
+    # （サブタイトルは文字を大きくしているので、画像の位置がずれてしまうため）
+    return text if @text_type == "subtitle"
+
     begin
       # AozoraEpub3 は相対パスじゃないとエラーになるので相対パスに変換
       dash_paths = dash_image_relative_paths(Narou.get_preset_dir, output_text_dir)
