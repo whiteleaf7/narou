@@ -21,7 +21,8 @@ module Command
   ・<device>には現在 #{Device::DEVICES.keys.join(", ")} が指定出来ます
   ・narou setting device=<device>としておけば、<device>の入力を省略できます
     また、convertコマンドで変換時に(端末がPCに接続されていれば)自動でデータを送信するようになります
-  ・<target>を省略した場合、管理している小説全てのファイルのタイムスタンプを端末のものと比べて新しければ送信します
+  ・送信時はファイルのタイムスタンプを端末のものと比べて新しければ送信します
+  ・<target>を省略した場合、管理している小説全てが送信対象になります
   ・<target>にhotentryを指定した場合、最新のhotnetryを送信します
 
   Examples:
@@ -39,8 +40,11 @@ module Command
   Options:
       EOS
 
-      @opt.on("--without-freeze", "一括送信時に凍結された小説は対象外にする") {
+      @opt.on("-w", "--without-freeze", "送信時に凍結された小説は対象外にする") {
         @options["without-freeze"] = true
+      }
+      @opt.on("-f", "--force", "タイムスタンプを比較せずに必ず送信する") {
+        @options["force"] = true
       }
       @opt.on("-b", "--backup-bookmark", "端末の栞データを手動でバックアップする(KindlePW系用)") {
         @options["command-backup-bookmark"] = true
@@ -81,7 +85,6 @@ module Command
       if argv.empty?
         send_all = true
         Database.instance.each do |id, data|
-          next if @options["without-freeze"] && Narou.novel_frozen?(id)
           argv << id
           titles[id] = data["title"]
         end
@@ -102,6 +105,13 @@ module Command
 
       tagname_to_ids(argv)
       argv.each do |target|
+        # WEB UI 使用時は、send.without-freeze を設定して使うことを想定していて、
+        # コマンドのようにオプションを付けたり外したりするのが容易ではないため、
+        # 個別送信時はオプションに関わらず凍結済みでも送信出来るようにする
+        if @options["without-freeze"] && Narou.novel_frozen?(target) &&
+           (!Narou.web? || (Narou.web? && send_all))
+          next
+        end
         if target == "hotentry"
           ebook_path = Update.get_newest_hotentry_file_path(device)
         else
@@ -115,18 +125,18 @@ module Command
           error "まだファイル(#{File.basename(ebook_path)})が無いようです" unless send_all
           next
         end
-        if send_all
-          if device.ebook_file_old?(ebook_path)
-            if target == "hotentry"
-              display_target = target
-            else
-              display_target = "ID:#{target}　#{TermColorLight.escape(titles[target])}"
-            end
-            puts "<bold><green>#{display_target}</green></bold>".termcolor
-          else
-            next
-          end
+
+        if !@options["force"] && !device.ebook_file_old?(ebook_path)
+          next
         end
+        display_target =
+          if target == "hotentry"
+            target
+          else
+            "ID:#{target}　#{TermColorLight.escape(titles[target])}"
+          end
+        puts "<bold><green>#{display_target}</green></bold>".termcolor
+
         print "#{device.name}へ送信しています"
         exit_copy = false
         copy_to_path = nil

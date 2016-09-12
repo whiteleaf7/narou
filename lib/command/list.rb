@@ -4,10 +4,12 @@
 #
 
 require_relative "../database"
+require_relative "list/novel_decorator"
 
 module Command
   class List < CommandBase
-    ANNOTATION_COLOR_TIME_LIMIT = 6 * 60 * 60   # 更新してから何秒まで色を変更するか
+    # 更新してから何秒まで色を変更するか
+    ANNOTATION_COLOR_TIME_LIMIT = 6 * 60 * 60
 
     # MEMO: 0 は昔の小説を凍結したままな場合、novel_type が設定されていないので、
     #       nil.to_i → 0 という互換性維持のため
@@ -15,10 +17,13 @@ module Command
 
     FILTERS_TYPE = Hash[*%w(series 連載 ss 短編 frozen 凍結 nonfrozen 非凍結)]
 
+    attr_reader :options
+
     def self.oneline_help
       "現在管理している小説の一覧を表示します"
     end
 
+    # rubocop:disable Metrics/MethodLength
     def initialize
       super("[<limit>] [options]")
       @opt.separator <<-EOS
@@ -81,7 +86,7 @@ module Command
       }
       @opt.on("-f", "--filter VAL", String,
               "表示を絞るためのフィルター。スペース区切りで複数可\n" \
-              "#{' '*25}#{filter_type_help}") { |filter|
+              "#{' ' * 25}#{filter_type_help}") { |filter|
         @options["filters"] = filter.downcase.split
       }
       @opt.on("-g", "--grep VAL", String,
@@ -119,7 +124,7 @@ module Command
       apply_sum = filters.inject(0) do |sum, item|
         apply = case item
                 when "series"
-                  novel_type == 0 && novel_type == 1
+                  novel_type == 0 || novel_type == 1
                 when "ss"
                   novel_type == 2
                 when "frozen"
@@ -138,26 +143,33 @@ module Command
 
     def header
       [
-         " ID ",
-         @options["general-lastup"] ? " 掲載日 " : " 更新日 ",
-         @options["kind"] ? "種別" : nil,
-         @options["author"] ? "作者名" : nil,
-         @options["site"] ? "サイト名" : nil,
-         "     タイトル"
+        " ID ",
+        @options["general-lastup"] ? " 掲載日 " : " 更新日 ",
+        @options["kind"] ? "種別" : nil,
+        @options["author"] ? "作者名" : nil,
+        @options["site"] ? "サイト名" : nil,
+        "     タイトル"
       ].compact.join(" | ")
     end
 
     def view_date_type
-      @options["general-lastup"] ? "general_lastup" : "last_update"
+      @_view_data_type ||= @options["general-lastup"] ? "general_lastup" : "last_update"
     end
 
-    def output_list(novels)
-      now = Time.now
-      today = now.strftime("%y/%m/%d")
+    def now
+      @now ||= Time.now
+    end
+
+    def output_list(novels, limit)
+      took_lines = Hash[decorate_lines(novels).take(limit)]
+      output_lines(took_lines)
+    end
+
+    def decorate_lines(novels)
       filters = @options["filters"] || []
       selected_lines = {}
-      view_date_type_key = view_date_type
       novels.each do |novel|
+        novel_decorator = NovelDecorator.new(novel, self)
         novel_type = novel["novel_type"].to_i
         id = novel["id"]
         frozen = Narou.novel_frozen?(id)
@@ -169,80 +181,54 @@ module Command
         if @options["tags"]
           next unless valid_tags?(novel, @options["tags"])
         end
-        disp_id = ((frozen ? "*" : "") + id.to_s).rjust(4)
-        disp_id = disp_id.sub("*", "<bold><cyan>*</cyan></bold>") if frozen
-        tags = novel["tags"] || []
-        selected_lines[id] = [
-          disp_id,
-          novel[view_date_type_key].strftime("%y/%m/%d").tap { |s|
-            new_arrivals_date = novel["new_arrivals_date"]
-            last_update = novel["last_update"]
-            if new_arrivals_date && new_arrivals_date >= last_update \
-               && new_arrivals_date + ANNOTATION_COLOR_TIME_LIMIT >= now
-              # 新着表示色
-              s.replace "<bold><magenta>#{s}</magenta></bold>"
-            elsif last_update + ANNOTATION_COLOR_TIME_LIMIT >= now
-              # 更新だけあった色
-              s.replace "<bold><green>#{s}</green></bold>"
-            end
-          },
-          @options["kind"] ? NOVEL_TYPE_LABEL[novel_type] : nil,
-          @options["author"] ? novel["author"].escape : nil,
-          @options["site"] ? novel["sitename"].escape : nil,
-          novel["title"].escape + (!@options["kind"] && novel_type == 2 ?
-                           "  <bold><black>(#{NOVEL_TYPE_LABEL[novel_type]})</black></bold>" :
-                           "") +
-                           (tags.include?("end") ? " <bold><black>(完結)</black></bold>" : "") +
-                           (tags.include?("404") ? " <bold><black>(削除)</black></bold>" : ""),
-          @options["url"] ? novel["toc_url"].escape : nil,
-          @options["tags"] || @options["all-tags"] ?
-              tags.empty? ? nil : tags.map{ |tag|
-                color = Tag.get_color(tag)
-                "<bold><#{color}>#{tag.escape}</#{color}></bold>"
-              }.join(",") : nil,
-        ].compact.join(" | ")
+        selected_lines[id] = novel_decorator.decorate_line
       end
-      if @options["grep"]
-        @options["grep"].each do |search_word|
-          selected_lines.keep_if { |_, line|
-            if search_word =~ /^-(.+)/
-              # NOT検索
-              !line.include?($1)
-            else
-              line.include?(search_word)
-            end
-          }
-        end
+      grep(selected_lines)
+    end
+
+    def grep(selected_lines)
+      return selected_lines unless @options["grep"]
+      @options["grep"].each do |search_word|
+        selected_lines.keep_if { |_, line|
+          if search_word =~ /^-(.+)/
+            # NOT検索
+            !line.include?($1)
+          else
+            line.include?(search_word)
+          end
+        }
       end
+      selected_lines
+    end
+
+    def output_lines(took_lines)
       if STDOUT.tty?
         puts header
-        puts selected_lines.values.join("\n").termcolor
+        puts took_lines.values.join("\n").termcolor
+      elsif @options["echo"]
+        # pipeにそのまま出力するときはansicolorコードが邪魔なので削除
+        puts header
+        puts TermColorLight.strip_tag(took_lines.values.join("\n"))
       else
-        if @options["echo"]
-          # pipeにそのまま出力するときはansicolorコードが邪魔なので削除
-          puts header
-          puts TermColorLight.strip_tag(selected_lines.values.join("\n"))
-        else
-          # pipeに接続するときはIDを渡す
-          puts selected_lines.keys.join(" ")
-        end
+        # pipeに接続するときはIDを渡す
+        puts took_lines.keys.join(" ")
       end
     end
 
     def execute(argv)
       super
       database_values = Database.instance.get_object.values
-      if !argv.empty? && argv.first =~ /^\d+$/
-        num = argv.first.to_i
-      else
-        num = database_values.size
-      end
+      limit =
+        if !argv.empty? && argv.first =~ /^\d+$/
+          argv.first.to_i
+        else
+          database_values.size
+        end
       if @options["latest"]
         database_values = Database.instance.sort_by(view_date_type)
       end
       database_values.reverse! if @options["reverse"]
-      novels = database_values[0, num]
-      output_list(novels)
+      output_list(database_values, limit)
     end
   end
 end

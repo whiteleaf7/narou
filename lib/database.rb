@@ -15,10 +15,6 @@ class Database
   ARCHIVE_ROOT_DIR_PATH = "小説データ/"
   DATABASE_NAME = "database"
 
-  if Narou.already_init?
-    @@archive_root_path = File.expand_path(File.join(Narou.get_root_dir, ARCHIVE_ROOT_DIR_PATH))
-  end
-
   def [](key)
     @database[key]
   end
@@ -69,7 +65,7 @@ class Database
   # 小説格納用のルートディレクトリを取得
   #
   def self.archive_root_path
-    @@archive_root_path
+    @archive_root_path ||= File.expand_path(File.join(Narou.get_root_dir, ARCHIVE_ROOT_DIR_PATH))
   end
 
   def save_database
@@ -78,6 +74,10 @@ class Database
 
   def get_object
     @database
+  end
+
+  def ids
+    @database.keys
   end
 
   def novel_exists?(id)
@@ -113,5 +113,16 @@ class Database
     else
       values
     end
+  end
+
+  def tag_indexies
+    result = Hash.new { [] }
+    @database.each do |id, data|
+      tags = data["tags"] || []
+      tags.each do |tag|
+        result[tag.to_s] |= [id]
+      end
+    end
+    result
   end
 end

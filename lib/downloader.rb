@@ -214,10 +214,17 @@ class Downloader
   #
   # 小説サイトの定義ファイルを全部読み込む
   #
+  # スクリプト同梱の設定ファイルを読み込んだあと、ユーザの小説の管理ディレクトリ内にある
+  # webnovel ディレクトリからも定義ファイルを読み込む
+  #
   def self.load_settings
     settings = @@__settings_cache ||= []
     return settings unless settings.empty?
-    Dir.glob(File.join(Narou.get_script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")) do |path|
+    load_paths = [
+      File.join(Narou.get_script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml"),
+      File.join(Narou.get_root_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")
+    ].join("\0")
+    Dir.glob(load_paths) do |path|
       setting = SiteSetting.load_file(path)
       if setting["name"] == "小説家になろう"
         @@narou = setting
@@ -261,7 +268,8 @@ class Downloader
   # サブディレクトリ名を生成
   #
   def self.create_subdirecotry_name(title)
-    title.start_with?("n") ? title[1..2] : title[0..1]
+    name = title.start_with?("n") ? title[1..2] : title[0..1]
+    name.strip
   end
 
   if Narou.already_init?
@@ -1135,7 +1143,7 @@ narou s download.wait-steps=5
     cookie = @setting["cookie"] || ""
     begin
       open_uri_options = make_open_uri_options("Cookie" => cookie, allow_redirections: :safe)
-      open(url, open_uri_options) do |fp|
+      open(url, "r:#{@setting["encoding"]}", open_uri_options) do |fp|
         raw = Helper.pretreatment_source(fp.read, @setting["encoding"])
       end
     rescue OpenURI::HTTPError => e

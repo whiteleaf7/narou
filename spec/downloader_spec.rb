@@ -27,6 +27,16 @@ describe Downloader do
       end
     end
 
+    context "1桁のID＋タイトルを渡された場合" do
+      it do
+        expect(Downloader.create_subdirecotry_name("5 魔王の友を持つ魔王")).to eq "5"
+      end
+
+      it do
+        expect(Downloader.create_subdirecotry_name("10 ペルソナ4～覚醒のゼロの力～")).to eq "10"
+      end
+    end
+
     context "１文字のタイトルが渡された場合" do
       it { expect(Downloader.create_subdirecotry_name("n")).to eq "" }
       it { expect(Downloader.create_subdirecotry_name("1")).to eq "1" }

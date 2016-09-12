@@ -30,9 +30,9 @@ module Inventory
   def init(name, scope)
     dir = case scope
           when :local
-            Narou.get_local_setting_dir
+            Narou.local_setting_dir
           when :global
-            Narou.get_global_setting_dir
+            Narou.global_setting_dir
           else
             raise "Unknown scope"
           end

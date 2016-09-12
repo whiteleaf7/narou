@@ -185,7 +185,7 @@
       %button.close(type="button" data-dismiss="alert")
         %span(aria-hidden="true") &times;
         %span.sr-only Close
-      %h2 Welcome
+      %h2 Welcome to Narou.rb WEB UI
       %p 最初に簡単な操作説明があるヘルプをご覧下さい。なお、このメッセージは今回のみ表示されます。
       %p(style="margin-top:20px")
         %a.btn.btn-primary(href="/help" role="button") ヘルプを見る &raquo;
@@ -219,11 +219,13 @@
           %span.sr-only Toggle Dropdown
         %ul.dropdown-menu(role="menu")
           %li
+            %a.button-update-by-tag(href="#") タグを指定して更新
+          %li
+            %a.button-update-general-lastup(href="#") 最新話掲載日を更新
+          %li
             %a.button-update-view(href="#") 表示されている小説を更新
           %li
             %a.button-update-force(href="#") 凍結済みでも更新
-          %li
-            %a.button-update-general-lastup(href="#") 最新話掲載日を更新
       .btn-group
         %button.button-send.btn.btn-warning(type="button" data-toggle="tooltip") Send
         - if Inventory.load("local_setting")["hotentry"]

@@ -66,6 +66,13 @@ module Command
     narou update n9669bk 異世界迷宮で奴隷ハーレムを
     narou update http://ncode.syosetu.com/n9669bk/
 
+    # foo タグが付いた小説と bar タグが付いた小説を更新(タグのOR指定)
+    narou u foo bar
+
+    # foo タグ及び bar タグが両方付いた小説のみ更新(タグのAND指定)
+    narou tag foo bar | narou u
+    narou l -t "foo bar" | narou   # こっちでも同じ(覚えやすい方を使う)
+
   Options:
       EOS
       @opt.on("-n", "--no-convert", "変換をせずアップデートのみ実行する") {
@@ -90,6 +97,9 @@ module Command
       }
       @opt.on("-s", "--sort-by KEY", "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries}") { |key|
         @options["sort-by"] = key
+      }
+      @opt.on("-i", "--ignore-all", "<target>を省略した場合の全件更新処理を無効化する") {
+        @options["ignore-all"] = true
       }
     end
 
@@ -137,9 +147,8 @@ module Command
       update_target_list = argv.dup
       @options["no-open"] = false
       if update_target_list.empty?
-        Database.instance.each_key do |id|
-          update_target_list << id
-        end
+        exit 0 if @options["ignore-all"]
+        update_target_list += Database.instance.get_object.keys
         @options["no-open"] = true
       end
       tagname_to_ids(update_target_list)

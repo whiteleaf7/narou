@@ -99,6 +99,12 @@ module Helper
 
   def replace_filename_special_chars(str, invalid_replace = false)
     result = str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥").gsub("\t", "").gsub("\n", "")
+    if Inventory.load("local_setting")["normalize-filename"]
+      begin
+        result.unicode_normalize!
+      rescue Encoding::CompatibilityError
+      end
+    end
     if invalid_replace
       org_encoding = result.encoding
       result = result.encode(Encoding::Windows_31J, invalid: :replace, undef: :replace, replace: "_")
@@ -111,7 +117,13 @@ module Helper
   # ダウンロードした文字列をエンコード及び不正な文字列除去、改行コード統一
   #
   def pretreatment_source(src, encoding = Encoding::UTF_8)
+    encoding_class = Encoding.find(encoding)
     src.force_encoding(encoding)
+       .tap do |this|
+         if encoding_class != Encoding::UTF_8
+           this.encode!(Encoding::UTF_8, invalid: :replace, undef: :replace)
+         end
+       end
        .scrub("?")
        .gsub("\r", "")
   end

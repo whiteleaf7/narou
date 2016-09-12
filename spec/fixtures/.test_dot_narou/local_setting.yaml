@@ -1,0 +1,24 @@
+---
+convert.no-open: true
+convert.no-epub: false
+default.enable_half_indent_bracket: true
+convert.copy-to-grouping: true
+hotentry.auto-mail: false
+update.strong: true
+update.logging: false
+update.convert-only-new-arrival: false
+convert.no-mobi: false
+convert.no-strip: false
+convert.no-zip: false
+convert.inspect: false
+download.use-subdirectory: false
+send.without-freeze: false
+send.backup-bookmark: false
+default.enable_double_dash_to_image: true
+guard-spoiler: false
+download.wait-steps: 30
+convert.filename-to-ncode: false
+default.author_comment_style: simple
+device: kindle
+update.interval: 2.5
+download.interval: 0.5

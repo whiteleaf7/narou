@@ -1,0 +1,25 @@
+# vim: set ft=yaml :
+---
+# クラスコメントはなくてもいい
+IrresponsibleModule:
+  enabled: false
+
+# メソッドの複雑さは rubocop でチェックする
+TooManyStatements:
+  enabled: false
+
+DuplicateMethodCall:
+  max_calls: 2
+
+NestedIterators:
+  max_allowed_nesting: 3
+
+TooManyMethods:
+  enabled: false
+
+# Narou.rb ではクラス変数は使用許可
+ClassVariable:
+  enabled: false
+
+UtilityFunction:
+  enabled: false

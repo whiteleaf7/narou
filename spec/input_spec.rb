@@ -3,16 +3,16 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require "stringio"
-require_relative "../lib/input"
+require "input"
+require "logger"
 
 describe Narou::Input do
   before :all do
-    $stdout = StringIO.new
+    $stdout.silent = true
   end
 
   after :all do
-    $stdout = STDOUT
+    $stdout.silent = false
   end
 
   describe ".confirm" do
