@@ -485,6 +485,10 @@ module Command
           select_summaries: Narou.get_theme_names,
           tab: :general
         },
+        "normalize-filename" => {
+          type: :boolean, help: "ファイル名の文字列をNFCで正規化する。※既存データとの互換性が無くなる可能性があるので、バックアップを取った上で機能を理解の上有効にして下さい",
+          tab: :detail,
+        },
       },
       global: {
         "aozoraepub3dir" => {
