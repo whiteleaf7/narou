@@ -4,6 +4,7 @@
 #
 
 require "yaml"
+require_relative "narou/api"
 
 class SiteSetting
   def self.load_file(path)

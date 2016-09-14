@@ -6,17 +6,27 @@
 require "open-uri"
 require "time"
 require_relative "html"
+require_relative "narou/api"
 
 class NovelInfo
   REFRESH_INTERVAL = 10 * 60   # キャッシュを捨てて再取得するまでの時間(s)
+  DEFAULT_OF = "t-nt-ga-s-gf-nu-gl-w"
   @@novel_info_parameters = {}
 
-  def self.load(setting, toc_source = nil)
-    info = new(setting, toc_source)
+  def self.load(setting, toc_source: nil, of: DEFAULT_OF)
+    if setting["narou_api_url"]
+      Narou::API.new(setting, of)
+    else
+      force_load(setting, toc_source: toc_source, of: of)
+    end
+  end
+
+  def self.force_load(setting, toc_source: nil, of: DEFAULT_OF)
+    info = new(setting, toc_source, of)
     info.parse_novel_info
   end
 
-  def initialize(setting, toc_source = nil)
+  def initialize(setting, toc_source = nil, of = DEFAULT_OF)
     @setting = setting
     @ncode = @setting["ncode"]
     @toc_source = toc_source
@@ -35,8 +45,7 @@ class NovelInfo
       end
       need_reload = true
     end
-    of = "t-nt-ga-s-gf-nu-gl-w"
-    request_output_parameters = of.split("-")
+    request_output_parameters = @of.split("-")
     info_source = ""
 
     if @setting["novel_info_url"] == @setting["toc_url"] && @toc_source && !need_reload

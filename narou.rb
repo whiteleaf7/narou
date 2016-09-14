@@ -24,7 +24,10 @@ require_relative "lib/inventory"
 
 $development = Narou.commit_version.!
 begin
-  require "pry" if $development
+  if $development
+    require "pry"
+    require "awesome_print"
+  end
 rescue LoadError
 end
 
