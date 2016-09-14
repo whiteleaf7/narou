@@ -5,7 +5,7 @@
 
 require_relative "../lib/novelinfo"
 
-describe NovelInfo do
+xdescribe NovelInfo do
   before do
     setting = {
       "name" => "dummy", "ncode" => "10000"
