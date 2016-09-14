@@ -31,7 +31,6 @@ module Narou
     end
 
     def request_api(of, gzip = 5)
-      # TODO: of で指定された項目ごとにキャッシュ
       gzip_opt = RUBY_VERSION >= "2.0.0" ? "gzip=#{gzip}&" : ""
       url = "#{@api_url}?#{gzip_opt}ncode=#{@ncode}&of=#{of}&out=json"
       open(url) do |fp|
