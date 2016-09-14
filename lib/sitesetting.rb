@@ -57,7 +57,7 @@ class SiteSetting
   end
 
   def is_container?(value)
-    value.kind_of?(Hash) || value.kind_of?(Array) || value.kind_of?(Narou::API)
+    value.is_a?(Hash) || value.is_a?(Array) || value.is_a?(Narou::API)
   end
 
   def replace_group_values(key, option_values = {})
