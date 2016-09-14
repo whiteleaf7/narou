@@ -30,6 +30,7 @@ class NovelInfo
     @setting = setting
     @ncode = @setting["ncode"]
     @toc_source = toc_source
+    @of = of
     @@novel_info_parameters[@setting["name"]] ||= {}
   end
 
