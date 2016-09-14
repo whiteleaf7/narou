@@ -52,7 +52,7 @@ module Narou
         else
           # なろうAPIからデータを取得出来なかった
           # 開示設定が検索から除外に設定されるとAPIからはアクセスできなくなる
-          result = NovelInfo.force_load(@setting)
+          result = NovelInfo.load(@setting)
           unless result
             error "小説家になろうからデータを取得出来ませんでした"
             exit Narou::EXIT_ERROR_CODE
