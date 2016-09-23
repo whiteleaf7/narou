@@ -41,7 +41,15 @@ module Inventory
     @inventory_file_path = File.join(dir, name + ".yaml")
     if File.exist?(@inventory_file_path)
       self.merge!(Helper::CacheLoader.memo(@inventory_file_path) { |yaml|
-        YAML.load(yaml)
+        begin
+          YAML.load(yaml)
+        rescue Psych::SyntaxError
+          if restore(@inventory_file_path)
+            YAML.load_file(@inventory_file_path)
+          else
+            raise
+          end
+        end
       })
     end
   end
@@ -53,6 +61,13 @@ module Inventory
     @mutex.synchronize do
       File.write(@inventory_file_path, YAML.dump(self))
     end
+  end
+
+  def restore(path)
+    backup_path = "#{path}.backup"
+    return nil unless File.exist?(backup_path)
+    FileUtils.copy(backup_path, path)
+    return true
   end
 end
 
