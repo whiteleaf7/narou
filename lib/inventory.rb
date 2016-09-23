@@ -44,7 +44,10 @@ module Inventory
       begin
         YAML.load(yaml)
       rescue Psych::SyntaxError
-        raise unless restore(@inventory_file_path)
+        unless restore(@inventory_file_path)
+          error "#{@inventory_file_path} が壊れてるっぽい"
+          raise
+        end
         YAML.load_file(@inventory_file_path)
       end
     })
