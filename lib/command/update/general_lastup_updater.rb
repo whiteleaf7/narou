@@ -43,7 +43,7 @@ module Command
               data["novelupdated_at"] = result["novelupdated_at"]
               data["general_lastup"] = result["general_lastup"]
               tags = data["tags"] ||= []
-              tags << "modified" unless tags.include?("modified")
+              tags << Narou::MODIFIED_TAG unless tags.include?(Narou::MODIFIED_TAG)
             end
           end
           @other_novels += api.private_novels
@@ -82,7 +82,7 @@ module Command
           data.merge!(dates)
           if data["novelupdated_at"] > data["last_update"]
             tags = @database[id]["tags"] ||= []
-            tags << "modified" unless tags.include?("modified")
+            tags << Narou::MODIFIED_TAG unless tags.include?(Narou::MODIFIED_TAG)
           end
           setting.clear
         end

@@ -195,7 +195,7 @@ module Command
           case result.status
           when :ok
             tags = data["tags"] || []
-            data["tags"] = tags - ["modified"] if tags.include?("modified")
+            data["tags"] = tags - [Narou::MODIFIED_TAG] if tags.include?(Narou::MODIFIED_TAG)
             if @options["no-convert"] ||
                  (@options["convert-only-new-arrival"] && !result.new_arrivals)
               interval.force_wait

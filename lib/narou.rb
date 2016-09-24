@@ -22,6 +22,7 @@ module Narou
   EXIT_ERROR_CODE = 127
   EXIT_INTERRUPT = 126
   EXIT_REQUEST_REBOOT = 125
+  MODIFIED_TAG = "modified"
 
   UPDATE_SORT_KEYS = {
     "id" => "ID", "last_update" => "更新日", "title" => "タイトル", "author" => "作者名",
