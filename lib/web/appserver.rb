@@ -749,8 +749,10 @@ class Narou::AppServer < Sinatra::Base
   end
 
   post "/api/update_general_lastup" do
+    option = params["option"]
+    option = nil if option == "all"
     Narou::Worker.push do
-      CommandLine.run!(["update", "--gl"])
+      CommandLine.run!(["update", "--gl", option].compact)
       @@push_server.send_all(:"table.reload")
     end
   end
