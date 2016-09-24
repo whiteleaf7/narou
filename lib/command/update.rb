@@ -73,10 +73,10 @@ module Command
 データベースに最新話掲載日を反映させる
                             |    OPT   |          概要
                             | 指定なし | 全ての小説を対象にする
-                            |    api   | なろうAPIを使える小説のみ対象
+                            |   narou  | なろうAPIを使える小説のみ対象
                             |   other  | なろうAPIが使えない小説のみ対象
         EOS
-        if option && !["api", "other"].include?(option)
+        if option && !["narou", "other"].include?(option)
           error "--gl で指定可能なオプションではありません。詳細は narou u -h を参照"
           exit Narou::EXIT_ERROR_CODE
         end
@@ -288,7 +288,7 @@ module Command
       puts "最新話掲載日を更新しています..."
 
       updater = GeneralLastupUpdater.new(@options)
-      updater.update_narou_novels if !option || option == "api"
+      updater.update_narou_novels if !option || option == "narou"
       updater.update_other_novels if !option || option == "other"
       updater.save
 
