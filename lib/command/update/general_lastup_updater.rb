@@ -42,6 +42,8 @@ module Command
             if result["novelupdated_at"] > data["last_update"]
               data["novelupdated_at"] = result["novelupdated_at"]
               data["general_lastup"] = result["general_lastup"]
+              tags = data["tags"] ||= []
+              tags << "modified" unless tags.include?("modified")
             end
           end
           @other_novels += api.private_novels
@@ -76,7 +78,12 @@ module Command
               next
             end
           end
-          @database[id].merge!(dates)
+          data = @database[id]
+          data.merge!(dates)
+          if data["novelupdated_at"] > data["last_update"]
+            tags = @database[id]["tags"] ||= []
+            tags << "modified" unless tags.include?("modified")
+          end
           setting.clear
         end
       ensure
