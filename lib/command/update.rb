@@ -287,14 +287,14 @@ module Command
     end
 
     def update_general_lastup(option = nil)
-      puts "最新話掲載日を更新しています..."
+      puts "最新話掲載日を確認しています..."
 
       updater = GeneralLastupUpdater.new(@options)
       updater.update_narou_novels if !option || option == "narou"
       updater.update_other_novels if !option || option == "other"
       updater.save
 
-      puts "更新が完了しました"
+      puts "確認が完了しました"
     end
 
     #
