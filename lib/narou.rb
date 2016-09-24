@@ -248,10 +248,12 @@ module Narou
     @@is_web
   end
 
-  def update_sort_key_summaries(width = 27)
-    ({"KEY" => "対象"}.merge(UPDATE_SORT_KEYS)).map { |(key, summary)|
-      "#{key.rjust(width)} : #{summary}"
-    }.join("\n")
+  def update_sort_key_summaries(left_space = 28)
+    summaries = { "KEY" => "   対象" }.merge(UPDATE_SORT_KEYS)
+    key_max_width = summaries.keys.max_by(&:length).length
+    summaries.map do |(key, summary)|
+      "#{" " * left_space}| #{key.center(key_max_width)} | #{summary}"
+    end.join("\n")
   end
 
   def get_theme
