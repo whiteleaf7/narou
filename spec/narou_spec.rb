@@ -10,6 +10,12 @@ describe Narou do
     Narou.flush_cache
   end
 
+  describe ".last_commit_year" do
+    it "should be commited year" do
+      expect(Narou.last_commit_year).to eq Time.now.year
+    end
+  end
+
   describe ".global_setting_dir" do
     before :all do
       @original_name = Narou::GLOBAL_SETTING_DIR_NAME.replace(".narousetting_dummy")
