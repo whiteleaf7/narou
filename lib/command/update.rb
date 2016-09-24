@@ -194,6 +194,8 @@ module Command
           result = downloader.start_download
           case result.status
           when :ok
+            tags = data["tags"] || []
+            data["tags"] = tags - ["modified"] if tags.include?("modified")
             if @options["no-convert"] ||
                  (@options["convert-only-new-arrival"] && !result.new_arrivals)
               interval.force_wait
