@@ -7,6 +7,7 @@ require "open-uri"
 require "zlib"
 require "yaml"
 require "json"
+require "memoist"
 require_relative "../novelinfo"
 
 module Narou
@@ -14,6 +15,8 @@ module Narou
   # 小説家になろうデベロッパーAPI操作クラス
   #
   class API
+    extend Memoist
+
     # 一度に問い合わせする件数
     BATCH_LIMIT = 300
 
@@ -24,13 +27,14 @@ module Narou
     # なろうデベロッパーAPIから情報を取得
     #
     # api_url: なろうAPIのエンドポイントを指定。通常小説用と18禁小説用と分かれているため
-    # ncode: 取得したい小説のNコードを指定。文字列か配列を指定可能
+    # ncodes: 取得したい小説のNコードを指定。文字列か配列を指定可能
     # of: 出力パラメータ（http://dev.syosetu.com/man/api/#of_parm 参照）
     #
-    def initialize(api_url:, ncode:, of:)
+    def initialize(api_url:, ncodes:, of:)
       @api_url = api_url
-      @ncodes = Array(ncode).map(&:downcase)
+      @ncodes = Array(ncodes).map(&:downcase)
       @of = "n-#{of}"
+      @splited_of = @of.split("-")
     end
 
     def [](key)
@@ -39,7 +43,6 @@ module Narou
 
     def request
       @stores = []
-      @private_ncodes = []
       @ncodes.each_slice(BATCH_LIMIT) do |ncodes|
         request_api(ncodes)
       end
@@ -59,8 +62,8 @@ module Narou
     def store_results(results)
       @stores += results.map do |result|
         result["ncode"].downcase!
-        result["novel_type"] = result["noveltype"]
-        result["writer"] = result["writer"].to_s
+        result["novel_type"] = result["noveltype"] if has_of?("nt")
+        result["writer"] = result["writer"].to_s if has_of?("w")
         %w(general_firstup general_lastup novelupdated_at).each do |key|
           result[key] &&= Time.parse(result[key])
         end
@@ -72,8 +75,15 @@ module Narou
       end
     end
 
+    def has_of?(type)
+      @splited_of.include?(type)
+    end
+    memoize :has_of?
+
     def private_novels
-      @private_ncodes = @ncodes - @stores.map { |s| s["ncode"] }
+      (@ncodes - @stores.map { |s| s["ncode"] }).map do |ncode|
+        Downloader.get_data_by_target(ncode)["id"]
+      end
     end
   end
 end
