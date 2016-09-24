@@ -2,6 +2,19 @@
   +function() {
     var action = new Narou.Action;
 
+    function checkVersionIsUpdated(latest, current) {
+      var latestNumbers = latest.split(".");
+      var currentNumbers = current.split(".");
+      for (var i = 0; i < 3; i++) {
+        var leftNum = latestNumbers[i] | 0;
+        var rightNum = currentNumbers[i] | 0;
+        if (leftNum !== rightNum) {
+          return leftNum > rightNum;
+        }
+      }
+      return false;
+    }
+
     function getCurrentVersion() {
       var dfd = jQuery.Deferred();
       $.ajax({
@@ -111,7 +124,7 @@
         )
         .done(function(current_version, latest_version) {
           $result.children(".checking").hide();
-          if (latest_version > current_version) {
+          if (checkVersionIsUpdated(latest_version, current_version)) {
             $("#latest-version").text(latest_version);
             $result.children(".need-an-update").show();
           }
