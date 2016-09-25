@@ -694,7 +694,7 @@ class Downloader
   #
   def get_title
     return @title if @title
-    @title = @setting["title"]
+    @title = @setting["title"] || @@database[@id]["title"]
     if @setting["title_strip_pattern"]
       @title = @title.gsub(/#{@setting["title_strip_pattern"]}/, "").gsub(/^[　\s]*(.+?)[　\s]*?$/, "\\1")
     end
