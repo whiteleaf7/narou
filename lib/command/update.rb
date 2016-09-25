@@ -194,6 +194,7 @@ module Command
           delete_modified_tag = -> do
             tags = data["tags"] || []
             data["tags"] = tags - [Narou::MODIFIED_TAG] if tags.include?(Narou::MODIFIED_TAG)
+            data["last_update"] = Time.now
           end
 
           result = downloader.start_download
