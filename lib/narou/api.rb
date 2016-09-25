@@ -23,6 +23,9 @@ module Narou
     # なろうAPIの結果の圧縮レベル(1〜5)
     GZIP_LEVEL = 5
 
+    # リクエスト間ウェイト(sec)
+    REQUEST_INTERVAL = 3
+
     #
     # なろうデベロッパーAPIから情報を取得
     #
@@ -43,7 +46,8 @@ module Narou
 
     def request
       @stores = []
-      @ncodes.each_slice(BATCH_LIMIT) do |ncodes|
+      @ncodes.each_slice(BATCH_LIMIT).with_index do |ncodes, index|
+        sleep REQUEST_INTERVAL unless index.zero?
         request_api(ncodes)
       end
       @stores

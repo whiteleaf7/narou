@@ -291,7 +291,10 @@ module Command
 
       updater = GeneralLastupUpdater.new(@options)
       updater.update_narou_novels if !option || option == "narou"
-      updater.update_other_novels if !option || option == "other"
+      if !option || option == "other"
+        sleep Narou::API::REQUEST_INTERVAL unless option
+        updater.update_other_novels
+      end
       updater.save
 
       puts "確認が完了しました"
