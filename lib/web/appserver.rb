@@ -749,9 +749,17 @@ class Narou::AppServer < Sinatra::Base
   end
 
   post "/api/update_general_lastup" do
+    option = params["option"]
+    option = nil if option == "all"
+    is_update_modified = params["is_update_modified"]
     Narou::Worker.push do
-      CommandLine.run!(["update", "--gl"])
+      CommandLine.run!(["update", "--gl", option].compact)
       @@push_server.send_all(:"table.reload")
+      if is_update_modified
+        puts "<yellow>#{Narou::MODIFIED_TAG} タグの付いた小説を更新します</yellow>".termcolor
+        CommandLine.run!(["update", "tag:#{Narou::MODIFIED_TAG}"])
+        @@push_server.send_all(:"table.reload")
+      end
     end
   end
 

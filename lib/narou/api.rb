@@ -6,6 +6,8 @@
 require "open-uri"
 require "zlib"
 require "yaml"
+require "json"
+require "memoist"
 require_relative "../novelinfo"
 
 module Narou
@@ -13,52 +15,78 @@ module Narou
   # 小説家になろうデベロッパーAPI操作クラス
   #
   class API
+    extend Memoist
+
+    # 一度に問い合わせする件数
+    BATCH_LIMIT = 300
+
+    # なろうAPIの結果の圧縮レベル(1〜5)
+    GZIP_LEVEL = 5
+
+    # リクエスト間ウェイト(sec)
+    REQUEST_INTERVAL = 3
+
     #
     # なろうデベロッパーAPIから情報を取得
     #
-    # setting: なろうの SiteSetting
+    # api_url: なろうAPIのエンドポイントを指定。通常小説用と18禁小説用と分かれているため
+    # ncodes: 取得したい小説のNコードを指定。文字列か配列を指定可能
     # of: 出力パラメータ（http://dev.syosetu.com/man/api/#of_parm 参照）
     #
-    def initialize(setting, of)
-      @setting = setting
-      @api_url = @setting["narou_api_url"]
-      @ncode = @setting["ncode"]
-      request_api(of)
+    def initialize(api_url:, ncodes:, of:)
+      @api_url = api_url
+      @ncodes = Array(ncodes).map(&:downcase)
+      @of = "n-#{of}"
+      @splited_of = @of.split("-")
     end
 
     def [](key)
       @api_result[key]
     end
 
-    def request_api(of, gzip = 5)
-      gzip_opt = RUBY_VERSION >= "2.0.0" ? "gzip=#{gzip}&" : ""
-      url = "#{@api_url}?#{gzip_opt}ncode=#{@ncode}&of=#{of}&out=json"
+    def request
+      @stores = []
+      @ncodes.each_slice(BATCH_LIMIT).with_index do |ncodes, index|
+        sleep REQUEST_INTERVAL unless index.zero?
+        request_api(ncodes)
+      end
+      @stores
+    end
+
+    def request_api(ncodes, limit = BATCH_LIMIT)
+      url = "#{@api_url}?gzip=#{GZIP_LEVEL}&ncode=#{ncodes.join("-")}&of=#{@of}&lim=#{limit}&out=json"
       open(url) do |fp|
         data = Zlib::GzipReader.wrap(fp).read.force_encoding(Encoding::UTF_8)
-        result = JSON.load(data)
-        if result[0]["allcount"] == 1
-          @api_result = result[1]
-          if of.length > 0
-            @api_result["novel_type"] = @api_result["noveltype"]
-            @api_result["writer"] = @api_result["writer"].to_s
-            %w(general_firstup general_lastup novelupdated_at).each do |key|
-              @api_result[key] &&= Time.parse(@api_result[key])
-            end
-            stat_end = @api_result["end"]
-            if stat_end
-              @api_result["end"] = stat_end == 0
-            end
-          end
-        else
-          # なろうAPIからデータを取得出来なかった
-          # 開示設定が検索から除外に設定されるとAPIからはアクセスできなくなる
-          result = NovelInfo.force_load(@setting)
-          unless result
-            error "小説家になろうからデータを取得出来ませんでした"
-            exit Narou::EXIT_ERROR_CODE
-          end
-          @api_result = result
+        results = JSON.parse(data)
+        return if results[0]["allcount"].zero?
+        store_results(results.drop(1))
+      end
+    end
+
+    def store_results(results)
+      @stores += results.map do |result|
+        result["ncode"].downcase!
+        result["novel_type"] = result["noveltype"] if has_of?("nt")
+        result["writer"] = result["writer"].to_s if has_of?("w")
+        %w(general_firstup general_lastup novelupdated_at).each do |key|
+          result[key] &&= Time.parse(result[key])
         end
+        stat_end = result["end"]
+        if stat_end
+          result["end"] = stat_end.zero?
+        end
+        result
+      end
+    end
+
+    def has_of?(type)
+      @splited_of.include?(type)
+    end
+    memoize :has_of?
+
+    def private_novels
+      (@ncodes - @stores.map { |st| st["ncode"] }).map do |ncode|
+        Downloader.get_data_by_target(ncode)["id"]
       end
     end
   end

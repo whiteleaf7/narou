@@ -23,3 +23,12 @@ ClassVariable:
 
 UtilityFunction:
   enabled: false
+
+FeatureEnvy:
+  enabled: false
+
+UncommunicativeVariableName:
+  accept:
+    - _
+    - e
+    - i

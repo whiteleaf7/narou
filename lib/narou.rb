@@ -22,6 +22,7 @@ module Narou
   EXIT_ERROR_CODE = 127
   EXIT_INTERRUPT = 126
   EXIT_REQUEST_REBOOT = 125
+  MODIFIED_TAG = "modified"
 
   UPDATE_SORT_KEYS = {
     "id" => "ID", "last_update" => "更新日", "title" => "タイトル", "author" => "作者名",
@@ -32,6 +33,10 @@ module Narou
   extend Memoist
 
   @@is_web = false
+
+  def last_commit_year
+    2016
+  end
 
   def get_root_dir
     root_dir = nil
@@ -248,10 +253,12 @@ module Narou
     @@is_web
   end
 
-  def update_sort_key_summaries(width = 27)
-    ({"KEY" => "対象"}.merge(UPDATE_SORT_KEYS)).map { |(key, summary)|
-      "#{key.rjust(width)} : #{summary}"
-    }.join("\n")
+  def update_sort_key_summaries(left_space = 28)
+    summaries = { "KEY" => "   対象" }.merge(UPDATE_SORT_KEYS)
+    key_max_width = summaries.keys.max_by(&:length).length
+    summaries.map do |(key, summary)|
+      "#{" " * left_space}| #{key.center(key_max_width)} | #{summary}"
+    end.join("\n")
   end
 
   def get_theme
