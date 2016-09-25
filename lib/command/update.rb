@@ -191,11 +191,15 @@ module Command
             end
           end
 
+          delete_modified_tag = -> do
+            tags = data["tags"] || []
+            data["tags"] = tags - [Narou::MODIFIED_TAG] if tags.include?(Narou::MODIFIED_TAG)
+          end
+
           result = downloader.start_download
           case result.status
           when :ok
-            tags = data["tags"] || []
-            data["tags"] = tags - [Narou::MODIFIED_TAG] if tags.include?(Narou::MODIFIED_TAG)
+            delete_modified_tag.call
             if @options["no-convert"] ||
                  (@options["convert-only-new-arrival"] && !result.new_arrivals)
               interval.force_wait
@@ -210,6 +214,7 @@ module Command
             mistook_count += 1
             next
           when :none
+            delete_modified_tag.call
             puts "#{data["title"]} に更新はありません"
             next unless data["_convert_failure"]
           end
