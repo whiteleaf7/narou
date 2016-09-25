@@ -114,6 +114,12 @@ module Narou::ServerHelpers
   def notepad_text_path
     File.join(Narou.local_setting_dir, "notepad.txt")
   end
+
+  def get_general_all_no_by_toc(id)
+    toc = Downloader.new(id).load_toc_file
+    return nil unless toc
+    toc["subtitles"].size
+  end
 end
 
 class Narou::AppServer < Sinatra::Base
@@ -519,7 +525,9 @@ class Narou::AppServer < Sinatra::Base
           download: %!<a href="/novels/#{id}/download" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-download-alt"></span></a>!,
           frozen: Narou.novel_frozen?(id),
           new_arrivals_date: data["new_arrivals_date"].tap { |m| break m.to_i if m },
-          general_lastup: data["general_lastup"].tap { |m| break m.to_i if m }
+          general_lastup: data["general_lastup"].tap { |m| break m.to_i if m },
+          # 掲載話数
+          general_all_no: data["general_all_no"] || get_general_all_no_by_toc(id)
         }
       end
     json json_objects
