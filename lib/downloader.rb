@@ -371,6 +371,7 @@ class Downloader
   def run_download
     old_toc = @new_novel ? nil : load_toc_file
     latest_toc = get_latest_table_of_contents(old_toc)
+    latest_toc_subtitles = latest_toc["subtitles"]
     unless latest_toc
       @stream.error @setting["toc_url"] + " の目次データが取得出来ませんでした"
       return :failed
@@ -388,12 +389,12 @@ class Downloader
     end
     init_raw_dir
     if old_toc.empty? || @force
-      update_subtitles = latest_toc["subtitles"]
+      update_subtitles = latest_toc_subtitles
     else
-      update_subtitles = update_body_check(old_toc["subtitles"], latest_toc["subtitles"])
+      update_subtitles = update_body_check(old_toc["subtitles"], latest_toc_subtitles)
     end
 
-    if old_toc.empty? && update_subtitles.count == 0
+    if old_toc.empty? && update_subtitles.size.zero?
       @stream.error "#{@setting['title']} の目次がありません"
       return :failed
     end
@@ -421,7 +422,7 @@ class Downloader
         end
         update_database
         :ok
-      when old_toc["subtitles"].size > latest_toc["subtitles"].size
+      when old_toc["subtitles"].size > latest_toc_subtitles.size
         # 削除された節がある（かつ更新がない）場合
         @stream.puts "#{id_and_title} は一部の話が削除されています"
         :ok
@@ -437,6 +438,9 @@ class Downloader
       else
         :none
       end
+
+    @@database[@id]["general_all_no"] = latest_toc_subtitles.size
+
     save_novel_data(TOC_FILE_NAME, latest_toc)
     tags = @new_novel ? [] : @@database[@id]["tags"] || []
     if novel_end?
