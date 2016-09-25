@@ -7,6 +7,7 @@ AllCops:
     - "trash/**/*"
     - "narou.gemspec"
   DisplayCopNames: true
+  TargetRubyVersion: 2.1
 
 Metrics/ClassLength:
   CountComments: false

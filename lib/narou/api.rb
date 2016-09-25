@@ -53,8 +53,8 @@ module Narou
       url = "#{@api_url}?gzip=#{GZIP_LEVEL}&ncode=#{ncodes.join("-")}&of=#{@of}&lim=#{limit}&out=json"
       open(url) do |fp|
         data = Zlib::GzipReader.wrap(fp).read.force_encoding(Encoding::UTF_8)
-        results = JSON.load(data)
-        return if results[0]["allcount"] == 0
+        results = JSON.parse(data)
+        return if results[0]["allcount"].zero?
         store_results(results.drop(1))
       end
     end
@@ -69,7 +69,7 @@ module Narou
         end
         stat_end = result["end"]
         if stat_end
-          result["end"] = stat_end == 0
+          result["end"] = stat_end.zero?
         end
         result
       end
@@ -81,7 +81,7 @@ module Narou
     memoize :has_of?
 
     def private_novels
-      (@ncodes - @stores.map { |s| s["ncode"] }).map do |ncode|
+      (@ncodes - @stores.map { |st| st["ncode"] }).map do |ncode|
         Downloader.get_data_by_target(ncode)["id"]
       end
     end

@@ -11,7 +11,7 @@ module Command
       def initialize(options)
         @options = options
         @database = Database.instance
-        @narou_novels = Hash.new { |h, k| h[k] = [] }
+        @narou_novels = Hash.new { |hash, key| hash[key] = [] }
         @other_novels = []
         prepare
       end
@@ -21,9 +21,9 @@ module Command
       end
 
       def prepare
-        @database.each.with_index do |(id, data), i|
+        @database.each_key do |id|
           next if Narou.novel_frozen?(id)
-          setting =  Downloader.get_sitesetting_by_target(id)
+          setting = Downloader.get_sitesetting_by_target(id)
           if setting["narou_api_url"]
             @narou_novels[setting["narou_api_url"]] << setting["ncode"]
           else
@@ -39,12 +39,11 @@ module Command
           api.request.each do |result|
             ncode = result["ncode"]
             data = Downloader.get_data_by_target(ncode)
-            if result["novelupdated_at"] > data["last_update"]
-              data["novelupdated_at"] = result["novelupdated_at"]
-              data["general_lastup"] = result["general_lastup"]
-              tags = data["tags"] ||= []
-              tags << Narou::MODIFIED_TAG unless tags.include?(Narou::MODIFIED_TAG)
-            end
+            next unless result["novelupdated_at"] > data["last_update"]
+            data["novelupdated_at"] = result["novelupdated_at"]
+            data["general_lastup"] = result["general_lastup"]
+            tags = data["tags"] ||= []
+            tags << Narou::MODIFIED_TAG unless tags.include?(Narou::MODIFIED_TAG)
           end
           @other_novels += api.private_novels
         end
@@ -58,25 +57,20 @@ module Command
           progressbar.output(index)
           interval.wait
           begin
-            setting =  Downloader.get_sitesetting_by_target(id)
+            setting = Downloader.get_sitesetting_by_target(id)
             info = NovelInfo.load(setting)
-          rescue OpenURI::HTTPError, Errno::ECONNRESET => e
+            dates = if info
+                      {
+                        "novelupdated_at" => info["novelupdated_at"],
+                        "general_lastup" => info["general_lastup"]
+                      }
+                    else
+                      # 小説情報ページがない場合は目次から取得する
+                      get_latest_dates(id)
+                    end
+          rescue OpenURI::HTTPError, Errno::ECONNRESET
             setting.clear
             next
-          end
-          if info
-            dates = {
-              "novelupdated_at" => info["novelupdated_at"],
-              "general_lastup" => info["general_lastup"]
-            }
-          else
-            # 小説情報ページがない場合は目次から取得する
-            begin
-              dates = get_latest_dates(id)
-            rescue OpenURI::HTTPError, Errno::ECONNRESET => e
-              setting.clear
-              next
-            end
           end
           data = @database[id]
           data.merge!(dates)
@@ -95,7 +89,7 @@ module Command
       def get_latest_dates(target)
         downloader = Downloader.new(target)
         old_toc = downloader.load_toc_file
-        latest_toc = downloader.get_latest_table_of_contents(old_toc, through_error: true)
+        downloader.get_latest_table_of_contents(old_toc, through_error: true)
         {
           "novelupdated_at" => downloader.get_novelupdated_at,
           "general_lastup" => downloader.get_general_lastup
