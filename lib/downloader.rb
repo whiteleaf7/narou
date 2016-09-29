@@ -764,7 +764,7 @@ class Downloader
     toc_source = get_toc_source
     return nil unless toc_source
     @setting.multi_match(toc_source, "tcode")
-    info = NovelInfo.load(@setting, of: "t-s-gf-gl-nu-w", toc_source: toc_source)
+    info = NovelInfo.load(@setting, toc_source: toc_source)
     if info
       raise DownloaderNotFoundError unless info["title"]
       @setting["title"] = info["title"]
