@@ -61,7 +61,7 @@ class Inspector
   def display_summary(target = $stdout)
     padding = { "エラー" => "", "警告" => "  ", "INFO" => "  " }
     KLASS_TAG.each_value do |value|
-      num = @messages.count{ |msg| msg =~ /^\[#{value}\]/ }
+      num = @messages.count { |msg| msg =~ /^\[#{value}\]/ }
       printf(target, "  %s%s：%5d件\n", padding[value], value, num)
     end
   end
