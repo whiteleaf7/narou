@@ -679,6 +679,7 @@ class NovelConverter
     if !@display_inspector
       unless @inspector.empty?
         puts "小説状態の調査結果を #{Inspector::INSPECT_LOG_NAME} に出力しました"
+        @inspector.display_summary
       end
     else
       # 小説の監視・検査状況を表示する
