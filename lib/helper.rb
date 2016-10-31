@@ -132,7 +132,7 @@ module Helper
   #
   # エンティティ復号
   #
-  def restor_entity(str)
+  def restore_entity(str)
     result = str.dup
     ENTITIES.each do |key, value|
       result.gsub!("&#{key};", value)

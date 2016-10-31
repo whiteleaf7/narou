@@ -743,7 +743,7 @@ class Downloader
           @setting = s
           toc_url = @setting["toc_url"]
         end
-        toc_source = Helper.restor_entity(Helper.pretreatment_source(toc_fp.read, @setting["encoding"]))
+        toc_source = Helper.restore_entity(Helper.pretreatment_source(toc_fp.read, @setting["encoding"]))
         raise DownloaderNotFoundError if Downloader.detect_error_message(@setting, toc_source)
       end
     rescue DownloaderForceRedirect
@@ -1090,7 +1090,7 @@ class Downloader
     end
     raw = download_raw_data(subtitle_url)
     if @setting["is_narou"]
-      raw = Helper.restor_entity(raw)
+      raw = Helper.restore_entity(raw)
       save_raw_data(raw, subtitle_info)
       element = extract_elements_in_section(raw, subtitle_info["subtitle"])
       element["data_type"] = "text"
