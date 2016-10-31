@@ -484,6 +484,7 @@ class ConverterBase
     # たまに見かける誤字対策
     data.gsub!(/。　/, "。")
     data.gsub!(/([？！])。/, "\\1")
+    data.gsub!(/([？！])、/, "\\1")
   end
 
   #
