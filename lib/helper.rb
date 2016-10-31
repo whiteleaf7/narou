@@ -128,7 +128,7 @@ module Helper
        .gsub("\r", "")
   end
 
-  ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)", "#39" => "'", "#039" => "'" }
+  ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)", "#39" => "'" }
   #
   # エンティティ復号
   #
