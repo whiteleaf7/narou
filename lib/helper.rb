@@ -126,6 +126,8 @@ module Helper
        end
        .scrub("?")
        .gsub("\r", "")
+       .gsub(/&#x([0-9a-f]+);/i) { [$1.hex].pack("U") }
+       .gsub(/&#(\d+);/) { [$1.to_i].pack("U") }
   end
 
   ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)", "#39" => "'" }
