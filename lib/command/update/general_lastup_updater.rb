@@ -39,12 +39,14 @@ module Command
           api.request.each do |result|
             ncode = result["ncode"]
             data = Downloader.get_data_by_target(ncode)
-            last_check_date = data["last_check_date"] || Time.mktime(0)
-            next unless result["novelupdated_at"] > last_check_date
-            data["novelupdated_at"] = result["novelupdated_at"]
-            data["general_lastup"] = result["general_lastup"]
-            tags = data["tags"] ||= []
-            tags << Narou::MODIFIED_TAG unless tags.include?(Narou::MODIFIED_TAG)
+            last_check_date = data["last_check_date"] || data["last_update"]
+            if result["novelupdated_at"] > last_check_date
+              data["novelupdated_at"] = result["novelupdated_at"]
+              data["general_lastup"] = result["general_lastup"]
+              tags = data["tags"] ||= []
+              tags << Narou::MODIFIED_TAG unless tags.include?(Narou::MODIFIED_TAG)
+            end
+            data["last_check_date"] = Time.now
           end
           @other_novels += api.private_novels
         end
@@ -75,11 +77,12 @@ module Command
           end
           data = @database[id]
           data.merge!(dates)
-          last_check_date = data["last_check_date"] || Time.mktime(0)
+          last_check_date = data["last_check_date"] || data["last_update"]
           if data["novelupdated_at"] > last_check_date
             tags = @database[id]["tags"] ||= []
             tags << Narou::MODIFIED_TAG unless tags.include?(Narou::MODIFIED_TAG)
           end
+          data["last_check_date"] = Time.now
           setting.clear
         end
       ensure
