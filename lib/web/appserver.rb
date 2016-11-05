@@ -527,7 +527,8 @@ class Narou::AppServer < Sinatra::Base
           new_arrivals_date: data["new_arrivals_date"].tap { |m| break m.to_i if m },
           general_lastup: data["general_lastup"].tap { |m| break m.to_i if m },
           # 掲載話数
-          general_all_no: data["general_all_no"] # || get_general_all_no_by_toc(id),
+          general_all_no: data["general_all_no"], # || get_general_all_no_by_toc(id),
+          last_check_date: data["last_check_date"].tap { |m| break m.to_i if m },
         }
       end
     json json_objects
