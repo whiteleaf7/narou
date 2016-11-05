@@ -59,11 +59,12 @@ class Inspector
   end
 
   def display_summary(target = $stdout)
-    padding = { "エラー" => "", "警告" => "  ", "INFO" => "  " }
-    KLASS_TAG.each_value do |value|
-      num = @messages.count { |msg| msg =~ /^\[#{value}\]/ }
-      printf(target, "  %s%s：%5d件\n", padding[value], value, num)
-    end
+    target.print "小説状態の調査結果を #{Inspector::INSPECT_LOG_NAME} に出力しました（"
+    target.print KLASS_TAG.values.map { |klass_type|
+      num = @messages.count { |msg| msg =~ /^\[#{klass_type}\]/ }
+      "#{klass_type}：#{num}件"
+    }.join("、")
+    target.puts "）"
   end
 
   def display(klass = ALL, target = $stdout)
