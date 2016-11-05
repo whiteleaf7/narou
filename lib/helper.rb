@@ -265,8 +265,9 @@ module Helper
   #
   # from: ファイルパスをまとめた Array
   # dest_dir: コピー先のディレクトリ
+  # check_timestamp: タイムスタンプを比較して新しければコピーする
   #
-  def copy_files(from, dest_dir)
+  def copy_files(from, dest_dir, check_timestamp: true)
     from.each do |path|
       basename = File.basename(path)
       dirname = File.basename(File.dirname(path))
@@ -274,7 +275,13 @@ module Helper
       unless File.directory?(save_dir)
         FileUtils.mkdir_p(save_dir)
       end
-      FileUtils.copy(path, File.join(save_dir, basename))
+      dest = File.join(save_dir, basename)
+      if check_timestamp && File.exist?(dest)
+        src_mtime = File.mtime(path)
+        dest_mtime = File.mtime(dest)
+        next if dest_mtime >= src_mtime
+      end
+      FileUtils.copy(path, dest)
     end
   end
 
