@@ -214,8 +214,6 @@
             %a.button-download-force(href="#") 選択した小説を強制再ダウンロード
       .btn-group
         %button.button-update.btn.btn-success(type="button" data-toggle="tooltip") Update
-        %button.button-update-general-lastup.btn.btn-success(type="button" data-toggle="tooltip" |
-                              title="最新話掲載日を確認") Check |
         %button.btn.btn-success.dropdown-toggle(type="button" data-toggle="dropdown")
           %span.caret
           %span.sr-only Toggle Dropdown
@@ -228,6 +226,13 @@
             %a.button-update-view(href="#") 表示されている小説を更新
           %li
             %a.button-update-force(href="#") 凍結済みでも更新
+      .btn-group
+        %button.button-update-general-lastup-narou.btn.btn-success(type="button" data-toggle="tooltip" title="最新話掲載日をなろうAPIで確認")
+          な
+        %button.button-update-general-lastup-other.btn.btn-success(type="button" data-toggle="tooltip" title="その他の小説の最新話掲載日を確認")
+          他
+        %button.button-update-general-lastup-update-modified.btn.btn-success(type="button" data-toggle="tooltip" title="modifiedタグが付いた小説を更新")
+          %span.glyphicon.glyphicon-refresh
       .btn-group
         %button.button-send.btn.btn-warning(type="button" data-toggle="tooltip") Send
         - if Inventory.load("local_setting")["hotentry"]
