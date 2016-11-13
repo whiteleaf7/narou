@@ -290,6 +290,8 @@ module Helper
   #
   def date_string_to_time(date)
     date ? Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒@;", "///::: :")) : nil
+  rescue ArgumentError
+    nil
   end
 
   #
