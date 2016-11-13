@@ -23,6 +23,7 @@ require_relative "buttons_controller"
 
 # rubocop:disable Metrics/ClassLength
 # rubocop:disable Style/ClassAndModuleChildren
+# rubocop:disable Metrics/LineLength
 
 class Narou::AppServer < Narou::ApplicationController
   helpers Narou::ServerHelper
@@ -82,7 +83,8 @@ class Narou::AppServer < Narou::ApplicationController
   #
   def self.create_address(user_port = nil)
     global_setting = Inventory.load("global_setting", :global)
-    port, bind = global_setting["server-port"], global_setting["server-bind"]
+    port = global_setting["server-port"]
+    bind = global_setting["server-bind"]
     port = user_port if user_port
     ipaddress = my_ipaddress
     unless port
@@ -137,7 +139,7 @@ class Narou::AppServer < Narou::ApplicationController
       loop do
         if @@push_server.connections.count > 0
           device = Narou.get_device
-          @@push_server.send_all(:"device.ejectable" => device && device.ejectable?)
+          @@push_server.send_all("device.ejectable": device && device.ejectable?)
         end
 
         sleep 2
@@ -169,9 +171,9 @@ class Narou::AppServer < Narou::ApplicationController
     @global_replace_pattern = @replace_pattern = Narou.global_replace_pattern
   end
 
+  # rubocop:disable Lint/HandleExceptions
   post "/settings" do
     built_arguments = []
-    output = ""
     device = params.delete("device")
     [:local, :global].each do |scope|
       @setting_variables[scope].each do |name, info|
@@ -183,12 +185,12 @@ class Narou::AppServer < Narou::ApplicationController
           # 何もデータが無い＝off を選択したと判断する。
           # 隠しデータの場合は hidden として on, off, nil が必ず送信されるので、
           # それで判断できる。
-          if param_data
-            argument = convert_on_off_to_boolean(param_data).to_s
-          else
-            argument = "false"
-          end
-        elsif param_data.kind_of?(Array)
+          argument = if param_data
+                       convert_on_off_to_boolean(param_data).to_s
+                     else
+                       "false"
+                     end
+        elsif param_data.is_a?(Array)
           argument = param_data.join(",")
         else
           argument = param_data
@@ -217,20 +219,21 @@ class Narou::AppServer < Narou::ApplicationController
     # 置換設定保存
     params_replace_pattern = params["replace_pattern"]
     @global_replace_pattern.clear
-    if params_replace_pattern.kind_of?(Array)
+    if params_replace_pattern.is_a?(Array)
       params_replace_pattern.each do |pattern|
-        left, right = pattern["left"].strip, pattern["right"].strip
+        left = pattern["left"].strip
+        right = pattern["right"].strip
         next if left == ""
         @global_replace_pattern << [left, right]
       end
     end
     Narou.save_global_replace_pattern
 
-    if @error_list.empty?
-      session[:alert] = [ "保存が完了しました", "success" ]
-    else
-      session[:alert] = [ "#{@error_list.size}個の設定にエラーがありました", "danger" ]
-    end
+    session[:alert] = if @error_list.empty?
+                        ["保存が完了しました", "success"]
+                      else
+                        ["#{@error_list.size}個の設定にエラーがありました", "danger"]
+                      end
     haml :settings
   end
 
@@ -264,7 +267,7 @@ class Narou::AppServer < Narou::ApplicationController
     Thread.new do
       buffer = `gem update --no-document narou`
       @@gem_update_last_log = buffer.strip!
-      if buffer =~ /Nothing to update\z/
+      if buffer.end_with?("Nothing to update")
         @@push_server.send_all("server.update.nothing" => buffer)
       elsif buffer.include?("Gems updated: narou")
         @@already_update_system = true
@@ -296,7 +299,7 @@ class Narou::AppServer < Narou::ApplicationController
     @title = "小説の変換設定 - #{h @novel_title}"
     @setting_variables = []
     @error_list = {}
-    @novel_setting = NovelSetting.new(@id, true, true)    # 空っぽの設定を作成
+    @novel_setting = NovelSetting.new(@id, true, true) # 空っぽの設定を作成
     @novel_setting.settings = @novel_setting.load_setting_ini["global"]
     @original_settings = NovelSetting.get_original_settings
     @force_settings = NovelSetting.load_force_settings
@@ -307,22 +310,21 @@ class Narou::AppServer < Narou::ApplicationController
   post "/novels/:id/setting" do
     # 変換設定保存
     @original_settings.each do |info|
-      name, type = info[:name], info[:type]
+      name = info[:name]
+      type = info[:type]
       param_data = params[name]
       value = nil
       begin
         if type == :boolean
-          if param_data
-            value = convert_on_off_to_boolean(param_data)
-          else
-            value = false
-          end
-        elsif param_data.kind_of?(Array)
+          value = if param_data
+                    convert_on_off_to_boolean(param_data)
+                  else
+                    false
+                  end
+        elsif param_data.is_a?(Array)
           value = param_data.join(",")
-        else
-          if param_data.strip != ""
-            value = Helper.string_cast_to_type(param_data, type)
-          end
+        elsif param_data.strip != ""
+          value = Helper.string_cast_to_type(param_data, type)
         end
         @novel_setting[name] = value
       rescue Helper::InvalidVariableType => e
@@ -334,20 +336,21 @@ class Narou::AppServer < Narou::ApplicationController
     # 置換設定保存
     params_replace_pattern = params["replace_pattern"]
     @novel_setting.replace_pattern.clear
-    if params_replace_pattern.kind_of?(Array)
+    if params_replace_pattern.is_a?(Array)
       params_replace_pattern.each do |pattern|
-        left, right = pattern["left"].strip, pattern["right"].strip
+        left = pattern["left"].strip
+        right = pattern["right"].strip
         next if left == ""
         @novel_setting.replace_pattern << [left, right]
       end
     end
     @novel_setting.save_replace_pattern
 
-    if @error_list.empty?
-      session[:alert] = [ "保存が完了しました", "success" ]
-    else
-      session[:alert] = [ "#{@error_list.size}個の設定にエラーがありました", "danger" ]
-    end
+    session[:alert] = if @error_list.empty?
+                        ["保存が完了しました", "success"]
+                      else
+                        ["#{@error_list.size}個の設定にエラーがありました", "danger"]
+                      end
 
     haml :"novels/setting"
   end
@@ -402,7 +405,13 @@ class Narou::AppServer < Narou::ApplicationController
           sitename: data["sitename"],
           toc_url: data["toc_url"],
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
-          tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'),
+          tags:
+            if tags.empty?
+              ""
+            else
+              decorate_tags(tags) + \
+                '&nbsp;<span class="tag label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'
+            end,
           status: [
             Narou.novel_frozen?(id) ? "凍結" : nil,
             tags.include?("end") ? "完結" : nil,
@@ -433,8 +442,8 @@ class Narou::AppServer < Narou::ApplicationController
 
   post "/api/download" do
     targets = params["targets"] or pass
-    targets = targets.kind_of?(Array) ? targets : targets.split
-    pass if targets.size == 0
+    targets = targets.is_a?(Array) ? targets : targets.split
+    pass if targets.empty?
     Narou::Worker.push do
       CommandLine.run!(["download"] + targets)
       @@push_server.send_all(:"table.reload")
@@ -611,13 +620,17 @@ class Narou::AppServer < Narou::ApplicationController
         end
       end
     end
-    json Hash[tag_info.sort_by { |k, v| k }].values
+    json Hash[tag_info.sort_by { |k, _v| k }].values
   end
 
   post "/api/edit_tag" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     # key と value を重複を維持したまま反転
-    invert_states = params["states"].inject({}) { |h,(k,v)| (h[v] ||= []) << k; h }
+    # rubocop:disable Style/EachWithObject
+    invert_states = params["states"].inject({}) do |h, (k, v)|
+      (h[v] ||= []) << k
+      h
+    end
     $stdout.silence do
       invert_states.each do |state, tags|
         case state.to_i
@@ -770,7 +783,7 @@ class Narou::AppServer < Narou::ApplicationController
   get "/js/widget.js" do
     if BOOKMARKLET_MODE.include?(params["mode"])
       content_type :js
-      erb :"bookmarklet/#{params['mode']}.js"
+      erb :"bookmarklet/#{params["mode"]}.js"
     else
       error("invaid mode")
     end
