@@ -14,7 +14,8 @@ module Narou
     #
     def decorate_exclusion_tags(tags)
       tags.sort.map do |tag|
-        %!<span class="tag label label-#{Command::Tag.get_color(tag)}" data-exclusion-tag="#{escape_html(tag)}">^tag:#{escape_html(tag)}</span>!
+        color = Command::Tag.get_color(tag)
+        %!<span class="tag label label-#{color}" data-exclusion-tag="#{escape_html(tag)}">^tag:#{escape_html(tag)}</span>!
       end.join(" ")
     end
 
@@ -22,12 +23,10 @@ module Narou
     # Rubyバージョンを構築
     #
     def build_ruby_version
-      begin
-        `"#{RbConfig.ruby}" -v`.strip
-      rescue
-        config = RbConfig::CONFIG
-        "ruby #{RUBY_VERSION}p#{config["PATCHLEVEL"]} [#{RUBY_PLATFORM}]"
-      end
+      `"#{RbConfig.ruby}" -v`.strip
+    rescue
+      config = RbConfig::CONFIG
+      "ruby #{RUBY_VERSION}p#{config["PATCHLEVEL"]} [#{RUBY_PLATFORM}]"
     end
 
     #
@@ -35,7 +34,7 @@ module Narou
     # ID が指定されなかったか、１件も存在しない場合は nil を返す
     #
     def select_valid_novel_ids(ids)
-      return nil unless ids.kind_of?(Array)
+      return nil unless ids.is_a?(Array)
       result = ids.select do |id|
         id =~ /^\d+$/
       end
@@ -51,8 +50,6 @@ module Narou
         true
       when "off"
         false
-      else
-        nil
       end
     end
 
