@@ -47,6 +47,9 @@ begin
   CommandLine.run(ARGV.map { |v| v.dup })
 rescue SystemExit => e
   exit e.status
+rescue SyntaxError => e
+  warn e
+  exit Narou::EXIT_ERROR_CODE
 rescue rescue_level => e
   warn $@.shift + ": #{e.message.encode(Encoding::UTF_8)} (#{e.class})"
   if $display_backtrace
