@@ -1,16 +1,30 @@
-%script(src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/codemirror.js")
-%script(src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/javascript/javascript.js")
+%script(src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/codemirror.min.js")
+%script(src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/xml/xml.min.js")
+%script(src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/javascript/javascript.min.js")
+%script(src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/mode/htmlmixed/htmlmixed.min.js")
 %link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/codemirror.css")
 -# %link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.20.2/theme/monokai.css")
 
 :javascript
   local_initialize_functions.push(function($) {
-    var myCodeMirror = CodeMirror(document.getElementById("editor"), {
-      mode: "javascript",
+    CodeMirror(document.getElementById("html_editor"), {
+      mode: "htmlmixed",
       lineNumbers: true,
       autofocus: true
     });
+
+    CodeMirror(document.getElementById("js_editor"), {
+      mode: "javascript",
+      lineNumbers: true,
+      autofocus: false
+    });
   });
+
+:css
+  .CodeMirror {
+    border: 1px solid #ccc;
+    height: 500px;
+  }
 
 .navbar.navbar-default.navbar-fixed-top(role="navigation")
   .container
@@ -36,19 +50,21 @@
 .container.theme-showcase(role="main")
   %h1 操作ボタンの編集
 
-  #editor(style="height: 300px")
+  .row
+    .col-md-6
+      .form-group
+        %h4 HTML
+        #html_editor
+          = @html_code
 
-  %table.table.table-striped.table-custome-buttons
-    %thead
-      %tr
-        %th 表示順
-        %th タイトル
-        %th ラベル
-        %th slug
-    %tbody
-      - @buttons.each do |button|
-        %tr
-          %td.position= button.position
-          %td.title= button.title
-          %td.button_label= button.label
-          %td.slug= button.slug
+    .col-md-6
+      .form-group
+        %h4 Javascript
+        #js_editor
+          = @js_code
+    
+  .row
+    .col-md-12
+      .form-group
+        %button.btn.btn-info
+          保存
