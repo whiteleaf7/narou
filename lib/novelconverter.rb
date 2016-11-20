@@ -451,6 +451,7 @@ class NovelConverter
   # $t タイトル自身。書式の中で自由な位置にタイトルを埋め込める
   # $ns 小説が掲載されているサイト名
   # $nt 小説種別（短編 or 連載）
+  # $ntag 小説のタグをカンマ区切りにしたもの
   #
   # ※ $t を使用した場合、title_date_align を無視する
   #
@@ -462,6 +463,7 @@ class NovelConverter
       special_format_chars = [
         ["$s", calc_reverse_short_time(new_arrivals_date)],
         ["$ns", @data["sitename"]],
+        ["$ntag", tags_join_comma(@data)],
         ["$nt", Narou.novel_type_text(@data["novel_type"])],
         ["$t", title]
       ]
@@ -485,6 +487,11 @@ class NovelConverter
       end
     end
     result
+  end
+
+  def tags_join_comma(data)
+    tags = data["tags"] || []
+    tags.sort.join(",")
   end
 
   def decorate_title(title)
