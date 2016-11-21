@@ -92,7 +92,7 @@ module Command
         rescue Interrupt => e
           # 中断されてコンソールへの入力が可能になってから、WEBrick が終了するまで
           # タイムラグがあって表示がごちゃまぜになるので、終わるのを少し待つ
-          sleep 3
+          sleep 2
         end
       end
     end
