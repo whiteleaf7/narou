@@ -31,7 +31,7 @@ def File.write(path, string, *options)
   super(temp_path, string, *options)
 
   if backup
-    FileUtils.copy(temp_path, path)
+    super(path, string, *options)
   else
     File.rename(temp_path, path)
   end
