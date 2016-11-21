@@ -114,12 +114,6 @@ module Narou::ServerHelpers
   def notepad_text_path
     File.join(Narou.local_setting_dir, "notepad.txt")
   end
-
-  def get_general_all_no_by_toc(id)
-    toc = Downloader.new(id).load_toc_file
-    return nil unless toc
-    toc["subtitles"].size
-  end
 end
 
 class Narou::AppServer < Sinatra::Base
@@ -222,6 +216,7 @@ class Narou::AppServer < Sinatra::Base
     super
     puts_hello_messages
     start_device_ejectable_event
+    fill_general_all_no_in_database
   end
 
   def puts_hello_messages
@@ -240,6 +235,23 @@ class Narou::AppServer < Sinatra::Base
         sleep 2
       end
     end
+  end
+
+  def general_all_no_by_toc(id)
+    toc = Downloader.new(id).load_toc_file
+    return nil unless toc
+    toc["subtitles"].size
+  end
+
+  # 話数の設定されていない小説の話数を取得して埋める
+  def fill_general_all_no_in_database
+    modified = false
+    Database.instance.each do |id, data|
+      next if data["general_all_no"]
+      data["general_all_no"] = general_all_no_by_toc(id)
+      modified = true
+    end
+    Database.instance.save_database if modified
   end
 
   # ===================================================================
@@ -527,7 +539,7 @@ class Narou::AppServer < Sinatra::Base
           new_arrivals_date: data["new_arrivals_date"].tap { |m| break m.to_i if m },
           general_lastup: data["general_lastup"].tap { |m| break m.to_i if m },
           # 掲載話数
-          general_all_no: data["general_all_no"], # || get_general_all_no_by_toc(id),
+          general_all_no: data["general_all_no"],
           last_check_date: data["last_check_date"].tap { |m| break m.to_i if m },
         }
       end
