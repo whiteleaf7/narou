@@ -357,7 +357,7 @@ class ConverterBase
     data.gsub!(/[#{SINGLE_MINUTE_FAMILY}]([^"\n]+?)[#{SINGLE_MINUTE_FAMILY}]/, "〝\\1〟")
     data.gsub!(/[#{DOUBLE_MINUTE_FAMILY}]([^"\n]+?)[#{DOUBLE_MINUTE_FAMILY}]/, "〝\\1〟")
     data.tr!("-=+/*《》'\"%$#&!?<>＜＞()|‐,._;:\[\]{}",
-             "－＝＋／＊≪≫’〝％＄＃＆！？〈〉〈〉（）｜－，．＿；：［］")
+             "－＝＋／＊≪≫’〝％＄＃＆！？〈〉〈〉（）｜－，．＿；：［］｛｝")
     data.gsub!("\\", "￥")
     data
   end
