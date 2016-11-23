@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2015-08-07 22:44:33 +0900
+# auto generated at 2016-11-23 10:43:07 +0900
 
 Encoding.default_external = Encoding::UTF_8
 
@@ -99,6 +99,10 @@ describe "convert" do
 
   it "replace/test_replace.txt" do
     check_answer("replace/test_replace.txt")
+  end
+
+  it "rome_num/test_rome_num.txt" do
+    check_answer("rome_num/test_rome_num.txt")
   end
 
   it "ruby/test_ruby.txt" do
