@@ -132,6 +132,7 @@ module Command
       Narou::UPDATE_SORT_KEYS.keys.include?(key)
     end
 
+    # rubocop:disable Metrics/BlockLength
     def execute(argv)
       super
       mistook_count = 0
