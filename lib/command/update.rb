@@ -170,11 +170,8 @@ module Command
             if !data
               display_message = "<bold><red>[ERROR]</red></bold> #{target} は管理小説の中に存在しません".termcolor
             elsif Narou.novel_frozen?(target) && !@options["force"]
-              if argv.length > 0
-                display_message = "ID:#{data["id"]}　#{data["title"]} は凍結中です"
-              else
-                next
-              end
+              next if argv.empty?
+              display_message = "ID:#{data["id"]}　#{data["title"]} は凍結中です"
             end
             Helper.print_horizontal_rule if i > 0
             if display_message
