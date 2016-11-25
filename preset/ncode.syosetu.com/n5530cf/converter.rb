@@ -11,7 +11,6 @@
 converter "n5530cf うちの娘の為ならば、俺はもしかしたら魔王も倒せるかもしれない 。" do
   # 各種変換処理がされる「前」の生データに対しての変換処理を記述
   def before(io, text_type)
-
     io.string.gsub!(/[－ー][－―]/, "――")
     io.string.gsub!(/\( ([前後]) \)/, "（\\1）") if text_type == "subtitle"
     if text_type =~ /body|postscript/
@@ -19,7 +18,7 @@ converter "n5530cf うちの娘の為ならば、俺はもしかしたら魔王�
       io.string.gsub!(/ +/, "")
     end
 
-    case (@current_index+1)
+    case (@current_index + 1)
     when 78
       io.string.gsub!("どうして無事だっ　たのですか", "どうして無事だったのですか")
     end
