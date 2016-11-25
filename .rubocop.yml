@@ -213,3 +213,6 @@ Style/EmptyLinesAroundClassBody:
 
 Style/FrozenStringLiteralComment:
   Enabled: false
+
+Style/MultilineOperationIndentation:
+  Enabled: false
