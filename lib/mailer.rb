@@ -56,7 +56,8 @@ class Mailer
     params[:charset] = "UTF-8"
     params[:text_part_charset] = "UTF-8"
     if attached_file_path
-      params[:attachments] = { File.basename(attached_file_path) => File.binread(attached_file_path) }
+      basename = File.basename(attached_file_path).tr("@", "＠")
+      params[:attachments] = { basename => File.binread(attached_file_path) }
     end
     begin
       Pony.mail(params)

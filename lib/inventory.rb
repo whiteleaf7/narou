@@ -30,20 +30,27 @@ module Inventory
   def init(name, scope)
     dir = case scope
           when :local
-            Narou.get_local_setting_dir
+            Narou.local_setting_dir
           when :global
-            Narou.get_global_setting_dir
+            Narou.global_setting_dir
           else
             raise "Unknown scope"
           end
     return nil unless dir
     @mutex = Mutex.new
     @inventory_file_path = File.join(dir, name + ".yaml")
-    if File.exist?(@inventory_file_path)
-      self.merge!(Helper::CacheLoader.memo(@inventory_file_path) { |yaml|
+    return unless File.exist?(@inventory_file_path)
+    self.merge!(Helper::CacheLoader.memo(@inventory_file_path) { |yaml|
+      begin
         YAML.load(yaml)
-      })
-    end
+      rescue Psych::SyntaxError
+        unless restore(@inventory_file_path)
+          error "#{@inventory_file_path} が壊れてるっぽい"
+          raise
+        end
+        YAML.load_file(@inventory_file_path)
+      end
+    })
   end
 
   def save
@@ -53,6 +60,13 @@ module Inventory
     @mutex.synchronize do
       File.write(@inventory_file_path, YAML.dump(self))
     end
+  end
+
+  def restore(path)
+    backup_path = "#{path}.backup"
+    return nil unless File.exist?(backup_path)
+    FileUtils.copy(backup_path, path)
+    true
   end
 end
 

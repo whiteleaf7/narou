@@ -3,6 +3,7 @@
 #
 .backup/
 小説データ/
+小説データ/
 kindlestrip.py
 kindlegen.exe
 t.rb
@@ -11,6 +12,7 @@ AozoraEpub3*
 TODO.txt
 MEMO.txt
 .narou/
+.narousetting/
 *.zip
 debug
 .DS_Store
@@ -32,6 +34,11 @@ tags
 
 archive
 commitversion
+
+.test_dot_narou/
+.test_novel_data/
+
+mail_setting.yaml
 
 #
 # for gem

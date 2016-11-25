@@ -6,7 +6,8 @@
     %meta{:content => "width=device-width, initial-scale=1", :name => "viewport"}/
     %meta{:content => "whiteleaf", :name => "author"}/
     %meta{:content => "none", :name => "robots"}/
-    %title Narou.rb WEB UI #{@title ? "- #{@title}" : ""}
+    %title
+      = [@title, "Narou.rb WEB UI"].compact.join(" - ")
     %link{:href => "/favicon.ico", :rel => "shortcut icon"}/
     - if @bootstrap_theme
       %link{:href => "/theme/#{@bootstrap_theme}/bootstrap.min.css", :rel => "stylesheet"}/

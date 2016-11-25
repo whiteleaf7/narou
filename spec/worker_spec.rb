@@ -40,7 +40,7 @@ describe Narou::Worker do
         @worker.push(&block2)
       end
 
-      it do
+      it "should call blocks", retry: 3, retry_wait: 3 do
         # 確実にWorkerスレッドが実行されるように
         Thread.pass
         sleep 0.001
@@ -49,7 +49,7 @@ describe Narou::Worker do
       end
     end
 
-    it "canceling" do
+    it "canceling", retry: 3, retry_wait: 3 do
       @worker.stop
       expect(@worker.canceled?).to be_falsey
       _execute = false
@@ -60,6 +60,7 @@ describe Narou::Worker do
       expect(@worker.canceled?).to be_truthy
       @worker.start
       Thread.pass
+      sleep 0.001
       expect(@worker.running?).to be_truthy
       expect(@worker.canceled?).to be_falsey
       expect(_execute).to be false

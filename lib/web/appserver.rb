@@ -29,6 +29,15 @@ module Narou::ServerHelpers
   end
 
   #
+  # タグをHTMLで装飾する(除外タグ指定用)
+  #
+  def decorate_exclusion_tags(tags)
+    tags.sort.map do |tag|
+      %!<span class="tag label label-#{Command::Tag.get_color(tag)}" data-exclusion-tag="#{escape_html(tag)}">^tag:#{escape_html(tag)}</span>!
+    end.join(" ")
+  end
+
+  #
   # Rubyバージョンを構築
   #
   def build_ruby_version
@@ -103,7 +112,7 @@ module Narou::ServerHelpers
   end
 
   def notepad_text_path
-    File.join(Narou.get_local_setting_dir, "notepad.txt")
+    File.join(Narou.local_setting_dir, "notepad.txt")
   end
 end
 
@@ -190,10 +199,16 @@ class Narou::AppServer < Sinatra::Base
   def self.my_ipaddress
     @@__ipaddress ||= -> {
       udp = UDPSocket.new
-      udp.connect("128.0.0.0", 7)
-      adrs = Socket.unpack_sockaddr_in(udp.getsockname)[1]
-      udp.close
-      adrs
+      begin
+        # 128.0.0.0 への送信に使用されるNICのアドレスを取得
+        udp.connect("128.0.0.0", 7)
+        Socket.unpack_sockaddr_in(udp.getsockname)[1]
+      rescue Errno::ENETUNREACH
+        # 128.0.0.0 へのルーティングがないとき
+        "127.0.0.1"
+      ensure
+        udp.close
+      end
     }.call
   end
 
@@ -201,6 +216,7 @@ class Narou::AppServer < Sinatra::Base
     super
     puts_hello_messages
     start_device_ejectable_event
+    fill_general_all_no_in_database
   end
 
   def puts_hello_messages
@@ -219,6 +235,23 @@ class Narou::AppServer < Sinatra::Base
         sleep 2
       end
     end
+  end
+
+  def general_all_no_by_toc(id)
+    toc = Downloader.new(id).load_toc_file
+    return nil unless toc
+    toc["subtitles"].size
+  end
+
+  # 話数の設定されていない小説の話数を取得して埋める
+  def fill_general_all_no_in_database
+    modified = false
+    Database.instance.each do |id, data|
+      next if data["general_all_no"]
+      data["general_all_no"] = general_all_no_by_toc(id)
+      modified = true
+    end
+    Database.instance.save_database if modified
   end
 
   # ===================================================================
@@ -504,7 +537,10 @@ class Narou::AppServer < Sinatra::Base
           download: %!<a href="/novels/#{id}/download" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-download-alt"></span></a>!,
           frozen: Narou.novel_frozen?(id),
           new_arrivals_date: data["new_arrivals_date"].tap { |m| break m.to_i if m },
-          general_lastup: data["general_lastup"].tap { |m| break m.to_i if m }
+          general_lastup: data["general_lastup"].tap { |m| break m.to_i if m },
+          # 掲載話数
+          general_all_no: data["general_all_no"],
+          last_check_date: data["last_check_date"].tap { |m| break m.to_i if m },
         }
       end
     json json_objects
@@ -547,6 +583,22 @@ class Narou::AppServer < Sinatra::Base
     end
     Narou::Worker.push do
       CommandLine.run!(["update", ids, opt_arguments])
+      @@push_server.send_all(:"table.reload")
+    end
+  end
+
+  post "/api/update_by_tag" do
+    tags = params["tags"] || []
+    exclusion_tags = params["exclusion_tags"] || []
+    tag_params = tags.map do |tag|
+      "tag:#{tag}"
+    end
+    tag_params += exclusion_tags.map do |tag|
+      "^tag:#{tag}"
+    end
+    pass if tag_params.empty?
+    Narou::Worker.push do
+      CommandLine.run!(["update", tag_params])
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -666,7 +718,7 @@ class Narou::AppServer < Sinatra::Base
     result
   end
 
-  post "/api/taginfo.json" do
+  get "/api/taginfo.json" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     ids.map!(&:to_i)
     database = Database.instance
@@ -677,7 +729,8 @@ class Narou::AppServer < Sinatra::Base
         tag_info[tag] ||= {
           count: 0,
           tag: tag,
-          html: decorate_tags([tag])
+          html: decorate_tags([tag]),
+          exclusion_html: params["with_exclusion"] ? decorate_exclusion_tags([tag]) : ""
         }
         if ids.include?(data["id"])
           tag_info[tag][:count] += 1
@@ -717,9 +770,19 @@ class Narou::AppServer < Sinatra::Base
   end
 
   post "/api/update_general_lastup" do
+    option = params["option"]
+    option = nil if option == "all"
+    is_update_modified = params["is_update_modified"] == "true"
     Narou::Worker.push do
-      CommandLine.run!(["update", "--gl"])
+      CommandLine.run!(["update", "--gl", option].compact)
       @@push_server.send_all(:"table.reload")
+      @@push_server.send_all(:"tag.updateCanvas")
+      if is_update_modified
+        puts "<yellow>#{Narou::MODIFIED_TAG} タグの付いた小説を更新します</yellow>".termcolor
+        CommandLine.run!(["update", "tag:#{Narou::MODIFIED_TAG}"])
+        @@push_server.send_all(:"table.reload")
+        @@push_server.send_all(:"tag.updateCanvas")
+      end
     end
   end
 

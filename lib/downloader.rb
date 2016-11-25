@@ -13,7 +13,6 @@ require_relative "template"
 require_relative "database"
 require_relative "inventory"
 require_relative "eventable"
-require_relative "narou/api"
 require_relative "html"
 require_relative "input"
 
@@ -214,10 +213,17 @@ class Downloader
   #
   # 小説サイトの定義ファイルを全部読み込む
   #
+  # スクリプト同梱の設定ファイルを読み込んだあと、ユーザの小説の管理ディレクトリ内にある
+  # webnovel ディレクトリからも定義ファイルを読み込む
+  #
   def self.load_settings
     settings = @@__settings_cache ||= []
     return settings unless settings.empty?
-    Dir.glob(File.join(Narou.get_script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")) do |path|
+    load_paths = [
+      File.join(Narou.get_script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml"),
+      File.join(Narou.get_root_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")
+    ].join("\0")
+    Dir.glob(load_paths) do |path|
       setting = SiteSetting.load_file(path)
       if setting["name"] == "小説家になろう"
         @@narou = setting
@@ -261,7 +267,8 @@ class Downloader
   # サブディレクトリ名を生成
   #
   def self.create_subdirecotry_name(title)
-    title.start_with?("n") ? title[1..2] : title[0..1]
+    name = title.start_with?("n") ? title[1..2] : title[0..1]
+    name.strip
   end
 
   if Narou.already_init?
@@ -364,6 +371,7 @@ class Downloader
   def run_download
     old_toc = @new_novel ? nil : load_toc_file
     latest_toc = get_latest_table_of_contents(old_toc)
+    latest_toc_subtitles = latest_toc["subtitles"]
     unless latest_toc
       @stream.error @setting["toc_url"] + " の目次データが取得出来ませんでした"
       return :failed
@@ -381,12 +389,12 @@ class Downloader
     end
     init_raw_dir
     if old_toc.empty? || @force
-      update_subtitles = latest_toc["subtitles"]
+      update_subtitles = latest_toc_subtitles
     else
-      update_subtitles = update_body_check(old_toc["subtitles"], latest_toc["subtitles"])
+      update_subtitles = update_body_check(old_toc["subtitles"], latest_toc_subtitles)
     end
 
-    if old_toc.empty? && update_subtitles.count == 0
+    if old_toc.empty? && update_subtitles.size.zero?
       @stream.error "#{@setting['title']} の目次がありません"
       return :failed
     end
@@ -414,7 +422,7 @@ class Downloader
         end
         update_database
         :ok
-      when old_toc["subtitles"].size > latest_toc["subtitles"].size
+      when old_toc["subtitles"].size > latest_toc_subtitles.size
         # 削除された節がある（かつ更新がない）場合
         @stream.puts "#{id_and_title} は一部の話が削除されています"
         :ok
@@ -430,6 +438,9 @@ class Downloader
       else
         :none
       end
+
+    @@database[@id]["general_all_no"] = latest_toc_subtitles.size
+
     save_novel_data(TOC_FILE_NAME, latest_toc)
     tags = @new_novel ? [] : @@database[@id]["tags"] || []
     if novel_end?
@@ -628,11 +639,7 @@ class Downloader
   end
 
   def get_novel_status
-    novel_status = if false # @setting["narou_api_url"]
-                     Narou::API.new(@setting, "nt-e")
-                   else
-                     NovelInfo.load(@setting)
-                   end
+    novel_status = NovelInfo.load(@setting, of: "nt-e")
     unless novel_status
       novel_status = {
         "novel_type" => NOVEL_TYPE_SERIES,
@@ -687,7 +694,7 @@ class Downloader
   #
   def get_title
     return @title if @title
-    @title = @setting["title"]
+    @title = @setting["title"] || @@database[@id]["title"]
     if @setting["title_strip_pattern"]
       @title = @title.gsub(/#{@setting["title_strip_pattern"]}/, "").gsub(/^[　\s]*(.+?)[　\s]*?$/, "\\1")
     end
@@ -736,7 +743,7 @@ class Downloader
           @setting = s
           toc_url = @setting["toc_url"]
         end
-        toc_source = Helper.restor_entity(Helper.pretreatment_source(toc_fp.read, @setting["encoding"]))
+        toc_source = Helper.restore_entity(Helper.pretreatment_source(toc_fp.read, @setting["encoding"]))
         raise DownloaderNotFoundError if Downloader.detect_error_message(@setting, toc_source)
       end
     rescue DownloaderForceRedirect
@@ -757,13 +764,7 @@ class Downloader
     toc_source = get_toc_source
     return nil unless toc_source
     @setting.multi_match(toc_source, "tcode")
-    #if @setting["narou_api_url"]
-    if false
-      # なろうAPIの出力がおかしいので直るまで使用中止
-      info = Narou::API.new(@setting, "t-s-gf-gl-nu-w")
-    else
-      info = NovelInfo.load(@setting, toc_source)
-    end
+    info = NovelInfo.load(@setting, toc_source: toc_source)
     if info
       raise DownloaderNotFoundError unless info["title"]
       @setting["title"] = info["title"]
@@ -1089,7 +1090,7 @@ class Downloader
     end
     raw = download_raw_data(subtitle_url)
     if @setting["is_narou"]
-      raw = Helper.restor_entity(raw)
+      raw = Helper.restore_entity(raw)
       save_raw_data(raw, subtitle_info)
       element = extract_elements_in_section(raw, subtitle_info["subtitle"])
       element["data_type"] = "text"
@@ -1136,7 +1137,7 @@ narou s download.wait-steps=5
     cookie = @setting["cookie"] || ""
     begin
       open_uri_options = make_open_uri_options("Cookie" => cookie, allow_redirections: :safe)
-      open(url, open_uri_options) do |fp|
+      open(url, "r:#{@setting["encoding"]}", open_uri_options) do |fp|
         raw = Helper.pretreatment_source(fp.read, @setting["encoding"])
       end
     rescue OpenURI::HTTPError => e

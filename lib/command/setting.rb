@@ -452,7 +452,7 @@ module Command
           tab: :detail
         },
         "send.without-freeze" => {
-          type: :boolean, help: "一括送信時に凍結された小説は対象外にする",
+          type: :boolean, help: "送信時に凍結された小説は対象外にする",
           tab: :general
         },
         "send.backup-bookmark" => {
@@ -484,6 +484,10 @@ module Command
           select_keys: Narou.get_theme_names,
           select_summaries: Narou.get_theme_names,
           tab: :general
+        },
+        "normalize-filename" => {
+          type: :boolean, help: "ファイル名の文字列をNFCで正規化する。※既存データとの互換性が無くなる可能性があるので、バックアップを取った上で機能を理解の上有効にして下さい",
+          tab: :detail,
         },
       },
       global: {

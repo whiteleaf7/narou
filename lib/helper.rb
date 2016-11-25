@@ -99,6 +99,12 @@ module Helper
 
   def replace_filename_special_chars(str, invalid_replace = false)
     result = str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥").gsub("\t", "").gsub("\n", "")
+    if Inventory.load("local_setting")["normalize-filename"]
+      begin
+        result.unicode_normalize!
+      rescue Encoding::CompatibilityError
+      end
+    end
     if invalid_replace
       org_encoding = result.encoding
       result = result.encode(Encoding::Windows_31J, invalid: :replace, undef: :replace, replace: "_")
@@ -111,16 +117,24 @@ module Helper
   # ダウンロードした文字列をエンコード及び不正な文字列除去、改行コード統一
   #
   def pretreatment_source(src, encoding = Encoding::UTF_8)
+    encoding_class = Encoding.find(encoding)
     src.force_encoding(encoding)
+       .tap do |this|
+         if encoding_class != Encoding::UTF_8
+           this.encode!(Encoding::UTF_8, invalid: :replace, undef: :replace)
+         end
+       end
        .scrub("?")
        .gsub("\r", "")
+       .gsub(/&#x([0-9a-f]+);/i) { [$1.hex].pack("U") }
+       .gsub(/&#(\d+);/) { [$1.to_i].pack("U") }
   end
 
   ENTITIES = { quot: '"', amp: "&", nbsp: " ", lt: "<", gt: ">", copy: "(c)", "#39" => "'" }
   #
   # エンティティ復号
   #
-  def restor_entity(str)
+  def restore_entity(str)
     result = str.dup
     ENTITIES.each do |key, value|
       result.gsub!("&#{key};", value)
@@ -251,8 +265,9 @@ module Helper
   #
   # from: ファイルパスをまとめた Array
   # dest_dir: コピー先のディレクトリ
+  # check_timestamp: タイムスタンプを比較して新しければコピーする
   #
-  def copy_files(from, dest_dir)
+  def copy_files(from, dest_dir, check_timestamp: true)
     from.each do |path|
       basename = File.basename(path)
       dirname = File.basename(File.dirname(path))
@@ -260,7 +275,13 @@ module Helper
       unless File.directory?(save_dir)
         FileUtils.mkdir_p(save_dir)
       end
-      FileUtils.copy(path, File.join(save_dir, basename))
+      dest = File.join(save_dir, basename)
+      if check_timestamp && File.exist?(dest)
+        src_mtime = File.mtime(path)
+        dest_mtime = File.mtime(dest)
+        next if dest_mtime >= src_mtime
+      end
+      FileUtils.copy(path, dest)
     end
   end
 
@@ -269,6 +290,8 @@ module Helper
   #
   def date_string_to_time(date)
     date ? Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒@;", "///::: :")) : nil
+  rescue ArgumentError
+    nil
   end
 
   #

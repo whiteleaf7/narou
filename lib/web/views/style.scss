@@ -301,6 +301,18 @@ table#novel-list {
   /* 上記の日付以上を過ぎている */
   .gl-other {
   }
+
+  .hint-new-arrival {
+    position: relative;
+
+    &:before {
+      position: absolute;
+      content: "●";
+      color: rgba(#e478e1, 0.6);
+      top: -6px;
+      left: -1px;
+    }
+  }
 }
 
 .context-menu-target-cover {

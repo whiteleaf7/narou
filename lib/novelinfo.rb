@@ -8,18 +8,20 @@ require "time"
 require_relative "html"
 
 class NovelInfo
-  REFRESH_INTERVAL = 10 * 60   # キャッシュを捨てて再取得するまでの時間(s)
+  REFRESH_INTERVAL = 10 # キャッシュを捨てて再取得するまでの時間(s)
+  DEFAULT_OF = "t-nt-ga-s-gf-nu-gl-w"
   @@novel_info_parameters = {}
 
-  def self.load(setting, toc_source = nil)
-    info = new(setting, toc_source)
+  def self.load(setting, toc_source: nil, of: DEFAULT_OF)
+    info = new(setting, toc_source, of)
     info.parse_novel_info
   end
 
-  def initialize(setting, toc_source = nil)
+  def initialize(setting, toc_source = nil, of = DEFAULT_OF)
     @setting = setting
     @ncode = @setting["ncode"]
     @toc_source = toc_source
+    @of = of
     @@novel_info_parameters[@setting["name"]] ||= {}
   end
 
@@ -35,8 +37,7 @@ class NovelInfo
       end
       need_reload = true
     end
-    of = "t-nt-ga-s-gf-nu-gl-w"
-    request_output_parameters = of.split("-")
+    request_output_parameters = @of.split("-")
     info_source = ""
 
     if @setting["novel_info_url"] == @setting["toc_url"] && @toc_source && !need_reload
@@ -47,7 +48,7 @@ class NovelInfo
       cookie = @setting["cookie"] || ""
       open_uri_options = make_open_uri_options("Cookie" => cookie, allow_redirections: :safe)
       open(info_url, open_uri_options) do |fp|
-        info_source = Helper.restor_entity(Helper.pretreatment_source(fp.read, @setting["encoding"]))
+        info_source = Helper.restore_entity(Helper.pretreatment_source(fp.read, @setting["encoding"]))
         raise Downloader::DownloaderNotFoundError if Downloader.detect_error_message(@setting, info_source)
       end
     end

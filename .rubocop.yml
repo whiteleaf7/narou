@@ -5,7 +5,9 @@ AllCops:
   Exclude:
     - "小説データ/**/*"
     - "trash/**/*"
+    - "narou.gemspec"
   DisplayCopNames: true
+  TargetRubyVersion: 2.1
 
 Metrics/ClassLength:
   CountComments: false
@@ -22,7 +24,7 @@ Metrics/BlockNesting:
   Max: 3
 
 Metrics/CyclomaticComplexity:
-  Max: 10
+  Max: 8
 
 Metrics/LineLength:
   Max: 140
@@ -207,4 +209,10 @@ Lint/UnderscorePrefixedVariableName:
   Enabled: false
 
 Style/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/MultilineOperationIndentation:
   Enabled: false

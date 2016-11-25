@@ -49,7 +49,7 @@ class HTML
     @string = img_to_aozora
     @string = em_to_sesame
     @string = delete_tag
-    @string = Helper.restor_entity(@string)
+    @string = Helper.restore_entity(@string)
     @string
   end
 

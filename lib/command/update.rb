@@ -9,31 +9,12 @@ require_relative "../database"
 require_relative "../downloader"
 require_relative "../template"
 require_relative "../novelconverter"
+require_relative "update/interval"
+require_relative "update/general_lastup_updater"
 
 module Command
   class Update < CommandBase
     extend Memoist
-
-    class Interval
-      MIN = 2.5               # 作品間ウェイトの最低秒数(処理時間含む)
-      FORCE_WAIT_TIME = 2.0   # 強制待機時間
-
-      def initialize(interval)
-        @time = Time.now - MIN
-        interval = interval.to_f
-        @interval_time = interval >= MIN ? interval : MIN
-      end
-
-      def wait
-        wait_time = Time.now - @time
-        sleep(@interval_time - wait_time) if wait_time < @interval_time
-        @time = Time.now
-      end
-
-      def force_wait
-        sleep(FORCE_WAIT_TIME)
-      end
-    end
 
     LOG_DIR_NAME = "log"
     LOG_NUM_LIMIT = 30   # ログの保存する上限数
@@ -66,6 +47,13 @@ module Command
     narou update n9669bk 異世界迷宮で奴隷ハーレムを
     narou update http://ncode.syosetu.com/n9669bk/
 
+    # foo タグが付いた小説と bar タグが付いた小説を更新(タグのOR指定)
+    narou u foo bar
+
+    # foo タグ及び bar タグが両方付いた小説のみ更新(タグのAND指定)
+    narou tag foo bar | narou u
+    narou l -t "foo bar" | narou   # こっちでも同じ(覚えやすい方を使う)
+
   Options:
       EOS
       @opt.on("-n", "--no-convert", "変換をせずアップデートのみ実行する") {
@@ -81,8 +69,18 @@ module Command
         view_log
         exit 0
       }
-      @opt.on("--gl", "データベースに最新話掲載日を反映させる") {
-        update_general_lastup
+      @opt.on("--gl [OPT]", <<-EOS) { |option|
+データベースに最新話掲載日を反映させる
+                            |    OPT   |          概要
+                            | 指定なし | 全ての小説を対象にする
+                            |   narou  | なろうAPIを使える小説のみ対象
+                            |   other  | なろうAPIが使えない小説のみ対象
+        EOS
+        if option && !["narou", "other"].include?(option)
+          error "--gl で指定可能なオプションではありません。詳細は narou u -h を参照"
+          exit Narou::EXIT_ERROR_CODE
+        end
+        update_general_lastup(option)
         exit 0
       }
       @opt.on("-f", "--force", "凍結済みも更新する") {
@@ -90,6 +88,9 @@ module Command
       }
       @opt.on("-s", "--sort-by KEY", "アップデートする順番を変更する\n#{Narou.update_sort_key_summaries}") { |key|
         @options["sort-by"] = key
+      }
+      @opt.on("-i", "--ignore-all", "<target>を省略した場合の全件更新処理を無効化する") {
+        @options["ignore-all"] = true
       }
     end
 
@@ -131,15 +132,15 @@ module Command
       Narou::UPDATE_SORT_KEYS.keys.include?(key)
     end
 
+    # rubocop:disable Metrics/BlockLength
     def execute(argv)
       super
       mistook_count = 0
       update_target_list = argv.dup
       @options["no-open"] = false
       if update_target_list.empty?
-        Database.instance.each_key do |id|
-          update_target_list << id
-        end
+        exit 0 if @options["ignore-all"]
+        update_target_list += Database.instance.get_object.keys
         @options["no-open"] = true
       end
       tagname_to_ids(update_target_list)
@@ -162,83 +163,90 @@ module Command
 
       interval = Interval.new(@options["interval"])
 
-      update_log = $stdout.capture(quiet: false) do
-        sort_by_key(sort_key, update_target_list).each_with_index do |target, i|
-          display_message = nil
-          data = Downloader.get_data_by_target(target)
-          if !data
-            display_message = "<bold><red>[ERROR]</red></bold> #{target} は管理小説の中に存在しません".termcolor
-          elsif Narou.novel_frozen?(target) && !@options["force"]
-            if argv.length > 0
+      begin
+        update_log = $stdout.capture(quiet: false) do
+          sort_by_key(sort_key, update_target_list).each_with_index do |target, i|
+            display_message = nil
+            data = Downloader.get_data_by_target(target)
+            if !data
+              display_message = "<bold><red>[ERROR]</red></bold> #{target} は管理小説の中に存在しません".termcolor
+            elsif Narou.novel_frozen?(target) && !@options["force"]
+              next if argv.empty?
               display_message = "ID:#{data["id"]}　#{data["title"]} は凍結中です"
+            end
+            Helper.print_horizontal_rule if i > 0
+            if display_message
+              puts display_message
+              mistook_count += 1
+              next
+            end
+            interval.wait
+            downloader = Downloader.new(target)
+
+            if @options["hotentry"]
+              downloader.on(:newarrival) do |hash|
+                entry = hotentry[hash[:id]] ||= []
+                entry << hash[:subtitle_info]
+              end
+            end
+
+            delete_modified_tag = -> do
+              tags = data["tags"] || []
+              data["tags"] = tags - [Narou::MODIFIED_TAG] if tags.include?(Narou::MODIFIED_TAG)
+              data["last_check_date"] = Time.now
+            end
+
+            result = downloader.start_download
+            case result.status
+            when :ok
+              delete_modified_tag.call
+              if @options["no-convert"] ||
+                   (@options["convert-only-new-arrival"] && !result.new_arrivals)
+                interval.force_wait
+                next
+              end
+            when :failed
+              puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
+              mistook_count += 1
+              next
+            when :canceled
+              puts "ID:#{data["id"]}　#{data["title"]} の更新はキャンセルされました"
+              mistook_count += 1
+              next
+            when :none
+              delete_modified_tag.call
+              puts "#{data["title"]} に更新はありません"
+              next unless data["_convert_failure"]
+            end
+
+            if data["_convert_failure"]
+              puts "<yellow>前回変換できなかったので再変換します</yellow>".termcolor
+            end
+            convert_argv = [target]
+            convert_argv << "--no-open" if @options["no-open"]
+            convert_status = Convert.execute!(convert_argv)
+            if convert_status > 0
+              # 変換が失敗したか、中断された
+              data["_convert_failure"] = true
+              # 中断された場合には残りのアップデートも中止する
+              raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
             else
-              next
-            end
-          end
-          Helper.print_horizontal_rule if i > 0
-          if display_message
-            puts display_message
-            mistook_count += 1
-            next
-          end
-          interval.wait
-          downloader = Downloader.new(target)
-
-          if @options["hotentry"]
-            downloader.on(:newarrival) do |hash|
-              entry = hotentry[hash[:id]] ||= []
-              entry << hash[:subtitle_info]
+              # 変換に成功した
+              data.delete("_convert_failure")
             end
           end
 
-          result = downloader.start_download
-          case result.status
-          when :ok
-            if @options["no-convert"] ||
-                 (@options["convert-only-new-arrival"] && !result.new_arrivals)
-              interval.force_wait
-              next
-            end
-          when :failed
-            puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
-            mistook_count += 1
-            next
-          when :canceled
-            puts "ID:#{data["id"]}　#{data["title"]} の更新はキャンセルされました"
-            mistook_count += 1
-            next
-          when :none
-            puts "#{data["title"]} に更新はありません"
-            next unless data["_convert_failure"]
-          end
-
-          if data["_convert_failure"]
-            puts "<yellow>前回変換できなかったので再変換します</yellow>".termcolor
-          end
-          convert_argv = [target]
-          convert_argv << "--no-open" if @options["no-open"]
-          convert_status = Convert.execute!(convert_argv)
-          if convert_status > 0
-            # 変換が失敗したか、中断された
-            data["_convert_failure"] = true
-            # 中断された場合には残りのアップデートも中止する
-            raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
-          else
-            # 変換に成功した
-            data.delete("_convert_failure")
-          end
+          process_hotentry(hotentry)
         end
-
-        process_hotentry(hotentry)
+      ensure
+        save_log(update_log)
+        Database.instance.save_database
       end
 
       exit mistook_count if mistook_count > 0
     rescue Interrupt
       puts "アップデートを中断しました"
       exit Narou::EXIT_INTERRUPT
-    ensure
-      save_log(update_log)
-      Database.instance.save_database
     end
 
     def get_log_paths
@@ -284,60 +292,18 @@ module Command
       end
     end
 
-    def update_general_lastup(through_frozen_novel: true)
-      completed = false
-      database = Database.instance
-      puts "最新話掲載日を更新しています..."
-      progressbar = ProgressBar.new(database.get_object.size - 1)
-      interval = Interval.new(@options["interval"])
-      database.each.with_index do |(id, data), i|
-        progressbar.output(i)
-        if through_frozen_novel
-          next if Narou.novel_frozen?(id)
-        end
-        setting =  Downloader.get_sitesetting_by_target(id)
-        interval.wait
-        begin
-          info = NovelInfo.load(setting)
-        rescue OpenURI::HTTPError, Errno::ECONNRESET => e
-          setting.clear
-          next
-        end
-        if info
-          dates = {
-            "general_firstup" => info["general_firstup"],
-            "novelupdated_at" => info["novelupdated_at"],
-            "general_lastup" => info["general_lastup"]
-          }
-        else
-          # 小説情報ページがない場合は目次から取得する
-          begin
-            dates = get_latest_dates(id)
-          rescue OpenURI::HTTPError, Errno::ECONNRESET => e
-            setting.clear
-            next
-          end
-        end
-        database[id].merge!(dates)
-        setting.clear
-      end
-      database.save_database
-      completed = true
-    ensure
-      progressbar.clear if progressbar
-      puts "更新が完了しました" if completed
-    end
+    def update_general_lastup(option = nil)
+      puts "最新話掲載日を確認しています..."
 
-    # オンラインの目次からgeneral_lastupを取得する
-    # ただし、toc.yaml に最新話が存在し、かつsubdateが設定されていたらそれを使う
-    def get_latest_dates(target)
-      downloader = Downloader.new(target)
-      old_toc = downloader.load_toc_file
-      latest_toc = downloader.get_latest_table_of_contents(old_toc, through_error: true)
-      {
-        "novelupdated_at" => downloader.get_novelupdated_at,
-        "general_lastup" => downloader.get_general_lastup
-      }
+      updater = GeneralLastupUpdater.new(@options)
+      updater.update_narou_novels if !option || option == "narou"
+      if !option || option == "other"
+        sleep Narou::API::REQUEST_INTERVAL unless option
+        updater.update_other_novels
+      end
+      updater.save
+
+      puts "確認が完了しました"
     end
 
     #
