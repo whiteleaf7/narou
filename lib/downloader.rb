@@ -371,11 +371,11 @@ class Downloader
   def run_download
     old_toc = @new_novel ? nil : load_toc_file
     latest_toc = get_latest_table_of_contents(old_toc)
-    latest_toc_subtitles = latest_toc["subtitles"]
     unless latest_toc
       @stream.error @setting["toc_url"] + " の目次データが取得出来ませんでした"
       return :failed
     end
+    latest_toc_subtitles = latest_toc["subtitles"]
     if @setting["confirm_over18"]
       unless confirm_over18?
         @stream.puts "18歳以上のみ閲覧出来る小説です。ダウンロードを中止しました"
