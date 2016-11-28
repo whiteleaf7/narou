@@ -92,7 +92,7 @@ module Narou
   def init
     return nil if already_init?
     FileUtils.mkdir(LOCAL_SETTING_DIR_NAME)
-    puts "#{LOCAL_SETTING_DIR}/ を作成しました"
+    puts "#{LOCAL_SETTING_DIR_NAME}/ を作成しました"
     Database.init
   end
 
