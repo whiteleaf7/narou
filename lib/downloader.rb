@@ -966,7 +966,7 @@ class Downloader
       "subtitle" => @setting["title"],
       "file_subtitle" => title_to_filename(@setting["title"]),
       "subdate" => info["general_firstup"],
-      "subupdate" => info["novelupdated_at"]
+      "subupdate" => info["novelupdated_at"] || info["general_lastup"] || info["general_firstup"]
     }
     [subtitle]
   end
