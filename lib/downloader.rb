@@ -573,11 +573,15 @@ class Downloader
     FileUtils.remove_entry_secure(@cache_dir, true) if @cache_dir
   end
 
-  def __search_latest_update_time(key, subtitles)
+  def __search_latest_update_time(key, subtitles, subkey: nil)
     latest = Time.new(0)
     subtitles.each do |subtitle|
-      time = Helper.date_string_to_time(subtitle[key])
-      latest = time if latest < time
+      value = subtitle[key]
+      if value.to_s.empty? && subkey
+        value = subtitle[subkey]
+      end
+      time = Helper.date_string_to_time(value)
+      latest = time if time && latest < time
     end
     latest
   end
@@ -590,7 +594,7 @@ class Downloader
     if info["novelupdated_at"]
       info["novelupdated_at"]
     else
-      __search_latest_update_time("subupdate", @setting["subtitles"])
+      __search_latest_update_time("subupdate", @setting["subtitles"], subkey: "subdate")
     end
   end
 
