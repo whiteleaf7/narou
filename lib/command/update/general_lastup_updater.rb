@@ -60,19 +60,14 @@ module Command
           progressbar.output(index)
           interval.wait
           begin
-            setting = Downloader.get_sitesetting_by_target(id)
-            info = NovelInfo.load(setting)
-            dates = if info
-                      {
-                        "novelupdated_at" => info["novelupdated_at"],
-                        "general_lastup" => info["general_lastup"]
-                      }
-                    else
-                      # 小説情報ページがない場合は目次から取得する
-                      get_latest_dates(id)
-                    end
+            downloader = Downloader.new(id)
+            next unless downloader.get_latest_table_of_contents(through_error: true)
+            dates = {
+              "novelupdated_at" => downloader.get_novelupdated_at,
+              "general_lastup" => downloader.get_general_lastup
+            }
           rescue OpenURI::HTTPError, Errno::ECONNRESET
-            setting.clear
+            downloader.setting.clear
             next
           end
           data = @database[id]
@@ -84,22 +79,10 @@ module Command
             tags << Narou::MODIFIED_TAG unless tags.include?(Narou::MODIFIED_TAG)
           end
           data["last_check_date"] = Time.now
-          setting.clear
+          downloader.setting.clear
         end
       ensure
         progressbar.clear if progressbar
-      end
-
-      # オンラインの目次からgeneral_lastupを取得する
-      # ただし、toc.yaml に最新話が存在し、かつsubdateが設定されていたらそれを使う
-      def get_latest_dates(target)
-        downloader = Downloader.new(target)
-        old_toc = downloader.load_toc_file
-        downloader.get_latest_table_of_contents(old_toc, through_error: true)
-        {
-          "novelupdated_at" => downloader.get_novelupdated_at,
-          "general_lastup" => downloader.get_general_lastup
-        }
       end
     end
   end

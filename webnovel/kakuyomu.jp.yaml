@@ -72,10 +72,8 @@ nu: |-2
             <dt><span>最終更新日</span></dt>
             <dd><time itemprop="dateModified" datetime="(?<novelupdated_at>.+?)">.+?</time>
 
-# general_lastup 最終掲載日
-gl: |-2
-            <dt><span>最終更新日</span></dt>
-            <dd><time itemprop="dateModified" datetime="(?<general_lastup>.+?)">.+?</time>
+# general_lastup 最新話掲載日
+gl: null
 
 # writer 作者名
 w: |-
