@@ -78,7 +78,8 @@ module Command
           data = @database[id]
           data.merge!(dates)
           last_check_date = data["last_check_date"] || data["last_update"]
-          if data["novelupdated_at"] > last_check_date
+          novelupdated_at = data["novelupdated_at"]
+          if novelupdated_at && novelupdated_at > last_check_date
             tags = @database[id]["tags"] ||= []
             tags << Narou::MODIFIED_TAG unless tags.include?(Narou::MODIFIED_TAG)
           end
