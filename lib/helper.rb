@@ -289,7 +289,12 @@ module Helper
   # 日付形式の文字列をTime型に変換する
   #
   def date_string_to_time(date)
-    date ? Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒@;", "///::: :")) : nil
+    case date
+    when Time
+      date
+    when String
+      Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒@;", "///::: :"))
+    end
   rescue ArgumentError
     nil
   end

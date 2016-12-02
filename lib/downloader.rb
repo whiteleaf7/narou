@@ -35,7 +35,7 @@ class Downloader
   DISPLAY_LIMIT_DIGITS = 4   # indexの表示桁数限界
   DEFAULT_INTERVAL_WAIT = 0.7   # download.interval のデフォルト値(秒)
 
-  attr_reader :id
+  attr_reader :id, :setting
 
   class InvalidTarget < StandardError; end
 
