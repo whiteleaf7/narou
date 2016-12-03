@@ -100,15 +100,19 @@ module Command
     end
 
     #
-    # 普通にコマンドを実行するけど、exit(2) を補足してexitstatus を返す
-    # 正常終了なら0
+    # コマンドを実行するが、アプリケーションは終了させない
+    # (SystemExit を補足し、終了コードを返り値とする)
     #
-    def self.execute!(argv)
-      self.new.execute(argv)
+    def execute!(argv)
+      execute(argv)
     rescue SystemExit => e
       e.status
     else
       0
+    end
+
+    def self.execute!(argv)
+      self.new.execute!(argv)
     end
 
     def self.oneline_help
