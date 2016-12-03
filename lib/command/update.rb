@@ -9,6 +9,7 @@ require_relative "../database"
 require_relative "../downloader"
 require_relative "../template"
 require_relative "../novelconverter"
+require_relative "../eventable"
 require_relative "update/interval"
 require_relative "update/general_lastup_updater"
 require_relative "update/hotentry_manager"
@@ -16,6 +17,7 @@ require_relative "update/hotentry_manager"
 module Command
   class Update < CommandBase
     extend Memoist
+    include Narou::Eventable
 
     LOG_DIR_NAME = "log"
     LOG_NUM_LIMIT = 30   # ログの保存する上限数
@@ -192,6 +194,7 @@ module Command
             case result.status
             when :ok
               delete_modified_tag.call
+              trigger(:success, data)
               if @options["no-convert"] ||
                    (@options["convert-only-new-arrival"] && !result.new_arrivals)
                 interval.force_wait
