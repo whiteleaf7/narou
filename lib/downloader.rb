@@ -35,7 +35,7 @@ class Downloader
   DISPLAY_LIMIT_DIGITS = 4   # indexの表示桁数限界
   DEFAULT_INTERVAL_WAIT = 0.7   # download.interval のデフォルト値(秒)
 
-  attr_reader :id
+  attr_reader :id, :setting
 
   class InvalidTarget < StandardError; end
 
@@ -573,11 +573,15 @@ class Downloader
     FileUtils.remove_entry_secure(@cache_dir, true) if @cache_dir
   end
 
-  def __search_latest_update_time(key, subtitles)
+  def __search_latest_update_time(key, subtitles, subkey: nil)
     latest = Time.new(0)
     subtitles.each do |subtitle|
-      time = Helper.date_string_to_time(subtitle[key])
-      latest = time if latest < time
+      value = subtitle[key]
+      if value.to_s.empty? && subkey
+        value = subtitle[subkey]
+      end
+      time = Helper.date_string_to_time(value)
+      latest = time if time && latest < time
     end
     latest
   end
@@ -590,7 +594,7 @@ class Downloader
     if info["novelupdated_at"]
       info["novelupdated_at"]
     else
-      __search_latest_update_time("subupdate", @setting["subtitles"])
+      __search_latest_update_time("subupdate", @setting["subtitles"], subkey: "subdate")
     end
   end
 
@@ -966,7 +970,7 @@ class Downloader
       "subtitle" => @setting["title"],
       "file_subtitle" => title_to_filename(@setting["title"]),
       "subdate" => info["general_firstup"],
-      "subupdate" => info["novelupdated_at"]
+      "subupdate" => info["novelupdated_at"] || info["general_lastup"] || info["general_firstup"]
     }
     [subtitle]
   end

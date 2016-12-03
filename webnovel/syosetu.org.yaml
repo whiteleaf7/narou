@@ -58,8 +58,8 @@ s: "あらすじ</td><td colspan=3 bgcolor=#FFFFFF>(?<story>.+?)</td>"
 # general_firstup 初回掲載日
 gf: 掲載開始</td><td>(?<general_firstup>.+?)</td>
 
-# novelupdated_at 小説の更新時刻。最新投稿日で代用
-nu: 最新投稿</td><td>(?<novelupdated_at>.+?)</td>
+# novelupdated_at 小説の更新時刻
+nu: null
 
 # general_lastup 最終掲載日
 gl: 最新投稿</td><td>(?<general_lastup>.+?)</td>
