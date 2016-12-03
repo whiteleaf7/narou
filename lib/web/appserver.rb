@@ -582,7 +582,11 @@ class Narou::AppServer < Sinatra::Base
       opt_arguments << "--force"
     end
     Narou::Worker.push do
-      CommandLine.run!(["update", ids, opt_arguments])
+      cmd = Command::Update.new
+      cmd.on(:success) do
+        @@push_server.send_all(:"table.reload")
+      end
+      cmd.execute!([ids, opt_arguments])
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -598,7 +602,11 @@ class Narou::AppServer < Sinatra::Base
     end
     pass if tag_params.empty?
     Narou::Worker.push do
-      CommandLine.run!(["update", tag_params])
+      cmd = Command::Update.new
+      cmd.on(:success) do
+        @@push_server.send_all(:"table.reload")
+      end
+      cmd.execute!(tag_params)
       @@push_server.send_all(:"table.reload")
     end
   end
