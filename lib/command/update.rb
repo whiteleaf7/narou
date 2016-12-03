@@ -11,6 +11,7 @@ require_relative "../template"
 require_relative "../novelconverter"
 require_relative "update/interval"
 require_relative "update/general_lastup_updater"
+require_relative "update/hotentry_manager"
 
 module Command
   class Update < CommandBase
@@ -157,11 +158,7 @@ module Command
 
       flush_cache    # memoist のキャッシュ削除
 
-      inv = Inventory.load("local_setting")
-      @options["hotentry"] = inv["hotentry"]
-      @options["hotentry.auto-mail"] = inv["hotentry.auto-mail"]
-      hotentry = {}
-
+      hotentry_manager = HotentryManager.new
       interval = Interval.new(@options["interval"])
 
       begin
@@ -183,13 +180,7 @@ module Command
             end
             interval.wait
             downloader = Downloader.new(target)
-
-            if @options["hotentry"]
-              downloader.on(:newarrival) do |hash|
-                entry = hotentry[hash[:id]] ||= []
-                entry << hash[:subtitle_info]
-              end
-            end
+            hotentry_manager.connect(downloader)
 
             delete_modified_tag = -> do
               tags = data["tags"] || []
@@ -237,7 +228,7 @@ module Command
             end
           end
 
-          process_hotentry(hotentry)
+          process_hotentry(hotentry_manager.hotentries)
         end
       ensure
         save_log(update_log)
