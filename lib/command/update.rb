@@ -132,6 +132,16 @@ module Command
       Narou::UPDATE_SORT_KEYS.keys.include?(key)
     end
 
+    def sort_key
+      key = @options["sort-by"]
+      return nil unless key
+      key.downcase!
+      return key if valid_sort_key?(key)
+      error "#{key} は正しいキーではありません。次の中から選択して下さい\n " \
+            "#{Narou.update_sort_key_summaries(17)}"
+      exit Narou::EXIT_ERROR_CODE
+    end
+
     # rubocop:disable Metrics/BlockLength
     def execute(argv)
       super
@@ -145,15 +155,6 @@ module Command
       end
       tagname_to_ids(update_target_list)
 
-      sort_key = @options["sort-by"]
-      if sort_key
-        sort_key.downcase!
-        unless valid_sort_key?(sort_key)
-          error "#{sort_key} は正しいキーではありません。次の中から選択して下さい\n " \
-                "#{Narou.update_sort_key_summaries(17)}"
-          exit Narou::EXIT_ERROR_CODE
-        end
-      end
       flush_cache    # memoist のキャッシュ削除
 
       inv = Inventory.load("local_setting")
