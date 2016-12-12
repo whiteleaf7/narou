@@ -37,6 +37,7 @@ module Command
     "mail" => Mail,
     "backup" => Backup,
     "csv" => Csv,
+    "clean" => Clean,
     "help" => Help,
     "version" => Version,
     "init" => Init
