@@ -63,32 +63,35 @@ module Command
       end
     end
 
-    def check_all(is_remove = false)
+    def check_all(is_remove)
       Database.instance.each_key do |id|
         next if Narou.novel_frozen?(id)
         dir = Downloader.get_novel_data_dir_by_target(id)
-        next unless File.exist?(dir)
         check(dir, is_remove)
       end
     end
 
-    def check(dir, is_remove = false)
+    def check(dir, is_remove)
       return unless File.directory?(dir)
       return unless File.exist?(File.join(dir, Downloader::TOC_FILE_NAME))
+      orphans = find_orphans(dir)
+      orphans.each do |path|
+        puts path
+        FileUtils.remove_entry_secure(path) if is_remove
+      end
+    end
+
+    def find_orphans(dir)
+      orphans = []
       toc = Downloader.get_toc_data(dir)
       items = toc["subtitles"].map { |item| "#{item['index']} #{item['file_subtitle']}" }
       Dir.glob(File.join(dir, Downloader::RAW_DATA_DIR_NAME, "*.txt")).each do |path|
-        unless items.include?(File.basename(path, ".*"))
-          puts path
-          FileUtils.remove_entry_secure(path) if is_remove
-        end
+        orphans.push(path) unless items.include?(File.basename(path, ".*"))
       end
       Dir.glob(File.join(dir, Downloader::SECTION_SAVE_DIR_NAME, "*.yaml")).each do |path|
-        unless items.include?(File.basename(path, ".*"))
-          puts path
-          FileUtils.remove_entry_secure(path) if is_remove
-        end
+        orphans.push(path) unless items.include?(File.basename(path, ".*"))
       end
+      orphans
     end
   end
 end
