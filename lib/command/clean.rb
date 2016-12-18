@@ -32,7 +32,7 @@ module Command
       @opt.on("-n", "--dry-run", "指定した小説の不要なファイルを表示する") {
         @options["force"] = false
       }
-      @opt.on("--all", "全小説を検査する") {
+      @opt.on("-a", "--all", "全小説を検査する") {
         @options["all"] = true
       }
     end
