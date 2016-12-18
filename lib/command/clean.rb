@@ -41,14 +41,14 @@ module Command
     def execute(argv)
       super
       if @options["all"]
-        check_all(@options["force"])
+        clean_all_directories(@options["force"])
         return
       end
       if argv.empty?
         latest_id = Inventory.load("latest_convert")["id"]
         if latest_id
           dir = Downloader.get_novel_data_dir_by_target(latest_id)
-          check(dir, @options["force"])
+          clean_directory(dir, @options["force"])
         end
         return
       end
@@ -56,22 +56,22 @@ module Command
       argv.each do |target|
         dir = Downloader.get_novel_data_dir_by_target(target)
         if dir
-          check(dir, @options["force"])
+          clean_directory(dir, @options["force"])
         else
           error "#{target} は存在しません"
         end
       end
     end
 
-    def check_all(is_remove)
+    def clean_all_directories(is_remove)
       Database.instance.each_key do |id|
         next if Narou.novel_frozen?(id)
         dir = Downloader.get_novel_data_dir_by_target(id)
-        check(dir, is_remove)
+        clean_directory(dir, is_remove)
       end
     end
 
-    def check(dir, is_remove)
+    def clean_directory(dir, is_remove)
       return unless File.directory?(dir)
       return unless File.exist?(File.join(dir, Downloader::TOC_FILE_NAME))
       orphans = find_orphans(dir)
