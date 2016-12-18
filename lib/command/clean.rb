@@ -8,28 +8,29 @@ require_relative "../inventory"
 module Command
   class Clean < CommandBase
     def self.oneline_help
-      "参照されなくなったファイルを削除します"
+      "ゴミファイルを削除します"
     end
 
     def initialize
       super("[<target> ...] [options]")
       @opt.separator <<-EOS
 
-  ・サブタイトルの変更等により参照されなくなったファイルを削除します。
-  ・対象小説を指定しなかった場合は直前に更新した小説について検査します。
+  ・サブタイトルの変更等により参照されなくなったゴミファイルを削除します。
+  ・対象小説を指定しなかった場合は直前に変換した小説について検査します。
 
   Examples:
-    narou clean          # 直前に更新した小説について調査
+    narou clean          # 直前に変換した小説について検査
     narou clean 6
     narou clean 6 -f     # 実際に削除
-    narou clean --all    # 全小説について調査
+    narou clean --all    # 全小説について検査
+    narou clean -af      # 全小説について検査して、実際に削除
   Options:
       EOS
 
-      @opt.on("-f", "--force", "指定した小説の不要なファイルを実際に削除する") {
+      @opt.on("-f", "--force", "指定した小説のゴミファイルを実際に削除する") {
         @options["force"] = true
       }
-      @opt.on("-n", "--dry-run", "指定した小説の不要なファイルを表示する") {
+      @opt.on("-n", "--dry-run", "指定した小説のゴミファイルを表示する") {
         @options["force"] = false
       }
       @opt.on("-a", "--all", "全小説を検査する") {
