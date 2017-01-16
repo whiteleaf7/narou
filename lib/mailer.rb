@@ -47,7 +47,7 @@ class Mailer
     @options.merge!(options)
   end
 
-  def send(message, attached_file_path = nil)
+  def send(id, message, attached_file_path = nil)
     gem "mail", "2.5.4"
     require "pony"
     @error_message = ""
@@ -56,7 +56,7 @@ class Mailer
     params[:charset] = "UTF-8"
     params[:text_part_charset] = "UTF-8"
     if attached_file_path
-      basename = File.basename(attached_file_path).tr("@", "＠")
+      basename = "#{id}#{extname(attached_file_path)}"
       params[:attachments] = { basename => File.binread(attached_file_path) }
     end
     begin
@@ -66,5 +66,14 @@ class Mailer
       return false
     end
     true
+  end
+
+  # .kepub.epub を考慮する必要がある
+  def extname(path)
+    if path =~ /\A[^.]+(.+)/
+      $1
+    else
+      ""
+    end
   end
 end
