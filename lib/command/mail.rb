@@ -83,7 +83,9 @@ module Command
           error "まだファイル(#{File.basename(ebook_path)})が無いようです" unless send_all
           next
         end
-        if target != "hotentry"
+        if target == "hotentry"
+          id = "hotentry"
+        else
           id = data["id"]
           title = data["title"]
           display_target = "ID:#{id}　#{TermColorLight.escape(title)}"
@@ -93,7 +95,7 @@ module Command
         exit_mail = false
         mail_result = nil
         Thread.new do
-          mail_result = mailer.send(File.basename(ebook_path), ebook_path)
+          mail_result = mailer.send(id, File.basename(ebook_path), ebook_path)
           exit_mail = true
         end
         until exit_mail
