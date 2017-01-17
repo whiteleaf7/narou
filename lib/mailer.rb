@@ -70,7 +70,7 @@ class Mailer
 
   # .kepub.epub を考慮する必要がある
   def extname(path)
-    if path =~ /\A[^.]+(.+)/
+    if File.basename(path) =~ /\A[^.]+(.+)/
       $1
     else
       ""
