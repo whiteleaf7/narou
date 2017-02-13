@@ -247,8 +247,9 @@ module Helper
     result
   end
 
+  INTEGER_CLASS = RUBY_VERSION >= "2.4.0" ? Integer : Fixnum
   TYPE_OF_VALUE = {
-    TrueClass => :boolean, FalseClass => :boolean,
+    TrueClass => :boolean, FalseClass => :boolean, INTEGER_CLASS => :integer,
     Float => :float, String => :string
   }
 
@@ -256,13 +257,7 @@ module Helper
   # Rubyの変数がなんの型かシンボルで取得
   #
   def type_of_value(value)
-    klass = value.class
-    # 2.4 以上で Fixnum を使うと Warning が出るので、Fixnum という定数を使わないで書く
-    if klass == Integer || klass.superclass == Integer
-      :integer
-    else
-      TYPE_OF_VALUE[klass]
-    end
+    TYPE_OF_VALUE[klass]
   end
 
   #
