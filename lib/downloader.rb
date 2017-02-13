@@ -92,7 +92,7 @@ class Downloader
     when /^n\d+[a-z]+$/i
       target.downcase!
       :ncode
-    when /^\d+$/, Fixnum
+    when /^\d+$/, Integer
       :id
     else
       :other

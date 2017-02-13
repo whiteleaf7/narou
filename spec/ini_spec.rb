@@ -12,8 +12,8 @@ describe Ini, "#cast" do
     @ini = Ini.new
   end
 
-  it "class type should be Fixnum" do
-    expect(@ini.cast("100").class).to eq Fixnum
+  it "class type should be Integer" do
+    expect(@ini.cast("100").class).to eq Integer
   end
 
   it "return 100" do
