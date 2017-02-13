@@ -248,7 +248,7 @@ module Helper
   end
 
   TYPE_OF_VALUE = {
-    TrueClass => :boolean, FalseClass => :boolean, Fixnum => :integer,
+    TrueClass => :boolean, FalseClass => :boolean,
     Float => :float, String => :string
   }
 
@@ -256,7 +256,13 @@ module Helper
   # Rubyの変数がなんの型かシンボルで取得
   #
   def type_of_value(value)
-    TYPE_OF_VALUE[value.class]
+    klass = value.class
+    # 2.4 以上で Fixnum を使うと Warning が出るので、Fixnum という定数を使わないで書く
+    if klass == Integer || klass.superclass == Integer
+      :integer
+    else
+      TYPE_OF_VALUE[klass]
+    end
   end
 
   #
