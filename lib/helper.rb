@@ -257,7 +257,7 @@ module Helper
   # Rubyの変数がなんの型かシンボルで取得
   #
   def type_of_value(value)
-    TYPE_OF_VALUE[klass]
+    TYPE_OF_VALUE[value.class]
   end
 
   #
