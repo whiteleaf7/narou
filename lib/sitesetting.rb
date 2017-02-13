@@ -63,11 +63,8 @@ class SiteSetting
   def replace_group_values(key, option_values = {})
     dest = option_values[key] || @match_values[key] || @yaml_setting[key]
     return dest if is_container?(dest)
-    begin
-      result = dest.dup
-    rescue TypeError
-      return dest
-    end
+    return dest unless dest.respond_to?(:gsub!)
+    result = dest.dup
     values = @yaml_setting.merge(@match_values).merge(option_values)
     result.gsub!(/\\\\k<(.+?)>/) do |match|
       value = values[$1]
