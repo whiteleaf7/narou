@@ -575,6 +575,13 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  post "/api/mail" do
+    ids = select_valid_novel_ids(params["ids"]) || []
+    Narou::Worker.push do
+      CommandLine.run!(["mail", ids])
+    end
+  end
+
   post "/api/update" do
     ids = select_valid_novel_ids(params["ids"]) || []
     opt_arguments = []
@@ -941,4 +948,3 @@ class Narou::AppServer < Sinatra::Base
     haml :"widget/notepad", layout: nil
   end
 end
-
