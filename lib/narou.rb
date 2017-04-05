@@ -294,7 +294,7 @@ module Narou
   #
   def latest_version
     response = `gem search ^narou$`.split("\n")
-    if response.last =~ /\Anarou \((.+?)\)\z/
+    if response.last =~ /\Anarou \(([0-9.]+).*?\)\z/
       $1
     end
   end
