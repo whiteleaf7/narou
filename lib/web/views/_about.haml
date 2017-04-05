@@ -5,7 +5,8 @@
     function checkVersionIsUpdated(latest, current) {
       var latestNumbers = latest.split(".");
       var currentNumbers = current.split(".");
-      for (var i = 0; i < 3; i++) {
+      var maxVersionLength = Math.max(latestNumbers.length, currentNumbers.length);
+      for (var i = 0; i < maxVersionLength; i++) {
         var leftNum = latestNumbers[i] | 0;
         var rightNum = currentNumbers[i] | 0;
         if (leftNum !== rightNum) {
