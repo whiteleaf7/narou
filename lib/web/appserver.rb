@@ -575,6 +575,13 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  post "/api/mail" do
+    ids = select_valid_novel_ids(params["ids"]) || []
+    Narou::Worker.push do
+      CommandLine.run!(["mail", ids])
+    end
+  end
+
   post "/api/update" do
     ids = select_valid_novel_ids(params["ids"]) || []
     opt_arguments = []
@@ -582,7 +589,11 @@ class Narou::AppServer < Sinatra::Base
       opt_arguments << "--force"
     end
     Narou::Worker.push do
-      CommandLine.run!(["update", ids, opt_arguments])
+      cmd = Command::Update.new
+      cmd.on(:success) do
+        @@push_server.send_all(:"table.reload")
+      end
+      cmd.execute!([ids, opt_arguments].flatten)
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -598,7 +609,11 @@ class Narou::AppServer < Sinatra::Base
     end
     pass if tag_params.empty?
     Narou::Worker.push do
-      CommandLine.run!(["update", tag_params])
+      cmd = Command::Update.new
+      cmd.on(:success) do
+        @@push_server.send_all(:"table.reload")
+      end
+      cmd.execute!(tag_params)
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -933,4 +948,3 @@ class Narou::AppServer < Sinatra::Base
     haml :"widget/notepad", layout: nil
   end
 end
-

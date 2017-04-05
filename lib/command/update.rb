@@ -9,12 +9,15 @@ require_relative "../database"
 require_relative "../downloader"
 require_relative "../template"
 require_relative "../novelconverter"
+require_relative "../eventable"
 require_relative "update/interval"
 require_relative "update/general_lastup_updater"
+require_relative "update/hotentry_manager"
 
 module Command
   class Update < CommandBase
     extend Memoist
+    include Narou::Eventable
 
     LOG_DIR_NAME = "log"
     LOG_NUM_LIMIT = 30   # ログの保存する上限数
@@ -132,6 +135,16 @@ module Command
       Narou::UPDATE_SORT_KEYS.keys.include?(key)
     end
 
+    def sort_key
+      key = @options["sort-by"]
+      return nil unless key
+      key.downcase!
+      return key if valid_sort_key?(key)
+      error "#{key} は正しいキーではありません。次の中から選択して下さい\n " \
+            "#{Narou.update_sort_key_summaries(17)}"
+      exit Narou::EXIT_ERROR_CODE
+    end
+
     # rubocop:disable Metrics/BlockLength
     def execute(argv)
       super
@@ -145,22 +158,9 @@ module Command
       end
       tagname_to_ids(update_target_list)
 
-      sort_key = @options["sort-by"]
-      if sort_key
-        sort_key.downcase!
-        unless valid_sort_key?(sort_key)
-          error "#{sort_key} は正しいキーではありません。次の中から選択して下さい\n " \
-                "#{Narou.update_sort_key_summaries(17)}"
-          exit Narou::EXIT_ERROR_CODE
-        end
-      end
       flush_cache    # memoist のキャッシュ削除
 
-      inv = Inventory.load("local_setting")
-      @options["hotentry"] = inv["hotentry"]
-      @options["hotentry.auto-mail"] = inv["hotentry.auto-mail"]
-      hotentry = {}
-
+      hotentry_manager = HotentryManager.new
       interval = Interval.new(@options["interval"])
 
       begin
@@ -182,13 +182,7 @@ module Command
             end
             interval.wait
             downloader = Downloader.new(target)
-
-            if @options["hotentry"]
-              downloader.on(:newarrival) do |hash|
-                entry = hotentry[hash[:id]] ||= []
-                entry << hash[:subtitle_info]
-              end
-            end
+            hotentry_manager.connect(downloader)
 
             delete_modified_tag = -> do
               tags = data["tags"] || []
@@ -200,6 +194,7 @@ module Command
             case result.status
             when :ok
               delete_modified_tag.call
+              trigger(:success, data)
               if @options["no-convert"] ||
                    (@options["convert-only-new-arrival"] && !result.new_arrivals)
                 interval.force_wait
@@ -236,7 +231,7 @@ module Command
             end
           end
 
-          process_hotentry(hotentry)
+          process_hotentry(hotentry_manager.hotentries)
         end
       ensure
         save_log(update_log)

@@ -247,8 +247,9 @@ module Helper
     result
   end
 
+  INTEGER_CLASS = RUBY_VERSION >= "2.4.0" ? Integer : Fixnum
   TYPE_OF_VALUE = {
-    TrueClass => :boolean, FalseClass => :boolean, Fixnum => :integer,
+    TrueClass => :boolean, FalseClass => :boolean, INTEGER_CLASS => :integer,
     Float => :float, String => :string
   }
 

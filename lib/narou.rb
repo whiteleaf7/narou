@@ -35,7 +35,7 @@ module Narou
   @@is_web = false
 
   def last_commit_year
-    2016
+    2017
   end
 
   def get_root_dir

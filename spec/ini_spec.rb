@@ -12,8 +12,9 @@ describe Ini, "#cast" do
     @ini = Ini.new
   end
 
-  it "class type should be Fixnum" do
-    expect(@ini.cast("100").class).to eq Fixnum
+  it "class type should be Integer" do
+    integer_class = RUBY_VERSION >= "2.4.0" ? Integer : Fixnum
+    expect(@ini.cast("100").class).to eq integer_class
   end
 
   it "return 100" do
