@@ -94,7 +94,7 @@ class ConverterBase
     data.gsub!(/([\d０-９#{KANJI_NUM}]+?)[\.．]([\d０-９#{KANJI_NUM}]+?)/) do |match|
       integer = $1
       decimal = $2
-      if integer[-1] =~ /\d/ && decimal[0] =~ /\d/ || integer[-1] =~ /[０-９]/ && decimal[0] =~ /[０-９]/ || integer[-1] =~ /[#{KANJI_NUM}]/ && decimal[0] =~ /[#{KANJI_NUM}]/
+      if [/\d/, /[０-９]/, /[#{KANJI_NUM}]/].any? {|r| integer[-1] =~ r && decimal[0] =~ r }
         "#{integer}・#{decimal}"
       else
         match
