@@ -1,0 +1,10 @@
+test_convert_numbers
+whiteleaf
+
+［＃改ページ］
+数字変換テスト
+
+
+3.14
+三.一四
+1.一石二鳥
