@@ -23,6 +23,9 @@ module Command
       else
         initialize_init_yet
       end
+      @opt.on("-p", "--path DIRECTORY", "指定したディレクトリを利用") { |dirname|
+        @aozora_dirname = dirname
+      }
     end
 
     def initialize_init_yet
@@ -33,6 +36,9 @@ module Command
 
   Examples:
     narou init
+    narou init -p /opt/narou/aozora    # AozoraEpub3ディレクトリを指定
+
+  Options:
       EOS
     end
 
@@ -43,6 +49,9 @@ module Command
 
   Examples:
     narou init
+    narou init -p :keep                # 既存のディレクトリを指定
+
+  Options:
       EOS
     end
 
@@ -70,7 +79,11 @@ module Command
         puts "<bold><red>#{"!!!WARNING!!!".center(70)}</red></bold>".termcolor
         puts "AozoraEpub3の構成ファイルを書き換えます。narouコマンド用に別途新規インストールしておくことをオススメします"
       end
-      aozora_path = ask_aozoraepub3_path
+      if @aozora_dirname then
+        aozora_path = @aozora_dirname
+      else
+        aozora_path = ask_aozoraepub3_path
+      end
       unless aozora_path
         puts "設定をスキップしました。あとで " + "<bold><yellow>narou init</yellow></bold>".termcolor + " で再度設定出来ます"
         return
