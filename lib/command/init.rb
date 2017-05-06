@@ -79,11 +79,7 @@ module Command
         puts "<bold><red>#{"!!!WARNING!!!".center(70)}</red></bold>".termcolor
         puts "AozoraEpub3の構成ファイルを書き換えます。narouコマンド用に別途新規インストールしておくことをオススメします"
       end
-      if @aozora_dirname then
-        aozora_path = @aozora_dirname
-      else
-        aozora_path = ask_aozoraepub3_path
-      end
+      aozora_path = @aozora_dirname or ask_aozoraepub3_path
       unless aozora_path
         puts "設定をスキップしました。あとで " + "<bold><yellow>narou init</yellow></bold>".termcolor + " で再度設定出来ます"
         return
