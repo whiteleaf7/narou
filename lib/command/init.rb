@@ -17,13 +17,13 @@ module Command
     end
 
     def initialize
-      super("")
+      super("[options]")
       if Narou.already_init?
         initialize_already_init
       else
         initialize_init_yet
       end
-      @opt.on("-p", "--path DIRECTORY", "指定したディレクトリを利用") { |dirname|
+      @opt.on("-p", "--path FOLDER", "指定したフォルダを利用") { |dirname|
         @aozora_dirname = dirname
       }
     end
@@ -36,7 +36,7 @@ module Command
 
   Examples:
     narou init
-    narou init -p /opt/narou/aozora    # AozoraEpub3ディレクトリを指定
+    narou init -p /opt/narou/aozora    # AozoraEpub3フォルダを指定
 
   Options:
       EOS
@@ -49,7 +49,7 @@ module Command
 
   Examples:
     narou init
-    narou init -p :keep                # 既存のディレクトリを指定
+    narou init -p :keep                # 既存のフォルダを指定
 
   Options:
       EOS
