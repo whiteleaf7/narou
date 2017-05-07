@@ -82,7 +82,7 @@ module Command
       end
       if @aozora_dirname
         path = check_aozoraepub3_path(@aozora_dirname)
-        print "\n<bold><green>指定されたフォルダにAozoraEpub3がありません。</green></bold>\n".termcolor if !path
+        print "\n<bold><green>指定されたフォルダにAozoraEpub3がありません。</green></bold>\n".termcolor unless path
       end
       aozora_path = (path or ask_aozoraepub3_path)
       unless aozora_path
@@ -142,19 +142,18 @@ module Command
       nil
     end
 
-    def check_aozoraepub3_path (input)
+    def check_aozoraepub3_path(input)
       if Helper.os_windows?
         input.force_encoding(Encoding::Windows_31J).encode!(Encoding::UTF_8)
       end
-      input = input.gsub(/"/, "")
+      input.delete!("\"")
       path = File.expand_path(input)
-      case
-      when input == ":keep"
+      if input == ":keep"
         aozora_dir = @global_setting["aozoraepub3dir"]
         if aozora_dir && Narou.aozoraepub3_directory?(aozora_dir)
           return aozora_dir
         end
-      when Narou.aozoraepub3_directory?(path)
+      elsif Narou.aozoraepub3_directory?(path)
         return path
       end
       nil
