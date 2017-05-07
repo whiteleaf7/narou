@@ -24,6 +24,7 @@ module Command
         initialize_init_yet
       end
       @opt.on("-p", "--path FOLDER", "指定したフォルダを利用") { |dirname|
+        # no check here since global_setting is not loaded yet
         @aozora_dirname = dirname
       }
     end
@@ -79,7 +80,11 @@ module Command
         puts "<bold><red>#{"!!!WARNING!!!".center(70)}</red></bold>".termcolor
         puts "AozoraEpub3の構成ファイルを書き換えます。narouコマンド用に別途新規インストールしておくことをオススメします"
       end
-      aozora_path = @aozora_dirname or ask_aozoraepub3_path
+      if @aozora_dirname
+        path = check_aozoraepub3_path(@aozora_dirname)
+        print "\n<bold><green>指定されたフォルダにAozoraEpub3がありません。</green></bold>\n".termcolor if !path
+      end
+      aozora_path = (path or ask_aozoraepub3_path)
       unless aozora_path
         puts "設定をスキップしました。あとで " + "<bold><yellow>narou init</yellow></bold>".termcolor + " で再度設定出来ます"
         return
@@ -128,24 +133,29 @@ module Command
       end
       print ")\n>"
       while input = $stdin.gets
-        if Helper.os_windows?
-          input.force_encoding(Encoding::Windows_31J).encode!(Encoding::UTF_8)
-        end
-        input = input.strip.gsub(/"/, "")
-        path = File.expand_path(input)
-        case
-        when input == ":keep"
-          aozora_dir = @global_setting["aozoraepub3dir"]
-          if aozora_dir && Narou.aozoraepub3_directory?(aozora_dir)
-            return aozora_dir
-          end
-        when Narou.aozoraepub3_directory?(path)
-          return path
-        when input == ""
-          break
-        end
+        break if input.strip! == ""
+        checked_input = check_aozoraepub3_path(input)
+        return checked_input if checked_input
         print "\n<bold><green>入力されたフォルダにAozoraEpub3がありません。" \
               "もう一度入力して下さい:</green></bold>\n&gt;".termcolor
+      end
+      nil
+    end
+
+    def check_aozoraepub3_path (input)
+      if Helper.os_windows?
+        input.force_encoding(Encoding::Windows_31J).encode!(Encoding::UTF_8)
+      end
+      input = input.gsub(/"/, "")
+      path = File.expand_path(input)
+      case
+      when input == ":keep"
+        aozora_dir = @global_setting["aozoraepub3dir"]
+        if aozora_dir && Narou.aozoraepub3_directory?(aozora_dir)
+          return aozora_dir
+        end
+      when Narou.aozoraepub3_directory?(path)
+        return path
       end
       nil
     end
