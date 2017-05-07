@@ -84,7 +84,7 @@ module Command
         path = check_aozoraepub3_path(@aozora_dirname)
         print "\n<bold><green>指定されたフォルダにAozoraEpub3がありません。</green></bold>\n".termcolor unless path
       end
-      aozora_path = (path or ask_aozoraepub3_path)
+      aozora_path = path || ask_aozoraepub3_path
       unless aozora_path
         puts "設定をスキップしました。あとで " + "<bold><yellow>narou init</yellow></bold>".termcolor + " で再度設定出来ます"
         return
