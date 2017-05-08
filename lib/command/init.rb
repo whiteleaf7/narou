@@ -23,7 +23,7 @@ module Command
       else
         initialize_init_yet
       end
-      @opt.on("-p", "--path FOLDER", "指定したフォルダを利用") { |dirname|
+      @opt.on("-p", "--path FOLDER", "指定したフォルダの AozoraEpub3 を利用する") { |dirname|
         # no check here since global_setting is not loaded yet
         @aozora_dirname = dirname
       }
@@ -37,7 +37,7 @@ module Command
 
   Examples:
     narou init
-    narou init -p /opt/narou/aozora    # AozoraEpub3フォルダを指定
+    narou init -p /opt/narou/aozora    # AozoraEpub3 のフォルダを直接指定
 
   Options:
       EOS
@@ -50,7 +50,8 @@ module Command
 
   Examples:
     narou init
-    narou init -p :keep                # 既存のフォルダを指定
+    narou init -p /opt/narou/aozora    # AozoraEpub3 のフォルダを直接指定
+    narou init -p :keep                # 設定済みと同じ場所を指定
 
   Options:
       EOS
