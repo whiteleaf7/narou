@@ -82,7 +82,7 @@ module Command
         puts "AozoraEpub3の構成ファイルを書き換えます。narouコマンド用に別途新規インストールしておくことをオススメします"
       end
       if @aozora_dirname
-        path = check_aozoraepub3_path(@aozora_dirname)
+        path = normalize_aozoraepub3_path(@aozora_dirname)
         print "\n<bold><green>指定されたフォルダにAozoraEpub3がありません。</green></bold>\n".termcolor unless path
       end
       aozora_path = path || ask_aozoraepub3_path
@@ -135,7 +135,7 @@ module Command
       print ")\n>"
       while input = $stdin.gets
         break if input.strip! == ""
-        checked_input = check_aozoraepub3_path(input)
+        checked_input = normalize_aozoraepub3_path(input)
         return checked_input if checked_input
         print "\n<bold><green>入力されたフォルダにAozoraEpub3がありません。" \
               "もう一度入力して下さい:</green></bold>\n&gt;".termcolor
@@ -143,7 +143,7 @@ module Command
       nil
     end
 
-    def check_aozoraepub3_path(input)
+    def normalize_aozoraepub3_path(input)
       if Helper.os_windows?
         input.force_encoding(Encoding::Windows_31J).encode!(Encoding::UTF_8)
       end
