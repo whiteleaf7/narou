@@ -515,7 +515,7 @@ module Command
           invisible: true,
           tab: :global
         },
-        "server-addtional-accepted-domains" => {
+        "server-ws-add-accepted-domains" => {
           type: :string, help: "PushServer の accepted_domains に追加するホストのリスト（カンマ区切り）",
           invisible: true,
           tab: :global

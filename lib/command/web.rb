@@ -65,7 +65,7 @@ module Command
       accepted_domains = (host == "0.0.0.0" ? "*" : host)
       if accepted_domains != "*"
         global_setting = Inventory.load("global_setting", :global)
-        addtional_accepted_domains = global_setting["server-addtional-accepted-domains"]
+        addtional_accepted_domains = global_setting["server-ws-add-accepted-domains"]
         if addtional_accepted_domains
           accepted_domains = [
             accepted_domains,
