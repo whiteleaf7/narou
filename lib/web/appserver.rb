@@ -114,6 +114,17 @@ module Narou::ServerHelpers
   def notepad_text_path
     File.join(Narou.local_setting_dir, "notepad.txt")
   end
+
+  def query_to_boolean(value, default: false)
+    case value
+    when "1", 1, "true", true
+      true
+    when  "0", 0, "false", false
+      false
+    else
+      default
+    end
+  end
 end
 
 class Narou::AppServer < Sinatra::Base
@@ -512,14 +523,19 @@ class Narou::AppServer < Sinatra::Base
   # -------------------------------------------------------------------------------
 
   get "/api/list" do
+    view_frozen = query_to_boolean(params["view_frozen"], default: true)
+    view_nonfrozen = query_to_boolean(params["view_nonfrozen"], default: true)
     database_values = Database.instance.get_object.values
     json_objects = {
-      draw: 1, recordsTotal: database_values.count, recordsFiltered: database_values.count
+      draw: 1
     }
     json_objects[:data] =
       database_values.map do |data|
-        tags = data["tags"] || []
         id = data["id"]
+        is_frozen = Narou.novel_frozen?(id)
+        next nil if !view_frozen && is_frozen
+        next nil if !view_nonfrozen && !is_frozen
+        tags = data["tags"] || []
         {
           id: id.to_s,
           last_update: data["last_update"].to_i,
@@ -530,19 +546,21 @@ class Narou::AppServer < Sinatra::Base
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
           tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'),
           status: [
-            Narou.novel_frozen?(id) ? "凍結" : nil,
+            is_frozen ? "凍結" : nil,
             tags.include?("end") ? "完結" : nil,
             tags.include?("404") ? "削除" : nil,
           ].compact.join(", "),
           download: %!<a href="/novels/#{id}/download" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-download-alt"></span></a>!,
-          frozen: Narou.novel_frozen?(id),
+          frozen: is_frozen,
           new_arrivals_date: data["new_arrivals_date"].tap { |m| break m.to_i if m },
           general_lastup: data["general_lastup"].tap { |m| break m.to_i if m },
           # 掲載話数
           general_all_no: data["general_all_no"],
           last_check_date: data["last_check_date"].tap { |m| break m.to_i if m },
         }
-      end
+      end.compact
+    json_objects[:recordsTotal] = json_objects[:data].size
+    json_objects[:recordsFiltered] = json_objects[:recordsTotal]
     json json_objects
   end
 
