@@ -3,6 +3,9 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+# rubocop:disable Metrics/ClassLength
+# rubocop:disable Style/ClassAndModuleChildren
+
 require "socket"
 require "sinatra/base"
 require "sinatra/json"
@@ -119,7 +122,7 @@ module Narou::ServerHelpers
     case value
     when "1", 1, "true", true
       true
-    when  "0", 0, "false", false
+    when "0", 0, "false", false
       false
     else
       default
