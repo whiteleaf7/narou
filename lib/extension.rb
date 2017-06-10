@@ -1,12 +1,13 @@
 
 require "open-uri"
+require "openssl"
 
 # open-uri で http → https へのリダイレクトを有効にする
 require "open_uri_redirections"
 
 # open-uri に渡すオプションを生成（必要に応じて extensions/*.rb でオーバーライドする）
 def make_open_uri_options(add)
-  add
+  add.merge(ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
 end
 
 #
