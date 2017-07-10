@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2016-11-23 10:43:07 +0900
+# auto generated at 2017-04-15 18:44:11 +0900
 
 Encoding.default_external = Encoding::UTF_8
 
@@ -59,6 +59,10 @@ describe "convert" do
 
   it "auto_join_line/test_auto_join_line.txt" do
     check_answer("auto_join_line/test_auto_join_line.txt")
+  end
+
+  it "convert_numbers/test_convert_numbers.txt" do
+    check_answer("convert_numbers/test_convert_numbers.txt")
   end
 
   it "convert_page_break/test_convert_page_break.txt" do

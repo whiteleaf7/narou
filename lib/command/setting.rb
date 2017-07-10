@@ -511,7 +511,13 @@ module Command
           tab: :global
         },
         "server-bind" => {
-          type: :string, help: "WEBサーバのホスト制限(未設定時:起動PCのIP)。頻繁にローカルIPが変わってしまう場合は127.0.0.1の指定を推奨", invisible: true,
+          type: :string, help: "WEBサーバのホスト制限(未設定時:起動PCのIP)。頻繁にローカルIPが変わってしまう場合は127.0.0.1の指定を推奨",
+          invisible: true,
+          tab: :global
+        },
+        "server-ws-add-accepted-domains" => {
+          type: :string, help: "PushServer の accepted_domains に追加するホストのリスト（カンマ区切り）",
+          invisible: true,
           tab: :global
         },
         "over18" => {

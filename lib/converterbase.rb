@@ -91,7 +91,15 @@ class ConverterBase
   #
   def convert_numbers(data)
     # 小数点を・に
-    data.gsub!(/([\d０-９#{KANJI_NUM}]+?)[\.．]([\d０-９#{KANJI_NUM}]+?)/, "\\1・\\2")
+    data.gsub!(/([\d０-９#{KANJI_NUM}]+?)[\.．]([\d０-９#{KANJI_NUM}]+?)/) do |match|
+      integer = $1
+      decimal = $2
+      if [/\d/, /[０-９]/, /[#{KANJI_NUM}]/].any? { |r| integer[-1] =~ r && decimal[0] =~ r }
+        "#{integer}・#{decimal}"
+      else
+        match
+      end
+    end
     if @setting.enable_convert_num_to_kanji &&
        @text_type != "subtitle" && @text_type != "chapter" && @text_type != "story"
       num_to_kanji(data)
