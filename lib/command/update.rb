@@ -398,7 +398,8 @@ module Command
     end
 
     def mail_hotentry
-      return unless @options["hotentry.auto-mail"]
+      hotentry_manager = HotentryManager.new
+      return unless hotentry_manager.auto_mail?
       Mail.execute!(["hotentry"])
     end
 
