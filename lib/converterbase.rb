@@ -302,7 +302,7 @@ class ConverterBase
   def insert_separate_space(data)
     data.gsub!(/([!?！？]+)([^!?！？])/) do
       m1, m2 = $1, $2
-      m2 = "　" if m2 == " "
+      m2 = "　" if m2 =~ /[ 、。]/
       if m2 =~ /[^」］｝\]\}』】〉》〕＞>≫)）"”’〟　☆★♪［―]/
         "#{m1}　#{m2}"
       else
@@ -491,8 +491,6 @@ class ConverterBase
     end
     # たまに見かける誤字対策
     data.gsub!(/。　/, "。")
-    data.gsub!(/([？！])。/, "\\1")
-    data.gsub!(/([？！])、/, "\\1")
   end
 
   #
