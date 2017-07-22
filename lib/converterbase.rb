@@ -934,14 +934,22 @@ class ConverterBase
       else
         # なろうのルビ対象文字を辿って｜を挿入する（青空文庫となろうのルビ仕様の差異吸収のため）
         # 空白もルビ対象文字に含むのはなろうの仕様である
-        m1.sub(/([#{CHARACTER_OF_RUBY} 　]+)$/) {
-          match_target = $1
-          if match_target =~ /^(　+)/
-            "#{$1}［＃ルビ用縦線］#{match_target[$1.length..-1]}"
+        if m2 =~ /^([ぁ-んァ-ヶーゝゞ・]+)[ 　]?([ぁ-んァ-ヶーゝゞ・]*)$/
+          f1, f2 = $1, $2
+          if m1 =~ /([#{CHARACTER_OF_RUBY}]+)([ 　])([#{CHARACTER_OF_RUBY}]+)$/
+            m1.sub(/([#{CHARACTER_OF_RUBY}]+)([ 　])([#{CHARACTER_OF_RUBY}]+)$/) {
+              if f2 == ""
+                "#{$1}#{$2}［＃ルビ用縦線］#{$3}《#{ruby_youon_to_big(m2)}》"
+              else
+                "［＃ルビ用縦線］#{$1}《#{ruby_youon_to_big(f1)}》#{$2}［＃ルビ用縦線］#{$3}《#{ruby_youon_to_big(f2)}》"
+              end
+            }
           else
-            "［＃ルビ用縦線］#{match_target}"
+            m1.sub(/([#{CHARACTER_OF_RUBY}]+)$/, "［＃ルビ用縦線］\\1") + "《#{ruby_youon_to_big(m2)}》"
           end
-        } + "《#{ruby_youon_to_big(m2)}》"
+        else
+          match
+        end
       end
     else
       match
