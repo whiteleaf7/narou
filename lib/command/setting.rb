@@ -524,7 +524,7 @@ module Command
           tab: :global
         },
         "server-digest-auth.password" => {
-          type: :string, help: "WEBサーバのDigest認証のパスワード",
+          type: :string, help: "WEBサーバのDigest認証のパスワード。hashed-passwordも設定した場合はそちらが優先される",
           tab: :global
         },
         "server-digest-auth.hashed-password" => {
