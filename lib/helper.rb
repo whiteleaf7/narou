@@ -50,9 +50,8 @@ module Helper
     def $stdin.getch
       WinAPI._getch.chr
     end
-  else
-    require "io/console"
   end
+  require "io/console"
 
   def open_browser_linux(address, error_message)
     %w(xdg-open firefox w3m).each do |browser|
