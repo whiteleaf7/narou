@@ -278,9 +278,9 @@ class Narou::AppServer < Sinatra::Base
     user = setting["server-digest-auth.user"]
     hashed = !!setting["server-digest-auth.hashed-password"]
     passwd = hashed ? setting["server-digest-auth.hashed-password"] : setting["server-digest-auth.password"]
-    
+
     self.class.class_exec do
-      use Rack::Auth::Digest::MD5, {realm: 'narou.rb', opaque:'', passwords_hashed: hashed} do |username|
+      use Rack::Auth::Digest::MD5, { realm: "narou.rb", opaque: "", passwords_hashed: hashed } do |username|
         passwd if username == user
       end
     end
