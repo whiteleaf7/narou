@@ -231,6 +231,7 @@ class Narou::AppServer < Sinatra::Base
     puts_hello_messages
     start_device_ejectable_event
     fill_general_all_no_in_database
+    setup_server_authentication
   end
 
   def puts_hello_messages
@@ -266,6 +267,23 @@ class Narou::AppServer < Sinatra::Base
       modified = true
     end
     Database.instance.save_database if modified
+  end
+
+  # サーバーの認証の設定
+  # とりあえずDigest認証のみ
+  def setup_server_authentication
+    setting = Inventory.load("global_setting", :global)
+    return unless setting["server-digest-auth.use"]
+
+    user = setting["server-digest-auth.user"]
+    hashed = !!setting["server-digest-auth.hashed-password"]
+    passwd = hashed ? setting["server-digest-auth.hashed-password"] : setting["server-digest-auth.password"]
+
+    self.class.class_exec do
+      use Rack::Auth::Digest::MD5, { realm: "narou.rb", opaque: "", passwords_hashed: hashed } do |username|
+        passwd if username == user
+      end
+    end
   end
 
   # ===================================================================

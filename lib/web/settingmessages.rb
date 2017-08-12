@@ -19,7 +19,9 @@ module Narou
                       "<b>%OLD</b> : 古い方の差分用ファイルパス",
     "no-color" => "コンソールのカラー表示を無効にする\n※要WEB UIサーバ再起動",
     "economy" => "容量節約に関する設定",
-    "send.without-freeze" => "一括送信時に凍結された小説は対象外にする。（個別送信時は凍結済みでも送信可能）"
+    "send.without-freeze" => "一括送信時に凍結された小説は対象外にする。（個別送信時は凍結済みでも送信可能）",
+    "server-digest-auth.use" => "WEBサーバでDigest認証を使用するかどうか\n※要WEB UIサーバ再起動",
+    "server-digest-auth.hashed-password" => "WEBサーバのDigest認証のパスワードを、Realmを\"narou.rb\"としてハッシュにしたもの。\nhttps://tgws.plus/app/digest/ などで生成できる",
   }
 end
 

@@ -515,6 +515,24 @@ module Command
           invisible: true,
           tab: :global
         },
+        "server-digest-auth.use" => {
+          type: :boolean, help: "WEBサーバでDigest認証を使用するかどうか",
+          tab: :global
+        },
+        "server-digest-auth.user" => {
+          type: :string, help: "WEBサーバでDigest認証をするユーザ名",
+          tab: :global
+        },
+        "server-digest-auth.password" => {
+          type: :string, help: "WEBサーバのDigest認証のパスワード。hashed-passwordも設定した場合はそちらが優先される",
+          tab: :global
+        },
+        "server-digest-auth.hashed-password" => {
+          type: :string,
+          help: "WEBサーバのDigest認証のパスワードを、Realmを\"narou.rb\"としてハッシュにしたもの。下記のようなコマンドで生成できる\n" \
+                "$ ruby -r 'digest/md5' -e 'puts Digest::MD5.hexdigest \"\#{$*[0]}:narou.rb:\#{$*[1]}\"' user password",
+          tab: :global
+        },
         "server-ws-add-accepted-domains" => {
           type: :string, help: "PushServer の accepted_domains に追加するホストのリスト（カンマ区切り）",
           invisible: true,
