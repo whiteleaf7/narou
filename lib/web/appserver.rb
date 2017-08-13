@@ -272,12 +272,12 @@ class Narou::AppServer < Sinatra::Base
   # サーバーの認証の設定
   # とりあえずDigest認証のみ
   def setup_server_authentication
-    setting = Inventory.load("global_setting", :global)
-    return unless setting["server-digest-auth.enable"]
+    auth = Inventory.load("global_setting", :global).group("server-digest-auth")
+    return unless auth.enable
 
-    user = setting["server-digest-auth.user"]
-    hashed = setting["server-digest-auth.hashed-password"]
-    passwd = hashed || setting["server-digest-auth.password"]
+    user = auth.user
+    hashed = auth.hashed_password
+    passwd = hashed || auth.password
 
     self.class.class_exec do
       use Rack::Auth::Digest::MD5, { realm: "narou.rb", opaque: "", passwords_hashed: hashed } do |username|
