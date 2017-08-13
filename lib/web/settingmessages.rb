@@ -22,7 +22,8 @@ module Narou
     "send.without-freeze" => "一括送信時に凍結された小説は対象外にする。（個別送信時は凍結済みでも送信可能）",
     "server-digest-auth.enable" => "WEBサーバでDigest認証を使用するかどうか\n" \
                                    "※digest-auth関連の設定を変更した場合WEB UIサーバの再起動が必要",
-    "server-digest-auth.hashed-password" => "WEBサーバのDigest認証のパスワードを、Realmを\"narou.rb\"としてハッシュにしたもの。\nhttps://tgws.plus/app/digest/ などで生成できる",
+    "server-digest-auth.hashed-password" => "WEBサーバのDigest認証のパスワードを、Realmを\"narou.rb\"としてハッシュにしたもの。\n" \
+                                            "https://tgws.plus/app/digest/ などで生成できる",
   }
 end
 
