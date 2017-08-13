@@ -4,6 +4,7 @@
 #
 
 require "yaml"
+require "ostruct"
 require_relative "narou"
 
 #
@@ -67,6 +68,18 @@ module Inventory
     return nil unless File.exist?(backup_path)
     FileUtils.copy(backup_path, path)
     true
+  end
+
+  def group(group_name)
+    result = {}
+    each do |name, value|
+      next unless name =~ /^#{group_name}\.(.+)$/
+      child_name = $1
+      result[child_name] = value
+      lodashed_name = child_name.tr("-", "_")
+      result[lodashed_name] = value if child_name != lodashed_name
+    end
+    OpenStruct.new(result)
   end
 end
 
