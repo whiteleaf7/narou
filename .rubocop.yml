@@ -6,6 +6,7 @@ AllCops:
     - "小説データ/**/*"
     - "trash/**/*"
     - "narou.gemspec"
+    - "spec/**/*"
   DisplayCopNames: true
   TargetRubyVersion: 2.1
 

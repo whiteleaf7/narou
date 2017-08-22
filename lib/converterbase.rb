@@ -302,7 +302,7 @@ class ConverterBase
   def insert_separate_space(data)
     data.gsub!(/([!?！？]+)([^!?！？])/) do
       m1, m2 = $1, $2
-      m2 = "　" if m2 == " "
+      m2 = "　" if m2 =~ /[ 、。]/
       if m2 =~ /[^」］｝\]\}』】〉》〕＞>≫)）"”’〟　☆★♪［―]/
         "#{m1}　#{m2}"
       else
@@ -491,8 +491,6 @@ class ConverterBase
     end
     # たまに見かける誤字対策
     data.gsub!(/。　/, "。")
-    data.gsub!(/([？！])。/, "\\1")
-    data.gsub!(/([？！])、/, "\\1")
   end
 
   #
@@ -933,20 +931,30 @@ class ConverterBase
       if openclose_symbols[0] == "≪" && m2 !~ /^#{AUTO_RUBY_CHARACTERS}$/
         # 《 》タイプのルビであっても、｜が存在しない場合の自動ルビ化対象はひらがな等だけである
         match
+      elsif m2 =~ /^([ぁ-んァ-ヶーゝゞ・]+)[ 　]?([ぁ-んァ-ヶーゝゞ・]*)$/
+        build_ruby(m1, m2, $1, $2)
       else
-        # なろうのルビ対象文字を辿って｜を挿入する（青空文庫となろうのルビ仕様の差異吸収のため）
-        # 空白もルビ対象文字に含むのはなろうの仕様である
-        m1.sub(/([#{CHARACTER_OF_RUBY} 　]+)$/) {
-          match_target = $1
-          if match_target =~ /^(　+)/
-            "#{$1}［＃ルビ用縦線］#{match_target[$1.length..-1]}"
-          else
-            "［＃ルビ用縦線］#{match_target}"
-          end
-        } + "《#{ruby_youon_to_big(m2)}》"
+        match
       end
     else
       match
+    end
+  end
+
+  #
+  # なろうのルビ対象文字を辿って｜を挿入する（青空文庫となろうのルビ仕様の差異吸収のため）
+  # 空白もルビ対象文字に含むのはなろうの仕様である
+  def build_ruby(m1, m2, f1, f2)
+    if m1 =~ /([#{CHARACTER_OF_RUBY}]+)([ 　])([#{CHARACTER_OF_RUBY}]+)$/
+      m1.sub(/([#{CHARACTER_OF_RUBY}]+)([ 　])([#{CHARACTER_OF_RUBY}]+)$/) {
+        if f2 == ""
+          "#{$1}#{$2}［＃ルビ用縦線］#{$3}《#{ruby_youon_to_big(m2)}》"
+        else
+          "［＃ルビ用縦線］#{$1}《#{ruby_youon_to_big(f1)}》#{$2}［＃ルビ用縦線］#{$3}《#{ruby_youon_to_big(f2)}》"
+        end
+      }
+    else
+      m1.sub(/([#{CHARACTER_OF_RUBY}]+)$/, "［＃ルビ用縦線］\\1") + "《#{ruby_youon_to_big(m2)}》"
     end
   end
 
