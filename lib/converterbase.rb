@@ -1307,6 +1307,7 @@ class ConverterBase
     return "" if text == ""
     output_text_dir = @output_text_dir || @setting.archive_path
     @text_type = text_type
+    text.force_encoding(Encoding::UTF_8)
     io = StringIO.new(rstrip_all_lines(text))
     (io = before_convert(io)).rewind
     (io = convert_main(io)).rewind
