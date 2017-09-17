@@ -4,7 +4,7 @@
 #
 
 require "commandline"
-require "logger"
+require "narou_logger"
 require "database"
 require "downloader"
 

@@ -37,7 +37,7 @@ $display_backtrace ||= $debug
 $disable_color = ARGV.delete("--no-color")
 $disable_color ||= global["no-color"]
 
-require_relative "lib/logger"
+require_relative "lib/narou_logger"
 require_relative "lib/version"
 require_relative "lib/commandline"
 

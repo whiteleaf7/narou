@@ -5,7 +5,7 @@
 # auto generated at 2015-08-07 22:44:33 +0900
 
 require "commandline"
-require "logger"
+require "narou_logger"
 
 describe Command::Update do
   describe "--ignore-all" do
