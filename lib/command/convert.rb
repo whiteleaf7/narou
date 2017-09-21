@@ -206,14 +206,17 @@ module Command
           @options["yokogaki"] = NovelSetting.load(target)["enable_yokogaki"]
         end
         next unless res
-        @converted_txt_path = res[:converted_txt_path]
-        @use_dakuten_font = res[:use_dakuten_font]
+        array_of_converted_txt_path = res[:converted_txt_paths]
+        array_of_converted_txt_path.each do |converted_txt_path|
+          @converted_txt_path = converted_txt_path
+          @use_dakuten_font = res[:use_dakuten_font]
 
-        ebook_file = hook_call(:convert_txt_to_ebook_file)
-        next if ebook_file.nil?
-        if ebook_file
-          copied_file_path = copy_to_converted_file(ebook_file)
-          send_file_to_device(ebook_file)
+          ebook_file = hook_call(:convert_txt_to_ebook_file)
+          next if ebook_file.nil?
+          if ebook_file
+            copied_file_path = copy_to_converted_file(ebook_file)
+            send_file_to_device(ebook_file)
+          end
         end
 
         if @options["no-open"].! && Narou.web?.!

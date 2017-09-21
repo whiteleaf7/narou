@@ -472,6 +472,13 @@ $ntag 小説のタグをカンマ区切りにしたもの
             "全話数分以上の数値を指定した場合、最新話だけ変換する"
     },
     {
+      name: "slice_size",
+      type: :integer,
+      value: 0,
+      help: "小説が指定した話数より多い場合、指定した話数ごとに分割する。" \
+            "cut_old_subtitlesで処理した後の話数を対象に処理する"
+    },
+    {
       name: "author_comment_style",
       type: :select,
       value: "css",

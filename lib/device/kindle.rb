@@ -15,6 +15,7 @@ module Device::Kindle
 
   RELATED_VARIABLES = {
     "default.enable_half_indent_bracket" => true,
+    "default.slice_size" => 500,
   }
 
   include Device::BackupBookmarkUtility
