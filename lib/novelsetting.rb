@@ -287,7 +287,7 @@ class NovelSetting
     {
       name: "enable_auto_join_in_brackets",
       type: :boolean,
-      value: true,
+      value: false,
       help: "かぎ括弧内自動連結を有効にする\n例)\n「～～～！\n　＊＊＊？」  → 「～～～！　＊＊＊？」"
     },
     {
