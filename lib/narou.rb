@@ -220,15 +220,29 @@ module Narou
     end
   end
 
-  def get_mobi_path(target)
-    get_ebook_file_path(target, ".mobi")
+  def get_mobi_paths(target)
+    get_ebook_file_paths(target, ".mobi")
   end
 
-  def get_ebook_file_path(target, ext)
+  def get_ebook_file_paths(target, ext)
     data = Downloader.get_data_by_target(target)
     return nil unless data
     dir = Downloader.get_novel_data_dir_by_target(target)
-    File.join(dir, create_novel_filename(data, ext))
+    fname = create_novel_filename(data, ext)
+    base = File.basename(fname, ext)
+
+    index = 1
+    if File.exist?(path = File.join(dir, "#{base}_#{index}#{ext}"))
+      paths = []
+      loop do
+        paths.push(path)
+        index += 1
+        break unless File.exist?(path = File.join(dir, "#{base}_#{index}#{ext}"))
+      end
+      paths
+    else
+      [ File.join(dir, fname) ]
+    end
   end
 
   def get_misc_dir

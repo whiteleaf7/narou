@@ -64,9 +64,11 @@ module Command
       argv.each do |target|
         if target == "hotentry"
           ebook_path = Update.get_newest_hotentry_file_path(device)
+          ebook_paths = [ ebook_path ]
           display_target = "hotentry"
         else
-          ebook_path = Narou.get_ebook_file_path(target, device ? device.ebook_file_ext : ".epub")
+          ebook_paths = Narou.get_ebook_file_paths(target, device ? device.ebook_file_ext : ".epub")
+          ebook_path = ebook_paths[0]
           data = Downloader.get_data_by_target(target)
           if send_all && !@options["force"]
             new_arrivals_date = data["new_arrivals_date"] || Time.now
@@ -92,23 +94,25 @@ module Command
         end
         puts "<bold><green>#{display_target}</green></bold>".termcolor
         print "メールを送信しています"
-        exit_mail = false
-        mail_result = nil
-        Thread.new do
-          mail_result = mailer.send(id, File.basename(ebook_path), ebook_path)
-          exit_mail = true
-        end
-        until exit_mail
-          print "."
-          sleep(0.5)
-        end
-        puts
-        if mail_result
-          puts File.basename(ebook_path) + " をメールで送信しました"
-          database[id]["last_mail_date"] = Time.now if target != "hotentry"
-        else
-          error "#{mailer.error_message}"
-          exit Narou::EXIT_ERROR_CODE   # next しても次も失敗する可能性が高いのでここで終了
+        ebook_paths.each do |ebook_path|
+          exit_mail = false
+          mail_result = nil
+          Thread.new do
+            mail_result = mailer.send(id, File.basename(ebook_path), ebook_path)
+            exit_mail = true
+          end
+          until exit_mail
+            print "."
+            sleep(0.5)
+          end
+          puts
+          if mail_result
+            puts File.basename(ebook_path) + " をメールで送信しました"
+            database[id]["last_mail_date"] = Time.now if target != "hotentry"
+          else
+            error "#{mailer.error_message}"
+            exit Narou::EXIT_ERROR_CODE   # next しても次も失敗する可能性が高いのでここで終了
+          end
         end
       end
     rescue Interrupt

@@ -114,8 +114,10 @@ module Command
         end
         if target == "hotentry"
           ebook_path = Update.get_newest_hotentry_file_path(device)
+          ebook_paths = [ ebook_path ]
         else
-          ebook_path = Narou.get_ebook_file_path(target, device.ebook_file_ext)
+          ebook_paths = Narou.get_ebook_file_paths(target, device.ebook_file_ext)
+          ebook_path = ebook_paths[0]
         end
         unless ebook_path
           error "#{target} は存在しません"
@@ -126,6 +128,7 @@ module Command
           next
         end
 
+        # TODO should check all items in ebook_paths
         if !@options["force"] && !device.ebook_file_old?(ebook_path)
           next
         end
@@ -138,23 +141,25 @@ module Command
         puts "<bold><green>#{display_target}</green></bold>".termcolor
 
         print "#{device.name}へ送信しています"
-        exit_copy = false
-        copy_to_path = nil
-        Thread.abort_on_exception = true
-        Thread.new do
-          copy_to_path = device.copy_to_documents(ebook_path)
-          exit_copy = true
-        end
-        until exit_copy
-          print "."
-          sleep(0.5)
-        end
-        puts
-        if copy_to_path
-          puts copy_to_path + " へコピーしました"
-        else
-          error "#{device.name}が見つからなかったためコピー出来ませんでした"
-          exit Narou::EXIT_ERROR_CODE   # next しても次も失敗すると分かりきっているためここで終了する
+        ebook_paths.each do |ebook_path|
+          exit_copy = false
+          copy_to_path = nil
+          Thread.abort_on_exception = true
+          Thread.new do
+            copy_to_path = device.copy_to_documents(ebook_path)
+            exit_copy = true
+          end
+          until exit_copy
+            print "."
+            sleep(0.5)
+          end
+          puts
+          if copy_to_path
+            puts copy_to_path + " へコピーしました"
+          else
+            error "#{device.name}が見つからなかったためコピー出来ませんでした"
+            exit Narou::EXIT_ERROR_CODE   # next しても次も失敗すると分かりきっているためここで終了する
+          end
         end
       end
       if send_all && @options["backup-bookmark"]
