@@ -231,18 +231,13 @@ module Narou
     fname = create_novel_filename(data, ext)
     base = File.basename(fname, ext)
 
-    index = 1
-    if File.exist?(path = File.join(dir, "#{base}_#{index}#{ext}"))
-      paths = []
-      loop do
-        paths.push(path)
-        index += 1
-        break unless File.exist?(path = File.join(dir, "#{base}_#{index}#{ext}"))
-      end
-      paths
-    else
-      [ File.join(dir, fname) ]
+    paths = [ File.join(dir, fname) ]
+    index = 2
+    while File.exist?(path = File.join(dir, "#{base}_#{index}#{ext}"))
+      paths.push(path)
+      index += 1
     end
+    paths
   end
 
   def get_misc_dir
