@@ -641,7 +641,8 @@ class NovelConverter
         create_novel_text_by_template(
           sections, toc, is_hotentry,
           array_of_subtitles.length == 1 ? nil : index + 1
-        ))
+        )
+      )
     end
 
     if is_hotentry
