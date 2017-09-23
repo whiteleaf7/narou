@@ -214,7 +214,7 @@ module Command
           ebook_file = hook_call(:convert_txt_to_ebook_file)
           next if ebook_file.nil?
           if ebook_file
-            copied_file_path = copy_to_converted_file(ebook_file)
+            copy_to_converted_file(ebook_file)
             send_file_to_device(ebook_file)
           end
         end

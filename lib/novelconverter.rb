@@ -633,8 +633,8 @@ class NovelConverter
       html = HTML.new
       html.strip_decoration_tag = @setting.enable_strip_decoration_tag
       site_setting = find_site_setting(toc["toc_url"])
-      html.set_illust_setting({current_url: site_setting["illust_current_url"],
-                               grep_pattern: site_setting["illust_grep_pattern"]})
+      html.set_illust_setting({ current_url: site_setting["illust_current_url"],
+                                grep_pattern: site_setting["illust_grep_pattern"] })
 
       sections = subtitles_to_sections(sliced_subtitles, html)
       array_of_converted_text.push(create_novel_text_by_template(
