@@ -156,7 +156,7 @@ module Command
             puts copy_to_path + " へコピーしました"
           else
             error "#{device.name}が見つからなかったためコピー出来ませんでした"
-            exit Narou::EXIT_ERROR_CODE   # next しても次も失敗すると分かりきっているためここで終了する
+            exit Narou::EXIT_ERROR_CODE # next しても次も失敗すると分かりきっているためここで終了する
           end
         end
       end

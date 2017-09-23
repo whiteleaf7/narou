@@ -109,7 +109,7 @@ module Command
             database[id]["last_mail_date"] = Time.now if target != "hotentry"
           else
             error mailer.error_message
-            exit Narou::EXIT_ERROR_CODE   # next しても次も失敗する可能性が高いのでここで終了
+            exit Narou::EXIT_ERROR_CODE # next しても次も失敗する可能性が高いのでここで終了
           end
         end
       end
