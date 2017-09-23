@@ -427,7 +427,7 @@ class NovelConverter
 
   # is_hotentry を有効にすると、テンプレートで作成するテキストファイルに
   # あらすじ、作品タイトル、本の読み終わり表示が付与されなくなる
-  def create_novel_text_by_template(sections, toc, is_hotentry = false, index)
+  def create_novel_text_by_template(sections, toc, is_hotentry = false, index = nil)
     cover_chuki = create_cover_chuki
     device = Narou.get_device
     setting = @setting
@@ -605,7 +605,7 @@ class NovelConverter
 
     @use_dakuten_font = @converter.use_dakuten_font
 
-    [ converted_text ]
+    [converted_text]
   end
 
   #
@@ -624,11 +624,11 @@ class NovelConverter
       puts "#{@setting.slice_size}話ごとに分割して変換します"
       array_of_subtitles = subtitles.each_slice(@setting.slice_size).to_a
     else
-      array_of_subtitles = [ subtitles ]
+      array_of_subtitles = [subtitles]
     end
     array_of_converted_text = []
-    array_of_subtitles.each_with_index do |subtitles, index|
-      @converter.subtitles = subtitles
+    array_of_subtitles.each_with_index do |sliced_subtitles, index|
+      @converter.subtitles = sliced_subtitles
       toc["story"] = @converter.convert(toc["story"], "story")
       html = HTML.new
       html.strip_decoration_tag = @setting.enable_strip_decoration_tag
@@ -636,9 +636,9 @@ class NovelConverter
       html.set_illust_setting({current_url: site_setting["illust_current_url"],
                                grep_pattern: site_setting["illust_grep_pattern"]})
 
-      sections = subtitles_to_sections(subtitles, html)
-      array_of_converted_text.push(create_novel_text_by_template(sections, toc, is_hotentry,
-        array_of_subtitles.length == 1 ? nil : index+1))
+      sections = subtitles_to_sections(sliced_subtitles, html)
+      array_of_converted_text.push(create_novel_text_by_template(
+        sections, toc, is_hotentry, array_of_subtitles.length == 1 ? nil : index + 1))
     end
 
     if is_hotentry

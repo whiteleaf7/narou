@@ -231,7 +231,7 @@ module Narou
     fname = create_novel_filename(data, ext)
     base = File.basename(fname, ext)
 
-    paths = [ File.join(dir, fname) ]
+    paths = [File.join(dir, fname)]
     index = 2
     while File.exist?(path = File.join(dir, "#{base}_#{index}#{ext}"))
       paths.push(path)

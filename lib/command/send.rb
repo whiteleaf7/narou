@@ -113,23 +113,21 @@ module Command
           next
         end
         if target == "hotentry"
-          ebook_path = Update.get_newest_hotentry_file_path(device)
-          ebook_paths = [ ebook_path ]
+          ebook_paths = [Update.get_newest_hotentry_file_path(device)]
         else
           ebook_paths = Narou.get_ebook_file_paths(target, device.ebook_file_ext)
-          ebook_path = ebook_paths[0]
         end
-        unless ebook_path
+        unless ebook_paths[0]
           error "#{target} は存在しません"
           next
         end
-        unless File.exist?(ebook_path)
-          error "まだファイル(#{File.basename(ebook_path)})が無いようです" unless send_all
+        unless File.exist?(ebook_paths[0])
+          error "まだファイル(#{File.basename(ebook_paths[0])})が無いようです" unless send_all
           next
         end
 
-        # TODO should check all items in ebook_paths
-        if !@options["force"] && !device.ebook_file_old?(ebook_path)
+        # TODO: should check all items in ebook_paths
+        if !@options["force"] && !device.ebook_file_old?(ebook_paths[0])
           next
         end
         display_target =
