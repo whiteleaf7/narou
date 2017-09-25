@@ -377,11 +377,10 @@ class NovelConverter
       array_of_converted_text = convert_main_for_novel
       update_latest_convert_novel
     end
+    inspect_novel(array_of_converted_text)
 
     array_of_output_path = []
     array_of_converted_text.each_with_index do |converted_text, i|
-      inspect_novel(converted_text)
-
       output_path = create_output_path(text, converted_text, i + 1)
       File.write(output_path, converted_text)
       array_of_output_path.push(output_path)
@@ -710,8 +709,9 @@ class NovelConverter
     { "title" => title, "author" => author }
   end
 
-  def inspect_novel(text)
+  def inspect_novel(array_of_text)
     if @setting.enable_inspect
+      text = array_of_text.flatten
       @inspector.inspect_end_touten_conditions(text)   # 行末読点の現在状況を調査する
       @inspector.countup_return_in_brackets(text)      # カギ括弧内の改行状況を調査する
     end
