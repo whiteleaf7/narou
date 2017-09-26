@@ -11,7 +11,7 @@ require "open-uri"
 class Illustration
   ILLUST_DIR = "挿絵/"
   # TODO: みてみんがSSL化したらアドレスを書き直す
-  NAROU_ILLUST_URL = "http://%s.mitemin.net/userpageimage/viewimage/icode/%s/"
+  NAROU_ILLUST_URL = "https://%s.mitemin.net/userpageimage/viewimage/icode/%s/"
   NAROU_ILLUST_TAG_PATTERN = /[ 　\t]*?<(i[0-9]+)\|([0-9]+)>\n?/m
 
   MIME = { "image/jpeg" => "jpg", "image/png" => "png", "image/gif" => "gif", "image/bmp" => "bmp" }
