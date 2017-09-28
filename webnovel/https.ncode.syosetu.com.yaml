@@ -33,7 +33,7 @@ subtitles: |-
 is_narou: true
 tcode: <li><a href="\\k<top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
 txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
-narou_api_url: http://api.syosetu.com/novelapi/api/
+narou_api_url: https://api.syosetu.com/novelapi/api/
 
 # ------------------------------------------------------------
 # 小説情報からパースするための設定
@@ -75,5 +75,4 @@ gl: |-
 # writer 作者名
 w: |-
   <th>作者名</th>
-  <td>(?:<a href=".+?">)?(?<writer>.+?)(?:</a>)?
-  </td>
+  <td>(?:<a href=".+?">)?(?<writer>.+?)(?:</a>)?.?</td>
