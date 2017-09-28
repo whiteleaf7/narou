@@ -10,6 +10,7 @@ confirm_over18: no
 append_title_to_folder_name: yes
 title_strip_pattern: null
 cookie: over18=yes
+https_top_url: https://\\k<domain>
 
 # ------------------------------------------------------------
 # 目次取得設定
@@ -31,9 +32,9 @@ subtitles: |-
 # ------------------------------------------------------------
 # 特殊な設定
 is_narou: true
-tcode: <li><a href="\\k<top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
-txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
-narou_api_url: http://api.syosetu.com/novelapi/api/
+tcode: <li><a href="\\k<https_top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
+txtdownload_url: \\k<https_top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
+narou_api_url: https://api.syosetu.com/novelapi/api/
 
 # ------------------------------------------------------------
 # 小説情報からパースするための設定
@@ -75,5 +76,4 @@ gl: |-
 # writer 作者名
 w: |-
   <th>作者名</th>
-  <td>(?:<a href=".+?">)?(?<writer>.+?)(?:</a>)?
-  </td>
+  <td>(?:<a href=".+?">)?(?<writer>.+?)(?:</a>)?.?</td>
