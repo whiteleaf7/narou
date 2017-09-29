@@ -38,7 +38,7 @@ $disable_color = ARGV.delete("--no-color")
 $disable_color ||= global["no-color"]
 $color_parser ||= global["color-parser"] || "system"
 
-require_relative "lib/logger"
+require_relative "lib/narou_logger"
 require_relative "lib/version"
 require_relative "lib/commandline"
 
