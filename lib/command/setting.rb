@@ -506,6 +506,14 @@ module Command
           type: :boolean, help: "カラー表示を無効にする",
           tab: :global
         },
+        "color-parser" => {
+          type: :select,
+          help: "コンソール上でのANSIカラーを表示する方法の選択(Windowsのみ)。" \
+                "system: システムに任せる(デフォルト) / self: Narou.rbで処理",
+          select_keys: %w(system self),
+          select_summaries: %w(システムに任せる Narou.rbで処理),
+          tab: :global
+        },
         "server-port" => {
           type: :integer, help: "WEBサーバ起動時のポート",
           tab: :global
@@ -549,13 +557,6 @@ module Command
         "dismiss-notice" => {
           type: :boolean, help: "お知らせを消す", invisible: true,
           tab: :global
-        },
-        "color-parser" => {
-          type: :multiple,
-          help: "コンソール上でのANSIカラーを処理する方法の選択(Windowsのみ)",
-          select_keys: %w(self system),
-          select_summaries: %w(Narou.rbで処理 システムで処理),
-          tab: :detail
         },
       }
     }
