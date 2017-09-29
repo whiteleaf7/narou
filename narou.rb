@@ -36,6 +36,7 @@ $display_backtrace = ARGV.delete("--backtrace")
 $display_backtrace ||= $debug
 $disable_color = ARGV.delete("--no-color")
 $disable_color ||= global["no-color"]
+$color_parser ||= global["color-parser"]
 
 require_relative "lib/logger"
 require_relative "lib/version"

@@ -550,6 +550,13 @@ module Command
           type: :boolean, help: "お知らせを消す", invisible: true,
           tab: :global
         },
+        "color-parser" => {
+          type: :multiple,
+          help: "コンソール上でのANSIカラーを処理する方法の選択(Windowsのみ)",
+          select_keys: %w(self system),
+          select_summaries: %w(Narou.rbで処理 システムで処理),
+          tab: :detail
+        },
       }
     }
 
