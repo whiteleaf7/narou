@@ -32,23 +32,27 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 60}
 
-3.1.5: 2017/08/27
+3.1.8: 2017/09/30
 ------------------
-#### 修正内容
-- 変換時にエラーになる小説に対応
+#### 仕様変更
+- 3.1.7 でデフォルト設定をオフにした「かぎ括弧内自動連結」ですが、一旦またオン
+  に戻しました。二転三転して申し訳ありません
+- コンソール上でのカラー表示時の処理方法を変更しました(Windowsのみ)
+  + narou setting の color-parser を変更することで今までの処理方法に戻せます
+  + `narou s color-parser=self` 今までの処理方法(独力でカラー処理)
+  + `narou s color-parser=system` システムにカラー表示を任せる(デフォルト)
+  + 稀に表示時にエラーになってしまう現象への対策です
 
 
-3.1.4 : 2017/08/22
+3.1.7: 2017/09/28
 ------------------
-#### 追加機能
-- WEB UIにDigest認証の設定を追加しました。設定に server-digest-auth.* 関連の値
-  が追加されています。詳しくは narou s -a かWEB UIの設定画面(Globalタブ)を参照
-  して下さい
+#### 仕様変更
+- かぎ括弧内自動連結のデフォルト設定をオフに変更しました。
+  今までと同じように標準で連結したい場合は default.enable_auto_join_in_brackets
+  を有効にして下さい
 
 #### 修正内容
-- 小説家になろうの目次の仕様変更に対応
-- 小説家になろうのルビ仕様に追随できていなかった部分(ふりがなに空白を含む場合)
-  を修正
+- 小説家になろうのSSL化に対応
 
 #{"*" * 60}
   EOS
@@ -61,8 +65,8 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'termcolorlight', '~> 1.0', '>= 1.1.1'
   gem.add_runtime_dependency 'rubyzip', '~> 1.1', '>= 1.1.0'
-  gem.add_runtime_dependency 'mail', '2.5.4'
-  gem.add_runtime_dependency 'pony', '~> 1.8'
+  gem.add_runtime_dependency 'mail', '~> 2', '>= 2.6.6'
+  gem.add_runtime_dependency 'pony', '~> 1', '>= 1.11'
   gem.add_runtime_dependency 'diff-lcs', '~> 1.2', '>= 1.2.5'
   gem.add_runtime_dependency 'sinatra', '~> 1.4', '>= 1.4.5'
   gem.add_runtime_dependency 'sinatra-contrib', '~> 1.4', '>= 1.4.2'
