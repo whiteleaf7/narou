@@ -4,7 +4,7 @@
 #
 
 require "input"
-require "logger"
+require "narou_logger"
 
 describe Narou::Input do
   before :all do

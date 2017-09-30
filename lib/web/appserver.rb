@@ -14,7 +14,7 @@ require "better_errors" if $debug
 require "tilt/erubis"
 require "tilt/haml"
 require "tilt/sass"
-require_relative "../logger"
+require_relative "../narou_logger"
 require_relative "../commandline"
 require_relative "../inventory"
 require_relative "worker"
