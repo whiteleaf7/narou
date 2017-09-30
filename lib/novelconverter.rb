@@ -394,13 +394,13 @@ class NovelConverter
   def initialize_event
     progressbar = nil
 
-    one(:"convert_main.init") do |subtitles|
+    on(:"convert_main.init") do |subtitles|
       progressbar = ProgressBar.new(subtitles.size)
     end
     on(:"convert_main.loop") do |i|
       progressbar.output(i) if progressbar
     end
-    one(:"convert_main.finish") do
+    on(:"convert_main.finish") do
       progressbar.clear if progressbar
     end
   end
