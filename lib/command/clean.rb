@@ -48,7 +48,11 @@ module Command
         latest_id = Inventory.load("latest_convert")["id"]
         if latest_id
           dir = Downloader.get_novel_data_dir_by_target(latest_id)
-          clean_directory(dir, @options["force"])
+          if dir
+            clean_directory(dir, @options["force"])
+          else
+            error "#{latest_id} は存在しません"
+          end
         end
         return
       end
@@ -72,6 +76,7 @@ module Command
     end
 
     def clean_directory(dir, is_remove)
+      return unless dir
       return unless File.directory?(dir)
       return unless File.exist?(File.join(dir, Downloader::TOC_FILE_NAME))
       orphans = find_orphans(dir)
