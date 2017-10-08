@@ -197,10 +197,6 @@ class NovelSetting
     @settings.fetch("output_filename", nil)
   end
 
-  def include?(key)
-    @settings.include?(key)
-  end
-
   #
   # replace.txt による置換定義を読み込む
   #
