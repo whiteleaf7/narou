@@ -193,10 +193,6 @@ class NovelSetting
     @settings[name] = value
   end
 
-  def output_filename
-    @settings.fetch("output_filename", nil)
-  end
-
   #
   # replace.txt による置換定義を読み込む
   #
