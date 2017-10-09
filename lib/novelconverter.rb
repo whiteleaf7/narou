@@ -352,9 +352,9 @@ class NovelConverter
   def initialize(setting, output_filename = nil, display_inspector = false, output_text_dir = nil)
     @setting = setting
     @novel_id = setting.id
-    @novel_author = setting.author
-    @novel_title = setting.title
-    @output_filename = output_filename
+    @novel_author = setting.novel_author.empty? ? setting.author : setting.novel_author
+    @novel_title = setting.novel_title.empty? ? setting.title : setting.novel_title
+    @output_filename = setting.output_filename.empty? ? output_filename : setting.output_filename
     @inspector = Inspector.new(@setting)
     @illustration = Illustration.new(@setting, @inspector)
     @display_inspector = display_inspector
@@ -427,6 +427,8 @@ class NovelConverter
     cover_chuki = create_cover_chuki
     device = Narou.get_device
     setting = @setting
+    toc["title"] = setting.novel_title unless setting.novel_title.empty?
+    toc["author"] = setting.novel_author unless setting.novel_author.empty?
     processed_title = decorate_title(toc["title"])
     tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
     Template.get(tempalte_name, binding, 1.1)

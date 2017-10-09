@@ -471,6 +471,25 @@ $ntag 小説のタグをカンマ区切りにしたもの
       select_keys: %w(css simple plain),
       select_summaries: %w(CSSで装飾 シンプルに段落 装飾しない)
     },
+    {
+      name: "output_filename",
+      type: :string,
+      value: "",
+      help: "出力ファイル名を指定を指定する。" \
+            "（拡張子の「.txt」まで指定すること）"
+    },
+    {
+      name: "novel_author",
+      type: :string,
+      value: "",
+      help: "小説の著者名を指定する。何も指定しない場合は元々の著者名"
+    },
+    {
+      name: "novel_title",
+      type: :string,
+      value: "",
+      help: "小説のタイトルを指定する。何も指定しない場合は元々のタイトル"
+    },
   ]
 
   ORIGINAL_SETTINGS_KEY_INDEXES = {}.tap { |hash|
