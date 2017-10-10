@@ -472,23 +472,22 @@ $ntag 小説のタグをカンマ区切りにしたもの
       select_summaries: %w(CSSで装飾 シンプルに段落 装飾しない)
     },
     {
-      name: "output_filename",
-      type: :string,
-      value: "",
-      help: "出力ファイル名を指定を指定する。" \
-            "（拡張子の「.txt」まで指定すること）"
-    },
-    {
       name: "novel_author",
       type: :string,
       value: "",
-      help: "小説の著者名を指定する。何も指定しない場合は元々の著者名"
+      help: "小説の著者名を変更する。作品内著者名及び出力ファイル名に影響する"
     },
     {
       name: "novel_title",
       type: :string,
       value: "",
-      help: "小説のタイトルを指定する。何も指定しない場合は元々のタイトル"
+      help: "小説のタイトルを変更する。作品内タイトル及び出力ファイル名に影響する"
+    },
+    {
+      name: "output_filename",
+      type: :string,
+      value: "",
+      help: "出力ファイル名を任意の文字列に変更する。convert.filename-to-ncode の影響を受けない"
     },
   ]
 
