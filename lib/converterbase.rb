@@ -1065,7 +1065,7 @@ class ConverterBase
     end
 
     def calc_cr_count(str)
-      head_cr_count = str.index(/[^\n]/)
+      head_cr_count = str.index(/[^\n]/) || 0
       head_cr_count > 2 ? 2 : head_cr_count
     end
 
