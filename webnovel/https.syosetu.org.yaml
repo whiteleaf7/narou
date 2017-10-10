@@ -43,7 +43,7 @@ novel_info_url: \\k<scheme>://syosetu.org/?mode=ss_detail&nid=\\k<ncode>
 t: タイトル</td><td bgcolor=#FFFFFF><a href=.+?>(?<title>.+?)</a>
 
 # novel_type 小説種別
-nt: 状態</td><td>.+?,(?<novel_type>.+?)</td>
+nt: 話数</td><td>(?<novel_type>.+?) .+?話</td>
 novel_type_string:
   連載(連載中): 1
   連載(未完): 1
@@ -51,7 +51,7 @@ novel_type_string:
   短編: 2
 
 # general_all_no 掲載話数
-ga: 話数</td><td>(?<general_all_no>\d+)話</td>
+ga: 話数</td><td>.+? (?<general_all_no>\d+)話</td>
 
 # story あらすじ
 s: "あらすじ</td><td colspan=3 bgcolor=#FFFFFF>(?<story>.+?)</td>"
