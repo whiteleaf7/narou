@@ -354,7 +354,8 @@ class NovelConverter
     @novel_id = setting.id
     @novel_author = setting.novel_author.empty? ? setting.author : setting.novel_author
     @novel_title = setting.novel_title.empty? ? setting.title : setting.novel_title
-    @output_filename = setting.output_filename.empty? ? output_filename : setting.output_filename
+    @output_filename = (output_filename || setting.output_filename)
+    @output_filename = nil if @output_filename.empty?
     @inspector = Inspector.new(@setting)
     @illustration = Illustration.new(@setting, @inspector)
     @display_inspector = display_inspector
