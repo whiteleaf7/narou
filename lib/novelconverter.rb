@@ -572,9 +572,9 @@ class NovelConverter
       end
       filename = Narou.create_novel_filename(info)
       output_path = File.join(@setting.archive_path, filename)
-      if output_path !~ /\.\w+$/
-        output_path += ".txt"
-      end
+    end
+    if output_path !~ /\.\w+$/
+      output_path += ".txt"
     end
     output_path
   end
