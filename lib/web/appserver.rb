@@ -518,12 +518,10 @@ class Narou::AppServer < Sinatra::Base
     device = Narou.get_device
     ext = device ? device.ebook_file_ext : ".epub"
     paths = Narou.get_ebook_file_paths(@id, ext)
-    paths.each do |path|
-      if File.exist?(path)
-        send_file(path, filename: File.basename(path), type: "application/octet-stream")
-      else
-        not_found
-      end
+    if !paths.empty? && File.exist?(paths[0])
+      send_file(paths[0], filename: File.basename(paths[0]), type: "application/octet-stream")
+    else
+      not_found
     end
   end
 
