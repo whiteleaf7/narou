@@ -33,7 +33,7 @@ module Command
   ・設定したタグは他のコマンドで指定することで、小説ID指定の代わりにすることができます(一部タグを使えないコマンドも存在します。またaliasでつけた別名よりもタグのほうが優先されます)
 
   Examples:
-    narou tag --add fav 0 2     # ID:0と1の小説にfavタグを設定(追加)
+    narou tag --add fav 0 2     # ID:0と2の小説にfavタグを設定(追加)
     narou t -a fav 0 2          # もしくはこの様に書けます
     narou t -a "fav later" 0 2  # 一度に複数のタグを指定出来ます
     narou t -a fav -c red 0     # favというタグを赤色で設定する
