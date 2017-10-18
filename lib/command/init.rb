@@ -19,14 +19,14 @@ module Command
     def initialize
       super("[options]")
       if Narou.already_init?
-        set_opt_message(<<-EOS)
+        opt_message(<<-MSG)
   ・AozoraEpub3 の再設定を行います。
-        EOS
+        MSG
       else
-        set_opt_message(<<-EOS)
+        opt_message(<<-MSG)
   ・現在のフォルダを小説格納用フォルダとして初期化します。
   ・初期化されるまでは他のコマンドは使えません。
-        EOS
+        MSG
       end
       @opt.on("-p", "--path FOLDER", "指定したフォルダの AozoraEpub3 を利用する") { |dirname|
         # no check here since global_setting is not loaded yet
@@ -42,8 +42,8 @@ module Command
       end
     end
 
-    def set_opt_message(description)
-      @opt.separator <<-EOS
+    def opt_message(description)
+      @opt.separator <<-MSG
 
 #{description}
   Examples:
@@ -64,7 +64,7 @@ module Command
     narou init -p /path/to/aozora -l 1.8
 
   Options:
-      EOS
+      MSG
     end
 
     def execute(argv)
@@ -113,8 +113,8 @@ module Command
       # chuki_tag.txt の書き換え
       custom_chuki_tag_path = File.join(Narou.get_preset_dir, "custom_chuki_tag.txt")
       chuki_tag_path = File.join(aozora_path, "chuki_tag.txt")
-      custom_chuki_tag = open(custom_chuki_tag_path, "r:BOM|UTF-8") { |fp| fp.read }
-      chuki_tag = open(chuki_tag_path, "r:BOM|UTF-8") { |fp| fp.read }
+      custom_chuki_tag = File.read(custom_chuki_tag_path, mode: "r:BOM|UTF-8")
+      chuki_tag = File.read(chuki_tag_path, mode: "r:BOM|UTF-8")
       embedded_mark = "### Narou.rb embedded custom chuki ###"
       if chuki_tag =~ /#{embedded_mark}/
         chuki_tag.gsub!(/#{embedded_mark}.+#{embedded_mark}/m, custom_chuki_tag)
@@ -145,7 +145,7 @@ module Command
         print "(現在の場所:#{@global_setting["aozoraepub3dir"]}"
       end
       print ")\n>"
-      while input = $stdin.gets
+      while (input = $stdin.gets)
         break if input.strip! == ""
         checked_input = normalize_aozoraepub3_path(input)
         return checked_input if checked_input
@@ -158,15 +158,15 @@ module Command
     def ask_line_height
       line_height = Narou.line_height
       puts
-      puts(<<-EOS.termcolor)
+      puts(<<-MSG.termcolor)
 <bold><green>行間の調整を行います。小説の行の高さを設定して下さい(単位 em):</green></bold>
 1em = 1文字分の高さ
 行の高さ＝1文字分の高さ＋行間の高さ
 オススメは 1.6 〜 1.8 程度。1.6 で若干行間狭め。1.8 だと一般的な小説程度。2.0 くらいにするとかなりスカスカ
 (未入力で #{line_height} を採用)
-      EOS
+      MSG
       print ">"
-      while input = $stdin.gets
+      while (input = $stdin.gets)
         break if input.strip! == ""
         begin
           line_height = Helper.string_cast_to_type(input, :float)
