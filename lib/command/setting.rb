@@ -494,6 +494,9 @@ module Command
         "aozoraepub3dir" => {
           type: :directory, help: "AozoraEpub3のあるフォルダを指定", invisible: true
         },
+        "line-height" => {
+          type: :float, help: "行間サイズ(narou init から指定しないと反映されません)", invisible: true
+        },
         "difftool" => {
           type: :string, help: "Diffで使うツールのパスを指定する",
           tab: :global
