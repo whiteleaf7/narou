@@ -8,8 +8,6 @@ require_relative "../commandbase"
 
 module Command
   class Init < CommandBase
-    LINE_HEIGHT_DEFAULT = 1.6
-
     def self.oneline_help
       if Narou.already_init?
         "AozoraEpub3 の再設定を行います"
@@ -158,7 +156,7 @@ module Command
     end
 
     def ask_line_height
-      line_height = @global_setting["line-height"] || LINE_HEIGHT_DEFAULT
+      line_height = Narou.line_height
       puts
       puts(<<-EOS.termcolor)
 <bold><green>行間の調整を行います。小説の行の高さを設定して下さい(単位 em):</green></bold>
