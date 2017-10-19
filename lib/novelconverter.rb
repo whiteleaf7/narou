@@ -352,9 +352,10 @@ class NovelConverter
   def initialize(setting, output_filename = nil, display_inspector = false, output_text_dir = nil)
     @setting = setting
     @novel_id = setting.id
-    @novel_author = setting.include?("novel_author") ? setting["novel_author"] : setting.author
-    @novel_title = setting.include?("novel_title") ? setting["novel_title"] : setting.title
+    @novel_author = setting.novel_author.empty? ? setting.author : setting.novel_author
+    @novel_title = setting.novel_title.empty? ? setting.title : setting.novel_title
     @output_filename = (output_filename || setting.output_filename)
+    @output_filename = nil if @output_filename.empty?
     @inspector = Inspector.new(@setting)
     @illustration = Illustration.new(@setting, @inspector)
     @display_inspector = display_inspector
@@ -427,8 +428,8 @@ class NovelConverter
     cover_chuki = create_cover_chuki
     device = Narou.get_device
     setting = @setting
-    toc["title"] = setting["novel_title"] if setting.include?("novel_title")
-    toc["author"] = setting["novel_author"] if setting.include?("novel_author")
+    toc["title"] = setting.novel_title unless setting.novel_title.empty?
+    toc["author"] = setting.novel_author unless setting.novel_author.empty?
     processed_title = decorate_title(toc["title"])
     tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
     Template.get(tempalte_name, binding, 1.1)
@@ -571,9 +572,9 @@ class NovelConverter
       end
       filename = Narou.create_novel_filename(info)
       output_path = File.join(@setting.archive_path, filename)
-      if output_path !~ /\.\w+$/
-        output_path += ".txt"
-      end
+    end
+    if output_path !~ /\.\w+$/
+      output_path += ".txt"
     end
     output_path
   end

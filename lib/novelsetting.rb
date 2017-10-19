@@ -193,14 +193,6 @@ class NovelSetting
     @settings[name] = value
   end
 
-  def output_filename
-    @settings.fetch("output_filename", nil)
-  end
-
-  def include?(key)
-    @settings.include?(key)
-  end
-
   #
   # replace.txt による置換定義を読み込む
   #
@@ -478,6 +470,24 @@ $ntag 小説のタグをカンマ区切りにしたもの
       help: "作者コメント(前書き・後書き)の装飾方法を指定する。KoboやAdobe Digital Editionでは「CSSで装飾」にするとデザインが崩れるのでそれ以外を推奨。css:CSSで装飾、simple:シンプルに段落、plain:装飾しない",
       select_keys: %w(css simple plain),
       select_summaries: %w(CSSで装飾 シンプルに段落 装飾しない)
+    },
+    {
+      name: "novel_author",
+      type: :string,
+      value: "",
+      help: "小説の著者名を変更する。作品内著者名及び出力ファイル名に影響する"
+    },
+    {
+      name: "novel_title",
+      type: :string,
+      value: "",
+      help: "小説のタイトルを変更する。作品内タイトル及び出力ファイル名に影響する"
+    },
+    {
+      name: "output_filename",
+      type: :string,
+      value: "",
+      help: "出力ファイル名を任意の文字列に変更する。convert.filename-to-ncode の影響を受けない"
     },
   ]
 
