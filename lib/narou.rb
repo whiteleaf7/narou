@@ -230,7 +230,7 @@ module Narou
     dir = Downloader.get_novel_data_dir_by_target(target)
     fname = create_novel_filename(data, ext)
     base = File.basename(fname, ext)
-    get_ebook_file_paths_from_components(dir, base, ext);
+    get_ebook_file_paths_from_components(dir, base, ext)
   end
 
   def get_ebook_file_paths_from_components(dir, base, ext)

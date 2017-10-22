@@ -34,7 +34,7 @@ class NovelConverter
   #
   # Get extensions for each device
   #
-  def self.get_txt_ext()
+  def self.get_txt_ext
     NOVEL_TEXT_EXT
   end
   def self.get_epub_ext(device)
@@ -44,16 +44,19 @@ class NovelConverter
       NOVEL_EPUB_EXT
     end
   end
+
   def self.get_mobi_ext(device)
     device.ebook_file_ext
   end
+
   def self.get_all_ext(device)
-    if (get_epub_ext(device) == get_mobi_ext(device))
-      [get_txt_ext(), get_epub_ext(device)]
+    if get_epub_ext(device) == get_mobi_ext(device)
+      [get_txt_ext, get_epub_ext(device)]
     else
-      [get_txt_ext(), get_epub_ext(device), get_mobi_ext(device)]
+      [get_txt_ext, get_epub_ext(device), get_mobi_ext(device)]
     end
   end
+
 
   #
   # 指定の小説を整形・変換する
@@ -330,7 +333,7 @@ class NovelConverter
       use_dakuten_font: options[:use_dakuten_font]
     )
     return nil if status != :success
-    epub_path = txt_path.sub(/#{Regexp.escape(get_txt_ext())}$/, get_epub_ext(device))
+    epub_path = txt_path.sub(/#{Regexp.escape(get_txt_ext)}$/, get_epub_ext(device))
 
     if !device || !device.kindle? || options[:no_mobi]
       puts File.basename(epub_path) + " を出力しました"
@@ -598,7 +601,7 @@ class NovelConverter
       filename = Narou.create_novel_filename(info)
       output_path = File.join(@setting.archive_path, filename)
       if output_path !~ /\.\w+$/
-        output_path += NovelConverter.get_txt_ext()
+        output_path += NovelConverter.get_txt_ext
       end
     end
     # change output_path to "basename_#{index}.ext" if index is greater than 1
