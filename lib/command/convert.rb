@@ -190,9 +190,16 @@ module Command
 
         if File.file?(target.to_s)
           using_send_command = false
+          # not remove output files for text file conversion
           res = convert_txt(target)
         else
           using_send_command = true
+          # remove output files for novel conversion
+          NovelConverter.get_all_ext(@device).each do |ext|
+            ebook_paths = Narou.get_ebook_file_paths(target, ext)
+            NovelConverter.clean_up_temp_files(ebook_paths)
+          end
+          # start novel conversion
           @argument_target_type = :novel
           unless Downloader.novel_exists?(target)
             error "#{target} は存在しません"
