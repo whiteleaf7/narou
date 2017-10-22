@@ -20,10 +20,8 @@ require_relative "eventable"
 class NovelConverter
   include Narou::Eventable
 
-  NOVEL_TEXT_EXT = ".txt"
-  NOVEL_EPUB_EXT = ".epub"
-  NOVEL_TEXT_TEMPLATE_NAME = "novel#{NOVEL_TEXT_EXT}"
-  NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO = "ibunko_novel#{NOVEL_TEXT_EXT}"
+  NOVEL_TEXT_TEMPLATE_NAME = "novel.txt"
+  NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO = "ibunko_novel.txt"
 
   attr_reader :use_dakuten_font
 
@@ -31,31 +29,14 @@ class NovelConverter
     @@site_settings = Downloader.load_settings
   end
 
-  #
-  # Get extensions for each device
-  #
-  def self.get_txt_ext
-    NOVEL_TEXT_EXT
-  end
-
-  def self.get_epub_ext(device)
+  def self.extensions_of_converted_files(device)
+    exts = [".txt"]
     if device && device.kobo?
-      device.ebook_file_ext
+      exts.push(device.ebook_file_ext)
     else
-      NOVEL_EPUB_EXT
+      exts.push(".epub", device.ebook_file_ext)
     end
-  end
-
-  def self.get_mobi_ext(device)
-    device.ebook_file_ext
-  end
-
-  def self.get_all_ext(device)
-    if get_epub_ext(device) == get_mobi_ext(device)
-      [get_txt_ext, get_epub_ext(device)]
-    else
-      [get_txt_ext, get_epub_ext(device), get_mobi_ext(device)]
-    end
+    exts
   end
 
   #
@@ -333,7 +314,12 @@ class NovelConverter
       use_dakuten_font: options[:use_dakuten_font]
     )
     return nil if status != :success
-    epub_path = txt_path.sub(/#{Regexp.escape(get_txt_ext)}$/, get_epub_ext(device))
+    if device && device.kobo?
+      epub_ext = device.ebook_file_ext
+    else
+      epub_ext = ".epub"
+    end
+    epub_path = txt_path.sub(/\.txt$/, epub_ext)
 
     if !device || !device.kindle? || options[:no_mobi]
       puts File.basename(epub_path) + " を出力しました"
@@ -345,7 +331,7 @@ class NovelConverter
     # mobi
     status = NovelConverter.epub_to_mobi(epub_path, options[:verbose])
     return nil if status != :success
-    mobi_path = epub_path.sub(/#{Regexp.escape(get_epub_ext(device))}$/, get_mobi_ext(device))
+    mobi_path = epub_path.sub(/\.epub$/, device.ebook_file_ext)
 
     # strip
     unless options[:no_strip]
@@ -601,7 +587,7 @@ class NovelConverter
       filename = Narou.create_novel_filename(info)
       output_path = File.join(@setting.archive_path, filename)
       if output_path !~ /\.\w+$/
-        output_path += NovelConverter.get_txt_ext
+        output_path += ".txt"
       end
     end
     # change output_path to "basename_#{index}.ext" if index is greater than 1

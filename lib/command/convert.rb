@@ -195,7 +195,7 @@ module Command
         else
           using_send_command = true
           # remove output files for novel conversion
-          NovelConverter.get_all_ext(@device).each do |ext|
+          NovelConverter.extensions_of_converted_files(@device).each do |ext|
             ebook_paths = Narou.get_ebook_file_paths(target, ext)
             NovelConverter.clean_up_temp_files(ebook_paths)
           end
