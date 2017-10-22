@@ -37,6 +37,7 @@ class NovelConverter
   def self.get_txt_ext
     NOVEL_TEXT_EXT
   end
+
   def self.get_epub_ext(device)
     if device && device.kobo?
       device.ebook_file_ext
@@ -56,7 +57,6 @@ class NovelConverter
       [get_txt_ext, get_epub_ext(device), get_mobi_ext(device)]
     end
   end
-
 
   #
   # 指定の小説を整形・変換する
