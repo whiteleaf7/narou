@@ -230,8 +230,11 @@ module Narou
     dir = Downloader.get_novel_data_dir_by_target(target)
     fname = create_novel_filename(data, ext)
     base = File.basename(fname, ext)
+    get_ebook_file_paths_from_components(dir, base, ext);
+  end
 
-    paths = [File.join(dir, fname)]
+  def get_ebook_file_paths_from_components(dir, base, ext)
+    paths = [File.join(dir, "#{base}#{ext}")]
     index = 2
     while File.exist?(path = File.join(dir, "#{base}_#{index}#{ext}"))
       paths.push(path)
