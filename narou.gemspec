@@ -73,7 +73,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'termcolorlight', '~> 1.0', '>= 1.1.1'
   gem.add_runtime_dependency 'rubyzip', '~> 1.1', '>= 1.1.0'
-  gem.add_runtime_dependency 'mail', '~> 2.6.0'
+  gem.add_runtime_dependency 'mail', '~> 2.6.0', '>= 2.6.6'
   gem.add_runtime_dependency 'pony', '~> 1', '>= 1.11'
   gem.add_runtime_dependency 'diff-lcs', '~> 1.2', '>= 1.2.5'
   gem.add_runtime_dependency 'sinatra', '~> 1.4', '>= 1.4.5'
