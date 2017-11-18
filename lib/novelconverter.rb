@@ -29,6 +29,16 @@ class NovelConverter
     @@site_settings = Downloader.load_settings
   end
 
+  def self.extensions_of_converted_files(device)
+    exts = [".txt"]
+    if device && device.kobo?
+      exts.push(device.ebook_file_ext)
+    else
+      exts.push(".epub", device.ebook_file_ext)
+    end
+    exts
+  end
+
   #
   # 指定の小説を整形・変換する
   #
@@ -42,7 +52,7 @@ class NovelConverter
     if setting
       novel_converter = new(setting, options[:output_filename], options[:display_inspector])
       return {
-        converted_txt_path: novel_converter.convert_main,
+        converted_txt_paths: novel_converter.convert_main,
         use_dakuten_font: novel_converter.use_dakuten_font
       }
     end
@@ -73,7 +83,7 @@ class NovelConverter
       text.force_encoding(options[:encoding]).encode!(Encoding::UTF_8)
     end
     {
-      converted_txt_path: novel_converter.convert_main(text),
+      converted_txt_paths: novel_converter.convert_main(text),
       use_dakuten_font: novel_converter.use_dakuten_font
     }
   end
@@ -309,7 +319,7 @@ class NovelConverter
     else
       epub_ext = ".epub"
     end
-    epub_path = txt_path.sub(/.txt$/, epub_ext)
+    epub_path = txt_path.sub(/\.txt$/, epub_ext)
 
     if !device || !device.kindle? || options[:no_mobi]
       puts File.basename(epub_path) + " を出力しました"
@@ -372,32 +382,35 @@ class NovelConverter
     initialize_event
 
     if text
-      converted_text = convert_main_for_text(text)
+      array_of_converted_text = convert_main_for_text(text)
     else
-      converted_text = convert_main_for_novel
+      array_of_converted_text = convert_main_for_novel
       update_latest_convert_novel
     end
+    inspect_novel(array_of_converted_text)
 
-    inspect_novel(converted_text)
-
-    output_path = create_output_path(text, converted_text)
-    File.write(output_path, converted_text)
+    array_of_output_path = []
+    array_of_converted_text.each_with_index do |converted_text, i|
+      output_path = create_output_path(text, converted_text, i + 1)
+      File.write(output_path, converted_text)
+      array_of_output_path.push(output_path)
+    end
 
     display_footer
 
-    output_path
+    array_of_output_path
   end
 
   def initialize_event
     progressbar = nil
 
-    one(:"convert_main.init") do |subtitles|
+    on(:"convert_main.init") do |subtitles|
       progressbar = ProgressBar.new(subtitles.size)
     end
     on(:"convert_main.loop") do |i|
       progressbar.output(i) if progressbar
     end
-    one(:"convert_main.finish") do
+    on(:"convert_main.finish") do
       progressbar.clear if progressbar
     end
   end
@@ -423,13 +436,15 @@ class NovelConverter
 
   # is_hotentry を有効にすると、テンプレートで作成するテキストファイルに
   # あらすじ、作品タイトル、本の読み終わり表示が付与されなくなる
-  def create_novel_text_by_template(sections, toc, is_hotentry = false)
+  def create_novel_text_by_template(sections, toc, is_hotentry = false, index = nil)
     cover_chuki = create_cover_chuki
     device = Narou.get_device
     setting = @setting
     toc["title"] = setting["novel_title"] if setting.include?("novel_title")
     toc["author"] = setting["novel_author"] if setting.include?("novel_author")
-    processed_title = decorate_title(toc["title"])
+    processing_title = toc["title"]
+    processing_title += "_#{index}" if index
+    processed_title = decorate_title(processing_title)
     tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
     Template.get(tempalte_name, binding, 1.1)
   end
@@ -554,7 +569,7 @@ class NovelConverter
   #
   # 最終的に出力するパスを生成
   #
-  def create_output_path(is_text_file_mode, converted_text)
+  def create_output_path(is_text_file_mode, converted_text, index)
     output_path = ""
     if @output_filename
       output_path = File.join(@setting.archive_path, File.basename(@output_filename))
@@ -575,6 +590,12 @@ class NovelConverter
         output_path += ".txt"
       end
     end
+    # change output_path to "basename_#{index}.ext" if index is greater than 1
+    if index > 1
+      ext = File.extname(output_path)
+      output_path = File.join(File.dirname(output_path), File.basename(output_path, ext))
+      output_path += "_#{index}#{ext}"
+    end
     output_path
   end
 
@@ -593,7 +614,7 @@ class NovelConverter
 
     @use_dakuten_font = @converter.use_dakuten_font
 
-    converted_text
+    [converted_text]
   end
 
   #
@@ -601,24 +622,43 @@ class NovelConverter
   #
   # 引数 subtitles にデータを渡した場合はそれを直接使う
   # is_hotentry を有効にすると出力されるテキストファイルにあらすじや作品タイトル等が含まれなくなる
+  # また、 is_hotentry を有効にすると分割も行われなくなる
   #
   def convert_main_for_novel(subtitles = nil, is_hotentry = false)
     toc = Downloader.get_toc_data(@setting.archive_path)
     unless subtitles
       subtitles = cut_subtitles(toc["subtitles"])
     end
-    @converter.subtitles = subtitles
-    toc["story"] = @converter.convert(toc["story"], "story")
-    html = HTML.new
-    html.strip_decoration_tag = @setting.enable_strip_decoration_tag
-    site_setting = find_site_setting(toc["toc_url"])
-    html.set_illust_setting({current_url: site_setting["illust_current_url"],
-                             grep_pattern: site_setting["illust_grep_pattern"]})
+    if is_hotentry == false && @setting.slice_size > 0 && subtitles.length > @setting.slice_size
+      puts "#{@setting.slice_size}話ごとに分割して変換します"
+      array_of_subtitles = subtitles.each_slice(@setting.slice_size).to_a
+    else
+      array_of_subtitles = [subtitles]
+    end
+    array_of_converted_text = []
+    array_of_subtitles.each_with_index do |sliced_subtitles, index|
+      @converter.subtitles = sliced_subtitles
+      toc["story"] = @converter.convert(toc["story"], "story")
+      html = HTML.new
+      html.strip_decoration_tag = @setting.enable_strip_decoration_tag
+      site_setting = find_site_setting(toc["toc_url"])
+      html.set_illust_setting({ current_url: site_setting["illust_current_url"],
+                                grep_pattern: site_setting["illust_grep_pattern"] })
 
-    sections = subtitles_to_sections(subtitles, html)
-    converted_text = create_novel_text_by_template(sections, toc, is_hotentry)
+      sections = subtitles_to_sections(sliced_subtitles, html)
+      array_of_converted_text.push(
+        create_novel_text_by_template(
+          sections, toc, is_hotentry,
+          array_of_subtitles.length == 1 ? nil : index + 1
+        )
+      )
+    end
 
-    converted_text
+    if is_hotentry
+      array_of_converted_text[0]
+    else
+      array_of_converted_text
+    end
   end
 
   def cut_subtitles(subtitles)
@@ -679,8 +719,9 @@ class NovelConverter
     { "title" => title, "author" => author }
   end
 
-  def inspect_novel(text)
+  def inspect_novel(array_of_text)
     if @setting.enable_inspect
+      text = array_of_text.flatten
       @inspector.inspect_end_touten_conditions(text)   # 行末読点の現在状況を調査する
       @inspector.countup_return_in_brackets(text)      # カギ括弧内の改行状況を調査する
     end

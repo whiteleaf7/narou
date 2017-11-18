@@ -189,8 +189,17 @@ module Command
         end
 
         if File.file?(target.to_s)
+          using_send_command = false
+          # not remove output files for text file conversion
           res = convert_txt(target)
         else
+          using_send_command = true
+          # remove output files for novel conversion
+          NovelConverter.extensions_of_converted_files(@device).each do |ext|
+            ebook_paths = Narou.get_ebook_file_paths(target, ext)
+            NovelConverter.clean_up_temp_files(ebook_paths)
+          end
+          # start novel conversion
           @argument_target_type = :novel
           unless Downloader.novel_exists?(target)
             error "#{target} は存在しません"
@@ -206,15 +215,21 @@ module Command
           @options["yokogaki"] = NovelSetting.load(target)["enable_yokogaki"]
         end
         next unless res
-        @converted_txt_path = res[:converted_txt_path]
-        @use_dakuten_font = res[:use_dakuten_font]
+        array_of_converted_txt_path = res[:converted_txt_paths]
+        ebook_file = nil
+        array_of_converted_txt_path.each do |converted_txt_path|
+          @converted_txt_path = converted_txt_path
+          @use_dakuten_font = res[:use_dakuten_font]
 
-        ebook_file = hook_call(:convert_txt_to_ebook_file)
-        next if ebook_file.nil?
-        if ebook_file
-          copied_file_path = copy_to_converted_file(ebook_file)
-          send_file_to_device(ebook_file)
+          ebook_file = hook_call(:convert_txt_to_ebook_file)
+          next if ebook_file.nil?
+          if ebook_file
+            copy_to_converted_file(ebook_file)
+            send_file_to_device(ebook_file) unless using_send_command
+          end
         end
+        send_file_to_device(ebook_file) if
+          using_send_command && ebook_file
 
         if @options["no-open"].! && Narou.web?.!
           Helper.open_directory(File.dirname(@converted_txt_path), "小説の保存フォルダを開きますか")
