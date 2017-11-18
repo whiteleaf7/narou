@@ -23,6 +23,7 @@ module Narou
   EXIT_INTERRUPT = 126
   EXIT_REQUEST_REBOOT = 125
   MODIFIED_TAG = "modified"
+  LINE_HEIGHT_DEFAULT = 1.6 # 単位em
 
   UPDATE_SORT_KEYS = {
     "id" => "ID", "last_update" => "更新日", "title" => "タイトル", "author" => "作者名",
@@ -322,6 +323,11 @@ module Narou
     File.join(File.dirname(Narou.get_aozoraepub3_path), "kindlegen#{postfix}")
   end
   memoize :kindlegen_path
+
+  def line_height
+    global_setting = Inventory.load("global_setting", :global)
+    global_setting["line-height"] || LINE_HEIGHT_DEFAULT
+  end
 
  end
 end

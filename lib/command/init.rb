@@ -19,42 +19,52 @@ module Command
     def initialize
       super("[options]")
       if Narou.already_init?
-        initialize_already_init
+        opt_message(<<-MSG)
+  ・AozoraEpub3 の再設定を行います。
+        MSG
       else
-        initialize_init_yet
+        opt_message(<<-MSG)
+  ・現在のフォルダを小説格納用フォルダとして初期化します。
+  ・初期化されるまでは他のコマンドは使えません。
+        MSG
       end
       @opt.on("-p", "--path FOLDER", "指定したフォルダの AozoraEpub3 を利用する") { |dirname|
         # no check here since global_setting is not loaded yet
-        @aozora_dirname = dirname
+        @options["aozora_dirname"] = dirname
       }
+      @opt.on("-l", "--line-height SIZE", "行の高さを変更する(単位em)。オススメは1.6〜1.8程度") do |line_height|
+        begin
+          @options["line_height"] = Helper.string_cast_to_type(line_height, :float)
+        rescue Helper::InvalidVariableType => e
+          error e.message
+          exit Narou::EXIT_ERROR_CODE
+        end
+      end
     end
 
-    def initialize_init_yet
-      @opt.separator <<-EOS
+    def opt_message(description)
+      @opt.separator <<-MSG
 
-  ・現在のフォルダを小説格納用フォルダとして初期化します。
-  ・初期化されるまでは他のコマンドは使えません。
-
+#{description}
   Examples:
     narou init
     narou init -p /opt/narou/aozora    # AozoraEpub3 のフォルダを直接指定
+    narou init -p :keep                # 設定済みと同じ場所を指定(既に初期化済の場合)
+
+    # 行の高さの調整
+    narou init --line-height 1.8       # 行の高さを1.8emに設定(1.8文字分相当)
+    # 行の高さなので、行間を1文字分あけたいという場合は 1+1 で 2 を指定する
+    # (デフォルト 1.6)
+    # 参考情報：Kindle Voyage で文字サイズ左から三番目の大きさの場合、
+    #   1.6em : 1ページに15行
+    #   1.8em : 1ページに13行
+    # の表示行数になる
+
+    # 入力を省略したい場合、-p と -l を両方指定してやる必要あり
+    narou init -p /path/to/aozora -l 1.8
 
   Options:
-      EOS
-    end
-
-    def initialize_already_init
-      @opt.separator <<-EOS
-
-  ・AozoraEpub3 の再設定を行います。
-
-  Examples:
-    narou init
-    narou init -p /opt/narou/aozora    # AozoraEpub3 のフォルダを直接指定
-    narou init -p :keep                # 設定済みと同じ場所を指定
-
-  Options:
-      EOS
+      MSG
     end
 
     def execute(argv)
@@ -81,8 +91,8 @@ module Command
         puts "<bold><red>#{"!!!WARNING!!!".center(70)}</red></bold>".termcolor
         puts "AozoraEpub3の構成ファイルを書き換えます。narouコマンド用に別途新規インストールしておくことをオススメします"
       end
-      if @aozora_dirname
-        path = normalize_aozoraepub3_path(@aozora_dirname)
+      if @options["aozora_dirname"]
+        path = normalize_aozoraepub3_path(@options["aozora_dirname"])
         print "\n<bold><green>指定されたフォルダにAozoraEpub3がありません。</green></bold>\n".termcolor unless path
       end
       aozora_path = path || ask_aozoraepub3_path
@@ -90,19 +100,21 @@ module Command
         puts "設定をスキップしました。あとで " + "<bold><yellow>narou init</yellow></bold>".termcolor + " で再度設定出来ます"
         return
       end
+      line_height = @options["line_height"] || ask_line_height
       puts
-      rewrite_aozoraepub3_files(aozora_path)
+      rewrite_aozoraepub3_files(aozora_path, line_height)
       @global_setting["aozoraepub3dir"] = aozora_path
+      @global_setting["line-height"] = line_height
       @global_setting.save
       puts "<bold><green>AozoraEpub3の設定を終了しました</green></bold>".termcolor
     end
 
-    def rewrite_aozoraepub3_files(aozora_path)
+    def rewrite_aozoraepub3_files(aozora_path, line_height)
       # chuki_tag.txt の書き換え
       custom_chuki_tag_path = File.join(Narou.get_preset_dir, "custom_chuki_tag.txt")
       chuki_tag_path = File.join(aozora_path, "chuki_tag.txt")
-      custom_chuki_tag = open(custom_chuki_tag_path, "r:BOM|UTF-8") { |fp| fp.read }
-      chuki_tag = open(chuki_tag_path, "r:BOM|UTF-8") { |fp| fp.read }
+      custom_chuki_tag = File.read(custom_chuki_tag_path, mode: "r:BOM|UTF-8")
+      chuki_tag = File.read(chuki_tag_path, mode: "r:BOM|UTF-8")
       embedded_mark = "### Narou.rb embedded custom chuki ###"
       if chuki_tag =~ /#{embedded_mark}/
         chuki_tag.gsub!(/#{embedded_mark}.+#{embedded_mark}/m, custom_chuki_tag)
@@ -120,7 +132,7 @@ module Command
       src.size.times do |i|
         src_full_path = File.join(Narou.get_preset_dir, src[i])
         dst_full_path = File.join(aozora_path, dst[i])
-        FileUtils.install(src_full_path, dst_full_path)
+        Helper.erb_copy(src_full_path, dst_full_path, binding)
         puts dst_full_path
       end
     end
@@ -133,7 +145,7 @@ module Command
         print "(現在の場所:#{@global_setting["aozoraepub3dir"]}"
       end
       print ")\n>"
-      while input = $stdin.gets
+      while (input = $stdin.gets)
         break if input.strip! == ""
         checked_input = normalize_aozoraepub3_path(input)
         return checked_input if checked_input
@@ -141,6 +153,30 @@ module Command
               "もう一度入力して下さい:</green></bold>\n&gt;".termcolor
       end
       nil
+    end
+
+    def ask_line_height
+      line_height = Narou.line_height
+      puts
+      puts(<<-MSG.termcolor)
+<bold><green>行間の調整を行います。小説の行の高さを設定して下さい(単位 em):</green></bold>
+1em = 1文字分の高さ
+行の高さ＝1文字分の高さ＋行間の高さ
+オススメは 1.6 〜 1.8 程度。1.6 で若干行間狭め。1.8 だと一般的な小説程度。2.0 くらいにするとかなりスカスカ
+(未入力で #{line_height} を採用)
+      MSG
+      print ">"
+      while (input = $stdin.gets)
+        break if input.strip! == ""
+        begin
+          line_height = Helper.string_cast_to_type(input, :float)
+          break
+        rescue Helper::InvalidVariableType => e
+          error e.message
+          print "<bold><green>もう一度入力して下さい:</green></bold>\n&gt;".termcolor
+        end
+      end
+      line_height
     end
 
     def normalize_aozoraepub3_path(input)

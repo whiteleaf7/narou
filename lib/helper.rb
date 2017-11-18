@@ -355,6 +355,15 @@ module Helper
   end
 
   #
+  # src をERBとして読み込んでから dst に書き出す
+  #
+  def erb_copy(src, dst, _binding)
+    data = File.read(src, mode: "r:BOM|UTF-8")
+    result = ERB.new(data, nil, "-").result(_binding)
+    File.write(dst, result)
+  end
+
+  #
   # 外部コマンド実行中の待機ループの処理を書けるクラス
   #
   # 返り値：[標準出力のキャプチャ, 標準エラーのキャプチャ, Process::Status]
