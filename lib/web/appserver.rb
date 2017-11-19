@@ -597,7 +597,8 @@ class Narou::AppServer < Sinatra::Base
   end
 
   post "/api/download" do
-    targets = params["targets"] or pass
+    headers "Access-Control-Allow-Origin" => "*"
+    targets = params["targets"] or error("need a parameter: `targets'")
     targets = targets.kind_of?(Array) ? targets : targets.split
     pass if targets.size == 0
     Narou::Worker.push do
@@ -873,13 +874,15 @@ class Narou::AppServer < Sinatra::Base
     ""
   end
 
-  # ダウンロード登録すると同時にグレーのボタン画像を返す
-  get "/api/download4ie" do
-    Narou::Worker.push do
-      CommandLine.run!(%W(download #{params["target"]}))
-      @@push_server.send_all(:"table.reload")
+  # ダウンロード済みかどうかで表示が変わる画像
+  get "/api/downloadable.gif" do
+    target = params["target"]
+    if target
+      number = Downloader.get_id_by_target(target) ? 1 : 0
+    else
+      number = 2
     end
-    redirect "/resources/images/dl_button1.gif"
+    redirect "/resources/images/dl_button#{number}.gif"
   end
 
   get "/api/validate_url_regexp_list" do
