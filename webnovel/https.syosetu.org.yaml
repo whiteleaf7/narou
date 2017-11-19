@@ -1,10 +1,11 @@
 # ------------------------------------------------------------
 # 小説サイト定義
 name: ハーメルン
-scheme: https
-domain: novel.syosetu.org
-top_url: \\k<scheme>://\\k<domain>
-url: \\k<top_url>/(?<ncode>\d+)
+domain: syosetu.org
+top_url: https?://\\k<domain>
+url:
+  - \\k<top_url>/novel/(?<ncode>\d+)
+  - https?://novel.syosetu.org/(?<ncode>\d+)
 encoding: UTF-8
 confirm_over18: no
 append_title_to_folder_name: yes
@@ -13,7 +14,7 @@ cookie: over18=off
 
 # ------------------------------------------------------------
 # 目次取得設定
-toc_url: \\k<top_url>/\\k<ncode>/
+toc_url: https://syosetu.org/novel/\\k<ncode>/
 subtitles: |-
   (?:<tr><td colspan=2><strong>(?<chapter>.+?)</strong></td></tr>)?<tr bgcolor="#.+?" class="bgcolor\d"><td width=60%><span id="(?<index>\d+?)">　</span> <a href=.+? style="text-decoration:none;">(?<subtitle>.+?)</a></td><td><NOBR>(?<subdate>.+?)(?:<span title="(?<subupdate>.+?)改稿">\(<u>改</u>\)</span>)?</NOBR></td></tr>
 
@@ -37,7 +38,7 @@ illust_grep_pattern: <a href="(?<src>.+?)" alt="挿絵" name='img'>【挿絵表�
 
 # ------------------------------------------------------------
 # 小説情報からパースするための設定
-novel_info_url: \\k<scheme>://syosetu.org/?mode=ss_detail&nid=\\k<ncode>
+novel_info_url: https://syosetu.org/?mode=ss_detail&nid=\\k<ncode>
 
 # タイトル
 t: タイトル</td><td bgcolor=#FFFFFF><a href=.+?>(?<title>.+?)</a>
