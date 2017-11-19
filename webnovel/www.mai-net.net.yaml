@@ -1,10 +1,9 @@
 # ------------------------------------------------------------
 # 小説サイト定義
 name: Arcadia
-scheme: http
 domain: www.mai-net.net
-top_url: \\k<scheme>://\\k<domain>
-url: \\k<top_url>/bbs/sst/sst.php\?act=dump&cate=(?<category>.+?)&all=(?<ncode>\d+)
+top_url: http://\\k<domain>
+url: https?://\\k<domain>/bbs/sst/sst.php\?act=dump&cate=(?<category>.+?)&all=(?<ncode>\d+)
 encoding: UTF-8
 confirm_over18: no
 append_title_to_folder_name: yes
