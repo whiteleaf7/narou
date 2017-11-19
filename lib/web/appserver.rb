@@ -886,11 +886,13 @@ class Narou::AppServer < Sinatra::Base
   # ダウンロード済みかどうかで表示が変わる画像
   get "/api/downloadable.gif" do
     target = params["target"]
-    if target
-      number = Downloader.get_id_by_target(target) ? 1 : 0
-    else
-      number = 2
-    end
+    # 0: 未ダウンロード, 1: ダウンロード済み, 2: ダウンロード出来ない
+    number =
+      if target
+        Downloader.get_id_by_target(target) ? 1 : 0
+      else
+        2
+      end
     redirect "/resources/images/dl_button#{number}.gif"
   end
 

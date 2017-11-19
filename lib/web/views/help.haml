@@ -1,4 +1,4 @@
-%script{src: "/js/widget.js?mode=insert_button&_=#{Narou::VERSION}"}
+%script{ src: "/js/widget.js?mode=insert_button&_=#{Narou::VERSION}" }
 
 :javascript
   local_initialize_functions.push(function($) {
@@ -51,7 +51,10 @@
     }
 
     $("#bookmarklet-download").attr("href", createBookmarkletStrings(bookmarklet, "download"));
-    $("#bookmarklet-insert-button").attr("href", createBookmarkletStrings(insertButtonBookmarklet));
+    $("#bookmarklet-insert-button").attr(
+      "href",
+      createBookmarkletStrings(insertButtonBookmarklet)
+    );
   });
 
 .navbar.navbar-default.navbar-fixed-top(role="navigation")
