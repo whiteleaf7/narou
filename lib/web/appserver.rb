@@ -884,8 +884,10 @@ class Narou::AppServer < Sinatra::Base
 
   get "/api/validate_url_regexp_list" do
     json Downloader.load_settings.map { |setting|
-      "(#{setting["url"].gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\")})"
-    }
+      Array(setting["url"]).map do |url|
+        "(#{url.gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\")})"
+      end
+    }.flatten
   end
 
   get "/api/version/current.json" do
