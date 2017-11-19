@@ -64,7 +64,7 @@ class SiteSetting
     buf = option_values[key] || @match_values[key] || @yaml_setting[key]
     return buf if is_container?(buf)
     if buf.is_a?(Array)
-      [*buf].map do |dest|
+      buf.map do |dest|
         do_replace(dest, option_values)
       end
     else
