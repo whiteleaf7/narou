@@ -235,7 +235,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   def puts_hello_messages
-    puts "<white>Narou.rb version #{::Version}</white>".termcolor
+    puts "<white>Narou.rb version #{Narou::VERSION}</white>".termcolor
   end
 
   def start_device_ejectable_event
@@ -889,7 +889,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   get "/api/version/current.json" do
-    json({ version: ::Version })
+    json({ version: Narou::VERSION })
   end
 
   get "/api/version/latest.json" do

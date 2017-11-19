@@ -3,4 +3,6 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-Version = "3.1.10"
+module Narou
+  VERSION = "3.1.10"
+end
