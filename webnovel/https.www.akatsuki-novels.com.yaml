@@ -1,10 +1,9 @@
 # ------------------------------------------------------------
 # 小説サイト定義
 name: 暁
-scheme: https
 domain: www.akatsuki-novels.com
-top_url: \\k<scheme>://\\k<domain>
-url: \\k<top_url>/stories/index/novel_id\~(?<ncode>\d+)
+top_url: https://\\k<domain>
+url: https?://\\k<domain>/stories/index/novel_id\~(?<ncode>\d+)
 encoding: UTF-8
 confirm_over18: no
 append_title_to_folder_name: yes

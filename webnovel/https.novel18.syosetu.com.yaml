@@ -1,10 +1,9 @@
 # ------------------------------------------------------------
 # 小説サイト定義
 name: ノクターン・ムーンライト
-scheme: https
 domain: novel18.syosetu.com
-top_url: \\k<scheme>://\\k<domain>
-url: \\k<top_url>/(?<ncode>n\d+[a-z]+)
+top_url: https://\\k<domain>
+url: https?://\\k<domain>/(?<ncode>n\d+[a-z]+)
 encoding: UTF-8
 confirm_over18: yes
 append_title_to_folder_name: yes
@@ -13,7 +12,7 @@ cookie: over18=yes
 
 # ------------------------------------------------------------
 # 目次取得設定
-toc_url: \\k<top_url>/\\k<ncode>/
+toc_url: https://\\k<domain>/\\k<ncode>/
 subtitles: |-
   (?:<div class="chapter_title">(?<chapter>.+?)</div>
    
