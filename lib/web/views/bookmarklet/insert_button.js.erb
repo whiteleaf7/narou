@@ -1,8 +1,6 @@
 <%# vim: set ft=javascript : -%>
-(function() {
-  var offline = document.getElementById("narourb-offline");
-  offline.parentNode.removeChild(offline);
-
+var insertButtonBookmarklet = (function() {
+  "DLボタン設置ブックマークレット v2.0";
   var site_settings = {
     <%- Downloader.load_settings.each.with_index do |setting, i| -%>
       "<%= setting["domain"] %>": {
@@ -44,13 +42,8 @@
     space.textContent = " ";
 
     var dl_listener = function(e) {
-      var url = server_origin + "/api/download";
-      var xhr = new XMLHttpRequest;
-      xhr.open("POST", url);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.send(encodeHTMLForm({ targets: href }));
-      img.src = server_origin + "/resources/images/dl_button1.gif";
-      img.onclick = null; // 登録したらもう押せないようにイベントを削除
+      img.src = server_origin + "/api/download4ssl?target=" + encodeURIComponent(href);
+      img.onclick = null;
       img.style.cursor = "default";
       return false;
     };
@@ -74,4 +67,4 @@
       }
     }
   }
-})();
+});
