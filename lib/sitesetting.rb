@@ -57,16 +57,25 @@ class SiteSetting
   end
 
   def is_container?(value)
-    value.is_a?(Hash) || value.is_a?(Array) || value.is_a?(Narou::API)
+    value.is_a?(Hash) || value.is_a?(Narou::API)
   end
 
   def replace_group_values(key, option_values = {})
-    dest = option_values[key] || @match_values[key] || @yaml_setting[key]
-    return dest if is_container?(dest)
-    return dest unless dest.respond_to?(:gsub!)
-    result = dest.dup
+    buf = option_values[key] || @match_values[key] || @yaml_setting[key]
+    return buf if is_container?(buf)
+    if buf.is_a?(Array)
+      [*buf].map do |dest|
+        do_replace(dest, option_values)
+      end
+    else
+      do_replace(buf, option_values)
+    end
+  end
+
+  def do_replace(dest, option_values)
+    return dest unless dest.respond_to?(:gsub)
     values = @yaml_setting.merge(@match_values).merge(option_values)
-    result.gsub!(/\\\\k<(.+?)>/) do |match|
+    dest.gsub(/\\\\k<(.+?)>/) do |match|
       value = values[$1]
       if value
         value.gsub(/\\\\k<(.+?)>/) do
@@ -76,6 +85,5 @@ class SiteSetting
         match
       end
     end
-    result
   end
 end
