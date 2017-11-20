@@ -116,10 +116,10 @@ Style/PredicateName:
 Style/GlobalVars:
   Enabled: false
 
-Style/IndentHash:
+Layout/IndentHash:
   Enabled: false
 
-Style/LeadingCommentSpace:
+Layout/LeadingCommentSpace:
   Enabled: true
 
 Style/LineEndConcatenation:
@@ -161,13 +161,13 @@ Style/RedundantSelf:
 SignalException:
   EnforcedStyle: only_raise
 
-Style/SpaceAfterComma:
+Layout/SpaceAfterComma:
   Enabled: true
 
-Style/SpaceAroundOperators:
+Layout/SpaceAroundOperators:
   Enabled: true
 
-Style/SpaceInsideRangeLiteral:
+Layout/SpaceInsideRangeLiteral:
   Enabled: true
 
 Style/SpecialGlobalVars:
@@ -179,10 +179,10 @@ Style/StringLiterals:
 Style/SymbolProc:
   Enabled: true
 
-Style/Tab:
+Layout/Tab:
   Enabled: true
 
-Style/TrailingBlankLines:
+Layout/TrailingBlankLines:
   Enabled: false
 
 Style/TrailingCommaInLiteral:
@@ -209,11 +209,14 @@ Style/MutableConstant:
 Lint/UnderscorePrefixedVariableName:
   Enabled: false
 
-Style/EmptyLinesAroundClassBody:
+Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
   Enabled: false
 
-Style/MultilineOperationIndentation:
+Layout/MultilineOperationIndentation:
+  Enabled: false
+
+Layout/IndentHeredoc:
   Enabled: false
