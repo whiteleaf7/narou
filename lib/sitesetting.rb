@@ -50,6 +50,11 @@ class SiteSetting
     match_data
   end
 
+  def multi_match_once(source, *keys)
+    clear
+    multi_match(source, *keys)
+  end
+
   def update_match_values(match_data)
     match_data.names.each do |name|
       @match_values[name] = match_data[name] || ""

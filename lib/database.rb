@@ -11,6 +11,7 @@ require_relative "inventory"
 
 class Database
   include Singleton
+  include Enumerable
 
   ARCHIVE_ROOT_DIR_PATH = "小説データ/"
   DATABASE_NAME = "database"
@@ -92,10 +93,13 @@ class Database
     nil
   end
 
-  def get_id(type, value)
-    data = get_data(type, value)
-    if data
-      return data["id"]
+  # SiteSetting を使って toc url を正規化してマッチングする。
+  # get_data("toc_url", url) だと、アドレスが仕様変更した場合に、
+  # 古いままのデータとマッチングしなくなるため
+  def get_data_by_toc_url(toc_url, site_setting)
+    @database.each do |_, data|
+      site_setting.multi_match_once(data["toc_url"], "url") or next
+      return data if site_setting["toc_url"] == toc_url
     end
     nil
   end
