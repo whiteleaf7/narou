@@ -1,23 +1,24 @@
 <%# vim: set ft=javascript : -%>
 var insertButtonBookmarklet = (function() {
   "DLボタン設置ブックマークレット v2.0";
-  var site_settings = {
+  var site_settings = [
     <%- Downloader.load_settings.each.with_index do |setting, i| -%>
-      "<%= setting["domain"] %>": {
+      <% setting.clear %>
+      {
         <%- case setting["domain"] -%>
         <%- when "www.mai-net.net" -%>
           add_tail: "&n=0&count=1",
-        <%- when "ncode.syosetu.com", "novel18.syosetu.com", "novel.syosetu.org" -%>
+        <%- when "ncode.syosetu.com", "novel18.syosetu.com", "syosetu.org" -%>
           add_tail: "/",
         <%- when "www.akatsuki-novels.com" -%>
           add_tail: "",
         <%- end -%>
         url: [<%= Array(setting["url"]).map do |url|
-          %!new RegExp("(#{url.gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\\\\\")})")!
+          %!new RegExp("^(#{url.gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\\\\\")})")!
         end.join(",") -%>]
       }<%= i == Downloader.load_settings.length - 1 ? "" : "," %>
     <%- end -%>
-  };
+  ];
 
   function encodeHTMLForm(data) {
     var params = [];
@@ -53,18 +54,27 @@ var insertButtonBookmarklet = (function() {
     return span;
   };
 
-  var links = document.getElementsByTagName("a");
-  for (var i = 0; i < links.length; i++) {
-    var link = links[i];
-    var setting = site_settings[link.hostname];
-    if (!setting) continue;
-    for (var x = 0; x < setting.url.length; x++) {
+  function matchLink(link, setting) {
+    var matched = false;
+    for (var x in setting.url) {
       var url = setting.url[x];
-      if (link.href.toLowerCase().match(url)) {
+      if (link.href && link.href.toLowerCase().match(url)) {
         var download_button = createButtonElement(RegExp.$1 + setting.add_tail);
         link.parentNode.insertBefore(download_button, link);
+        matched = true;
         break;
       }
+    }
+    return matched;
+  }
+
+  var links = document.getElementsByTagName("a");
+
+  for (var i in links) {
+    var link = links[i];
+    for (var y in site_settings) {
+      var setting = site_settings[y];
+      if (matchLink(link, setting)) break;
     }
   }
 });
