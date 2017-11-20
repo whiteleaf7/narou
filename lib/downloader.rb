@@ -141,7 +141,7 @@ class Downloader
         return @@database.get_data_by_toc_url(toc_url, setting)
       end
     when :ncode
-      @@database.each do |_, data|
+      @@database.each_value do |data|
         return data if data["toc_url"] =~ %r!#{target}/$!
       end
     when :id
@@ -173,7 +173,7 @@ class Downloader
       setting = @@settings.find { |s| s.multi_match_once(target, "url") }
       return setting["toc_url"] if setting
     when :ncode
-      @@database.each do |_, data|
+      @@database.each_value do |data|
         if data["toc_url"] =~ %r!#{target}/$!
           return data["toc_url"]
         end

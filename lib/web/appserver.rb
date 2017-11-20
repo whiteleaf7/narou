@@ -779,7 +779,7 @@ class Narou::AppServer < Sinatra::Base
     ids.map!(&:to_i)
     database = Database.instance
     tag_info = {}
-    database.each do |_, data|
+    database.each_value do |data|
       tags = data["tags"] || []
       tags.each do |tag|
         tag_info[tag] ||= {
