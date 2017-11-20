@@ -291,6 +291,7 @@ class Narou::AppServer < Sinatra::Base
   # ===================================================================
 
   before do
+    headers "Cache-Control" => "no-cache" if $development
     @bootstrap_theme = case params["theme"]
                        when nil
                          Narou.get_theme
