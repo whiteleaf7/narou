@@ -94,7 +94,7 @@ module Command
     def self.get_tag_list(ids = nil)
       database = Database.instance
       tag_list = Hash.new(0)
-      database.each do |_, data|
+      database.each_value do |data|
         if ids.kind_of?(Array)
           next unless ids.include?(data["id"])
         end

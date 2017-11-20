@@ -563,7 +563,7 @@ class NovelConverter
   # 目次情報からサイト設定を取得
   #
   def find_site_setting(toc_url)
-    @@site_settings.find { |s| s.multi_match(toc_url, "url") }
+    @@site_settings.find { |s| s.multi_match_once(toc_url, "url") }
   end
 
   #

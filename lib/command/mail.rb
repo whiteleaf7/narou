@@ -135,7 +135,7 @@ module Command
 
     def alter_database_add_column_last_mail_date
       database = Database.instance
-      database.each do |_, data|
+      database.each_value do |data|
         data["last_mail_date"] ||= Time.now
       end
       database.save_database
