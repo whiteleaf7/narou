@@ -235,7 +235,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   def puts_hello_messages
-    puts "<white>Narou.rb version #{::Version}</white>".termcolor
+    puts "<white>Narou.rb version #{Narou::VERSION}</white>".termcolor
   end
 
   def start_device_ejectable_event
@@ -291,6 +291,7 @@ class Narou::AppServer < Sinatra::Base
   # ===================================================================
 
   before do
+    headers "Cache-Control" => "no-cache" if $development
     @bootstrap_theme = case params["theme"]
                        when nil
                          Narou.get_theme
@@ -597,7 +598,8 @@ class Narou::AppServer < Sinatra::Base
   end
 
   post "/api/download" do
-    targets = params["targets"] or pass
+    headers "Access-Control-Allow-Origin" => "*"
+    targets = params["targets"] or error("need a parameter: `targets'")
     targets = targets.kind_of?(Array) ? targets : targets.split
     pass if targets.size == 0
     Narou::Worker.push do
@@ -777,7 +779,7 @@ class Narou::AppServer < Sinatra::Base
     ids.map!(&:to_i)
     database = Database.instance
     tag_info = {}
-    database.each do |_, data|
+    database.each_value do |data|
       tags = data["tags"] || []
       tags.each do |tag|
         tag_info[tag] ||= {
@@ -874,7 +876,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   # ダウンロード登録すると同時にグレーのボタン画像を返す
-  get "/api/download4ie" do
+  get "/api/download4ssl" do
     Narou::Worker.push do
       CommandLine.run!(%W(download #{params["target"]}))
       @@push_server.send_all(:"table.reload")
@@ -882,14 +884,29 @@ class Narou::AppServer < Sinatra::Base
     redirect "/resources/images/dl_button1.gif"
   end
 
+  # ダウンロード済みかどうかで表示が変わる画像
+  get "/api/downloadable.gif" do
+    target = params["target"]
+    # 0: 未ダウンロード, 1: ダウンロード済み, 2: ダウンロード出来ない
+    number =
+      if target
+        Downloader.get_id_by_target(target) ? 1 : 0
+      else
+        2
+      end
+    redirect "/resources/images/dl_button#{number}.gif"
+  end
+
   get "/api/validate_url_regexp_list" do
     json Downloader.load_settings.map { |setting|
-      "(#{setting["url"].gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\")})"
-    }
+      Array(setting["url"]).map do |url|
+        "(#{url.gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\")})"
+      end
+    }.flatten
   end
 
   get "/api/version/current.json" do
-    json({ version: ::Version })
+    json({ version: Narou::VERSION })
   end
 
   get "/api/version/latest.json" do

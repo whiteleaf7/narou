@@ -1,20 +1,18 @@
 # ------------------------------------------------------------
 # 小説サイト定義
 name: ノクターン・ムーンライト
-scheme: http
 domain: novel18.syosetu.com
-top_url: \\k<scheme>://\\k<domain>
-url: \\k<top_url>/(?<ncode>n\d+[a-z]+)
+top_url: https://\\k<domain>
+url: https?://\\k<domain>/(?<ncode>n\d+[a-z]+)
 encoding: UTF-8
 confirm_over18: yes
 append_title_to_folder_name: yes
 title_strip_pattern: null
 cookie: over18=yes
-https_top_url: https://\\k<domain>
 
 # ------------------------------------------------------------
 # 目次取得設定
-toc_url: \\k<top_url>/\\k<ncode>/
+toc_url: https://\\k<domain>/\\k<ncode>/
 subtitles: |-
   (?:<div class="chapter_title">(?<chapter>.+?)</div>
    
@@ -32,13 +30,13 @@ subtitles: |-
 # ------------------------------------------------------------
 # 特殊な設定
 is_narou: true
-tcode: <li><a href="\\k<https_top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
-txtdownload_url: \\k<https_top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
+tcode: <li><a href="\\k<top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
+txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
 narou_api_url: https://api.syosetu.com/novel18api/api/
 
 # ------------------------------------------------------------
 # 小説情報からパースするための設定
-novel_info_url: \\k<https_top_url>/novelview/infotop/ncode/\\k<ncode>/
+novel_info_url: \\k<top_url>/novelview/infotop/ncode/\\k<ncode>/
 
 # タイトル
 t: <h1><a href=".+?">(?<title>.+?)</a></h1>

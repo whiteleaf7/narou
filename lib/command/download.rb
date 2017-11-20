@@ -53,7 +53,7 @@ module Command
       when :ncode
         true
       when :url
-        !!@site_settings.find { |s| s.multi_match(target, "url") }
+        !!@site_settings.find { |s| s.multi_match_once(target, "url") }
       else
         false
       end
