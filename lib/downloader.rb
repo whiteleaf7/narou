@@ -22,7 +22,6 @@ require_relative "input"
 class Downloader
   include Narou::Eventable
 
-  NOVEL_SITE_SETTING_DIR = "webnovel/"
   SECTION_SAVE_DIR_NAME = "本文"    # 本文を保存するディレクトリ名
   CACHE_SAVE_DIR_NAME = "cache"   # 差分用キャッシュ保存用ディレクトリ名
   RAW_DATA_DIR_NAME = "raw"    # 本文の生データを保存するディレクトリ名
@@ -68,7 +67,7 @@ class Downloader
     toc_url = get_toc_url(target)
     setting = nil
     if toc_url
-      setting = @@settings.find { |s| s.multi_match_once(toc_url, "url") }
+      setting = SiteSetting.find(toc_url)
     end
     setting
   end
@@ -135,7 +134,7 @@ class Downloader
     target = Narou.alias_to_id(target)
     case get_target_type(target)
     when :url
-      setting = @@settings.find { |s| s.multi_match_once(target, "url") }
+      setting = SiteSetting.find(target)
       if setting
         toc_url = setting["toc_url"]
         return @@database.get_data_by_toc_url(toc_url, setting)
@@ -170,7 +169,7 @@ class Downloader
     target = Narou.alias_to_id(target)
     case get_target_type(target)
     when :url
-      setting = @@settings.find { |s| s.multi_match_once(target, "url") }
+      setting = SiteSetting.find(target)
       return setting["toc_url"] if setting
     when :ncode
       @@database.each_value do |data|
@@ -178,7 +177,7 @@ class Downloader
           return data["toc_url"]
         end
       end
-      return "#{@@narou["top_url"]}/#{target}/"
+      return "#{SiteSetting.narou["top_url"]}/#{target}/"
     when :id
       data = @@database[target.to_i]
       return data["toc_url"] if data
@@ -207,44 +206,6 @@ class Downloader
     @@database.delete(data["id"])
     @@database.save_database
     data["title"]
-  end
-
-  def self.get_sitesetting_by_sitename(sitename)
-    setting = @@settings.find { |s| s["name"] == sitename }
-    return setting if setting
-    error "#{sitename} の設定ファイルが見つかりません"
-    exit Narou::EXIT_ERROR_CODE
-  end
-
-  #
-  # 小説サイトの定義ファイルを全部読み込む
-  #
-  # スクリプト同梱の設定ファイルを読み込んだあと、ユーザの小説の管理ディレクトリ内にある
-  # webnovel ディレクトリからも定義ファイルを読み込む
-  #
-  def self.load_settings
-    settings = @@__settings_cache ||= []
-    return settings unless settings.empty?
-    load_paths = [
-      File.join(Narou.get_script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml"),
-      File.join(Narou.get_root_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")
-    ].uniq.join("\0")
-    Dir.glob(load_paths) do |path|
-      setting = SiteSetting.load_file(path)
-      if setting["name"] == "小説家になろう"
-        @@narou = setting
-      end
-      settings << setting
-    end
-    if settings.empty?
-      error "小説サイトの定義ファイルがひとつもありません"
-      exit Narou::EXIT_ERROR_CODE
-    end
-    unless @@narou
-      error "小説家になろうの定義ファイルが見つかりませんでした"
-      exit Narou::EXIT_ERROR_CODE
-    end
-    settings
   end
 
   #
@@ -278,7 +239,6 @@ class Downloader
   end
 
   if Narou.already_init?
-    @@settings = load_settings
     @@database = Database.instance
   end
 

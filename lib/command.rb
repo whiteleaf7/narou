@@ -38,6 +38,7 @@ module Command
     "backup" => Backup,
     "csv" => Csv,
     "clean" => Clean,
+    "trace" => Trace,
     "help" => Help,
     "version" => Version,
     "init" => Init

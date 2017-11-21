@@ -898,7 +898,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   get "/api/validate_url_regexp_list" do
-    json Downloader.load_settings.map { |setting|
+    json SiteSetting.settings.map { |setting|
       Array(setting["url"]).map do |url|
         "(#{url.gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\")})"
       end
@@ -974,7 +974,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   ALLOW_HOSTS = [].tap do |hosts|
-    Downloader.load_settings.each do |s|
+    SiteSetting.settings.each do |s|
       hosts << s["domain"]
     end
     hosts.freeze
