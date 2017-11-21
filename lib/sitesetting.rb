@@ -85,7 +85,7 @@ class SiteSetting
     @yaml_setting = YAML.load_file(path).freeze
   end
 
-  def initialize_copy(obj)
+  def initialize_copy(_obj)
     @match_values = {}
   end
 

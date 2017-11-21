@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 # frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -13,7 +13,7 @@ module Narou
     def capture(&block)
       raise "need a block" unless block
       rescue_level = $debug ? Exception : StandardError
-      block.call
+      yield
     rescue SystemExit => e
       exit e.status
     rescue SyntaxError => e
@@ -65,7 +65,6 @@ module Narou
     end
 
     def save_log(traces)
-      log = StringIO.new
       File.open(log_path, "w:UTF-8") do |fp|
         fp.puts "--- #{Time.now.strftime("%Y/%m/%d %H:%M:%S")} ---"
         fp.puts build_command
