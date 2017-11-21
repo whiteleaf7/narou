@@ -25,10 +25,6 @@ class NovelConverter
 
   attr_reader :use_dakuten_font
 
-  if Narou.already_init?
-    @@site_settings = Downloader.load_settings
-  end
-
   #
   # 指定の小説を整形・変換する
   #
@@ -538,13 +534,6 @@ class NovelConverter
   end
 
   #
-  # 目次情報からサイト設定を取得
-  #
-  def find_site_setting(toc_url)
-    @@site_settings.find { |s| s.multi_match_once(toc_url, "url") }
-  end
-
-  #
   # 各小説用の converter.rb 変換オブジェクトを生成
   #
   def create_converter
@@ -611,7 +600,7 @@ class NovelConverter
     toc["story"] = @converter.convert(toc["story"], "story")
     html = HTML.new
     html.strip_decoration_tag = @setting.enable_strip_decoration_tag
-    site_setting = find_site_setting(toc["toc_url"])
+    site_setting = SiteSetting.find(toc["toc_url"])
     html.set_illust_setting({current_url: site_setting["illust_current_url"],
                              grep_pattern: site_setting["illust_grep_pattern"]})
 
