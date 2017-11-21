@@ -2,8 +2,8 @@
 var insertButtonBookmarklet = (function() {
   "DLボタン設置ブックマークレット v2.0";
   var site_settings = [
-    <%- Downloader.load_settings.each.with_index do |setting, i| -%>
-      <% setting.clear %>
+    <%- SiteSetting.settings.each.with_index do |s, i| -%>
+      <% setting = s.clone %>
       {
         <%- case setting["domain"] -%>
         <%- when "www.mai-net.net" -%>
@@ -16,7 +16,7 @@ var insertButtonBookmarklet = (function() {
         url: [<%= Array(setting["url"]).map do |url|
           %!new RegExp("^(#{url.gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\\\\\")})")!
         end.join(",") -%>]
-      }<%= i == Downloader.load_settings.length - 1 ? "" : "," %>
+      }<%= i == SiteSetting.settings.length - 1 ? "" : "," %>
     <%- end -%>
   ];
 
