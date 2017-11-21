@@ -41,6 +41,14 @@ module Narou
       @argv || ARGV
     end
 
+    def log_path
+      if Narou.get_root_dir
+        File.join(Narou.get_root_dir, LOG_NAME)
+      else
+        LOG_NAME
+      end
+    end
+
     def build_traces(exception)
       backtrace = exception.backtrace
       head = "#{backtrace.shift}: #{exception.message.encode(Encoding::UTF_8)} (#{exception.class})"
@@ -58,7 +66,7 @@ module Narou
 
     def save_log(traces)
       log = StringIO.new
-      File.open(LOG_NAME, "w:UTF-8") do |fp|
+      File.open(log_path, "w:UTF-8") do |fp|
         fp.puts "--- #{Time.now.strftime("%Y/%m/%d %H:%M:%S")} ---"
         fp.puts build_command
         fp.puts
