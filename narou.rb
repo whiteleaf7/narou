@@ -44,10 +44,6 @@ require_relative "lib/narou_logger"
 require_relative "lib/version"
 require_relative "lib/commandline"
 
-rescue_level = $debug ? Exception : StandardError
-
-class HogeError < StandardError; end
-
 Narou::Backtracer.capture do
   CommandLine.run(ARGV.map(&:dup))
 end
