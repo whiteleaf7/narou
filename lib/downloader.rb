@@ -884,7 +884,11 @@ class Downloader
   end
 
   def title_to_filename(title)
-    Helper.replace_filename_special_chars(Helper.truncate_path(title))
+    Helper.replace_filename_special_chars(
+      Helper.truncate_path(
+        HTML.new(title).delete_ruby_tag
+      )
+    )
   end
 
   #
@@ -916,7 +920,7 @@ class Downloader
         "href" => @setting["href"],
         "chapter" => @setting["chapter"].to_s,
         "subchapter" => @setting["subchapter"].to_s,
-        "subtitle" => @setting["subtitle"].gsub("\n", ""),
+        "subtitle" => slim_subtitle(@setting["subtitle"]),
         "file_subtitle" => title_to_filename(@setting["subtitle"]),
         "subdate" => subdate,
         "subupdate" => @setting["subupdate"]
@@ -933,12 +937,17 @@ class Downloader
       "index" => "1",
       "href" => @setting.replace_group_values("href", "index" => "1"),
       "chapter" => "",
-      "subtitle" => @setting["title"],
+      "subtitle" => slim_subtitle(@setting["title"]),
       "file_subtitle" => title_to_filename(@setting["title"]),
       "subdate" => info["general_firstup"],
       "subupdate" => info["novelupdated_at"] || info["general_lastup"] || info["general_firstup"]
     }
     [subtitle]
+  end
+
+  def slim_subtitle(string)
+    # HTML.new(string).delete_ruby_tag.delete("\n")
+    HTML.new(string).delete_ruby_tag.delete("\n")
   end
 
   #
@@ -971,7 +980,7 @@ class Downloader
         @stream.print "短編　"
       end
       printable_subtitle = @gurad_spoiler ? Helper.to_unprintable_words(subtitle) : subtitle
-      @stream.print "#{printable_subtitle} (#{i+1}/#{max})"
+      @stream.print "#{HTML.new(printable_subtitle).delete_ruby_tag} (#{i + 1}/#{max})"
 
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)

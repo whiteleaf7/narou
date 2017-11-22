@@ -103,4 +103,8 @@ class HTML
   def em_to_sesame(text = @string)
     text.gsub(%r!<em class="emphasisDots">(.+?)</em>!, "［＃傍点］\\1［＃傍点終わり］")
   end
+
+  def delete_ruby_tag(text = @string)
+    text.gsub(%r!<\/?(?:ruby|rb|rp|rt)>!, "")
+  end
 end
