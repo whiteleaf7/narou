@@ -980,7 +980,7 @@ class Downloader
         @stream.print "短編　"
       end
       printable_subtitle = @gurad_spoiler ? Helper.to_unprintable_words(subtitle) : subtitle
-      @stream.print "#{HTML.new(printable_subtitle).delete_ruby_tag} (#{i+1}/#{max})"
+      @stream.print "#{HTML.new(printable_subtitle).delete_ruby_tag} (#{i + 1}/#{max})"
 
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
