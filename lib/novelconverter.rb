@@ -625,7 +625,6 @@ class NovelConverter
     unless subtitles
       subtitles = cut_subtitles(toc["subtitles"])
     end
-<<<<<<< HEAD
     if is_hotentry == false && @setting.slice_size > 0 && subtitles.length > @setting.slice_size
       puts "#{@setting.slice_size}話ごとに分割して変換します"
       array_of_subtitles = subtitles.each_slice(@setting.slice_size).to_a
