@@ -25,12 +25,12 @@ end
 require_relative "lib/inventory"
 
 $development = Narou.commit_version.!
-begin
-  if $development
+if $development
+  begin
     require "pry"
     require "awesome_print"
+  rescue LoadError
   end
-rescue LoadError
 end
 
 global = Inventory.load("global_setting", :global)
