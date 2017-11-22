@@ -325,7 +325,7 @@ module Helper
   # 数字やスペース、句読点、感嘆符はそのままにする
   #
   def to_unprintable_words(string, mask = "●")
-    result = ""
+    result = "".dup
     string.each_char do |char|
       result += case char
                 when /[0-9０-９ 　、。!?！？]/
