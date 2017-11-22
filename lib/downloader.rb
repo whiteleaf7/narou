@@ -920,7 +920,7 @@ class Downloader
         "href" => @setting["href"],
         "chapter" => @setting["chapter"].to_s,
         "subchapter" => @setting["subchapter"].to_s,
-        "subtitle" => @setting["subtitle"].gsub("\n", ""),
+        "subtitle" => slim_subtitle(@setting["subtitle"]),
         "file_subtitle" => title_to_filename(@setting["subtitle"]),
         "subdate" => subdate,
         "subupdate" => @setting["subupdate"]
@@ -937,12 +937,17 @@ class Downloader
       "index" => "1",
       "href" => @setting.replace_group_values("href", "index" => "1"),
       "chapter" => "",
-      "subtitle" => @setting["title"],
+      "subtitle" => slim_subtitle(@setting["title"]),
       "file_subtitle" => title_to_filename(@setting["title"]),
       "subdate" => info["general_firstup"],
       "subupdate" => info["novelupdated_at"] || info["general_lastup"] || info["general_firstup"]
     }
     [subtitle]
+  end
+
+  def slim_subtitle(string)
+    # HTML.new(string).delete_ruby_tag.delete("\n")
+    HTML.new(string).delete_ruby_tag.delete("\n")
   end
 
   #
