@@ -64,13 +64,13 @@ s: |-
 
 # general_firstup 初回掲載日
 gf: |-2
-            <dt><span>公開日</span></dt>
-            <dd><time itemprop="datePublished" datetime="(?<general_firstup>.+?)">.+?</time>
+              <dt><span>公開日</span></dt>
+              <dd><time itemprop="datePublished" datetime="(?<general_firstup>.+?)">.+?</time>
 
 # novelupdated_at 小説の更新時刻。最終掲載日で代用
 nu: |-2
-            <dt><span>最終更新日</span></dt>
-            <dd><time itemprop="dateModified" datetime="(?<novelupdated_at>.+?)">.+?</time>
+              <dt><span>最終更新日</span></dt>
+              <dd><time itemprop="dateModified" datetime="(?<novelupdated_at>.+?)">.+?</time>
 
 # general_lastup 最新話掲載日
 gl: null
