@@ -363,7 +363,9 @@ module Helper
     File.write(dst, result)
   end
 
-
+  #
+  # カンマ付き数字列を数値に変換
+  #
   def numeric_length(len)
     return len unless len.is_a?(String)
     len.delete(",").to_i
