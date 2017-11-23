@@ -78,3 +78,8 @@ gl: null
 # writer 作者名
 w: |-
   (?:<span class="activityName" itemprop="author">(?<writer>.+?)</span>)|(?:<span class="screenName.*?">(?<writer>.+?)</span>)
+
+# length 文字数
+l: |-2
+              <dt><span>総文字数</span></dt>
+              <dd>(?<length>.+?)文字</dd>

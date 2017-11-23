@@ -294,7 +294,7 @@ module Helper
     when Time
       date
     when String
-      Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒@;", "///::: :"))
+      Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒@;", "///::: :")).getlocal
     end
   rescue ArgumentError
     nil
@@ -361,6 +361,12 @@ module Helper
     data = File.read(src, mode: "r:BOM|UTF-8")
     result = ERB.new(data, nil, "-").result(_binding)
     File.write(dst, result)
+  end
+
+
+  def numeric_length(len)
+    return len unless len.is_a?(String)
+    len.delete(",").to_i
   end
 
   #

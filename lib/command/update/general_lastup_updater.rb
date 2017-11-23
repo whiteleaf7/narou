@@ -35,7 +35,7 @@ module Command
 
       def update_narou_novels
         @narou_novels.each do |api_url, ncodes|
-          api = Narou::API.new(api_url: api_url, ncodes: ncodes, of: "nu-gl")
+          api = Narou::API.new(api_url: api_url, ncodes: ncodes, of: "nu-gl-l")
           api.request.each do |result|
             ncode = result["ncode"]
             data = Downloader.get_data_by_target(ncode)
@@ -43,6 +43,7 @@ module Command
             if result["novelupdated_at"] > last_check_date
               data["novelupdated_at"] = result["novelupdated_at"]
               data["general_lastup"] = result["general_lastup"]
+              data["length"] = result["length"]
               tags = data["tags"] ||= []
               tags << Narou::MODIFIED_TAG unless tags.include?(Narou::MODIFIED_TAG)
             end
@@ -64,10 +65,10 @@ module Command
             next unless downloader.get_latest_table_of_contents(through_error: true)
             dates = {
               "novelupdated_at" => downloader.get_novelupdated_at,
-              "general_lastup" => downloader.get_general_lastup
+              "general_lastup" => downloader.get_general_lastup,
+              "length" => downloader.novel_length
             }
           rescue OpenURI::HTTPError, Errno::ECONNRESET
-            downloader.setting.clear
             next
           end
           data = @database[id]

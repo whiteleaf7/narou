@@ -580,6 +580,17 @@ class Downloader
   end
 
   #
+  # 小説の文字数
+  #
+  # 小説情報から取得するため、実際に計算するわけではない。
+  # 情報から取得出来ない（記載がない）場合は無視する
+  #
+  def novel_length
+    info = @setting["info"] || {}
+    info["length"]
+  end
+
+  #
   # データベース更新
   #
   def update_database
@@ -599,6 +610,7 @@ class Downloader
       "general_firstup" => info["general_firstup"],
       "novelupdated_at" => get_novelupdated_at,
       "general_lastup" => get_general_lastup,
+      "length" => novel_length,
     }
     if @@database[@id]
       @@database[@id].merge!(data)
