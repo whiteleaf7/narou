@@ -9,7 +9,7 @@ require_relative "html"
 
 class NovelInfo
   REFRESH_INTERVAL = 10 # キャッシュを捨てて再取得するまでの時間(s)
-  DEFAULT_OF = "t-nt-ga-s-gf-nu-gl-w"
+  DEFAULT_OF = "t-nt-ga-s-gf-nu-gl-w-l"
   @@novel_info_parameters = {}
 
   def self.load(setting, toc_source: nil, of: DEFAULT_OF)
@@ -70,6 +70,7 @@ class NovelInfo
     story_html.strip_decoration_tag = true
     result["story"] = story_html.to_aozora
     result["writer"] = @setting["writer"]
+    result["length"] = Helper.numeric_length(@setting["length"])
     %w(general_firstup novelupdated_at general_lastup).each do |elm|
       result[elm] = Helper.date_string_to_time(@setting[elm])
     end

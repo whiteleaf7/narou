@@ -55,7 +55,7 @@ module Command
 
     # foo タグ及び bar タグが両方付いた小説のみ更新(タグのAND指定)
     narou tag foo bar | narou u
-    narou l -t "foo bar" | narou   # こっちでも同じ(覚えやすい方を使う)
+    narou l -t "foo bar" | narou u   # こっちでも同じ(覚えやすい方を使う)
 
   Options:
       EOS

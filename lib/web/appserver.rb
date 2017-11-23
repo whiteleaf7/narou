@@ -579,6 +579,7 @@ class Narou::AppServer < Sinatra::Base
           # 掲載話数
           general_all_no: data["general_all_no"],
           last_check_date: data["last_check_date"].tap { |m| break m.to_i if m },
+          length: data["length"],
         }
       end.compact
     json_objects[:recordsTotal] = json_objects[:data].size

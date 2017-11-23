@@ -68,3 +68,6 @@ gl: 最新投稿</td><td>(?<general_lastup>.+?)</td>
 
 # writer 作者名
 w: 作者</td><td bgcolor=\#FFFFFF>(?:<a href=.+?>)?(?<writer>.+?)(?:</a>)?</td>
+
+# length 文字数
+l: 合計文字数</td><td>(?<length>.+?)文字

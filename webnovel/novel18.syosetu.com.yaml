@@ -75,3 +75,8 @@ gl: |-
 w: |-
   <th>作者名</th>
   <td>(?:<a href=".+?">)?(?<writer>.+?)(?:</a>)?.?</td>
+
+# length 文字数
+l: |-
+  <th>文字数</th>
+  <td>(?<length>.+?)文字</td>
