@@ -566,7 +566,12 @@ class Narou::AppServer < Sinatra::Base
           sitename: data["sitename"],
           toc_url: data["toc_url"],
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
-          tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag tag-reset label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'),
+          tags: if tags.empty?
+                  ""
+                else
+                  %!#{decorate_tags(tags)}&nbsp;<span class="tag tag-reset label label-white"! +
+                  %!data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>!
+                end,
           status: [
             is_frozen ? "凍結" : nil,
             tags.include?("end") ? "完結" : nil,
