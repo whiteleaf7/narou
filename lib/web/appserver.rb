@@ -566,7 +566,7 @@ class Narou::AppServer < Sinatra::Base
           sitename: data["sitename"],
           toc_url: data["toc_url"],
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
-          tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'),
+          tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag tag-reset label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'),
           status: [
             is_frozen ? "凍結" : nil,
             tags.include?("end") ? "完結" : nil,
@@ -764,7 +764,7 @@ class Narou::AppServer < Sinatra::Base
 
   get "/api/tag_list" do
     result =
-      '<div><span class="tag label label-default" data-tag="">タグ検索を解除</span></div>' \
+      '<div><span class="tag tag-reset label label-default" data-tag="">タグ検索を解除</span></div>' \
       '<div class="text-muted" style="font-size:10px">Altキーを押しながらで除外検索</div>'
     tagname_list = Command::Tag.get_tag_list.keys
     tagname_list.sort.each do |tagname|
