@@ -3,7 +3,7 @@
 
 body {
 	font-family: "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
-	line-height: 1.6em !important;
+	line-height: <%= line_height %>em !important;
 }
 
 .gtc, .b {

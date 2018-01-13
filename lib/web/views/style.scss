@@ -492,6 +492,14 @@ input::-ms-clear {
   }
 }
 
+.tag {
+  cursor: copy;
+}
+
+.tag-reset {
+  cursor: pointer;
+}
+
 #tag-list-canvas {
   padding: 3px 20px;
   overflow: auto;
@@ -1138,4 +1146,8 @@ $console-color: white;
     top: 10px;
     color: darkseagreen;
   }
+}
+
+.add-filter {
+  cursor: copy;
 }

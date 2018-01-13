@@ -519,9 +519,9 @@ class Narou::AppServer < Sinatra::Base
   get "/novels/:id/download" do
     device = Narou.get_device
     ext = device ? device.ebook_file_ext : ".epub"
-    path = Narou.get_ebook_file_path(@id, ext)
-    if File.exist?(path)
-      send_file(path, filename: File.basename(path), type: "application/octet-stream")
+    paths = Narou.get_ebook_file_paths(@id, ext)
+    if !paths.empty? && File.exist?(paths[0])
+      send_file(paths[0], filename: File.basename(paths[0]), type: "application/octet-stream")
     else
       not_found
     end
@@ -567,7 +567,12 @@ class Narou::AppServer < Sinatra::Base
           sitename: data["sitename"],
           toc_url: data["toc_url"],
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
-          tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'),
+          tags: if tags.empty?
+                  ""
+                else
+                  %!#{decorate_tags(tags)}&nbsp;<span class="tag tag-reset label label-white"! +
+                  %!data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>!
+                end,
           status: [
             is_frozen ? "凍結" : nil,
             tags.include?("end") ? "完結" : nil,
@@ -580,6 +585,7 @@ class Narou::AppServer < Sinatra::Base
           # 掲載話数
           general_all_no: data["general_all_no"],
           last_check_date: data["last_check_date"].tap { |m| break m.to_i if m },
+          length: data["length"],
         }
       end.compact
     json_objects[:recordsTotal] = json_objects[:data].size
@@ -764,7 +770,7 @@ class Narou::AppServer < Sinatra::Base
 
   get "/api/tag_list" do
     result =
-      '<div><span class="tag label label-default" data-tag="">タグ検索を解除</span></div>' \
+      '<div><span class="tag tag-reset label label-default" data-tag="">タグ検索を解除</span></div>' \
       '<div class="text-muted" style="font-size:10px">Altキーを押しながらで除外検索</div>'
     tagname_list = Command::Tag.get_tag_list.keys
     tagname_list.sort.each do |tagname|
