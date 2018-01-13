@@ -278,7 +278,7 @@ class Narou::AppServer < Sinatra::Base
     passwd = hashed || auth.password
 
     # enableかつユーザー名とパスワードが設定されている時のみ認証を有効にする
-    return unless auth.enable and user and passwd
+    return unless auth.enable && user && passwd
 
     self.class.class_exec do
       use Rack::Auth::Digest::MD5, { realm: "narou.rb", opaque: "", passwords_hashed: hashed } do |username|
