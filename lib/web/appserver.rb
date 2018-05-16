@@ -128,7 +128,6 @@ class Narou::AppServer < Sinatra::Base
 
   def puts_hello_messages
     puts "<white>Narou.rb version #{Narou::VERSION}</white>".termcolor
-    puts table_reload_timing
   end
 
   def start_device_ejectable_event
