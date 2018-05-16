@@ -283,7 +283,7 @@ module Narou
   end
 
   def get_theme
-    Inventory.load("local_setting")["theme"]
+    Inventory.load("local_setting")["webui.theme"]
   end
 
   def get_theme_dir(name = nil)

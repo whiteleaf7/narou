@@ -319,6 +319,7 @@ module Command
     SETTING_TAB_NAMES = {
       general: "一般",
       detail: "詳細",
+      webui: "WEB UI",
       global: "Global",
       default: "default.*",
       force: "force.*",
@@ -326,6 +327,7 @@ module Command
     }
 
     SETTING_TAB_INFO = {
+      webui: "WEB UI 専用の設定です",
       global: "Global な設定はユーザープロファイルに保存され、すべての narou コマンドで使われます",
       default: "default.* 系の設定は個別の変換設定で未設定の項目の挙動を指定することが出来ます",
       force: "force.* 系の設定は個別設定、default.* 等の設定を無視して反映されるようになります",
@@ -478,12 +480,16 @@ module Command
           help: "ネタバレ防止機能。ダウンロード時の各話タイトルを伏せ字で表示する",
           tab: :detail
         },
-        "theme" => {
+        "normalize-filename" => {
+          type: :boolean, help: "ファイル名の文字列をNFCで正規化する。※既存データとの互換性が無くなる可能性があるので、バックアップを取った上で機能を理解の上有効にして下さい",
+          tab: :detail,
+        },
+        "webui.theme" => {
           type: :select, help: "WEB UI 用テーマ選択",
           invisible: true,
           select_keys: Narou.get_theme_names,
           select_summaries: Narou.get_theme_names,
-          tab: :general
+          tab: :webui
         },
         "normalize-filename" => {
           type: :boolean, help: "ファイル名の文字列をNFCで正規化する。※既存データとの互換性が無くなる可能性があるので、バックアップを取った上で機能を理解の上有効にして下さい",
