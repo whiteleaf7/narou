@@ -1314,7 +1314,6 @@ class ConverterBase
     (io = after_convert(io)).rewind
     data = replace_by_replace_txt(io.read)
     data = insert_separator_for_selection(data)
-    data = double_dash_to_image(data, output_text_dir)
     return data
   end
 
@@ -1428,38 +1427,6 @@ class ConverterBase
       result.gsub!(src, dst)
     end
     result
-  end
-
-  DASH_FILES = %w(singledash.png doubledash.png)
-
-  def double_dash_to_image(text, output_text_dir)
-    return text unless @setting.enable_double_dash_to_image
-    # サブタイトルの中の場合は無視する
-    # （サブタイトルは文字を大きくしているので、画像の位置がずれてしまうため）
-    return text if @text_type == "subtitle"
-
-    begin
-      # AozoraEpub3 は相対パスじゃないとエラーになるので相対パスに変換
-      dash_paths = dash_image_relative_paths(Narou.get_preset_dir, output_text_dir)
-    rescue ArgumentError => e
-      if e.message =~ /^different prefix/
-        # Windowsにおいて、スクリプト本体のあるドライブと小説フォルダがあるドライブが
-        # 違う場合、相対パスを計算できなくなる。そのための対処として、.narou ディレクトリ
-        # に画像データをコピーし、同一ドライブ内で相対パスを取れるようにする
-        copy_dash_images_to_local_setting_dir
-        dash_paths = dash_image_relative_paths(Narou.local_setting_dir, output_text_dir)
-      else
-        raise
-      end
-    end
-    text.gsub(/―{2,}/) do |match|
-      len = match.length
-      result = "※［＃（#{dash_paths[1]}）］" * (len / 2)
-      if len.odd?
-        result += "※［＃（#{dash_paths[0]}）］"
-      end
-      result
-    end
   end
 
   def dash_image_relative_paths(base_dir, output_text_dir)

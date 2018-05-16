@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2017-04-15 18:44:11 +0900
+# auto generated at 2018-05-16 15:45:40 +0900
 
 Encoding.default_external = Encoding::UTF_8
 
@@ -49,50 +49,6 @@ describe "convert" do
     expect(load_file(output_file)).to eq load_file(correct_file)
   end
 
-  it "auto_indent/test_auto_indent.txt" do
-    check_answer("auto_indent/test_auto_indent.txt")
-  end
-
-  it "auto_join_bracket/test_auto_join_bracket.txt" do
-    check_answer("auto_join_bracket/test_auto_join_bracket.txt")
-  end
-
-  it "auto_join_line/test_auto_join_line.txt" do
-    check_answer("auto_join_line/test_auto_join_line.txt")
-  end
-
-  it "convert_numbers/test_convert_numbers.txt" do
-    check_answer("convert_numbers/test_convert_numbers.txt")
-  end
-
-  it "convert_page_break/test_convert_page_break.txt" do
-    check_answer("convert_page_break/test_convert_page_break.txt")
-  end
-
-  it "double_dash_to_image/test_double_dash_to_image.txt" do
-    check_answer("double_dash_to_image/test_double_dash_to_image.txt")
-  end
-
-  it "english/test_english.txt" do
-    check_answer("english/test_english.txt")
-  end
-
-  it "force_indent_special_chapter/test_force_indent_special_chapter.txt" do
-    check_answer("force_indent_special_chapter/test_force_indent_special_chapter.txt")
-  end
-
-  it "horizontal_ellipsis/test_horizontal_ellipsis.txt" do
-    check_answer("horizontal_ellipsis/test_horizontal_ellipsis.txt")
-  end
-
-  it "insert_separator/test_insert_separator.txt" do
-    check_answer("insert_separator/test_insert_separator.txt")
-  end
-
-  it "insert_separator_and_replace_txt/test_insert_separator_and_replace_txt.txt" do
-    check_answer("insert_separator_and_replace_txt/test_insert_separator_and_replace_txt.txt")
-  end
-
   it "kanji_num/test_kanji_num.txt" do
     check_answer("kanji_num/test_kanji_num.txt")
   end
@@ -101,27 +57,67 @@ describe "convert" do
     check_answer("nonokagi/test_nonokagi.txt")
   end
 
-  it "replace/test_replace.txt" do
-    check_answer("replace/test_replace.txt")
+  it "auto_join_bracket/test_auto_join_bracket.txt" do
+    check_answer("auto_join_bracket/test_auto_join_bracket.txt")
   end
 
-  it "rome_num/test_rome_num.txt" do
-    check_answer("rome_num/test_rome_num.txt")
+  it "force_indent_special_chapter/test_force_indent_special_chapter.txt" do
+    check_answer("force_indent_special_chapter/test_force_indent_special_chapter.txt")
   end
 
-  it "ruby/test_ruby.txt" do
-    check_answer("ruby/test_ruby.txt")
+  it "convert_page_break/test_convert_page_break.txt" do
+    check_answer("convert_page_break/test_convert_page_break.txt")
+  end
+
+  it "to_odd_leader/test_to_odd_leader.txt" do
+    check_answer("to_odd_leader/test_to_odd_leader.txt")
+  end
+
+  it "insert_separator_and_replace_txt/test_insert_separator_and_replace_txt.txt" do
+    check_answer("insert_separator_and_replace_txt/test_insert_separator_and_replace_txt.txt")
+  end
+
+  it "auto_indent/test_auto_indent.txt" do
+    check_answer("auto_indent/test_auto_indent.txt")
+  end
+
+  it "english/test_english.txt" do
+    check_answer("english/test_english.txt")
+  end
+
+  it "auto_join_line/test_auto_join_line.txt" do
+    check_answer("auto_join_line/test_auto_join_line.txt")
+  end
+
+  it "horizontal_ellipsis/test_horizontal_ellipsis.txt" do
+    check_answer("horizontal_ellipsis/test_horizontal_ellipsis.txt")
   end
 
   it "ruby_youon/test_ruby_youon.txt" do
     check_answer("ruby_youon/test_ruby_youon.txt")
   end
 
+  it "convert_numbers/test_convert_numbers.txt" do
+    check_answer("convert_numbers/test_convert_numbers.txt")
+  end
+
+  it "rome_num/test_rome_num.txt" do
+    check_answer("rome_num/test_rome_num.txt")
+  end
+
+  it "replace/test_replace.txt" do
+    check_answer("replace/test_replace.txt")
+  end
+
   it "sesame/test_sesame.txt" do
     check_answer("sesame/test_sesame.txt")
   end
 
-  it "to_odd_leader/test_to_odd_leader.txt" do
-    check_answer("to_odd_leader/test_to_odd_leader.txt")
+  it "ruby/test_ruby.txt" do
+    check_answer("ruby/test_ruby.txt")
+  end
+
+  it "insert_separator/test_insert_separator.txt" do
+    check_answer("insert_separator/test_insert_separator.txt")
   end
 end

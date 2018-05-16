@@ -445,12 +445,6 @@ $ntag 小説のタグをカンマ区切りにしたもの
       help: "HTMLの装飾系タグを削除する（主にArcadiaの作品に影響）"
     },
     {
-      name: "enable_double_dash_to_image",
-      type: :boolean,
-      value: false,
-      help: "２倍ダッシュ（――）を画像に差し替える。Kindleのデフォルトフォントみたいにダッシュが太くて気になる人用"
-    },
-    {
       name: "enable_add_end_to_title",
       type: :boolean,
       value: false,

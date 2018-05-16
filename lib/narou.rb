@@ -5,6 +5,7 @@
 
 require "fileutils"
 require "memoist"
+require "active_support/core_ext/object/blank"
 require_relative "helper"
 require_relative "inventory"
 if Helper.engine_jruby?
@@ -200,7 +201,12 @@ module Narou
   #
   def create_novel_filename(novel_data, ext = "")
     filename_to_ncode = Inventory.load("local_setting")["convert.filename-to-ncode"]
-    novel_setting = NovelSetting.load(novel_data["id"])
+    novel_setting =
+      if novel_data["id"]
+        NovelSetting.load(novel_data["id"])
+      else
+        OpenStruct.new
+      end
     if novel_setting.output_filename.present?
       %!#{novel_setting.output_filename}#{ext}!
     elsif filename_to_ncode
