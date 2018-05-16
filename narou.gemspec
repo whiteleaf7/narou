@@ -18,7 +18,7 @@ end
 Encoding.default_external = Encoding::UTF_8
 Gem::Specification.new do |gem|
   gem.name          = "narou"
-  gem.version       = Version
+  gem.version       = ::Narou::VERSION
   gem.license       = "MIT"
   gem.authors       = ["whiteleaf7"]
   gem.email         = ["2nd.leaf@gmail.com"]
@@ -32,27 +32,36 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 60}
 
-3.1.8: 2017/09/30
-------------------
-#### 仕様変更
-- 3.1.7 でデフォルト設定をオフにした「かぎ括弧内自動連結」ですが、一旦またオン
-  に戻しました。二転三転して申し訳ありません
-- コンソール上でのカラー表示時の処理方法を変更しました(Windowsのみ)
-  + narou setting の color-parser を変更することで今までの処理方法に戻せます
-  + `narou s color-parser=self` 今までの処理方法(独力でカラー処理)
-  + `narou s color-parser=system` システムにカラー表示を任せる(デフォルト)
-  + 稀に表示時にエラーになってしまう現象への対策です
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Ruby2.2の公式サポートが2018年3月末で終了することに合わせて、
+  Narou.rbも2018年3月末でRuby2.2を動作対象から外します。
+  早めにRuby2.4などの新しいバージョンへの移行をオススメします。
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
-3.1.7: 2017/09/28
+3.1.11: 2017/11/21
 ------------------
-#### 仕様変更
-- かぎ括弧内自動連結のデフォルト設定をオフに変更しました。
-  今までと同じように標準で連結したい場合は default.enable_auto_join_in_brackets
-  を有効にして下さい
+#### 追加機能
+- trace コマンドを追加しました。エラー発生時の詳細ログを表示できます
 
 #### 修正内容
-- 小説家になろうのSSL化に対応
+- ダイジェストを検知した場合の選択肢で、選んだ順番によってクラッシュする場合が
+  ある不具合
+
+
+3.1.10: 2017/11/20
+------------------
+#### 仕様変更
+- httpでダウンロードしたとしても目次アドレスをhttpsに強制切り替えを行います
+  (SSL対応サイトのみ)
+
+#### 修正内容
+- アドレスがhttpとhttpsの違いだけで、同じ小説を別の小説として扱われてしまう
+- gem ライブラリのアップデートにより mail コマンドが動かなくなっていた
+- ハーメルンのアドレス変更に対応
+- 「DLボタン設置」ブックマークレットをhttpsアドレス下でも動くように修正
+  + ヘルプページからブックマークレットの再取得が必要です。古いものは動きません
+  + 最近のブラウザじゃないとたぶん動きません
+- Arcadiaでカテゴリがない古い小説をダウンロード出来ない場合がある
 
 #{"*" * 60}
   EOS
@@ -65,7 +74,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'termcolorlight', '~> 1.0', '>= 1.1.1'
   gem.add_runtime_dependency 'rubyzip', '~> 1.1', '>= 1.1.0'
-  gem.add_runtime_dependency 'mail', '~> 2', '>= 2.6.6'
+  gem.add_runtime_dependency 'mail', '~> 2.6.0', '>= 2.6.6'
   gem.add_runtime_dependency 'pony', '~> 1', '>= 1.11'
   gem.add_runtime_dependency 'diff-lcs', '~> 1.2', '>= 1.2.5'
   gem.add_runtime_dependency 'sinatra', '~> 1.4', '>= 1.4.5'

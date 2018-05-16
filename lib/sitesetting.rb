@@ -7,8 +7,65 @@ require "yaml"
 require_relative "narou/api"
 
 class SiteSetting
-  def self.load_file(path)
-    new(path)
+  NOVEL_SITE_SETTING_DIR = "webnovel/"
+
+  class << self
+    #
+    # 小説サイトの定義ファイルを全部読み込む
+    #
+    # スクリプト同梱の設定ファイルを読み込んだあと、ユーザの小説の管理ディレクトリ内にある
+    # webnovel ディレクトリからも定義ファイルを読み込む
+    #
+    def load_settings
+      result = []
+      load_paths = [
+        File.join(Narou.get_script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml"),
+        File.join(Narou.get_root_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")
+      ].uniq.join("\0")
+      Dir.glob(load_paths) do |path|
+        setting = SiteSetting.load_file(path)
+        if setting["name"] == "小説家になろう"
+          @narou = setting
+        end
+        result << setting
+      end
+      if result.empty?
+        error "小説サイトの定義ファイルがひとつもありません"
+        exit Narou::EXIT_ERROR_CODE
+      end
+      unless @narou
+        error "小説家になろうの定義ファイルが見つかりませんでした"
+        exit Narou::EXIT_ERROR_CODE
+      end
+      # TODO: 配列の並び順で先頭をなろうにしておく。find するときになろうがすぐ引っかかるので効率的
+      # 設定ファイルに priority を追加して、それでソートする
+      result
+    end
+
+    def settings
+      @settings ||= load_settings
+    end
+
+    def narou
+      settings unless @narou
+      @narou.clone
+    end
+
+    def find(toc_url)
+      result = nil
+      settings.each do |s|
+        setting = s.clone
+        if setting.multi_match(toc_url, "url")
+          result = setting
+          break
+        end
+      end
+      result
+    end
+
+    def load_file(path)
+      new(path)
+    end
   end
 
   def [](key)
@@ -25,7 +82,11 @@ class SiteSetting
 
   def initialize(path)
     @match_values = {}
-    @yaml_setting = YAML.load_file(path)
+    @yaml_setting = YAML.load_file(path).freeze
+  end
+
+  def initialize_copy(_obj)
+    @match_values = {}
   end
 
   def matched?(key)
@@ -50,6 +111,11 @@ class SiteSetting
     match_data
   end
 
+  def multi_match_once(source, *keys)
+    clear
+    multi_match(source, *keys)
+  end
+
   def update_match_values(match_data)
     match_data.names.each do |name|
       @match_values[name] = match_data[name] || ""
@@ -57,16 +123,25 @@ class SiteSetting
   end
 
   def is_container?(value)
-    value.is_a?(Hash) || value.is_a?(Array) || value.is_a?(Narou::API)
+    value.is_a?(Hash) || value.is_a?(Narou::API)
   end
 
   def replace_group_values(key, option_values = {})
-    dest = option_values[key] || @match_values[key] || @yaml_setting[key]
-    return dest if is_container?(dest)
-    return dest unless dest.respond_to?(:gsub!)
-    result = dest.dup
+    buf = option_values[key] || @match_values[key] || @yaml_setting[key]
+    return buf if is_container?(buf)
+    if buf.is_a?(Array)
+      buf.map do |dest|
+        do_replace(dest, option_values)
+      end
+    else
+      do_replace(buf, option_values)
+    end
+  end
+
+  def do_replace(dest, option_values)
+    return dest unless dest.respond_to?(:gsub)
     values = @yaml_setting.merge(@match_values).merge(option_values)
-    result.gsub!(/\\\\k<(.+?)>/) do |match|
+    dest.gsub(/\\\\k<(.+?)>/) do |match|
       value = values[$1]
       if value
         value.gsub(/\\\\k<(.+?)>/) do
@@ -76,6 +151,5 @@ class SiteSetting
         match
       end
     end
-    result
   end
 end

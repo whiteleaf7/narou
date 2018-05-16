@@ -235,7 +235,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   def puts_hello_messages
-    puts "<white>Narou.rb version #{::Version}</white>".termcolor
+    puts "<white>Narou.rb version #{Narou::VERSION}</white>".termcolor
   end
 
   def start_device_ejectable_event
@@ -273,11 +273,12 @@ class Narou::AppServer < Sinatra::Base
   # とりあえずDigest認証のみ
   def setup_server_authentication
     auth = Inventory.load("global_setting", :global).group("server-digest-auth")
-    return unless auth.enable
-
     user = auth.user
     hashed = auth.hashed_password
     passwd = hashed || auth.password
+
+    # enableかつユーザー名とパスワードが設定されている時のみ認証を有効にする
+    return unless auth.enable && user && passwd
 
     self.class.class_exec do
       use Rack::Auth::Digest::MD5, { realm: "narou.rb", opaque: "", passwords_hashed: hashed } do |username|
@@ -291,6 +292,7 @@ class Narou::AppServer < Sinatra::Base
   # ===================================================================
 
   before do
+    headers "Cache-Control" => "no-cache" if $development
     @bootstrap_theme = case params["theme"]
                        when nil
                          Narou.get_theme
@@ -517,9 +519,9 @@ class Narou::AppServer < Sinatra::Base
   get "/novels/:id/download" do
     device = Narou.get_device
     ext = device ? device.ebook_file_ext : ".epub"
-    path = Narou.get_ebook_file_path(@id, ext)
-    if File.exist?(path)
-      send_file(path, filename: File.basename(path), type: "application/octet-stream")
+    paths = Narou.get_ebook_file_paths(@id, ext)
+    if !paths.empty? && File.exist?(paths[0])
+      send_file(paths[0], filename: File.basename(paths[0]), type: "application/octet-stream")
     else
       not_found
     end
@@ -565,7 +567,12 @@ class Narou::AppServer < Sinatra::Base
           sitename: data["sitename"],
           toc_url: data["toc_url"],
           novel_type: data["novel_type"] == 2 ? "短編" : "連載",
-          tags: (tags.empty? ? "" : decorate_tags(tags) + '&nbsp;<span class="tag label label-white" data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>'),
+          tags: if tags.empty?
+                  ""
+                else
+                  %!#{decorate_tags(tags)}&nbsp;<span class="tag tag-reset label label-white"! +
+                  %!data-tag="" data-toggle="tooltip" title="タグ検索を解除">&nbsp;</span>!
+                end,
           status: [
             is_frozen ? "凍結" : nil,
             tags.include?("end") ? "完結" : nil,
@@ -578,6 +585,7 @@ class Narou::AppServer < Sinatra::Base
           # 掲載話数
           general_all_no: data["general_all_no"],
           last_check_date: data["last_check_date"].tap { |m| break m.to_i if m },
+          length: data["length"],
         }
       end.compact
     json_objects[:recordsTotal] = json_objects[:data].size
@@ -597,7 +605,8 @@ class Narou::AppServer < Sinatra::Base
   end
 
   post "/api/download" do
-    targets = params["targets"] or pass
+    headers "Access-Control-Allow-Origin" => "*"
+    targets = params["targets"] or error("need a parameter: `targets'")
     targets = targets.kind_of?(Array) ? targets : targets.split
     pass if targets.size == 0
     Narou::Worker.push do
@@ -761,7 +770,7 @@ class Narou::AppServer < Sinatra::Base
 
   get "/api/tag_list" do
     result =
-      '<div><span class="tag label label-default" data-tag="">タグ検索を解除</span></div>' \
+      '<div><span class="tag tag-reset label label-default" data-tag="">タグ検索を解除</span></div>' \
       '<div class="text-muted" style="font-size:10px">Altキーを押しながらで除外検索</div>'
     tagname_list = Command::Tag.get_tag_list.keys
     tagname_list.sort.each do |tagname|
@@ -777,7 +786,7 @@ class Narou::AppServer < Sinatra::Base
     ids.map!(&:to_i)
     database = Database.instance
     tag_info = {}
-    database.each do |_, data|
+    database.each_value do |data|
       tags = data["tags"] || []
       tags.each do |tag|
         tag_info[tag] ||= {
@@ -874,7 +883,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   # ダウンロード登録すると同時にグレーのボタン画像を返す
-  get "/api/download4ie" do
+  get "/api/download4ssl" do
     Narou::Worker.push do
       CommandLine.run!(%W(download #{params["target"]}))
       @@push_server.send_all(:"table.reload")
@@ -882,14 +891,29 @@ class Narou::AppServer < Sinatra::Base
     redirect "/resources/images/dl_button1.gif"
   end
 
+  # ダウンロード済みかどうかで表示が変わる画像
+  get "/api/downloadable.gif" do
+    target = params["target"]
+    # 0: 未ダウンロード, 1: ダウンロード済み, 2: ダウンロード出来ない
+    number =
+      if target
+        Downloader.get_id_by_target(target) ? 1 : 0
+      else
+        2
+      end
+    redirect "/resources/images/dl_button#{number}.gif"
+  end
+
   get "/api/validate_url_regexp_list" do
-    json Downloader.load_settings.map { |setting|
-      "(#{setting["url"].gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\")})"
-    }
+    json SiteSetting.settings.map { |setting|
+      Array(setting["url"]).map do |url|
+        "(#{url.gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\")})"
+      end
+    }.flatten
   end
 
   get "/api/version/current.json" do
-    json({ version: ::Version })
+    json({ version: Narou::VERSION })
   end
 
   get "/api/version/latest.json" do
@@ -957,7 +981,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   ALLOW_HOSTS = [].tap do |hosts|
-    Downloader.load_settings.each do |s|
+    SiteSetting.settings.each do |s|
       hosts << s["domain"]
     end
     hosts.freeze

@@ -1,72 +1,26 @@
 <%# vim: set ft=javascript : -%>
-(function() {
-  // オフライン表記を先に消しておく
-  var offline = document.getElementById("narourb-offline");
-  offline.parentNode.removeChild(offline);
-
-  // 対応小説投稿サイトに関する情報
-  var site_settings = {
-    <%- Downloader.load_settings.each.with_index do |setting, i| -%>
-      <%- next if setting["top_url"] == "http://novel.syosetu.org" -%>
-      "<%= setting["domain"] %>": {
+var insertButtonBookmarklet = (function() {
+  "DLボタン設置ブックマークレット v2.0";
+  var site_settings = [
+    <%- SiteSetting.settings.each.with_index do |s, i| -%>
+      <% setting = s.clone %>
+      {
         <%- case setting["domain"] -%>
         <%- when "www.mai-net.net" -%>
           add_tail: "&n=0&count=1",
-        <%- when "ncode.syosetu.com", "novel18.syosetu.com", "novel.syosetu.org" -%>
+        <%- when "ncode.syosetu.com", "novel18.syosetu.com", "syosetu.org" -%>
           add_tail: "/",
         <%- when "www.akatsuki-novels.com" -%>
           add_tail: "",
         <%- end -%>
-        url: new RegExp('(<%= setting["url"].gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\\\\\") %>)')
-      }
-      <%= i == Downloader.load_settings.length - 1 ? "" : "," %>
-    <%- end -%>
-  };
-
-  // 管理している小説のURL一覧
-  var manage_novel_urls = [
-    <%-# バイナリーサーチ用にソートしておく -%>
-    <%- Database.instance.get_object.values.sort_by { |v| v["toc_url"] }.each do |data| -%>
-      '<%= data["toc_url"] %>',
+        url: [<%= Array(setting["url"]).map do |url|
+          %!new RegExp("^(#{url.gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\\\\\")})")!
+        end.join(",") -%>]
+      }<%= i == SiteSetting.settings.length - 1 ? "" : "," %>
     <%- end -%>
   ];
 
-  /*
-   * バイナリーサーチ
-   * 見つかったら見つかった位置のインデックス
-   * 見つからなかったら-1を返す
-   * array はソート済みである必要がある
-   */
-  var binarySearch = function(array, target) {
-    if (array.length === 0) return -1;
-    var left = 0, right = manage_novel_urls.length - 1;
-    while (left < right) {
-      var center = (left + right) / 2 | 0;
-      if (array[center] < target)
-        left = center + 1;
-      else if (array[center] > target)
-        right = center - 1;
-      else
-        return center;
-    }
-    if (array[left] === target) return left;
-    return -1;
-  };
-
-  /*
-   * 管理している小説のURLリストから検索
-   */
-  var searchRegisterURL = function(target) {
-    var result = binarySearch(manage_novel_urls, target);
-    if (result === -1)
-      return null;
-    return manage_novel_urls[result];
-  };
-
-  /*
-   * IE10未満のために自力でフォームエンコード
-   */
-  var encodeHTMLForm = function(data) {
+  function encodeHTMLForm(data) {
     var params = [];
     for (var name in data) {
       var value = data[name];
@@ -74,11 +28,11 @@
       params.push(param);
     }
     return params.join("&").replace(/%20/g, "+");
-  };
+  }
 
   var server_origin = '<%= "#{request.scheme}://#{env["SERVER_NAME"]}:#{env["SERVER_PORT"]}" %>';
 
-  var createButtonElement = function(href) {
+  function createButtonElement(href) {
     var span = document.createElement("span");
     var img = document.createElement("img");
     var space = span.cloneNode();
@@ -89,45 +43,38 @@
     space.textContent = " ";
 
     var dl_listener = function(e) {
-      var url = server_origin + "/api/download";
-      try {
-        var xhr = new XMLHttpRequest;
-        xhr.open("POST", url);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.send(encodeHTMLForm({ targets: href }));
-        img.src = server_origin + "/resources/images/dl_button1.gif";
-      }
-      catch(e) {
-        // IE7モード(なろうのトップページをIEで見た場合)の時は xhr.open の時点で
-        // 例外が発生してWEBUIサーバまでデータが飛ばないので、画像のURLにパラメータ
-        // 仕込んでDLの通知を行う
-        img.src = server_origin + "/api/download4ie?target=" + encodeURIComponent(href);
-      }
-      // 登録したらもう押せないようにイベントを削除
+      img.src = server_origin + "/api/download4ssl?target=" + encodeURIComponent(href);
       img.onclick = null;
       img.style.cursor = "default";
       return false;
     };
 
-    if (searchRegisterURL(href)) {
-      // すでにダンロード済みなら最初からグレー画像
-      img.src = server_origin + "/resources/images/dl_button1.gif";
-      img.style.cursor = "default";
-    }
-    else {
-      img.src = server_origin + "/resources/images/dl_button0.gif";
-      img.onclick = dl_listener;
-    }
+    img.src = server_origin + "/api/downloadable.gif?target=" + encodeURIComponent(href);
+    img.onclick = dl_listener;
     return span;
   };
 
+  function matchLink(link, setting) {
+    var matched = false;
+    for (var x in setting.url) {
+      var url = setting.url[x];
+      if (link.href && link.href.toLowerCase().match(url)) {
+        var download_button = createButtonElement(RegExp.$1 + setting.add_tail);
+        link.parentNode.insertBefore(download_button, link);
+        matched = true;
+        break;
+      }
+    }
+    return matched;
+  }
+
   var links = document.getElementsByTagName("a");
-  for (var i = 0; i < links.length; i++) {
+
+  for (var i in links) {
     var link = links[i];
-    var setting = site_settings[link.hostname];
-    if (setting && link.href.toLowerCase().match(setting.url)) {
-      var download_button = createButtonElement(RegExp.$1 + setting.add_tail);
-      link.parentNode.insertBefore(download_button, link);
+    for (var y in site_settings) {
+      var setting = site_settings[y];
+      if (matchLink(link, setting)) break;
     }
   }
-})();
+});

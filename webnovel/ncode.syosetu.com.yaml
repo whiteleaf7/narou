@@ -1,20 +1,18 @@
 # ------------------------------------------------------------
 # 小説サイト定義
 name: 小説家になろう
-scheme: http
 domain: ncode.syosetu.com
-top_url: \\k<scheme>://\\k<domain>
-url: \\k<top_url>/(?<ncode>n\d+[a-z]+)
+top_url: https://\\k<domain>
+url: https?://\\k<domain>/(?<ncode>n\d+[a-z]+)
 encoding: UTF-8
 confirm_over18: no
 append_title_to_folder_name: yes
 title_strip_pattern: null
 cookie: over18=yes
-https_top_url: https://\\k<domain>
 
 # ------------------------------------------------------------
 # 目次取得設定
-toc_url: \\k<top_url>/\\k<ncode>/
+toc_url: https://\\k<domain>/\\k<ncode>/
 subtitles: |-
   (?:<div class="chapter_title">(?<chapter>.+?)</div>
    
@@ -32,8 +30,8 @@ subtitles: |-
 # ------------------------------------------------------------
 # 特殊な設定
 is_narou: true
-tcode: <li><a href="\\k<https_top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
-txtdownload_url: \\k<https_top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
+tcode: <li><a href="\\k<top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
+txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
 narou_api_url: https://api.syosetu.com/novelapi/api/
 
 # ------------------------------------------------------------
@@ -77,3 +75,8 @@ gl: |-
 w: |-
   <th>作者名</th>
   <td>(?:<a href=".+?">)?(?<writer>.+?)(?:</a>)?.?</td>
+
+# length 文字数
+l: |-
+  <th>文字数</th>
+  <td>(?<length>.+?)文字</td>

@@ -7,11 +7,13 @@
 #
 
 require_relative "lib/extension"
+require_relative "lib/backtracer"
 
 script_dir = File.expand_path(File.dirname(__FILE__))
 $debug = File.exist?(File.join(script_dir, "debug"))
 
 Encoding.default_external = Encoding::UTF_8
+Narou::Backtracer.argv = ARGV
 
 if ARGV.delete("--time")
   now = Time.now
@@ -23,12 +25,12 @@ end
 require_relative "lib/inventory"
 
 $development = Narou.commit_version.!
-begin
-  if $development
+if $development
+  begin
     require "pry"
     require "awesome_print"
+  rescue LoadError
   end
-rescue LoadError
 end
 
 global = Inventory.load("global_setting", :global)
@@ -42,25 +44,6 @@ require_relative "lib/narou_logger"
 require_relative "lib/version"
 require_relative "lib/commandline"
 
-rescue_level = $debug ? Exception : StandardError
-
-begin
-  CommandLine.run(ARGV.map { |v| v.dup })
-rescue SystemExit => e
-  exit e.status
-rescue SyntaxError => e
-  warn e
-  exit Narou::EXIT_ERROR_CODE
-rescue rescue_level => e
-  warn "#{$@.shift}: #{e.message.encode(Encoding::UTF_8)} (#{e.class})"
-  if $display_backtrace
-    $@.each do |b|
-      warn "  from #{b}"
-    end
-  else
-    warn "  エラーが発生したため終了しました。"
-    warn "  詳細なエラーは --backtrace オプションを付けて再度実行して下さい。"
-  end
-  exit Narou::EXIT_ERROR_CODE
+Narou::Backtracer.capture do
+  CommandLine.run(ARGV.map(&:dup))
 end
-

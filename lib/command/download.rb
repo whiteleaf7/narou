@@ -48,12 +48,11 @@ module Command
     end
 
     def valid_target?(target)
-      @site_settings ||= Downloader.load_settings
       case Downloader.get_target_type(target)
       when :ncode
         true
       when :url
-        !!@site_settings.find { |s| s.multi_match(target, "url") }
+        !!SiteSetting.find(target)
       else
         false
       end

@@ -294,7 +294,7 @@ module Helper
     when Time
       date
     when String
-      Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒@;", "///::: :"))
+      Time.parse(date.sub(/[\(（].+?[\)）]/, "").tr("年月日時分秒@;", "///::: :")).getlocal
     end
   rescue ArgumentError
     nil
@@ -325,7 +325,7 @@ module Helper
   # 数字やスペース、句読点、感嘆符はそのままにする
   #
   def to_unprintable_words(string, mask = "●")
-    result = ""
+    result = "".dup
     string.each_char do |char|
       result += case char
                 when /[0-9０-９ 　、。!?！？]/
@@ -352,6 +352,23 @@ module Helper
     else
       path
     end
+  end
+
+  #
+  # src をERBとして読み込んでから dst に書き出す
+  #
+  def erb_copy(src, dst, _binding)
+    data = File.read(src, mode: "r:BOM|UTF-8")
+    result = ERB.new(data, nil, "-").result(_binding)
+    File.write(dst, result)
+  end
+
+  #
+  # カンマ付き数字列を数値に変換
+  #
+  def numeric_length(len)
+    return len unless len.is_a?(String)
+    len.delete(",").to_i
   end
 
   #
