@@ -444,17 +444,11 @@ class NovelConverter
     cover_chuki = create_cover_chuki
     device = Narou.get_device
     setting = @setting
-<<<<<<< HEAD
     toc["title"] = setting.novel_title unless setting.novel_title.empty?
     toc["author"] = setting.novel_author unless setting.novel_author.empty?
-    processed_title = decorate_title(toc["title"])
-=======
-    toc["title"] = setting["novel_title"] if setting.include?("novel_title")
-    toc["author"] = setting["novel_author"] if setting.include?("novel_author")
     processing_title = toc["title"]
     processing_title += "_#{index}" if index
     processed_title = decorate_title(processing_title)
->>>>>>> develop
     tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
     Template.get(tempalte_name, binding, 1.1)
   end
