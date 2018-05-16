@@ -200,7 +200,10 @@ module Narou
   #
   def create_novel_filename(novel_data, ext = "")
     filename_to_ncode = Inventory.load("local_setting")["convert.filename-to-ncode"]
-    if filename_to_ncode
+    novel_setting = NovelSetting.load(novel_data["id"])
+    if novel_setting.output_filename.present?
+      %!#{novel_setting.output_filename}#{ext}!
+    elsif filename_to_ncode
       ncode, domain = novel_data["ncode"], novel_data["domain"]
       if !ncode || !domain
         id = novel_data["id"]
@@ -214,9 +217,14 @@ module Narou
       serialized_domain = domain.to_s.gsub(".", "_")
       %!#{serialized_domain}_#{ncode}#{ext}!
     else
-      author, title = %w(author title).map { |k|
-        Helper.replace_filename_special_chars(novel_data[k], true)
-      }
+      author = Helper.replace_filename_special_chars(
+        novel_setting.novel_author.presence || novel_data["author"],
+        true
+      )
+      title = Helper.replace_filename_special_chars(
+        novel_setting.novel_title.presence || novel_data["title"],
+        true
+      )
       "[#{author}] #{title}#{ext}"
     end
   end

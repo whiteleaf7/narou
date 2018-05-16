@@ -494,7 +494,7 @@ $ntag 小説のタグをカンマ区切りにしたもの
       name: "output_filename",
       type: :string,
       value: "",
-      help: "出力ファイル名を任意の文字列に変更する。convert.filename-to-ncode の影響を受けない"
+      help: "出力ファイル名を任意の文字列に変更する。convert.filename-to-ncode の設定よりも優先される。※拡張子を含めないで下さい"
     },
   ]
 

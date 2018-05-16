@@ -6,6 +6,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require "active_support/core_ext/object/blank"
 require_relative "lib/extension"
 require_relative "lib/backtracer"
 

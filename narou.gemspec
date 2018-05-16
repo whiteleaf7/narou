@@ -80,5 +80,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'systemu', '~> 2.6', '>= 2.6.5'
   gem.add_runtime_dependency 'erubis', '~> 2.7'
   gem.add_runtime_dependency 'open_uri_redirections', '~> 0.2', '>= 0.2.1'
+  gem.add_runtime_dependency 'activesupport', '~> 5.2'
 end
 
