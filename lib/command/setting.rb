@@ -491,9 +491,15 @@ module Command
           select_summaries: Narou.get_theme_names,
           tab: :webui
         },
-        "normalize-filename" => {
-          type: :boolean, help: "ファイル名の文字列をNFCで正規化する。※既存データとの互換性が無くなる可能性があるので、バックアップを取った上で機能を理解の上有効にして下さい",
-          tab: :detail,
+        "webui.table.reload-timing" => {
+          type: :select, help: "小説リストの更新タイミングを選択。未設定時は１作品ごとに更新",
+          invisible: true,
+          select_keys: %w(every queue),
+          select_summaries: %w(
+            １作品ごとに更新
+            キューごとに更新
+          ),
+          tab: :webui
         },
       },
       global: {
