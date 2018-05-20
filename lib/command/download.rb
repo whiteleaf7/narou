@@ -21,6 +21,7 @@ module Command
   ・ダウンロード終了後に変換処理を行います。ダウンロードのみする場合は-nオプションを指定して下さい。
   ・すでにダウンロード済みの小説の場合は何もしません。
   ・--remove オプションをつけてダウンロードすると、ダウンロード（とその後の変換、送信）が終わったあと削除します。データベースのインデックスを外すだけなので、変換した書籍データは残ったままになります。ファイルを全て消す場合は手動で削除する必要があります。
+  ・--mail オプションをつけてダウンロードすると、ダウンロード後にメールで送信します。
   ・NコードもURLも指定しなかった場合、対話モード移行します。
 
   Examples:
@@ -44,6 +45,9 @@ module Command
       }
       @opt.on("-r", "--remove", "ダウンロードが終了したあと削除する") {
         @options["remove"] = true
+      }
+      @opt.on("-m", "--mail", "ダウンロードが終了したあとメールで送信する") {
+        @options["mail"] = true
       }
     end
 
@@ -143,6 +147,9 @@ module Command
             # 中断された場合には残りのダウンロードも中止する
             raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
           end
+        end
+        if @options["mail"]
+          Mail.execute!([download_target])
         end
         if @options["freeze"]
           Freeze.execute!([download_target])
