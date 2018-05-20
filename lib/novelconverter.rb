@@ -27,12 +27,12 @@ class NovelConverter
 
   def self.extensions_of_converted_files(device)
     exts = [".txt"]
-    if device && device.kobo?
+    if device&.kobo?
       exts.push(device.ebook_file_ext)
     else
-      exts.push(".epub", device.ebook_file_ext)
+      exts.push(".epub", device&.ebook_file_ext)
     end
-    exts
+    exts.compact
   end
 
   #
