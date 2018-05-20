@@ -32,8 +32,8 @@
   var url, div, iframe, btn_close;
 
   url = '<%= "#{request.scheme}://#{env["SERVER_NAME"]}:#{env["SERVER_PORT"]}" %>' +
-        "/widget/download?from=" + location.hostname + "&target=" +
-        encodeURIComponent(location.href) + "&t=" + Date.now();
+        "/widget/download?from=" + location.hostname + "&mail=<%= @params['mail'].empty? ? '' : '1' %>" +
+        "&target=" + encodeURIComponent(location.href) + "&t=" + Date.now();
 
   // IE の場合、iframe は親のドキュメントモードが汚染して動かない可能性があるので対処
   var docmode = document.documentMode || 10;

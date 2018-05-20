@@ -423,7 +423,7 @@ class Downloader
       if tags.include?("end")
         update_database if update_subtitles.size == 0
         $stdout.silence do
-          Command::Tag.execute!([@id, "--delete", "end"])
+          Command::Tag.execute!(@id, "--delete", "end")
         end
         @stream.puts "<cyan>#{id_and_title.escape} は連載を再開したようです</cyan>".termcolor
         return_status = :ok
@@ -493,10 +493,10 @@ class Downloader
         when "2"
           return true
         when "3"
-          Command::Freeze.execute!([latest_toc["toc_url"]])
+          Command::Freeze.execute!(latest_toc["toc_url"])
           return true
         when "4"
-          Command::Backup.execute!([latest_toc["toc_url"]])
+          Command::Backup.execute!(latest_toc["toc_url"])
         when "5"
           if Narou.web?
             message = "あらすじ\n#{latest_toc["story"]}\n"
@@ -509,7 +509,7 @@ class Downloader
         when "7"
           Helper.open_directory(Downloader.get_novel_data_dir_by_target(latest_toc["toc_url"]))
         when "8"
-          Command::Convert.execute!([latest_toc["toc_url"]])
+          Command::Convert.execute!(latest_toc["toc_url"])
         end
         unless Narou.web?
           message = ""   # 長いので二度は表示しない
@@ -788,7 +788,7 @@ class Downloader
         $stdout.silence do
           Command::Tag.execute!(%W(#{@id} --add 404 --color white --no-overwrite-color))
         end
-        Command::Freeze.execute!([@id, "--on"])
+        Command::Freeze.execute!(@id, "--on")
       end
     else
       @stream.error "何らかの理由により目次が取得できませんでした(#{e.message})"

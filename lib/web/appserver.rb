@@ -492,7 +492,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/convert" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["convert", "--no-open", ids])
+      CommandLine.run!("convert", "--no-open", ids)
     end
   end
 
@@ -502,7 +502,7 @@ class Narou::AppServer < Sinatra::Base
     targets = targets.kind_of?(Array) ? targets : targets.split
     pass if targets.size == 0
     Narou::Worker.push do
-      CommandLine.run!(["download"] + targets)
+      CommandLine.run!("download", targets)
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -510,7 +510,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/download_force" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["download", "--force", ids])
+      CommandLine.run!("download", "--force", ids)
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -518,7 +518,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/mail" do
     ids = select_valid_novel_ids(params["ids"]) || []
     Narou::Worker.push do
-      CommandLine.run!(["mail", ids])
+      CommandLine.run!("mail", ids)
     end
   end
 
@@ -535,7 +535,7 @@ class Narou::AppServer < Sinatra::Base
           @@push_server.send_all(:"table.reload")
         end
       end
-      cmd.execute!([ids, opt_arguments].flatten)
+      cmd.execute!(ids, opt_arguments)
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -565,14 +565,14 @@ class Narou::AppServer < Sinatra::Base
   post "/api/send" do
     ids = select_valid_novel_ids(params["ids"]) || []
     Narou::Worker.push do
-      CommandLine.run!(["send", ids])
+      CommandLine.run!("send", ids)
     end
   end
 
   post "/api/freeze" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["freeze", ids])
+      CommandLine.run!("freeze", ids)
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -580,7 +580,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/freeze_on" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["freeze", "--on", ids])
+      CommandLine.run!("freeze", "--on", ids)
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -588,7 +588,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/freeze_off" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["freeze", "--off", ids])
+      CommandLine.run!("freeze", "--off", ids)
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -600,7 +600,7 @@ class Narou::AppServer < Sinatra::Base
       opt_arguments << "--with-file"
     end
     Narou::Worker.push do
-      CommandLine.run!(["remove", "--yes", ids, opt_arguments])
+      CommandLine.run!("remove", "--yes", ids, opt_arguments)
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -608,7 +608,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/remove_with_file" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["remove", "--yes", "--with-file", ids])
+      CommandLine.run!("remove", "--yes", "--with-file", ids)
       @@push_server.send_all(:"table.reload")
     end
   end
@@ -620,7 +620,7 @@ class Narou::AppServer < Sinatra::Base
       # diff コマンドは１度に一つのIDしか受け取らないので
       ids.each do |id|
         # セキュリティ的にWEB UIでは独自の差分表示のみ使う
-        CommandLine.run!(["diff", "--no-tool", id, "--number", number])
+        CommandLine.run!("diff", "--no-tool", id, "--number", number)
         Helper.print_horizontal_rule
       end
     end
@@ -637,26 +637,26 @@ class Narou::AppServer < Sinatra::Base
     target = params["target"] or pass
     id = Downloader.get_id_by_target(target) or pass
     Narou::Worker.push do
-      CommandLine.run!(%W(diff --clean #{id}))
+      CommandLine.run!("diff", "--clean", id)
     end
   end
 
   post "/api/inspect" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["inspect", ids])
+      CommandLine.run!("inspect", ids)
     end
   end
 
   post "/api/folder" do
     ids = select_valid_novel_ids(params["ids"]) or pass
-    CommandLine.run!(["folder", ids])
+    CommandLine.run!("folder", ids)
   end
 
   post "/api/backup" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["backup", ids])
+      CommandLine.run!("backup", ids)
     end
   end
 
@@ -708,12 +708,12 @@ class Narou::AppServer < Sinatra::Base
         case state.to_i
         when 0
           # タグを削除
-          CommandLine.run!(["tag", "--delete", tags.join(" "), ids])
+          CommandLine.run!("tag", "--delete", tags.join(" "), ids)
         when 1
           # 現状を維持(何もしない)
         when 2
           # タグを追加
-          CommandLine.run!(["tag", "--add", tags.join(" "), ids])
+          CommandLine.run!("tag", "--add", tags.join(" "), ids)
         end
       end
     end
@@ -738,7 +738,7 @@ class Narou::AppServer < Sinatra::Base
       @@push_server.send_all(:"tag.updateCanvas")
       if is_update_modified
         puts "<yellow>#{Narou::MODIFIED_TAG} タグの付いた小説を更新します</yellow>".termcolor
-        CommandLine.run!(["update", "tag:#{Narou::MODIFIED_TAG}"])
+        CommandLine.run!("update", "tag:#{Narou::MODIFIED_TAG}")
         @@push_server.send_all(:"table.reload")
         @@push_server.send_all(:"tag.updateCanvas")
       end
@@ -748,7 +748,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/setting_burn" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::Worker.push do
-      CommandLine.run!(["setting", "--burn", ids])
+      CommandLine.run!("setting", "--burn", ids)
     end
   end
 
@@ -781,7 +781,7 @@ class Narou::AppServer < Sinatra::Base
   # ダウンロード登録すると同時にグレーのボタン画像を返す
   get "/api/download4ssl" do
     Narou::Worker.push do
-      CommandLine.run!(%W(download #{params["target"]}))
+      CommandLine.run!("download", params["target"])
       @@push_server.send_all(:"table.reload")
     end
     redirect "/resources/images/dl_button1.gif"
@@ -868,6 +868,7 @@ class Narou::AppServer < Sinatra::Base
   BOOKMARKLET_MODE = %w(download insert_button)
 
   get "/js/widget.js" do
+    @params = params
     if BOOKMARKLET_MODE.include?(params["mode"])
       content_type :js
       erb :"bookmarklet/#{params['mode']}.js"
@@ -892,8 +893,9 @@ class Narou::AppServer < Sinatra::Base
 
   get "/widget/download" do
     target = params["target"] or error("targetを指定して下さい")
+    mail = query_to_boolean(params["mail"]) ? "--mail" : nil
     Narou::Worker.push do
-      CommandLine.run!(["download", target])
+      CommandLine.run!("download", target, mail)
       @@push_server.send_all(:"table.reload")
     end
     haml :"widget/download", layout: nil
