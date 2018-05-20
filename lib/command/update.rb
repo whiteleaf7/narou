@@ -400,7 +400,7 @@ module Command
     def mail_hotentry
       hotentry_manager = HotentryManager.new
       return unless hotentry_manager.auto_mail?
-      Mail.execute!(["hotentry"])
+      Mail.execute!("hotentry")
     end
 
     def self.hotentry_dirname

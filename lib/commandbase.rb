@@ -103,7 +103,8 @@ module Command
     # コマンドを実行するが、アプリケーションは終了させない
     # (SystemExit を補足し、終了コードを返り値とする)
     #
-    def execute!(argv)
+    def execute!(*argv)
+      argv.flatten!
       execute(argv)
     rescue SystemExit => e
       e.status
@@ -111,8 +112,8 @@ module Command
       0
     end
 
-    def self.execute!(argv)
-      self.new.execute!(argv)
+    def self.execute!(*argv)
+      self.new.execute!(*argv)
     end
 
     def self.oneline_help

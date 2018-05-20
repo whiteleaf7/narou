@@ -97,7 +97,7 @@ module Command
       table = csv.read
       table[:url].each do |url|
         next unless url
-        Download.execute!([url])
+        Download.execute!(url)
         Helper.print_horizontal_rule
       end
     rescue CSV::MalformedCSVError => e

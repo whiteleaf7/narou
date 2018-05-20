@@ -535,7 +535,7 @@ class Narou::AppServer < Sinatra::Base
           @@push_server.send_all(:"table.reload")
         end
       end
-      cmd.execute!([ids, opt_arguments].flatten)
+      cmd.execute!(ids, opt_arguments)
       @@push_server.send_all(:"table.reload")
     end
   end

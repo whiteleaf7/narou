@@ -41,7 +41,7 @@ module Command
     end
 
     def output_freeze_list
-      List.execute!(%w(--filter frozen))
+      List.execute!("--filter", "frozen")
     end
 
     def execute(argv)

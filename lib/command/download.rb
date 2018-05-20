@@ -139,7 +139,7 @@ module Command
           next
         end
         unless @options["no-convert"]
-          convert_status = Convert.execute!([download_target])
+          convert_status = Convert.execute!(download_target)
           if convert_status > 0
             # 変換に失敗したか、中断された
             data = Downloader.get_data_by_target(download_target)   # 新規はDL後に取得しないとデータが存在しない
@@ -149,13 +149,13 @@ module Command
           end
         end
         if @options["mail"]
-          Mail.execute!([download_target])
+          Mail.execute!(download_target)
         end
         if @options["freeze"]
-          Freeze.execute!([download_target])
+          Freeze.execute!(download_target)
         elsif @options["remove"]
           # --freeze オプションが指定された場合は --remove オプションは無視する
-          Remove.execute!([download_target, "-y"])
+          Remove.execute!(download_target, "-y")
         end
       end
       exit mistook_count if mistook_count > 0

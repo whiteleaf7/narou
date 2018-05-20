@@ -153,7 +153,7 @@ module Command
     end
 
     def search_novel_by_tag(argv)
-      List.execute!(["--tag", argv.join(" ")])
+      List.execute!("--tag", argv.join(" "))
     end
 
     def change_colors
