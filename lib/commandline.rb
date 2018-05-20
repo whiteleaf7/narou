@@ -11,7 +11,7 @@ require_relative "inventory"
 module CommandLine
   module_function
 
-  def run(argv)
+  def run(*argv)
     argv.flatten!
     if Helper.os_windows?
       argv.map! do |arg|
@@ -53,8 +53,8 @@ module CommandLine
   #
   # exit を捕捉して終了コードを返す
   #
-  def run!(argv)
-    run(argv)
+  def run!(*argv)
+    run(*argv)
   rescue SystemExit => e
     e.status
   else

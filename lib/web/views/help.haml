@@ -9,8 +9,8 @@
 
     var bookmarklet = function(d,l,e,u,o,s,m,ssl) {
       org='#{request.scheme}://#{env["SERVER_NAME"]}:#{env["SERVER_PORT"]}/';
-      u=org+'js/widget.js?mode=%MODE%&_='+Date.now();
-      u2=org+'widget/download?from='+l.hostname+'&target='+encodeURIComponent(l.href)+'&_='+Date.now();
+      u=org+'js/widget.js?mode=%MODE%%OPTIONS%&_='+Date.now();
+      u2=org+'widget/download?from='+l.hostname+'%OPTIONS%&target='+encodeURIComponent(l.href)+'&_='+Date.now();
       ssl=l.protocol.match(/^https/);
       if('%MODE%'==='download'&&ssl){
         window.open(u2,'dl_window','width=400,height=300,menubar=no,toolbar=no,scrollbars=no,resizable=yes');
@@ -44,13 +44,15 @@
       d.body.appendChild(e)
     };
 
-    function createBookmarkletStrings(proc, mode) {
+    function createBookmarkletStrings(proc, mode, options) {
       var proc_string = proc.toString();
-      if (mode) proc_string = proc_string.replace(/%MODE%/g, mode);
+      proc_string = proc_string.replace(/%MODE%/g, mode);
+      proc_string = proc_string.replace(/%OPTIONS%/g, options || "");
       return ("javascript:(" + proc_string + ")(document,location)").replace(/ {2,}|\n/g, "");
     }
 
     $("#bookmarklet-download").attr("href", createBookmarkletStrings(bookmarklet, "download"));
+    $("#bookmarklet-download-and-mail").attr("href", createBookmarkletStrings(bookmarklet, "download", '&mail=1'));
     $("#bookmarklet-insert-button").attr(
       "href",
       createBookmarkletStrings(insertButtonBookmarklet)
@@ -92,6 +94,13 @@
       %big
         %a#bookmarklet-download(onclick="return false")
           %u Narou.rbでダウンロード
+    %p
+      %span.glyphicon.glyphicon-bookmark
+      %big
+        %a#bookmarklet-download-and-mail(onclick="return false")
+          %u Narou.rbでダウンロード＆メール
+      %span.text-muted
+        ※ダウンロード完了後にメールで送信します
 
   %h3 ページ内の小説へのリンクにダウンロードボタンを付ける
   %div

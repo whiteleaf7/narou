@@ -868,6 +868,7 @@ class Narou::AppServer < Sinatra::Base
   BOOKMARKLET_MODE = %w(download insert_button)
 
   get "/js/widget.js" do
+    @params = params
     if BOOKMARKLET_MODE.include?(params["mode"])
       content_type :js
       erb :"bookmarklet/#{params['mode']}.js"
@@ -892,8 +893,9 @@ class Narou::AppServer < Sinatra::Base
 
   get "/widget/download" do
     target = params["target"] or error("targetを指定して下さい")
+    mail = query_to_boolean(params["mail"]) ? "--mail" : nil
     Narou::Worker.push do
-      CommandLine.run!(["download", target])
+      CommandLine.run!("download", target, mail)
       @@push_server.send_all(:"table.reload")
     end
     haml :"widget/download", layout: nil
