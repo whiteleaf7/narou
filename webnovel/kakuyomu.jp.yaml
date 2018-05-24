@@ -22,15 +22,15 @@ story: |-
 # 目次取得設定
 toc_url: \\k<top_url>/works/\\k<ncode>
 subtitles: |-2
-            (?:<li class="widget-toc-chapter widget-toc-level1 js-vertical-composition-item">
+            (?:<li class="widget-toc-chapter widget-toc-level1.*?">
               <span>(?<chapter>.+?)</span>
             </li>
-            )?(?:<li class="widget-toc-chapter widget-toc-level2 js-vertical-composition-item">
+            )?(?:<li class="widget-toc-chapter widget-toc-level2.*?">
               <span>(?<subchapter>.+?)</span>
             </li>
             )?<li class="widget-toc-episode">
-              <a href="(?<href>/works/\d+/episodes/(?<index>\d+))">
-                <span class="widget-toc-episode-titleLabel js-vertical-composition-item">(?<subtitle>.+?)</span>
+              <a href="(?<href>/works/\d+/episodes/(?<index>\d+))".*?>
+                <span class="widget-toc-episode-titleLabel.*?">(?<subtitle>.+?)</span>
                 <time class="widget-toc-episode-datePublished" datetime="(?<subupdate>.+?)">.+?</time>
               </a>
             </li>
