@@ -98,7 +98,7 @@ module Helper
   end
 
   def replace_filename_special_chars(str, invalid_replace = false)
-    result = str.tr("/:*?\"<>|.", "／：＊？”〈〉｜．").gsub("\\", "￥").gsub("\t", "").gsub("\n", "")
+    result = str.tr("/:*?\"<>|.`", "／：＊？”〈〉｜．｀").gsub("\\", "￥").gsub("\t", "").gsub("\n", "")
     if Inventory.load("local_setting")["normalize-filename"]
       begin
         result.unicode_normalize!
