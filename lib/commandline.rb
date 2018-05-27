@@ -15,7 +15,7 @@ module CommandLine
     argv.flatten!
     if Helper.os_windows?
       argv.map! do |arg|
-        arg.encode(Encoding::UTF_8)
+        arg&.encode(Encoding::UTF_8)
       end
     end
     argv.unshift("help") if argv.empty?
