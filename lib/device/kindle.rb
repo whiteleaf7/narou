@@ -23,7 +23,7 @@ module Device::Kindle
     documents_path = get_documents_path
     raise Device::DontConneting unless documents_path
     paths = Dir.glob(File.join(documents_path, "*.sdr/*.azw3{f,r}"))
-    Helper.copy_files(paths, get_storage_path)
+    Helper.copy_files(paths, get_storage_path, exception: false)
     paths.size
   end
 
@@ -31,7 +31,7 @@ module Device::Kindle
     documents_path = get_documents_path
     raise Device::DontConneting unless documents_path
     paths = Dir.glob(File.join(get_storage_path, "*.sdr/*"))
-    Helper.copy_files(paths, documents_path)
+    Helper.copy_files(paths, documents_path, exception: false)
     paths.size
   end
 end

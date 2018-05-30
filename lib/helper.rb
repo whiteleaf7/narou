@@ -268,7 +268,7 @@ module Helper
   # dest_dir: コピー先のディレクトリ
   # check_timestamp: タイムスタンプを比較して新しければコピーする
   #
-  def copy_files(from, dest_dir, check_timestamp: true)
+  def copy_files(from, dest_dir, check_timestamp: true, exception: true)
     from.each do |path|
       basename = File.basename(path)
       dirname = File.basename(File.dirname(path))
@@ -282,7 +282,12 @@ module Helper
         dest_mtime = File.mtime(dest)
         next if dest_mtime >= src_mtime
       end
-      FileUtils.copy(path, dest)
+      begin
+        FileUtils.copy(path, dest)
+      rescue StandardError => e
+        raise if exception
+        error "#{path} はコピー出来ませんでした"
+      end
     end
   end
 
