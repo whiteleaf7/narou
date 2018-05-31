@@ -530,7 +530,7 @@ module Command
           tab: :global
         },
         "server-port" => {
-          type: :integer, help: "WEBサーバ起動時のポート",
+          type: :integer, help: "WEBサーバ起動時のポート。server-port + 1 のポートも WebSocket で使用",
           tab: :global
         },
         "server-bind" => {
