@@ -37,7 +37,11 @@
 
   $("#download-link-submit").on("click", function(e) {
     var targets = $("#download-input").val();
-    $.post("/api/download", { targets: targets });
+    var optMail = $("#download-mail").is(":checked");
+    $.post("/api/download", {
+      targets: targets,
+      mail: optMail
+    });
   });
 
 :css
@@ -87,3 +91,9 @@
     .inner
       %div ここにリンクかショートカットファイルをドラッグ
     #download-link-drop-cover.drop-cover(effectAllowed="all")
+
+.text-right
+  .checkbox
+    %label
+      %input#download-mail(type="checkbox")
+        ダウンロード終了後にメールで送信する

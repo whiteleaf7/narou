@@ -500,9 +500,10 @@ class Narou::AppServer < Sinatra::Base
     headers "Access-Control-Allow-Origin" => "*"
     targets = params["targets"] or error("need a parameter: `targets'")
     targets = targets.kind_of?(Array) ? targets : targets.split
+    opt_mail = "--mail" if query_to_boolean(params["mail"])
     pass if targets.size == 0
     Narou::Worker.push do
-      CommandLine.run!("download", targets)
+      CommandLine.run!("download", targets, opt_mail)
       @@push_server.send_all(:"table.reload")
     end
   end
