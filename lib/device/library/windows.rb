@@ -3,7 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-# rubocop:disable Style/VariableName
+# rubocop:disable Naming/VariableName
 
 require "win32ole"
 require_relative "../../extensions/windows"

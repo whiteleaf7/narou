@@ -2,8 +2,8 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# rubocop:disable Style/MethodName
-# rubocop:disable Style/VariableName
+# rubocop:disable Naming/MethodName
+# rubocop:disable Naming/VariableName
 
 class Device
   module Library
