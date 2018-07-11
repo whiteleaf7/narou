@@ -10,11 +10,15 @@ class HTML
   attr_reader :string
   attr_accessor :strip_decoration_tag
 
-  def initialize(string = "")
+  def initialize(string = +"")
     self.string = string
     @illust_current_url = nil
     @illust_grep_pattern = /<img.+?src=\"(?<src>.+?)\".*?>/i
     @strip_decoration_tag = false
+  end
+
+  def clear
+    @string = +""
   end
 
   def string=(str)
