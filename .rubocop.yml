@@ -43,7 +43,7 @@ Metrics/MethodLength:
 Metrics/PerceivedComplexity:
   Max: 11
 
-Style/AccessorMethodName:
+Naming/AccessorMethodName:
   Enabled: true
 
 # 条件式の時に使った時のみ警告を出す
@@ -105,7 +105,7 @@ Style/NumericLiterals:
   MinDigits: 7
 
 # has_ から始まるメソッドは許可する
-Style/PredicateName:
+Naming/PredicateName:
   NamePrefixBlacklist:
     - "is_"
     - "have_"
@@ -185,7 +185,10 @@ Layout/Tab:
 Layout/TrailingBlankLines:
   Enabled: false
 
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
   Enabled: false
 
 Style/TrivialAccessors:
