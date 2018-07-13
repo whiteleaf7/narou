@@ -12,11 +12,12 @@ title_strip_pattern: null
 
 # ------------------------------------------------------------
 # 書籍情報取得設定
-title: <h1 id="workTitle"><a href=".+?">(?<title>.+?)</a></h1>
+title: &title |-
+  <h1 id="workTitle"><a href=".+?">(?<title>.+?)</a></h1>
 author: |-
   (?:<span class="activityName" itemprop="author">(?<author>.+?)</span>)|(?:<span class="screenName.*?">(?<author>.+?)</span>)
-story: |-
-  <p id="introduction" class="ui-truncateText js-work-introduction">(?<story>.+?)(?:</span>|</p>)
+story: &story |-
+  <p id="introduction" class="ui-truncateTextButton js-work-introduction">(?<story>.+?)(?:[\n ]*?</span>|[\n ]*?</p>)
 
 # ------------------------------------------------------------
 # 目次取得設定
@@ -47,7 +48,7 @@ postscript_pattern: null
 novel_info_url: \\k<toc_url>
 
 # タイトル
-t: <h1 id="workTitle"><a href=".+?">(?<title>.+?)</a></h1>
+t: *title
 
 # novel_type 小説種別
 nt: <dt><span>執筆状況</span></dt>\n        <dd>(?<novel_type>.+?)</dd>
@@ -59,8 +60,7 @@ novel_type_string:
 ga: <dt><span>エピソード</span></dt>\n        <dd>(?<general_all_no>\d+)話</dd>
 
 # story あらすじ
-s: |-
-  <p id="introduction" class="ui-truncateText js-work-introduction">(?<story>.+?)(?:</span>|</p>)
+s: *story
 
 # general_firstup 初回掲載日
 gf: |-2
