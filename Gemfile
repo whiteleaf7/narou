@@ -15,3 +15,4 @@ gem "pry-byebug"
 gem "better_errors"
 gem "binding_of_caller"
 gem "awesome_print"
+gem "simplecov", require: false, group: :test
