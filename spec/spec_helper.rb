@@ -1,5 +1,9 @@
 require "rspec"
 require "pry"
+require "simplecov"
+SimpleCov.start do
+  add_filter "/spec/"
+end
 
 Encoding.default_external = Encoding::UTF_8
 ENV["NAROU_ENV"] ||= "test"
