@@ -49,7 +49,6 @@ mail_setting.yaml
 .bundle
 .config
 .yardoc
-Gemfile.lock
 InstalledFiles
 _yardoc
 coverage
