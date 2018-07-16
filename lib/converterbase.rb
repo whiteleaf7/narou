@@ -1428,20 +1428,4 @@ class ConverterBase
     end
     result
   end
-
-  def dash_image_relative_paths(base_dir, output_text_dir)
-    DASH_FILES.map do |name|
-      pathname = Pathname(File.join(base_dir, name))
-      pathname.relative_path_from(Pathname(output_text_dir)).to_s
-    end
-  end
-
-  def copy_dash_images_to_local_setting_dir
-    DASH_FILES.each do |name|
-      path = File.join(Narou.local_setting_dir, name)
-      unless File.exist?(path)
-        FileUtils.copy(File.join(Narou.get_preset_dir, name), path)
-      end
-    end
-  end
 end
