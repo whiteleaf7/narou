@@ -451,6 +451,12 @@ $ntag 小説のタグをカンマ区切りにしたもの
       help: "完結済み小説のタイトルに(完結)と表示する"
     },
     {
+      name: "enable_prolonged_sound_mark_to_dash",
+      type: :boolean,
+      value: false,
+      help: "長音記号を２つ以上つなげている場合に全角ダッシュに置換する"
+    },
+    {
       name: "cut_old_subtitles",
       type: :integer,
       value: 0,

@@ -474,6 +474,13 @@ class ConverterBase
     end
   end
 
+  def convert_prolonged_sound_mark_to_dash(data)
+    return unless @setting.enable_prolonged_sound_mark_to_dash
+    data.gsub!(/(ー{2,})/) do |match|
+      "―" * match.length
+    end
+  end
+
   #
   # 小説のルールに沿うように変換
   #
@@ -1164,6 +1171,7 @@ class ConverterBase
     convert_fraction_and_date(data)
     modify_kana_ni_to_kanji_ni(data)
     convert_dakuten_char_to_font(data)
+    convert_prolonged_sound_mark_to_dash(data)
   end
 
   def before_convert(io)

@@ -1,0 +1,10 @@
+test_convert_prolonged_sound_mark_to_dash
+whiteleaf
+
+［＃改ページ］
+２つ以上の長音記号を全角ダッシュに置換
+
+　ヨシダーーーー！！
+
+
+　ヨッシー

@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2018-05-16 15:45:40 +0900
+# auto generated at 2018-07-16 09:52:27 +0900
 
 Encoding.default_external = Encoding::UTF_8
 
@@ -115,6 +115,10 @@ describe "convert" do
 
   it "ruby/test_ruby.txt" do
     check_answer("ruby/test_ruby.txt")
+  end
+
+  it "convert_prolonged_sound_mark_to_dash/test_convert_prolonged_sound_mark_to_dash.txt" do
+    check_answer("convert_prolonged_sound_mark_to_dash/test_convert_prolonged_sound_mark_to_dash.txt")
   end
 
   it "insert_separator/test_insert_separator.txt" do
