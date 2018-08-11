@@ -338,9 +338,9 @@ module Narou
   end
   memoize :kindlegen_path
 
-  def line_height
+  def line_height(default: LINE_HEIGHT_DEFAULT)
     global_setting = Inventory.load("global_setting", :global)
-    global_setting["line-height"] || LINE_HEIGHT_DEFAULT
+    global_setting["line-height"] || default
   end
 
  end
