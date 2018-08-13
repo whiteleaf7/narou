@@ -1,0 +1,7 @@
+test_disable_alphabet_word_to_zenkaku
+whiteleaf
+
+［＃改ページ］
+英単語全角化抑制テスト
+
+Salarua, ｜Xalijasti《シャリヤスティ》! Edixa ｜mi《私》 klie dea do!

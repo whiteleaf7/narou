@@ -6,6 +6,7 @@
 require "fileutils"
 require_relative "ini"
 require_relative "downloader"
+require_relative "converterbase"
 
 class NovelSetting
   INI_NAME = "setting.ini"
@@ -256,7 +257,13 @@ class NovelSetting
       name: "enable_alphabet_force_zenkaku",
       type: :boolean,
       value: false,
-      help: "アルファベットを強制的に全角にする。falseの場合英文は半角、それ以外は全角になる"
+      help: "アルファベットを強制的に全角にする。false の場合は英文は半角、#{::ConverterBase::ENGLISH_SENTENCES_MIN_LENGTH}文字未満の英単語は全角になる"
+    },
+    {
+      name: "disable_alphabet_word_to_zenkaku",
+      type: :boolean,
+      value: false,
+      help: "enable_alphabet_force_zenkaku が false の場合に、#{::ConverterBase::ENGLISH_SENTENCES_MIN_LENGTH}文字未満の英単語を全角にする機能を抑制する。英文中にルビがふってあり、英文ではなく英単語と認識されて全角化されてしまう場合などに使用"
     },
     {
       name: "enable_half_indent_bracket",

@@ -2,7 +2,7 @@
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
-# auto generated at 2018-07-16 09:52:27 +0900
+# auto generated at 2018-08-13 18:17:03 +0900
 
 Encoding.default_external = Encoding::UTF_8
 
@@ -83,6 +83,10 @@ describe "convert" do
 
   it "english/test_english.txt" do
     check_answer("english/test_english.txt")
+  end
+
+  it "disable_alphabet_word_to_zenkaku/test_disable_alphabet_word_to_zenkaku.txt" do
+    check_answer("disable_alphabet_word_to_zenkaku/test_disable_alphabet_word_to_zenkaku.txt")
   end
 
   it "auto_join_line/test_auto_join_line.txt" do

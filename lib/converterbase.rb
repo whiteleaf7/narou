@@ -515,8 +515,9 @@ class ConverterBase
       end
     else
       data.gsub!(ENGLISH_SENTENCES_CHARACTERS) do |match|
-        if match.split(" ").size >= 2 \
-           || (match.length >= ENGLISH_SENTENCES_MIN_LENGTH && match.match(/[a-z]/i))
+        if match.split(" ").size >= 2 ||
+            (match.length >= ENGLISH_SENTENCES_MIN_LENGTH && match.match(/[a-z]/i)) ||
+            @setting.disable_alphabet_word_to_zenkaku
           @english_sentences << match
           "［＃英文＝#{@english_sentences.size - 1}］"
         else
