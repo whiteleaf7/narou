@@ -1,0 +1,9 @@
+test_disable_alphabet_word_to_zenkaku
+whiteleaf
+
+［＃改ページ］
+
+［＃３字下げ］［＃中見出し］英単語全角化抑制テスト［＃中見出し終わり］
+
+
+　Salarua, ｜Xalijasti《シャリヤスティ》! Edixa ｜mi《私》 klie dea do!
