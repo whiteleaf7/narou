@@ -118,4 +118,18 @@ module Narou::ServerHelpers
   def table_reload_timing
     Inventory.load("local_setting")["webui.table.reload-timing"] || RELOAD_TIMING_DEFAULT
   end
+
+  def partial(template, *args)
+    template_file_name = "_#{template}".intern
+    options = args.last.is_a?(Hash) ? args.pop : {}
+    options[:layout] = false
+    collection = options.delete(:collection)
+    if collection
+      collection.inject([]) do |buffer, member|
+        buffer << haml(template_file_name, options.merge(locals: { template => member }))
+      end.join("\n")
+    else
+      haml(template_file_name, options)
+    end
+  end
 end

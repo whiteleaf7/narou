@@ -1,0 +1,39 @@
+:javascript
+  local_initialize_functions.push(function($) {
+  });
+
+:ruby
+  html = HTML.new
+
+:css
+  .indent {
+    margin-left: 2em;
+    margin-right: 2em;
+  }
+
+= partial :header
+
+.container
+  %h1= @data["title"]
+  %ul
+    %li
+      まえがき率
+      = @introductions_ratio
+      \%
+    %li
+      あとがき率
+      = @postscripts_ratio
+      \%
+
+  %table.table.table-striped
+    - @comments.each do |comment|
+      %tr
+        %td
+          %dl
+            %dd= comment[:sub]["subtitle"]
+
+            %dt まえがき
+            %dd.indent= html.ln_to_br(comment[:introduction])
+
+            %dt あとがき
+            %dd.indent= html.ln_to_br(comment[:postscript])
