@@ -419,6 +419,42 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  get "/novels/:id/author_comments" do
+    downloader = Downloader.new(@id)
+    toc = downloader.load_toc_file
+    @comments = []
+    introductions_count = 0
+    postscripts_count = 0
+    toc["subtitles"].each do |sub|
+      begin
+        element = YAML.load_file(downloader.create_section_file_path(sub))["element"]
+        data_type = element["data_type"] || "text"
+        introduction = element["introduction"] || ""
+        postscript = element["postscript"] || ""
+        if data_type == "html"
+          html = HTML.new
+          html.strip_decoration_tag = true
+          html.string = introduction
+          introduction = html.to_aozora
+          html.string = postscript
+          postscript = html.to_aozora
+        end
+        @comments.push(
+          sub: sub,
+          introduction: introduction,
+          postscript: postscript
+        )
+        introductions_count += 1 unless introduction.empty?
+        postscripts_count += 1 unless postscript.empty?
+      rescue Errno::ENOENT
+      end
+    end
+    total = toc["subtitles"].count.to_f
+    @introductions_ratio = (introductions_count / total * 100).round(2)
+    @postscripts_ratio = (postscripts_count / total * 100).round(2)
+    haml :author_comments
+  end
+
   get "/notepad" do
     @title = "メモ帳"
     haml :notepad
