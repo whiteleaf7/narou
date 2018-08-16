@@ -122,10 +122,11 @@ module Narou::ServerHelpers
   def partial(template, *args)
     template_file_name = "_#{template}".intern
     options = args.last.is_a?(Hash) ? args.pop : {}
-    options.merge!(layout: false)
-    if collection = options.delete(:collection) then
+    options[:layout] = false
+    collection = options.delete(:collection)
+    if collection
       collection.inject([]) do |buffer, member|
-        buffer << haml(template_file_name, options.merge(layout: false, locals: { template => member }))
+        buffer << haml(template_file_name, options.merge(locals: { template => member }))
       end.join("\n")
     else
       haml(template_file_name, options)
