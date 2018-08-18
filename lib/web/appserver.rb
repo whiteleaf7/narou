@@ -886,6 +886,14 @@ class Narou::AppServer < Sinatra::Base
     ""
   end
 
+  get "/api/story" do
+    id = params["id"] or pass
+    toc = Downloader.get_toc_by_target(id)
+    story = toc["story"] || ""
+    html = HTML.new
+    json title: toc["title"], story: html.ln_to_br(story.strip)
+  end
+
   # -------------------------------------------------------------------------------
   # 一部分に表示するためのHTMLを取得する(パーシャル)
   # -------------------------------------------------------------------------------
