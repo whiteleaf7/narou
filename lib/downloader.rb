@@ -160,6 +160,11 @@ class Downloader
     YAML.load_file(File.join(archive_path, TOC_FILE_NAME))
   end
 
+  def self.get_toc_by_target(target)
+    dir = Downloader.get_novel_data_dir_by_target(target)
+    get_toc_data(dir)
+  end
+
   #
   # 指定の小説の目次ページのURLを取得する
   #
