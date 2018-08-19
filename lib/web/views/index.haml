@@ -19,6 +19,12 @@
             %li#action-view-setting
               %a(href="#") 表示する項目を設定
             %li.divider
+            %li#action-view-novel-list-wide
+              %a(href="#")
+                %span
+                  %span.active-ok.glyphicon.glyphicon-ok
+                  小説リストの幅を広げる
+            %li.divider
             %li#action-view-nonfrozen
               %a(href="#")
                 %span
@@ -290,6 +296,7 @@
           %li
             %a.button-eject-now(href="#") 今すぐ端末を取り出す
 
+.container.container-main.theme-showcase#novel-list-container(role="main")
   -# 小説の一覧テーブル
   %div
     %table#novel-list.dataTable.table.table-bordered(cellspacing="0" width="100%")
