@@ -87,17 +87,24 @@
           ・環境設定で force.* 系設定が有効になっている場合、ここでの該当項目は無視されます<br>
         .list-group
           - @original_settings.each do |original|
-            - name = original[:name]
-            - value = @novel_setting[name]
-            - help = original[:help].strip.gsub("\n", "<br>")
-            - list_group_item_style = {}
-            - force_value = @force_settings[name]
-            - if @error_list[name]
-              - list_group_item_style = {class: "has-error", style: "background-color:#f2dede"}
-            - elsif force_value.nil?.!
-              - list_group_item_style = {style: "background-color: #fcf8e3"}
+            :ruby
+              name = original[:name]
+              value = @novel_setting[name]
+              help = original[:help].strip.gsub("\n", "<br>")
+              list_group_item_style = {}
+              force_value = @force_settings[name]
+              list_group_item_style =
+                if @error_list[name]
+                  { class: "has-error", style: "background-color:#f2dede" }
+                elsif force_value.nil?.!
+                  { style: "background-color: #fcf8e3" }
+                else
+                  {}
+                end
+              list_group_item_style[:id] = "#{name}"
+
             .list-group-item.form-group{list_group_item_style}
-              %h4.list-group-item-heading #{name}
+              %h4.list-group-item-heading= name
               .list-group-item-text
                 - case original[:type]
                 - when :boolean

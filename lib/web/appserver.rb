@@ -452,7 +452,7 @@ class Narou::AppServer < Sinatra::Base
     total = toc["subtitles"].count.to_f
     @introductions_ratio = (introductions_count / total * 100).round(2)
     @postscripts_ratio = (postscripts_count / total * 100).round(2)
-    haml :author_comments
+    haml :"novels/author_comments"
   end
 
   get "/notepad" do
