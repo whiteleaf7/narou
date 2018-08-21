@@ -4,5 +4,5 @@
 #
 
 module Narou
-  VERSION = "3.2.5"
+  VERSION = "3.2.5.1"
 end
