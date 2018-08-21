@@ -304,7 +304,7 @@ module Command
     # 書籍ファイルのコピー先を取得
     #
     # copy-to が設定されていなければ nil を返す。
-    # 存在しないディレクトリだった場合は例外を投げる
+    # copy-to が存在しないディレクトリだった場合は例外を投げる
     #
     def get_copy_to_directory
       # 2.1.0 から convert.copy_to から convert.copy-to へ名称が変更された
@@ -314,17 +314,36 @@ module Command
       unless File.directory?(copy_to_dir)
         raise NoSuchDirectory, copy_to_dir
       end
-      # deviceごとにフォルダ振り分けの処理
-      if !@options["copy-to-grouping"] || !@device
-        return copy_to_dir
+
+      dirs = [copy_to_dir]
+      gvalues = grouping_values
+      if gvalues.device && @device
+        dirs << @device.display_name
       end
-      copy_to_dir_with_device = File.join(copy_to_dir, @device.display_name)
-      unless File.directory?(copy_to_dir_with_device)
-        FileUtils.mkdir(copy_to_dir_with_device)
+      if gvalues.site && @novel_data
+        dirs << @novel_data["sitename"]
       end
-      copy_to_dir_with_device
+      copy_to_dir_with_groups = File.join(dirs)
+      unless File.directory?(copy_to_dir_with_groups)
+        FileUtils.mkdir_p(copy_to_dir_with_groups)
+      end
+      copy_to_dir_with_groups
     end
     private :get_copy_to_directory
+
+    def grouping_values
+      result = OpenStruct.new
+      grouping = @options["copy-to-grouping"]
+      if grouping.is_a?(TrueClass)
+        # 後方互換維持用
+        result.device = true
+        return result
+      end
+      grouping.to_s.split(",").map(&:strip).each do |key|
+        result[key] = true
+      end
+      result
+    end
 
     def send_file_to_device(ebook_file)
       if @device && @device.physical_support? &&

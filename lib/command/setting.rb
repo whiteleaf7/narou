@@ -383,6 +383,13 @@ module Command
                 "      ※注意：存在しないフォルダだとエラーになる",
           tab: :general
         },
+        "convert.copy-to-grouping" => {
+          type: :multiple,
+          help: "copy-toで指定したフォルダの中で更に指定の各種フォルダにまとめる",
+          select_keys: %w(device site),
+          select_summaries: %w(端末毎にまとめる 掲載サイト毎にまとめる),
+          tab: :general
+        },
         "convert.copy_to" => {
           type: :directory, help: "copy-toの昔の書き方(非推奨)", invisible: true
         },
@@ -419,10 +426,6 @@ module Command
                 "端末名をカンマ区切りで入力。ただのEPUBを出力したい場合はepubを指定",
           select_keys: Device::DEVICES.keys,
           select_summaries: Device::DEVICES.values.map { |d| d::DISPLAY_NAME },
-          tab: :general
-        },
-        "convert.copy-to-grouping" => {
-          type: :boolean, help: "copy-toで指定したフォルダの中で更に端末毎にフォルダを振り分ける",
           tab: :general
         },
         "convert.filename-to-ncode" => {

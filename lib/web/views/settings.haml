@@ -25,16 +25,18 @@
     })
   });
 
+:ruby
+  Inventory.clear
+  inventory = Inventory.load("local_setting").merge(Inventory.load("global_setting", :global))
+  local_and_global_variables = @setting_variables[:local].merge(@setting_variables[:global])
+  tab_info = Command::Setting.get_setting_tab_info
+  error_tabs = @error_list.map { |name, _| local_and_global_variables[name][:tab] }.uniq
+
 %form(action="/settings" method="POST")
   = partial :header, locals: { nav: "settings", enable_save_settings: true }
 
   .container.container-main.theme-showcase(role="main")
     .container-settings
-      - inventory = Inventory.load("local_setting").merge(Inventory.load("global_setting", :global))
-      - local_and_global_variables = @setting_variables[:local].merge(@setting_variables[:global])
-      - tab_info = Command::Setting.get_setting_tab_info
-      - error_tabs = @error_list.map { |name, _| local_and_global_variables[name][:tab] }.uniq
-
       %p
         %ul.nav.nav-pills(role="tablist")
           - Command::Setting.get_setting_tab_names.each.with_index do |(key, name), index|
