@@ -1,7 +1,7 @@
 更新履歴 - ChangeLog
 ====================
 
-3.2.5: 2018/xx/xx
+3.2.5: 2018/08/21
 ------------------
 #### 追加機能
 - 個別設定に `enable_prolonged_sound_mark_to_dash` を追加
@@ -12,7 +12,7 @@
     て全角化されてしまう場合などに使用
 - 環境設定の `convert.copy-to-grouping` に「掲載サイト」毎にまとめる機能を追加
   (設定が真偽値ではなく文字列(複数)に変更)
-  + deivce: 単的毎にまとめる
+  + deivce: 端末毎にまとめる
   + site: 掲載サイト毎にまとめる
   + 設定例: `narou s convert.copy-to-grouping=device,site`
     - 端末フォルダの中に更に掲載サイトのフォルダが作られる
