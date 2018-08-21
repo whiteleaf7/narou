@@ -406,6 +406,10 @@ class Downloader
         # あらすじが更新されている場合
         @stream.puts "#{id_and_title} のあらすじが更新されています"
         :ok
+      when old_toc["author"] != latest_toc["author"]
+        # 作者名が更新されている場合
+        @stream.puts "#{id_and_title} の作者名が更新されています"
+        update_database
       else
         :none
       end
