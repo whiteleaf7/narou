@@ -24,17 +24,20 @@
                 %span
                   %span.active-ok.glyphicon.glyphicon-ok
                   小説リストの幅を広げる
+                %span.shortcut W
             %li.divider
             %li#action-view-nonfrozen
               %a(href="#")
                 %span
                   %span.active-ok.glyphicon.glyphicon-ok
                   凍結中以外を表示
+                %span.shortcut Shift+F
             %li#action-view-frozen
               %a(href="#")
                 %span
                   %span.active-ok.glyphicon.glyphicon-ok
                   凍結中を表示
+                %span.shortcut F
             %li.divider
             %li#action-view-toggle-setting-page-open-new-tab
               %a(href="#")
@@ -69,7 +72,7 @@
             選択
             %span#badge-number-of-selecting.badge 0
             %span.caret
-          %ul#dropdown-menu-select.dropdown-menu(role="menu")
+          %ul.dropdown-menu-wide.dropdown-menu(role="menu")
             %li#action-select-view
               %a(href="#")
                 %span 表示されている小説を選択
@@ -112,7 +115,9 @@
             %li#action-tag-edit.enable-selected
               %a(href="#")
                 %span
-                  選択した小説のタグを編集
+                  %span
+                    選択した小説のタグを編集
+                %span.shortcut T
         %li.dropdown
           %a.dropdown-toggle(data-toggle="dropdown" href="#")
             ツール

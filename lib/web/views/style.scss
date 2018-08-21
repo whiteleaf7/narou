@@ -714,7 +714,7 @@ $console-color: white;
  * ショートカットキー
  */
 @media (min-width:768px) {
-  #dropdown-menu-select {
+  .dropdown-menu-wide {
     width: 300px;
   }
   .shortcut {
@@ -724,6 +724,8 @@ $console-color: white;
   }
   /* Freifox で表示が崩れる対策 */
   ul.dropdown-menu {
+    min-width: 260px;
+
     & > li {
       a > span:first-child {
         float: left;
