@@ -789,7 +789,7 @@ class Downloader
       "subtitles" => subtitles
     }
     toc_objects
-  rescue OpenURI::HTTPError, Errno::ECONNRESET => e
+  rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout => e
     raise if through_error   # エラー処理はしなくていいからそのまま例外を受け取りたい時用
     if e.message.include?("404")
       @stream.error "小説が削除されているか非公開な可能性があります"
@@ -1140,7 +1140,7 @@ narou s download.wait-steps=5
       open(url, "r:#{@setting["encoding"]}", open_uri_options) do |fp|
         raw = Helper.pretreatment_source(fp.read, @setting["encoding"])
       end
-    rescue OpenURI::HTTPError => e
+    rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout => e
       if e.message =~ /^503/
         if retry_count == 0
           @stream.error "上限までリトライしましたがファイルがダウンロード出来ませんでした"
