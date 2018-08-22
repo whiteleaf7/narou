@@ -723,7 +723,7 @@ $console-color: white;
     left: auto;
   }
   /* Freifox で表示が崩れる対策 */
-  ul.dropdown-menu {
+  .navbar-nav ul.dropdown-menu {
     min-width: 260px;
 
     & > li {
