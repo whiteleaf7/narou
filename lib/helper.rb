@@ -398,7 +398,7 @@ module Helper
           loop do
             block.call if block
             sleep(sleep_time)
-            if Narou::Worker.canceled?
+            if Narou::WebWorker.canceled?
               Process.kill("KILL", pid)
               Process.detach(pid)
               break

@@ -6,7 +6,7 @@
 require "singleton"
 require_relative "pushserver"
 
-class Narou::Worker
+class Narou::WebWorker
   include Singleton
 
   attr_reader :size
@@ -46,7 +46,7 @@ class Narou::Worker
           end
         rescue SystemExit
         rescue Exception => e
-          # Workerスレッド内での例外は表示するだけしてスレッドは生かしたままにする
+          # WebWorkerスレッド内での例外は表示するだけしてスレッドは生かしたままにする
           STDOUT.puts $@.shift + ": #{e.message} (#{e.class})"
           $@.each do |b|
             STDOUT.puts "  from #{b}"

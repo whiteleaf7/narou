@@ -5,7 +5,7 @@
 
 require "optparse"
 require "termcolorlight"
-require_relative "web/worker"
+require_relative "web/web_worker"
 
 module Command
   class CommandBase
