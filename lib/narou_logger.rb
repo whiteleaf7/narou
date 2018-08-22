@@ -85,7 +85,7 @@ module Narou::LoggerModule
     $stdout = temp_stream
     result = options[:ansicolor_strip] ? strip_color(buffer) : buffer
     if $stdout.capturing && !options[:quiet]
-      # 多段キャプチャ中かつ quite: false の場合は外側にも伝播する
+      # 多段キャプチャ中かつ quiet: false の場合は外側にも伝播する
       $stdout.string << result
     end
     result
