@@ -691,6 +691,7 @@ $console-color: white;
     margin-bottom: 7px;
   }
 }
+
 .console-buttons {
   position: absolute;
   top: 3px;
@@ -701,6 +702,14 @@ $console-color: white;
   span:hover {
     color: mix($console-color, red, 80%);
   }
+}
+
+.console-col-left {
+  padding-right: 2px;
+}
+
+.console-col-right {
+  padding-left: 2px;
 }
 
 /*

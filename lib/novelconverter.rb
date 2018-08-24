@@ -176,10 +176,10 @@ class NovelConverter
       command = "cmd /c " + command.encode(Encoding::Windows_31J)
     end
     activate_dakuten_font_files if use_dakuten_font
-    print "AozoraEpub3でEPUBに変換しています"
+    $stdout2.print "AozoraEpub3でEPUBに変換しています"
     begin
       res = Helper::AsyncCommand.exec(command) do
-        print "."
+        $stdout2.print "."
       end
     ensure
       Dir.chdir(pwd)
@@ -189,9 +189,9 @@ class NovelConverter
     # AozoraEpub3はエラーだとしてもexitコードは0なので、
     # 失敗した場合はjavaが実行できない場合と確定できる
     unless res[2].success?
-      puts
-      puts res
-      error "JavaがインストールされていないかAozoraEpub3実行時にエラーが発生しました。EPUBを作成出来ませんでした"
+      $stdout2.puts
+      $stdout2.puts res
+      $stdout2.error "JavaがインストールされていないかAozoraEpub3実行時にエラーが発生しました。EPUBを作成出来ませんでした"
       return :error
     end
 
@@ -199,11 +199,11 @@ class NovelConverter
 
     # Javaの実行環境に由来するであろうエラー
     if stdout_capture =~ /Error occurred during initialization of VM/
-      puts
-      warn stdout_capture.strip
-      warn "-" * 70
-      error "Javaの実行エラーが発生しました。EPUBを作成出来ませんでした\n" \
-            "Hint: 複数のJava環境が混じっていると起きやすいエラーのようです"
+      $stdout2.puts
+      $stdout2.puts stdout_capture.strip
+      $stdout2.puts "-" * 70
+      $stdout2.error "Javaの実行エラーが発生しました。EPUBを作成出来ませんでした\n" \
+                     "Hint: 複数のJava環境が混じっていると起きやすいエラーのようです"
       return :error
     end
 
@@ -212,27 +212,27 @@ class NovelConverter
     info_list = stdout_capture.scan(/^\[INFO\].+$/)
 
     if verbose
-      puts
-      puts "==== AozoraEpub3 stdout capture " + "=" * 47
-      puts stdout_capture.strip
-      puts "=" * 79
+      $stdout2.puts
+      $stdout2.puts "==== AozoraEpub3 stdout capture " + "=" * 47
+      $stdout2.puts stdout_capture.strip
+      $stdout2.puts "=" * 79
     end
 
     if !error_list.empty? || !warn_list.empty?
       unless verbose
-        puts
-        puts error_list, warn_list
+        $stdout2.puts
+        $stdout2.puts error_list, warn_list
       end
       unless error_list.empty?
         # AozoraEpub3 のエラーにはEPUBが出力されないエラーとEPUBが出力されるエラーの2種類ある。
         # EPUBが出力される場合は「変換完了」という文字があるのでそれを検出する
         if stdout_capture !~ /^変換完了/
-          error "AozoraEpub3実行中にエラーが発生したため、EPUBが出力出来ませんでした"
+          $stdout2.error "AozoraEpub3実行中にエラーが発生したため、EPUBが出力出来ませんでした"
           return :error
         end
       end
     end
-    puts "変換しました"
+    $stdout2.puts "変換しました"
     :success
   end
 
@@ -245,7 +245,7 @@ class NovelConverter
   def self.epub_to_mobi(epub_path, verbose = false)
     kindlegen_path = Narou.kindlegen_path
     unless File.exist?(kindlegen_path)
-      error "kindlegenが見つかりませんでした。AozoraEpub3と同じディレクトリにインストールして下さい"
+      $stdout2.error "kindlegenが見つかりませんでした。AozoraEpub3と同じディレクトリにインストールして下さい"
       return :error
     end
 
@@ -256,35 +256,35 @@ class NovelConverter
     if Helper.os_windows?
       command.encode!(Encoding::Windows_31J)
     end
-    print "kindlegen実行中"
+    $stdout2.print "kindlegen実行中"
     res = Helper::AsyncCommand.exec(command) do
-      print "."
+      $stdout2.print "."
     end
     stdout_capture, _, proccess_status = res
     stdout_capture.force_encoding(Encoding::UTF_8)
 
     if verbose
-      puts
-      puts "==== kindlegen stdout capture " + "=" * 49
-      puts stdout_capture.gsub("\n\n", "\n").strip
-      puts "=" * 79
+      $stdout2.puts
+      $stdout2.puts "==== kindlegen stdout capture " + "=" * 49
+      $stdout2.puts stdout_capture.gsub("\n\n", "\n").strip
+      $stdout2.puts "=" * 79
     end
 
     if proccess_status.exited?
       if proccess_status.exitstatus == 2
-        puts ""
-        error "kindlegen実行中にエラーが発生したため、MOBIが出力出来ませんでした"
+        $stdout2.puts
+        $stdout2.error "kindlegen実行中にエラーが発生したため、MOBIが出力出来ませんでした"
         if stdout_capture.scan(/(エラー\(.+?\):\w+?:.+)$/)
-          error $1
+          $stdout2.error $1
         end
         return :error
       end
     else
-      puts ""
-      error "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
+      $stdout2.puts
+      $stdout2.error "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
       return :abort
     end
-    puts "変換しました"
+    $stdout2.puts "変換しました"
     :success
   end
 
@@ -325,8 +325,8 @@ class NovelConverter
     epub_path = txt_path.sub(/\.txt$/, epub_ext)
 
     if !device || !device.kindle? || options[:no_mobi]
-      puts File.basename(epub_path) + " を出力しました"
-      puts "<bold><green>EPUBファイルを出力しました</green></bold>".termcolor
+      $stdout2.puts File.basename(epub_path) + " を出力しました"
+      $stdout2.puts "<bold><green>EPUBファイルを出力しました</green></bold>".termcolor
       return epub_path
     end
 
@@ -338,15 +338,15 @@ class NovelConverter
 
     # strip
     unless options[:no_strip]
-      puts "kindlestrip実行中"
+      $stdout2.puts "kindlestrip実行中"
       begin
         SectionStripper.strip(mobi_path, nil, false)
       rescue StripException => e
-        error "#{e.message}"
+        $stdout2.error "#{e.message}"
       end
     end
-    puts File.basename(mobi_path).encode(Encoding::UTF_8) + " を出力しました"
-    puts "<bold><green>MOBIファイルを出力しました</green></bold>".termcolor
+    $stdout2.puts File.basename(mobi_path).encode(Encoding::UTF_8) + " を出力しました"
+    $stdout2.puts "<bold><green>MOBIファイルを出力しました</green></bold>".termcolor
 
     return mobi_path
   ensure
@@ -409,7 +409,7 @@ class NovelConverter
     progressbar = nil
 
     on(:"convert_main.init") do |subtitles|
-      progressbar = ProgressBar.new(subtitles.size)
+      progressbar = ProgressBar.new(subtitles.size, io: $stdout2)
     end
     on(:"convert_main.loop") do |i|
       progressbar.output(i) if progressbar
@@ -420,12 +420,12 @@ class NovelConverter
   end
 
   def display_header
-    print "ID:#{@novel_id}　" if @novel_id
-    puts "#{@novel_title} の変換を開始"
+    $stdout2.print "ID:#{@novel_id}　" if @novel_id
+    $stdout2.puts "#{@novel_title} の変換を開始"
   end
 
   def display_footer
-    puts "縦書用の変換が終了しました"
+    $stdout2.puts "縦書用の変換が終了しました"
   end
 
   def load_novel_section(subtitle_info, section_save_dir)
@@ -433,8 +433,8 @@ class NovelConverter
     path = File.join(section_save_dir, "#{subtitle_info["index"]} #{file_subtitle}.yaml")
     YAML.load_file(path)
   rescue Errno::ENOENT => e
-    error "#{path} を見つけることが出来ませんでした。narou update #{@novel_id} を実行することで、" \
-          "削除されてしまったファイルを再ダウンロードすることが出来ます"
+    $stdout2.error "#{path} を見つけることが出来ませんでした。narou update #{@novel_id} を実行することで、" \
+                   "削除されてしまったファイルを再ダウンロードすることが出来ます"
     exit Narou::EXIT_ERROR_CODE
   end
 
@@ -627,7 +627,7 @@ class NovelConverter
       subtitles = cut_subtitles(toc["subtitles"])
     end
     if is_hotentry == false && @setting.slice_size > 0 && subtitles.length > @setting.slice_size
-      puts "#{@setting.slice_size}話ごとに分割して変換します"
+      $stdout2.puts "#{@setting.slice_size}話ごとに分割して変換します"
       array_of_subtitles = subtitles.each_slice(@setting.slice_size).to_a
     else
       array_of_subtitles = [subtitles]
@@ -665,10 +665,10 @@ class NovelConverter
     when 0
       result = subtitles
     when 1...subtitles.size
-      puts "#{cut_size}話分カットして変換します"
+      $stdout2.puts "#{cut_size}話分カットして変換します"
       result = subtitles[cut_size..-1]
     else
-      puts "最新話のみ変換します"
+      $stdout2.puts "最新話のみ変換します"
       result = [subtitles[-1]]
     end
     result
@@ -728,21 +728,21 @@ class NovelConverter
 
     if !@display_inspector
       unless @inspector.empty?
-        @inspector.display_summary
+        @inspector.display_summary($stdout2)
       end
     else
       # 小説の監視・検査状況を表示する
       if @inspector.error? || @inspector.warning?
-        puts "<bold><yellow>―――― 小説にエラーもしくは警告が存在します ――――</yellow></bold>".termcolor
-        puts ""
+        $stdout2.puts "<bold><yellow>―――― 小説にエラーもしくは警告が存在します ――――</yellow></bold>".termcolor
+        $stdout2.puts
         @inspector.display(Inspector::ERROR | Inspector::WARNING)
-        puts ""
+        $stdout2.puts
       end
       if @inspector.info?
-        puts "<bold><yellow>―――― 小説の検査状況を表示します ――――</yellow></bold>".termcolor
-        puts ""
+        $stdout2.puts "<bold><yellow>―――― 小説の検査状況を表示します ――――</yellow></bold>".termcolor
+        $stdout2.puts
         @inspector.display(Inspector::INFO)
-        puts ""
+        $stdout2.puts
       end
     end
 

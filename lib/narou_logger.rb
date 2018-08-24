@@ -18,7 +18,7 @@ end
 module Narou end unless defined?(Narou)
 
 module Narou::LoggerModule
-  attr_accessor :capturing
+  attr_accessor :capturing, :stream
 
   def initialize
     super
@@ -132,9 +132,14 @@ end
 
 class Narou::Logger < StringIO
   include Narou::LoggerModule
+
+  def initialize
+    super
+    self.stream = STDOUT
+  end
   
   def write(str)
-    write_base(str, STDOUT)
+    write_base(str, stream)
     super(str)
   end
 
@@ -146,8 +151,13 @@ end
 class Narou::LoggerError < StringIO
   include Narou::LoggerModule
 
+  def initialize
+    super
+    self.stream = STDERR
+  end
+
   def write(str)
-    write_base(str, STDERR)
+    write_base(str, stream)
     super(str)
   end
 
@@ -167,3 +177,4 @@ end
 
 $stdout = Narou::Logger.new
 $stderr = Narou::LoggerError.new
+$stdout2 = $stdout

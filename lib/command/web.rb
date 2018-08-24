@@ -126,6 +126,7 @@ module Command
       send_rebooted_event_when_connection_recover(push_server)
 
       $stdout = Narou::StreamingLogger.new(push_server)
+      $stdout2 = Narou::StreamingLogger.new(push_server, target_console: "stdout2")
       ProgressBar.push_server = push_server
       Narou::AppServer.push_server = push_server
       Narou::WebWorker.instance.start

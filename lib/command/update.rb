@@ -326,10 +326,10 @@ module Command
       use_dakuten_font = false
 
       Helper.print_horizontal_rule
-      puts "hotentry の変換を開始"
+      $stdout2.puts "hotentry の変換を開始"
 
       subtitles_size = hotentry.inject(0) { |sum, (_, subtitles)| subtitles.size + sum }
-      progressbar = ProgressBar.new(subtitles_size)
+      progressbar = ProgressBar.new(subtitles_size, io: $stdout2)
       total_progress = 0
 
       begin
@@ -354,7 +354,7 @@ module Command
       ensure
         progressbar.clear
       end
-      puts "縦書用の変換が終了しました"
+      $stdout2.puts "縦書用の変換が終了しました"
 
       device = Narou.get_device
       now = Time.now

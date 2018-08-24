@@ -59,7 +59,10 @@ module Narou
                   trigger(name, value, ws)
                 end
               rescue JSON::ParserError => e
-                ws.send(JSON.generate(echo: e.message))
+                ws.send(JSON.generate(echo: {
+                  target_console: "#console",
+                  body: e.message
+                }))
               end
             end
           rescue Errno::ECONNRESET => e
@@ -107,10 +110,10 @@ module Narou
     end
 
     def stack_to_history(message)
-      if message == "." && @history[-1] =~ /\A\.+\z/
+      if message[:body] == "." && @history[-1][:body] =~ /\A\.+\z/
         # 進行中を表す .... の出力でヒストリーが消費されるのを防ぐため、
         # 連続した . は一つにまとめる
-        @history[-1] << "."
+        @history[-1][:body] << "."
       else
         @history.push(message)
         @history.shift

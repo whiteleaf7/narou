@@ -5,13 +5,16 @@
 
 class ProgressBar
   class OverRangeError < StandardError; end
-  
-  def initialize(max, interval = 1, width = 50, char = "*")
+
+  attr_reader :io
+
+  def initialize(max, interval = 1, width = 50, char = "*", io: $stdout)
     @max = max == 0 ? 1.0 : max.to_f
     @interval = interval
     @width = width
     @char = char
     @counter = 0
+    @io = io
   end
 
   def output(num)
@@ -24,12 +27,12 @@ class ProgressBar
     ratio = calc_ratio(num)
     now = (@width * ratio).round
     rest = @width - now
-    STDOUT.print "[" + @char * now + ' ' * rest + "] #{(ratio * 100).round}%\r"
+    io.stream.print "[" + @char * now + ' ' * rest + "] #{(ratio * 100).round}%\r"
   end
 
   def clear
     return if silence?
-    STDOUT.print " " * 79 + "\r"
+    io.stream.print " " * 79 + "\r"
   end
 
   def calc_ratio(num)
@@ -37,6 +40,6 @@ class ProgressBar
   end
 
   def silence?
-    $debug || ENV["NAROU_ENV"] == "test"
+    ENV["NAROU_ENV"] == "test" || !io.tty?
   end
 end

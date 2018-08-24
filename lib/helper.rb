@@ -93,8 +93,8 @@ module Helper
     end
   end
 
-  def print_horizontal_rule
-    puts "―" * 35
+  def print_horizontal_rule(io)
+    io.puts "―" * 35
   end
 
   def replace_filename_special_chars(str, invalid_replace = false)

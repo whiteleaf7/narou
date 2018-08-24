@@ -207,13 +207,17 @@
 
   -# コンソール
   #console-container
-    #console.console
-    #console-buttons.console-buttons
-      %span.queue-cancel.glyphicon.glyphicon-remove-circle(data-toggle="tooltip" title="処理を中断")
-      %span.console-trash.glyphicon.glyphicon-trash(data-toggle="tooltip" title="ログと履歴を削除")
-      %span.console-expand
-        %span.glyphicon.glyphicon-resize-full(data-toggle="tooltip" title="拡大")
-        %span.glyphicon.glyphicon-resize-small.hide(data-toggle="tooltip" title="縮小")
+    .row
+      .col-xs-7.console-col-left
+        #console.console
+        #console-buttons.console-buttons
+          %span.queue-cancel.glyphicon.glyphicon-remove-circle(data-toggle="tooltip" title="処理を中断")
+          %span.console-trash.glyphicon.glyphicon-trash(data-toggle="tooltip" title="ログと履歴を削除")
+          %span.console-expand
+            %span.glyphicon.glyphicon-resize-full(data-toggle="tooltip" title="拡大")
+            %span.glyphicon.glyphicon-resize-small.hide(data-toggle="tooltip" title="縮小")
+      .col-xs-5.console-col-right
+        #console-stdout2.console
 
   -# 操作パネル
   #control-panel
