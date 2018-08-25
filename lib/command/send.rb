@@ -65,17 +65,19 @@ module Command
       super
       device = get_device(argv)
       unless device
-        error "デバイス名が指定されていないか、間違っています。\n" +
-              "narou setting device=デバイス名 で指定出来ます。\n" +
-              "指定出来るデバイス名：" + Device::DEVICES.keys.join(", ")
+        stream_io.error <<~ERR
+          デバイス名が指定されていないか、間違っています。
+          narou setting device=デバイス名 で指定出来ます。
+          指定出来るデバイス名：#{Device::DEVICES.keys.join(", ")}
+        ERR
         exit Narou::EXIT_ERROR_CODE
       end
       unless device.physical_support?
-        error "#{device.display_name} への直接送信は対応していません"
+        stream_io.error "#{device.display_name} への直接送信は対応していません"
         exit Narou::EXIT_ERROR_CODE
       end
       unless device.connecting?
-        error "#{device.display_name} が接続されていません"
+        stream_io.error "#{device.display_name} が接続されていません"
         exit Narou::EXIT_ERROR_CODE
       end
 
@@ -118,11 +120,11 @@ module Command
           ebook_paths = Narou.get_ebook_file_paths(target, device.ebook_file_ext)
         end
         unless ebook_paths[0]
-          error "#{target} は存在しません"
+          stream_io.error "#{target} は存在しません"
           next
         end
         unless File.exist?(ebook_paths[0])
-          error "まだファイル(#{File.basename(ebook_paths[0])})が無いようです" unless send_all
+          stream_io.error "まだファイル(#{File.basename(ebook_paths[0])})が無いようです" unless send_all
           next
         end
 
@@ -136,9 +138,9 @@ module Command
           else
             "ID:#{target}　#{TermColorLight.escape(titles[target])}"
           end
-        puts "<bold><green>#{display_target}</green></bold>".termcolor
+        stream_io.puts "<bold><green>#{display_target}</green></bold>".termcolor
 
-        print "#{device.name}へ送信しています"
+        stream_io.print "#{device.name}へ送信しています"
         ebook_paths.each do |ebook_path|
           exit_copy = false
           copy_to_path = nil
@@ -148,14 +150,14 @@ module Command
             exit_copy = true
           end
           until exit_copy
-            print "."
+            stream_io.print "."
             sleep(0.5)
           end
-          puts
+          stream_io.puts
           if copy_to_path
-            puts copy_to_path + " へコピーしました"
+            stream_io.puts copy_to_path + " へコピーしました"
           else
-            error "#{device.name}が見つからなかったためコピー出来ませんでした"
+            stream_io.error "#{device.name}が見つからなかったためコピー出来ませんでした"
             exit Narou::EXIT_ERROR_CODE # next しても次も失敗すると分かりきっているためここで終了する
           end
         end
@@ -164,31 +166,31 @@ module Command
         process_backup_bookmark(device)
       end
     rescue Device::SendFailure, Interrupt
-      puts "送信を中断しました"
+      stream_io.puts "送信を中断しました"
       exit Narou::EXIT_INTERRUPT
     end
 
     def process_backup_bookmark(device)
       device.extend(device.get_hook_module)
       unless device.respond_to?(:backup_bookmark)
-        error "ご利用の端末での栞データのバックアップは対応していません"
+        stream_io.error "ご利用の端末での栞データのバックアップは対応していません"
         return
       end
       if device.backup_bookmark > 0
-        puts "端末の栞データをバックアップしました"
+        stream_io.puts "端末の栞データをバックアップしました"
       end
     end
 
     def process_restore_bookmark(device)
       device.extend(device.get_hook_module)
       unless device.respond_to?(:restore_bookmark)
-        error "ご利用の端末での栞データのバックアップは対応していません"
+        stream_io.error "ご利用の端末での栞データのバックアップは対応していません"
         return
       end
       if device.restore_bookmark > 0
-        puts "栞データを端末にコピーしました"
+        stream_io.puts "栞データを端末にコピーしました"
       else
-        puts "栞データが無いようです"
+        stream_io.puts "栞データが無いようです"
       end
     end
   end

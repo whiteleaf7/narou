@@ -24,6 +24,7 @@ module Narou
                                    "※digest-auth関連の設定を変更した場合WEB UIサーバの再起動が必要",
     "server-digest-auth.hashed-password" => "WEBサーバのDigest認証のパスワードを、Realmを\"narou.rb\"としてハッシュにしたもの。\n" \
                                             "https://tgws.plus/app/digest/ などで生成できる",
+    "logging" => "ログの保存を有効にする。※要再起動",
   }
 end
 

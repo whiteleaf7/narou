@@ -93,7 +93,7 @@ module Helper
     end
   end
 
-  def print_horizontal_rule(io)
+  def print_horizontal_rule(io = $stdout)
     io.puts "―" * 35
   end
 

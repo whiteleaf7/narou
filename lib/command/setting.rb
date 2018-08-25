@@ -114,19 +114,19 @@ module Command
         global: Inventory.load("global_setting", :global)
       }
       settings.each do |scope, scoped_settings|
-        puts "[#{scope.capitalize} Variables]"
+        stream_io.puts "[#{scope.capitalize} Variables]"
         scoped_settings.each do |name, value|
           if value =~ / /
             value = "'#{value}'"
           end
-          puts "<bold><green>#{name}</green></bold>=#{value}".termcolor
+          stream_io.puts "<bold><green>#{name}</green></bold>=#{value}".termcolor
         end
       end
     end
 
     def output_error(msg, name = nil)
       @error_count += 1
-      error msg
+      stream_io.error msg
       trigger(:error, msg, name)
     end
 
@@ -144,7 +144,7 @@ module Command
     def output_value(name, settings)
       scope = get_scope_of_variable_name(name)
       if scope
-        puts settings[scope][name]
+        stream_io.puts settings[scope][name]
       else
         output_error("#{name} という変数は存在しません", name)
       end
@@ -157,7 +157,7 @@ module Command
         return
       end
       if argv.empty?
-        puts @opt.help
+        stream_io.puts @opt.help
         return
       end
       settings = {
@@ -183,7 +183,7 @@ module Command
             # 定義上ではすでに存在しないが、設定ファイルには残っている古い変数
             # を削除できるようにする
             if sweep_dust_variable(name, settings)
-              puts "#{name} の設定を削除しました"
+              stream_io.puts "#{name} の設定を削除しました"
             else
               output_error("#{name} という変数は存在しません", name)
             end
@@ -212,10 +212,10 @@ module Command
     def modify_settings(scoped_settings, name, value)
       if value.nil?
         scoped_settings.delete(name)
-        puts "#{name} の設定を削除しました"
+        stream_io.puts "#{name} の設定を削除しました"
       else
         scoped_settings[name] = value
-        puts "#{name} を #{value} に設定しました"
+        stream_io.puts "#{name} を #{value} に設定しました"
       end
       if name == "device" && value
         modify_settings_when_device_changed(scoped_settings)
@@ -235,8 +235,8 @@ module Command
         end
       end
       if message.length > 0
-        puts "端末を#{device.display_name}に指定したことで、以下の関連設定が変更されました"
-        puts message.string
+        stream_io.puts "端末を#{device.display_name}に指定したことで、以下の関連設定が変更されました"
+        stream_io.puts message.string
       end
     rescue Device::UnknownDevice => e
       output_error("#{e.message}\n設定できるのは #{Device::DEVICES.keys.join(", ")} です", "device")
@@ -254,11 +254,11 @@ module Command
     end
 
     def display_variable_list
-      puts "Local Variable List:"
-      puts get_variable_list_strings(:local).gsub(/^ {4}/, "")
-      puts
-      puts "Global Variable List:"
-      puts get_variable_list_strings(:global).gsub(/^ {4}/, "")
+      stream_io.puts "Local Variable List:"
+      stream_io.puts get_variable_list_strings(:local).gsub(/^ {4}/, "")
+      stream_io.puts
+      stream_io.puts "Global Variable List:"
+      stream_io.puts get_variable_list_strings(:global).gsub(/^ {4}/, "")
     end
 
     #
@@ -300,7 +300,7 @@ module Command
         end
 
         novel_setting.save_settings
-        puts "#{data["title"]} の設定を保存しました"
+        stream_io.puts "#{data["title"]} の設定を保存しました"
       end
     end
 
@@ -354,6 +354,21 @@ module Command
           type: :boolean, help: "hotentryをメールで送る(mail設定済みの場合)",
           tab: :detail
         },
+        "logging" => {
+          help: "ログの保存を有効にする",
+          type: :boolean,
+          tab: :general
+        },
+        "logging.format-file" => {
+          help: "ログファイル名のフォーマット。デフォルトは #{Narou::LoggerModule::LOG_FORMAT_FILE} 。日付でファイルを分けたくなければ固定ファイル名にする。書式は http://bit.ly/date_format 参照",
+          type: :string,
+          tab: :detail
+        },
+        "logging.format-timestamp" => {
+          help: "ログ内のタイムスタンプのフォーマット。デフォルトは #{Narou::LoggerModule::LOG_FORMAT_TIMESTAMP}",
+          type: :string,
+          tab: :detail
+        },
         "update.interval" => {
           type: :float, help: "更新時に各作品間で指定した秒数待機する(処理時間を含む)。最低#{Update::Interval::MIN}秒以上",
           tab: :general
@@ -361,10 +376,6 @@ module Command
         "update.strong" => {
           type: :boolean, help: "改稿日当日の連続更新でも更新漏れが起きないように、中身もチェックして更新を検知する(やや処理が重くなる)",
           tab: :general
-        },
-        "update.logging" => {
-          type: :boolean, help: "更新時のログを保存する",
-          tab: :detail
         },
         "update.convert-only-new-arrival" => {
           type: :boolean, help: "更新時に新着のみ変換を実行する",

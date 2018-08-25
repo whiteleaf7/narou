@@ -18,7 +18,7 @@ Narou::Backtracer.argv = ARGV
 if ARGV.delete("--time")
   now = Time.now
   at_exit do
-    puts "実行時間 #{Time.now - now}秒"
+    STDOUT.puts "実行時間 #{Time.now - now}秒"
   end
 end
 

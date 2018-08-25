@@ -5,6 +5,7 @@
 
 require "fileutils"
 require "memoist"
+require "pathname"
 require "active_support/core_ext/object/blank"
 require_relative "helper"
 require_relative "inventory"
@@ -19,6 +20,7 @@ module Narou
   AOZORAEPUB3_DIR = "AozoraEpub3"
   PRESET_DIR = "preset"
   MISC_DIR = "misc"
+  LOG_DIR = "log"
   GLOBAL_REPLACE_NAME = "replace.txt"
   EXIT_ERROR_CODE = 127
   EXIT_INTERRUPT = 126
@@ -56,39 +58,43 @@ module Narou
       end
       path.gsub!(%r!/[^/]*$!, "")
     end
-    root_dir
+    Pathname(root_dir) if root_dir
   end
   memoize :get_root_dir
 
   def local_setting_dir
-    local_setting_dir = nil
-    root_dir = get_root_dir
-    if root_dir
-      local_setting_dir = File.join(root_dir, LOCAL_SETTING_DIR_NAME)
-    end
-    local_setting_dir
+    get_root_dir&.join(LOCAL_SETTING_DIR_NAME)
   end
   memoize :local_setting_dir
 
   def global_setting_dir
     root_dir = get_root_dir
     if root_dir
-      dir = File.join(root_dir, GLOBAL_SETTING_DIR_NAME)
-      return dir if File.directory?(dir)
+      dir = root_dir.join(GLOBAL_SETTING_DIR_NAME)
+      return dir if dir.directory?
     end
-    dir = File.expand_path(GLOBAL_SETTING_DIR_NAME, "~")
-    FileUtils.mkdir(dir) unless File.exist?(dir)
+    dir = Pathname(GLOBAL_SETTING_DIR_NAME).expand_path("~")
+    dir.mkdir unless dir.exist?
     dir
   end
   memoize :global_setting_dir
 
   def get_script_dir
-    File.expand_path(File.join(File.dirname(__FILE__), ".."))
+    Pathname(__dir__).join("..").expand_path
   end
   memoize :get_script_dir
 
+  def log_dir
+    get_root_dir&.join(LOG_DIR)
+  end
+
+  def get_preset_dir
+    get_script_dir&.join(PRESET_DIR)
+  end
+  memoize :get_preset_dir
+
   def already_init?
-    !!get_root_dir
+    get_root_dir.present?
   end
 
   def init
@@ -116,17 +122,12 @@ module Narou
     Inventory.load("freeze").include?(id)
   end
 
-  def get_preset_dir
-    File.expand_path(File.join(get_script_dir, PRESET_DIR))
-  end
-  memoize :get_preset_dir
-
   def create_aozoraepub3_jar_path(*paths)
-    File.expand_path(File.join(*paths, AOZORAEPUB3_JAR_NAME))
+    Pathname(File.expand_path(File.join(*paths, AOZORAEPUB3_JAR_NAME)))
   end
 
   def aozoraepub3_directory?(path)
-    File.exist?(create_aozoraepub3_jar_path(path))
+    create_aozoraepub3_jar_path(path).exist?
   end
 
   def parse_replace_txt(text)
@@ -148,8 +149,8 @@ module Narou
   end
 
   def load_global_replace_pattern
-    path = File.join(get_root_dir, GLOBAL_REPLACE_NAME)
-    if File.exist?(path)
+    path = get_root_dir.join(GLOBAL_REPLACE_NAME)
+    if path.exist?
       pairs = Helper::CacheLoader.memo(path) do |text|
         parse_replace_txt(text)
       end
@@ -165,7 +166,7 @@ module Narou
   end
 
   def save_global_replace_pattern
-    path = File.join(get_root_dir, GLOBAL_REPLACE_NAME)
+    path = get_root_dir.join(GLOBAL_REPLACE_NAME)
     write_replace_txt(path, @@global_replace_pattern_pairs)
   end
 
@@ -180,15 +181,13 @@ module Narou
     global_setting_aozora_path = Inventory.load("global_setting", :global)["aozoraepub3dir"]
     if global_setting_aozora_path
       aozora_jar_path = create_aozoraepub3_jar_path(global_setting_aozora_path)
-      if File.exist?(aozora_jar_path)
+      if aozora_jar_path.exist?
         return aozora_jar_path
       end
     end
     [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
       aozora_jar_path = create_aozoraepub3_jar_path(dir, AOZORAEPUB3_DIR)
-      if File.exist?(aozora_jar_path)
-        return aozora_jar_path
-      end
+      return aozora_jar_path if aozora_jar_path.exist?
     end
     nil
   end
@@ -252,14 +251,14 @@ module Narou
     paths = [File.join(dir, "#{base}#{ext}")]
     index = 2
     while File.exist?(path = File.join(dir, "#{base}_#{index}#{ext}"))
-      paths.push(path)
+      paths.push(Pathname(path))
       index += 1
     end
     paths
   end
 
   def get_misc_dir
-    File.join(get_root_dir, MISC_DIR)
+    get_root_dir.join(MISC_DIR)
   end
 
   require_relative "device"
@@ -293,7 +292,7 @@ module Narou
   end
 
   def get_theme_dir(name = nil)
-    File.join([get_script_dir, "lib/web/public/theme", name].compact)
+    Pathname(File.join([get_script_dir, "lib/web/public/theme", name].compact))
   end
 
   def get_theme_names
@@ -334,7 +333,7 @@ module Narou
 
   def kindlegen_path
     postfix = Helper.os_windows? ? ".exe" : ""
-    File.join(File.dirname(Narou.get_aozoraepub3_path), "kindlegen#{postfix}")
+    get_aozoraepub3_path.dirname.join("kindlegen#{postfix}")
   end
   memoize :kindlegen_path
 
@@ -342,6 +341,5 @@ module Narou
     global_setting = Inventory.load("global_setting", :global)
     global_setting["line-height"] || default
   end
-
  end
 end

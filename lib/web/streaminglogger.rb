@@ -25,12 +25,13 @@ end
 class Narou::StreamingLogger < StringIO
   include Narou::LoggerModule
 
-  attr_reader :push_server, :target_console
+  attr_reader :push_server, :target_console, :original_stream
 
-  def initialize(push_server = nil, target_console: "stdout")
+  def initialize(push_server, original_stream = $stdout, target_console: "stdout")
     super()
     @push_server = push_server
     @target_console = target_console
+    @original_stream = original_stream
   end
 
   def tty?
@@ -51,16 +52,16 @@ class Narou::StreamingLogger < StringIO
     end
   end
 
-  def push_streaming(str)
-    unless @is_silent
-      @push_server.send_all(echo: build_echo(str)) if @push_server
-    end
+  def push_streaming(str, no_history: false)
+    return if @is_silent
+    @push_server.send_all(echo: build_echo(str, no_history)) if @push_server
   end
 
-  def build_echo(str)
+  def build_echo(str, no_history)
     {
       target_console: target_console,
-      body: str
+      body: str,
+      no_history: no_history
     }
   end
 
@@ -71,6 +72,6 @@ class Narou::StreamingLogger < StringIO
     end
     super(str)
     push_streaming(str)
+    append_log(str)
   end
 end
-

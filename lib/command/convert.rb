@@ -346,7 +346,7 @@ module Command
       if @device && @device.physical_support? &&
         @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
         if @argument_target_type == :novel
-          if Send.execute!(@device.name, @target) > 0
+          if Send.execute!(@device.name, @target, io: $stdout2) > 0
             @@sending_error_list << ebook_file
           end
         else

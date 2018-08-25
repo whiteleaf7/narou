@@ -57,10 +57,10 @@ module Command
         @options["tags"] = tags.split.tap { |array|
           array.each do |tag|
             if tag =~ BAN_CHAR
-              error "#{tag} に使用禁止記号が含まれています"
+              stream_io.error "#{tag} に使用禁止記号が含まれています"
               exit Narou::EXIT_ERROR_CODE
             elsif BAN_WORD.include?(tag)
-              error "#{tag} は使用禁止ワードです"
+              stream_io.error "#{tag} は使用禁止ワードです"
               exit Narou::EXIT_ERROR_CODE
             end
           end
@@ -75,7 +75,7 @@ module Command
               "#{' '*25}COL=#{get_color_list}") { |color|
         color.downcase!
         unless COLORS.include?(color)
-          error "#{color}という色は存在しません。色指定は無視されます"
+          stream_io.error "#{color}という色は存在しません。色指定は無視されます"
           color = nil
         end
         @options["color"] = color
@@ -126,11 +126,11 @@ module Command
           return
         end
         if color_changed
-          puts "タグの色を変更しました"
+          stream_io.puts "タグの色を変更しました"
           display_taglist
           return
         else
-          error "対象の小説を指定して下さい"
+          stream_io.error "対象の小説を指定して下さい"
           exit Narou::EXIT_ERROR_CODE
         end
       else
@@ -145,8 +145,8 @@ module Command
     def display_taglist
       database = Database.instance
       tag_list = Tag.get_tag_list
-      puts "タグ一覧"
-      puts tag_list.map { |tag, count|
+      stream_io.puts "タグ一覧"
+      stream_io.puts tag_list.map { |tag, count|
         color = Tag.get_color(tag)
         "<bold><#{color}>#{TermColorLight.escape(tag)}(#{count})</#{color}></bold>"
       }.join(" ").termcolor
@@ -173,7 +173,7 @@ module Command
       argv.each do |target|
         data = Downloader.get_data_by_target(target)
         unless data
-          error "#{target} は存在しません"
+          stream_io.error "#{target} は存在しません"
           next
         end
         tags = data["tags"] || []
@@ -181,21 +181,21 @@ module Command
         case @options["mode"]
         when :add
           tags |= @options["tags"]
-          puts "#{title} にタグを設定しました"
+          stream_io.puts "#{title} にタグを設定しました"
         when :delete
           tags -= @options["tags"]
-          puts "#{title} からタグを外しました"
+          stream_io.puts "#{title} からタグを外しました"
         when :clear
           tags.clear
-          puts "#{title} のタグをすべて外しました"
+          stream_io.puts "#{title} のタグをすべて外しました"
         end
         if tags.size > 0
-          print "現在のタグは "
-          print tags.map { |tagname|
+          stream_io.print "現在のタグは "
+          stream_io.print tags.map { |tagname|
             color = Tag.get_color(tagname)
             "<bold><#{color}>#{TermColorLight.escape(tagname)}</#{color}></bold>"
           }.join(" ").termcolor
-          puts " です"
+          stream_io.puts " です"
         end
         database[data["id"]]["tags"] = tags
       end

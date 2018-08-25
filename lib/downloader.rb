@@ -421,9 +421,7 @@ class Downloader
     if novel_end?
       unless tags.include?("end")
         update_database if update_subtitles.count == 0
-        $stdout.silence do
-          Command::Tag.execute!(%W(#{id} --add end --color white --no-overwrite-color))
-        end
+        Command::Tag.execute!(%W(#{id} --add end --color white --no-overwrite-color), io: Naoru::NullIO.new)
         msg = old_toc.empty? ? "完結しているようです" : "完結したようです"
         @stream.puts "<cyan>#{id_and_title.escape} は#{msg}</cyan>".termcolor
         return_status = :ok
@@ -431,9 +429,7 @@ class Downloader
     else
       if tags.include?("end")
         update_database if update_subtitles.size == 0
-        $stdout.silence do
-          Command::Tag.execute!(@id, "--delete", "end")
-        end
+        Command::Tag.execute!(@id, "--delete", "end", io: Narou::NullIO.new)
         @stream.puts "<cyan>#{id_and_title.escape} は連載を再開したようです</cyan>".termcolor
         return_status = :ok
       end
@@ -794,9 +790,7 @@ class Downloader
     if e.message.include?("404")
       @stream.error "小説が削除されているか非公開な可能性があります"
       if @@database.novel_exists?(@id)
-        $stdout.silence do
-          Command::Tag.execute!(%W(#{@id} --add 404 --color white --no-overwrite-color))
-        end
+        Command::Tag.execute!(%W(#{@id} --add 404 --color white --no-overwrite-color), io: Narou::NullIO.new)
         Command::Freeze.execute!(@id, "--on")
       end
     else

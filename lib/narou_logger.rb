@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -6,6 +7,7 @@
 require "stringio"
 require "termcolorlight"
 require_relative "color"
+require_relative "inventory"
 
 if $disable_color
   class String
@@ -19,11 +21,22 @@ module Narou end unless defined?(Narou)
 
 module Narou::LoggerModule
   attr_accessor :capturing, :stream
+  attr_reader :enable_logging, :format_file, :format_timestamp
+
+  LOG_DIR = "log"
+  LOG_FORMAT_FILE = "%Y%m%d.txt"
+  LOG_FORMAT_TIMESTAMP = "[%H:%M:%S]"
 
   def initialize
     super
     @is_silent = false
     @capturing = false
+    inv = Inventory.load("local_setting")
+    inv_logging = inv.group("logging")
+    @enable_logging = inv["logging"]
+    @format_file = inv_logging.format_file || LOG_FORMAT_FILE
+    @format_timestamp = inv_logging.format_timestamp || LOG_FORMAT_TIMESTAMP
+    create_log_dir
   end
 
   def copy_instance
@@ -113,12 +126,17 @@ module Narou::LoggerModule
     end
   end
 
-  def write_base(str, stream)
+  def write_base(str, stream, force_disable_logging = false)
     str = str.to_s
     if str.encoding == Encoding::ASCII_8BIT
       str.force_encoding(Encoding::UTF_8)
     end
     write_console(str, stream)
+    append_log(str) unless force_disable_logging
+  end
+
+  def logging?
+    enable_logging && ENV["NAROU_ENV"] != "test"
   end
 
   def warn(str)
@@ -127,6 +145,37 @@ module Narou::LoggerModule
 
   def error(str)
     self.puts "<bold><red>[ERROR]</red></bold> ".termcolor + str
+  end
+
+  def create_log_dir
+    dir = Narou.log_dir
+    dir.mkdir unless dir.exist?
+  end
+
+  def append_log(str)
+    return unless logging?
+    File.write(log_filepath, strip_color(embed_timestamp(str)), mode: "a")
+  end
+
+  def log_filepath
+    Narou.log_dir.join(log_filename)
+  end
+
+  def log_filename
+    # TODO: 並列変換時には変換ログに postfix をつける（混ざるので）
+    "#{Time.now.strftime(format_file)}"
+  end
+
+  def embed_timestamp(str)
+    unless @before_head_ln
+      str = "\n#{str}"
+      @before_head_ln = true
+    end
+    if str.end_with?("\n")
+      str = str.sub(/\n\z/, "")
+      @before_head_ln = false
+    end
+    str.gsub("\n", "\n#{Time.now.strftime(format_timestamp)} ")
   end
 end
 
@@ -157,13 +206,19 @@ class Narou::LoggerError < StringIO
   end
 
   def write(str)
-    write_base(str, stream)
+    write_base(str, stream, false)
     super(str)
   end
 
   def tty?
     STDERR.tty?
   end
+end
+
+class Narou::NullIO < StringIO
+  include Narou::LoggerModule
+
+  def write(_str); end
 end
 
 def warn(str, trace = nil)
@@ -176,5 +231,5 @@ def error(str)
 end
 
 $stdout = Narou::Logger.new
-$stderr = Narou::LoggerError.new
+# $stderr = Narou::LoggerError.new
 $stdout2 = $stdout

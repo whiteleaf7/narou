@@ -19,10 +19,6 @@ module Command
     extend Memoist
     include Narou::Eventable
 
-    LOG_DIR_NAME = "log"
-    LOG_NUM_LIMIT = 30   # ログの保存する上限数
-    LOG_FILENAME_FORMAT = "update_log_%s.txt"
-
     HOTENTRY_DIR_NAME = "hotentry"
     HOTENTRY_TEMPLATE_NAME = "hotentry.txt"
     HOTENTRY_TITLE_PATTERN = "hotentry %y/%m/%d %H:%M"
@@ -64,13 +60,6 @@ module Command
       }
       @opt.on("-a", "--convert-only-new-arrival", "新着のみ変換を実行する") {
         @options["convert-only-new-arrival"] = true
-      }
-      @opt.on("-l", "--log [N]", "最新からN番目のログを表示する(デフォ1)") { |n|
-        n = n.to_i
-        n -= 1 if n > 0
-        @options["log"] = n
-        view_log
-        exit 0
       }
       @opt.on("--gl [OPT]", <<-EOS) { |option|
 データベースに最新話掲載日を反映させる
@@ -164,77 +153,75 @@ module Command
       interval = Interval.new(@options["interval"])
 
       begin
-        update_log = $stdout.capture(quiet: false) do
-          sort_by_key(sort_key, update_target_list).each_with_index do |target, i|
-            display_message = nil
-            data = Downloader.get_data_by_target(target)
-            if !data
-              display_message = "<bold><red>[ERROR]</red></bold> #{target} は管理小説の中に存在しません".termcolor
-            elsif Narou.novel_frozen?(target) && !@options["force"]
-              next if argv.empty?
-              display_message = "ID:#{data["id"]}　#{data["title"]} は凍結中です"
-            end
-            Helper.print_horizontal_rule if i > 0
-            if display_message
-              puts display_message
-              mistook_count += 1
-              next
-            end
-            interval.wait
-            downloader = Downloader.new(target)
-            hotentry_manager.connect(downloader)
+        sort_by_key(sort_key, update_target_list).each_with_index do |target, i|
+          display_message = nil
+          data = Downloader.get_data_by_target(target)
+          if !data
+            display_message = "<bold><red>[ERROR]</red></bold> #{target} は管理小説の中に存在しません".termcolor
+          elsif Narou.novel_frozen?(target) && !@options["force"]
+            next if argv.empty?
+            display_message = "ID:#{data["id"]}　#{data["title"]} は凍結中です"
+          end
+          Helper.print_horizontal_rule if i > 0
+          if display_message
+            puts display_message
+            mistook_count += 1
+            next
+          end
+          interval.wait
+          downloader = Downloader.new(target)
+          hotentry_manager.connect(downloader)
 
-            delete_modified_tag = -> do
-              tags = data["tags"] || []
-              data["tags"] = tags - [Narou::MODIFIED_TAG] if tags.include?(Narou::MODIFIED_TAG)
-              data["last_check_date"] = Time.now
-            end
-
-            result = downloader.start_download
-            case result.status
-            when :ok
-              delete_modified_tag.call
-              trigger(:success, data)
-              if @options["no-convert"] ||
-                   (@options["convert-only-new-arrival"] && !result.new_arrivals)
-                interval.force_wait
-                next
-              end
-            when :failed
-              puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
-              mistook_count += 1
-              next
-            when :canceled
-              puts "ID:#{data["id"]}　#{data["title"]} の更新はキャンセルされました"
-              mistook_count += 1
-              next
-            when :none
-              delete_modified_tag.call
-              puts "#{data["title"]} に更新はありません"
-              next unless data["_convert_failure"]
-            end
-
-            if data["_convert_failure"]
-              puts "<yellow>前回変換できなかったので再変換します</yellow>".termcolor
-            end
-            convert_argv = [target]
-            convert_argv << "--no-open" if @options["no-open"]
-            convert_status = Convert.execute!(convert_argv)
-            if convert_status > 0
-              # 変換が失敗したか、中断された
-              data["_convert_failure"] = true
-              # 中断された場合には残りのアップデートも中止する
-              raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
-            else
-              # 変換に成功した
-              data.delete("_convert_failure")
-            end
+          delete_modified_tag = -> do
+            tags = data["tags"] || []
+            data["tags"] = tags - [Narou::MODIFIED_TAG] if tags.include?(Narou::MODIFIED_TAG)
+            data["last_check_date"] = Time.now
           end
 
-          process_hotentry(hotentry_manager.hotentries)
+          result = downloader.start_download
+          case result.status
+          when :ok
+            delete_modified_tag.call
+            trigger(:success, data)
+            puts "#{data["title"]} の更新が完了しました"
+            if @options["no-convert"] ||
+                 (@options["convert-only-new-arrival"] && !result.new_arrivals)
+              interval.force_wait
+              next
+            end
+          when :failed
+            puts "ID:#{data["id"]}　#{data["title"]} の更新は失敗しました"
+            mistook_count += 1
+            next
+          when :canceled
+            puts "ID:#{data["id"]}　#{data["title"]} の更新はキャンセルされました"
+            mistook_count += 1
+            next
+          when :none
+            delete_modified_tag.call
+            puts "#{data["title"]} に更新はありません"
+            next unless data["_convert_failure"]
+          end
+
+          if data["_convert_failure"]
+            puts "<yellow>前回変換できなかったので再変換します</yellow>".termcolor
+          end
+          convert_argv = [target]
+          convert_argv << "--no-open" if @options["no-open"]
+          convert_status = Convert.execute!(convert_argv)
+          if convert_status > 0
+            # 変換が失敗したか、中断された
+            data["_convert_failure"] = true
+            # 中断された場合には残りのアップデートも中止する
+            raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
+          else
+            # 変換に成功した
+            data.delete("_convert_failure")
+          end
         end
+
+        process_hotentry(hotentry_manager.hotentries)
       ensure
-        save_log(update_log)
         Database.instance.save_database
       end
 
@@ -242,49 +229,6 @@ module Command
     rescue Interrupt
       puts "アップデートを中断しました"
       exit Narou::EXIT_INTERRUPT
-    end
-
-    def get_log_paths
-      Dir.glob(File.join(log_dirname, LOG_FILENAME_FORMAT % "*")).sort.reverse
-    end
-
-    def view_log
-      list = get_log_paths
-      n = @options["log"]
-      if list[n]
-        puts File.read(list[n], encoding: Encoding::UTF_8)
-      else
-        error "#{n+1}番目のログはありません"
-      end
-    end
-
-    def save_log(log)
-      return unless @options["logging"]
-      create_log_dir
-      now = Time.now
-      logname = File.join(log_dirname, LOG_FILENAME_FORMAT % now.strftime("%Y%m%d_%H%M%S"))
-      File.open(logname, "w:UTF-8") do |fp|
-        fp.puts "--- ログ出力日時 #{now.strftime("%Y/%m/%d %H:%M:%S")} ---"
-        fp.puts log
-      end
-      remove_old_log
-    end
-
-    def log_dirname
-      @@__log_dirname ||= File.join(Narou.get_root_dir, LOG_DIR_NAME)
-    end
-
-    def create_log_dir
-      logdir = log_dirname
-      return if File.directory?(logdir)
-      FileUtils.mkdir_p(logdir)
-    end
-
-    def remove_old_log
-      list = get_log_paths
-      (list[LOG_NUM_LIMIT..-1] || []).each do |path|
-        File.delete(path)
-      end
     end
 
     def update_general_lastup(option = nil)

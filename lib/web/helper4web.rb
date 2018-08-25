@@ -12,14 +12,17 @@ module Helper
     alias :original_print_horizontal_rule :print_horizontal_rule
   end
 
-  def print_horizontal_rule(io)
+  def print_horizontal_rule(io = $stdout)
     # タグがキャプチャーされると困るので、キャプチャ専用の出力とWEBへの出力は分ける
     if $stdout.capturing
       $stdout.silence do
         original_print_horizontal_rule($stdout)
       end
+    else
+      io.original_stream.silence do
+        original_print_horizontal_rule(io.original_stream)
+      end
     end
     io.push_streaming("<hr>")
   end
 end
-

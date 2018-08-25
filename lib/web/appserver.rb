@@ -14,7 +14,6 @@ require "better_errors" if $debug
 require "tilt/erubis"
 require "tilt/haml"
 require "tilt/sass"
-require_relative "../narou_logger"
 require_relative "../commandline"
 require_relative "../inventory"
 require_relative "web_worker"
@@ -252,18 +251,13 @@ class Narou::AppServer < Sinatra::Base
     # されないように最後にまわす
     built_arguments << "device=#{device}" if device
     unless built_arguments.empty?
-      $stdout.silence do
-        setting = Command::Setting.new
-        setting.on(:error) do |msg, name|
-          if name
-            @error_list[name] = msg
-          end
-        end
-        begin
-          setting.execute(built_arguments)
-        rescue SystemExit
+      setting = Command::Setting.new
+      setting.on(:error) do |msg, name|
+        if name
+          @error_list[name] = msg
         end
       end
+      setting.execute!(built_arguments, io: Narou::NullIO.new)
     end
 
     # 置換設定保存
@@ -697,8 +691,15 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  post "/api/puts_all_logs" do
+    $stdout.push_streaming($stdout.string, no_history: true)
+    $stdout2.push_streaming($stdout2.string, no_history: true) if $stdout != $stdout2
+  end
+
   post "/api/clear_history" do
     Narou::PushServer.instance.clear_history
+    $stdout.string.clear
+    $stdout2.string.clear if $stdout != $stdout2
   end
 
   get "/api/tag_list" do
@@ -740,18 +741,16 @@ class Narou::AppServer < Sinatra::Base
     ids = select_valid_novel_ids(params["ids"]) or pass
     # key と value を重複を維持したまま反転
     invert_states = params["states"].inject({}) { |h,(k,v)| (h[v] ||= []) << k; h }
-    $stdout.silence do
-      invert_states.each do |state, tags|
-        case state.to_i
-        when 0
-          # タグを削除
-          CommandLine.run!("tag", "--delete", tags.join(" "), ids)
-        when 1
-          # 現状を維持(何もしない)
-        when 2
-          # タグを追加
-          CommandLine.run!("tag", "--add", tags.join(" "), ids)
-        end
+    invert_states.each do |state, tags|
+      case state.to_i
+      when 0
+        # タグを削除
+        Command::Tag.execute!("--delete", tags.join(" "), ids, io: Narou::NullIO.new)
+      when 1
+        # 現状を維持(何もしない)
+      when 2
+        # タグを追加
+        Command::Tag.execute!("--add", tags.join(" "), ids, io: Narou::NullIO.new)
       end
     end
     @@push_server.send_all(:"table.reload")

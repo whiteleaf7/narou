@@ -13,7 +13,7 @@ module Narou
     include Singleton
     include Eventable
 
-    HISTORY_SAVED_COUNT = 30   # 保存する履歴の数
+    HISTORY_SAVED_COUNT = 60   # 保存する履歴の数
 
     attr_accessor :port, :host
     attr_reader :accepted_domains, :connections
@@ -110,6 +110,7 @@ module Narou
     end
 
     def stack_to_history(message)
+      return if message[:no_history]
       if message[:body] == "." && @history[-1][:body] =~ /\A\.+\z/
         # 進行中を表す .... の出力でヒストリーが消費されるのを防ぐため、
         # 連続した . は一つにまとめる
@@ -122,4 +123,3 @@ module Narou
 
   end
 end
-

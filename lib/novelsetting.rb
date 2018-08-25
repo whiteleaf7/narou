@@ -347,7 +347,7 @@ class NovelSetting
       name: "date_format",
       type: :string,
       value: "%Y年%m月%d日",
-      help: "書式は http://bit.ly/1m5e3w7 を参考"
+      help: "書式は http://bit.ly/date_format を参考"
     },
     {
       name: "enable_convert_horizontal_ellipsis",
@@ -390,7 +390,7 @@ class NovelSetting
       type: :string,
       value: "(%-m/%-d)",
       help: <<-EOS
-enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/1m5e3w7 を参照。
+enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/date_format を参照。
 Narou.rb専用の書式として下記のものも使用可能。
 $s 2045年までの残り時間(10分単位の4桁の36進数)
 $t 小説のタイトル
