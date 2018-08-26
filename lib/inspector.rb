@@ -162,7 +162,7 @@ class Inspector
       num += 1
     end
     if num > 0
-      msg = "#{num}個の行末読点を発見しました。"
+      msg = +"#{num}個の行末読点を発見しました。"
       if num >= END_TOUTEN_COUNT_THRESHOLD
         msg << "作者による手動改行により改行が多くなっています。" + \
                "setting.ini の enable_auto_join_line を true にすることをお薦めします。"

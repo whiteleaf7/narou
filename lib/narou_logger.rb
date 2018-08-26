@@ -57,7 +57,7 @@ module Narou
         if /^(.+?):(\d+)/ =~ caller(1..1).first
           file = $1
           line = $2.to_i
-          error_msg = "Did you mean: silence\n"
+          error_msg = +"Did you mean: silence\n"
           str = File.read(file).split("\n")[line - 1]
           error_msg += "in #{file}:#{line}\n"
           error_msg += str + "\n"

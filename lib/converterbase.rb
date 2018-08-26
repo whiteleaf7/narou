@@ -640,7 +640,7 @@ class ConverterBase
         top = "― "
         bottom = " ―"
       end
-      str = "　　　［＃ゴシック体］#{top}"
+      str = +"　　　［＃ゴシック体］#{top}"
       str += hankaku_num_to_zenkaku_num(chapter.tr("０-９", "0-9"))
       str += "#{bottom}［＃ゴシック体終わり］"
       # 前後に空行を入れたいが、それは行処理ループ中に行う

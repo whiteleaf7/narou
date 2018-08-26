@@ -127,7 +127,11 @@ module Command
       send_rebooted_event_when_connection_recover(push_server)
 
       $stdout = Narou::StreamingLogger.new(push_server)
-      $stdout2 = Narou::StreamingLogger.new(push_server, $stdout2, target_console: "stdout2")
+      $stdout2 = if Inventory.load["concurrency"]
+                   Narou::StreamingLogger.new(push_server, $stdout2, target_console: "stdout2")
+                 else
+                   $stdout
+                 end
       ProgressBar.push_server = push_server
       Narou::AppServer.push_server = push_server
       Narou::WebWorker.instance.start
