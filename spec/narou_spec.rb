@@ -19,7 +19,7 @@ describe Narou do
   describe ".global_setting_dir" do
     before :all do
       @original_name = Narou::GLOBAL_SETTING_DIR_NAME.replace(".narousetting_dummy")
-      @global_dir_in_root = File.expand_path(".narousetting_dummy", Narou.get_root_dir)
+      @global_dir_in_root = Pathname(".narousetting_dummy").expand_path(Narou.get_root_dir)
     end
 
     after :all do
@@ -32,7 +32,7 @@ describe Narou do
 
     context ".narou があるディレクトリにはない場合" do
       it "ユーザーディレクトリにあるべき" do
-        expect(Narou.global_setting_dir).to eq File.expand_path(".narousetting_dummy", "~")
+        expect(Narou.global_setting_dir).to eq Pathname(".narousetting_dummy").expand_path("~")
       end
     end
 
@@ -41,7 +41,9 @@ describe Narou do
         FileUtils.mkdir(@global_dir_in_root)
       end
 
-      it { expect(Narou.global_setting_dir).to eq @global_dir_in_root }
+      it "同じディレクトリにあるほうが優先されるべき" do
+        expect(Narou.global_setting_dir).to eq @global_dir_in_root
+      end
     end
   end
 end

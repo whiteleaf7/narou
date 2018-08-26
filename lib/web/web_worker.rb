@@ -52,7 +52,7 @@ class Narou::WebWorker
             STDOUT.puts "  from #{b}"
           end
         ensure
-          if q[:counting]
+          if q && q[:counting]
             countdown
             notification_queue
           end

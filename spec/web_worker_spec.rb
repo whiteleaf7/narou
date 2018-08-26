@@ -40,7 +40,7 @@ describe Narou::WebWorker do
         @worker.push(&block2)
       end
 
-      it "should call blocks", retry: 3, retry_wait: 3 do
+      it "should call blocks", retry: 5, retry_wait: 5 do
         # 確実にWebWorkerスレッドが実行されるように
         Thread.pass
         sleep 0.001
@@ -49,7 +49,7 @@ describe Narou::WebWorker do
       end
     end
 
-    it "canceling", retry: 3, retry_wait: 3 do
+    it "canceling", retry: 5, retry_wait: 5 do
       @worker.stop
       expect(@worker.canceled?).to be_falsey
       _execute = false

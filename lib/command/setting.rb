@@ -3,6 +3,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "../narou_logger"
 require_relative "../inventory"
 require_relative "../novelsetting"
 require_relative "../eventable"
