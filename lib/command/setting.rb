@@ -367,7 +367,8 @@ module Command
           tab: :general
         },
         "logging.format-filename" => {
-          help: "ログファイル名のフォーマット。デフォルトは #{Narou::LoggerModule::LOG_FORMAT_FILENAME} 。日付でファイルを分けたくなければ固定ファイル名にする。書式は http://bit.ly/date_format 参照",
+          help: "ログファイル名のフォーマット。デフォルトは #{Narou::LoggerModule::LOG_FORMAT_FILENAME} 。" \
+                "日付でファイルを分けたくなければ固定ファイル名にする。書式は http://bit.ly/date_format 参照",
           type: :string,
           tab: :detail
         },

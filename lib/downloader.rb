@@ -1275,7 +1275,7 @@ narou s download.wait-steps=5
     original_settings = NovelSetting.get_original_settings
     default_settings = NovelSetting.load_default_settings
     novel_setting = NovelSetting.new(@id, true, true)
-    special_preset_dir = File.join(Narou.get_preset_dir, @setting["domain"], @setting["ncode"])
+    special_preset_dir = File.join(Narou.preset_dir, @setting["domain"], @setting["ncode"])
     exists_special_preset_dir = File.exist?(special_preset_dir)
     templates = [
       [NovelSetting::INI_NAME, NovelSetting::INI_ERB_BINARY_VERSION],

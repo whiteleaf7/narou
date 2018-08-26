@@ -27,7 +27,7 @@ class ProgressBar
     ratio = calc_ratio(num)
     now = (@width * ratio).round
     rest = @width - now
-    io.stream.print "[" + @char * now + ' ' * rest + "] #{(ratio * 100).round}%\r"
+    io.stream.print format("[%s%s] %d%%\r", @char * now, " " * rest, (ratio * 100).round)
   end
 
   def clear

@@ -89,7 +89,7 @@ class NovelConverter
   DAKUTEN_ERB = [true, false]
 
   def self.activate_dakuten_font_files
-    preset_dir = Narou.get_preset_dir
+    preset_dir = Narou.preset_dir
     aozora_dir = File.dirname(Narou.get_aozoraepub3_path)
     line_height = Narou.line_height
 
@@ -105,7 +105,7 @@ class NovelConverter
   end
 
   def self.inactivate_dakuten_font_files
-    preset_dir = Narou.get_preset_dir
+    preset_dir = Narou.preset_dir
     aozora_dir = File.dirname(Narou.get_aozoraepub3_path)
     path_normal_vertical_css = File.join(preset_dir, "vertical_font.css")
     line_height = Narou.line_height
@@ -342,7 +342,7 @@ class NovelConverter
       begin
         SectionStripper.strip(mobi_path, nil, false)
       rescue StripException => e
-        $stdout2.error "#{e.message}"
+        $stdout2.error e.message
       end
     end
     $stdout2.puts File.basename(mobi_path).encode(Encoding::UTF_8) + " を出力しました"

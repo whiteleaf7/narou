@@ -121,7 +121,7 @@ module Command
     end
 
     def install_mailer_setting
-      setting_file_path = File.join(Narou.get_preset_dir, Mailer::SETTING_FILE)
+      setting_file_path = File.join(Narou.preset_dir, Mailer::SETTING_FILE)
       install_path = File.join(Narou.get_root_dir, Mailer::SETTING_FILE)
       FileUtils.cp(setting_file_path, install_path)
       alter_database_add_column_last_mail_date

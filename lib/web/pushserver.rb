@@ -13,7 +13,7 @@ module Narou
     include Singleton
     include Eventable
 
-    HISTORY_SAVED_COUNT = 60   # 保存する履歴の数
+    HISTORY_SAVED_COUNT = 60 # 保存する履歴の数
 
     attr_accessor :port, :host
     attr_reader :accepted_domains, :connections

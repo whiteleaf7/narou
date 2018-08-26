@@ -88,10 +88,10 @@ module Narou
     get_root_dir&.join(LOG_DIR)
   end
 
-  def get_preset_dir
+  def preset_dir
     get_script_dir&.join(PRESET_DIR)
   end
-  memoize :get_preset_dir
+  memoize :preset_dir
 
   def already_init?
     get_root_dir.present?
@@ -150,13 +150,14 @@ module Narou
 
   def load_global_replace_pattern
     path = get_root_dir.join(GLOBAL_REPLACE_NAME)
-    if path.exist?
-      pairs = Helper::CacheLoader.memo(path) do |text|
-        parse_replace_txt(text)
+    pairs =
+      if path.exist?
+        Helper::CacheLoader.memo(path) do |text|
+          parse_replace_txt(text)
+        end
+      else
+        []
       end
-    else
-      pairs = []
-    end
     @@global_replace_pattern_pairs = pairs
     pairs
   end

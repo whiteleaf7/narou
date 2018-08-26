@@ -398,11 +398,10 @@ module Helper
           loop do
             block.call if block
             sleep(sleep_time)
-            if Narou::WebWorker.canceled?
-              Process.kill("KILL", pid)
-              Process.detach(pid)
-              break
-            end
+            next unless Narou::WebWorker.canceled?
+            Process.kill("KILL", pid)
+            Process.detach(pid)
+            break
           end
         end
         looper.join

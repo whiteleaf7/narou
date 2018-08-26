@@ -82,9 +82,6 @@ Style/Documentation:
 Style/DoubleNegation:
   Enabled: false
 
-Style/FormatString:
-  EnforcedStyle: percent
-
 # 後置 if/unless を使わないほうがわかりやすい場合もある
 Style/IfUnlessModifier:
   Enabled: false
@@ -222,4 +219,16 @@ Layout/MultilineOperationIndentation:
   Enabled: false
 
 Layout/IndentHeredoc:
+  Enabled: true
+
+Style/NumericPredicate:
+  Enabled: false
+
+Lint/HandleExceptions:
+  Enabled: false
+
+Lint/RescueException:
+  Enabled: false
+
+Lint/EmptyWhen:
   Enabled: false

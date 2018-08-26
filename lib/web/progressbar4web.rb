@@ -17,7 +17,7 @@ class ProgressBar
 
   def initialize(*args)
     original_initialize(*args)
-    @@push_server.send_all("progressbar.init" => { target_console: io.target_console } )
+    @@push_server.send_all("progressbar.init" => { target_console: io.target_console })
   end
 
   def output(num)
@@ -29,7 +29,7 @@ class ProgressBar
   end
 
   def clear
-    @@push_server.send_all("progressbar.clear" => { target_console: io.target_console } )
+    @@push_server.send_all("progressbar.clear" => { target_console: io.target_console })
   end
 end
 

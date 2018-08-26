@@ -54,7 +54,7 @@ class Narou::StreamingLogger < StringIO
 
   def push_streaming(str, no_history: false)
     return if @is_silent
-    @push_server.send_all(echo: build_echo(str, no_history)) if @push_server
+    @push_server&.send_all(echo: build_echo(str, no_history))
   end
 
   def build_echo(str, no_history)

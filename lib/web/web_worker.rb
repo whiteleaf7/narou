@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -35,14 +36,11 @@ class Narou::WebWorker
             @queue.clear
             @cancel_signal = false
           else
-            #q[:block].call
             @thread_of_block_executing = Thread.new do
               q[:block].call
             end
-            @thread_of_block_executing.tap do |th|
-              th.join
-              th = nil
-            end
+            @thread_of_block_executing.join
+            @thread_of_block_executing = nil
           end
         rescue SystemExit
         rescue Exception => e
@@ -70,7 +68,7 @@ class Narou::WebWorker
       if @size > 0
         @cancel_signal = true
         @size = 0
-        @thread_of_block_executing.raise(Interrupt) if @thread_of_block_executing
+        @thread_of_block_executing&.raise(Interrupt)
         Thread.pass
       end
     end
@@ -85,7 +83,7 @@ class Narou::WebWorker
   end
 
   def stop
-    @worker_thread.kill if @worker_thread
+    @worker_thread&.kill
     @worker_thread = nil
   end
 

@@ -240,8 +240,4 @@ def error(str)
 end
 
 $stdout = Narou::Logger.new
-if Inventory.load["concurrency"]
-  $stdout2 = Narou::Logger.new("_convert")
-else
-  $stdout2 = $stdout
-end
+$stdout2 = Inventory.load["concurrency"] ? Narou::Logger.new("_convert") : $stdout

@@ -1,0 +1,7 @@
+linters:
+  LineLength:
+    max: 140
+  HtmlAttributes:
+    enabled: false
+  ClassesBeforeIds:
+    EnforcedStyle: 'id'
