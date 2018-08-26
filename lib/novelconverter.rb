@@ -568,7 +568,7 @@ class NovelConverter
   # 最終的に出力するパスを生成
   #
   def create_output_path(is_text_file_mode, converted_text, index)
-    output_path = ""
+    output_path = +""
     if @output_filename
       output_path = File.join(@setting.archive_path, File.basename(@output_filename))
     else

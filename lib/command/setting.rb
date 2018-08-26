@@ -245,7 +245,7 @@ module Command
     end
 
     def get_variable_list_strings(scope)
-      result = ""
+      result = +""
       SETTING_VARIABLES[scope].each do |name, info|
         if @options["all"] || !info[:invisible]
           raise "変数名「#{name}」のtypeが未設定です" unless info[:type]

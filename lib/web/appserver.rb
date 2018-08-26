@@ -223,7 +223,6 @@ class Narou::AppServer < Sinatra::Base
 
   post "/settings" do
     built_arguments = []
-    output = ""
     device = params.delete("device")
     [:local, :global].each do |scope|
       @setting_variables[scope].each do |name, info|

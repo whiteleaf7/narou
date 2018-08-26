@@ -27,7 +27,7 @@ class DiffViewer
     end
     old_strings.gsub!("\r", "")
     new_strings.gsub!("\r", "")
-    @builded_buffer = ""
+    @builded_buffer = +""
     @events = Diff::LCS.sdiff(old_strings.split("\n"), new_strings.split("\n"))
     build
   end
@@ -55,7 +55,7 @@ class DiffViewer
       index
     }.map { |(index, (event, str))|
       # index が途切れたら、ポジション情報を付与する
-      result = ""
+      result = +""
       if index - before_index >= 2
         result += "<bold><cyan>@@ -#{event.old_position+1}, " \
                   "+#{event.new_position+1} @@</cyan></bold>\n".termcolor
@@ -98,13 +98,13 @@ class DiffViewer
   # event.action を見てラインを装飾
   #
   def decorate_event(event)
-    result = ""
+    result = +""
     old_element = event.old_element
     new_element = event.new_element
     case event.action
     when "!"
-      old_str = ""
-      new_str = ""
+      old_str = +""
+      new_str = +""
       line_events = Diff::LCS.sdiff(old_element, new_element)
       distance = calc_levenshtein_distance(line_events)
       # レーベンシュタイン距離を正規化する

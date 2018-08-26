@@ -60,7 +60,9 @@ class NovelSetting
   end
 
   def load_setting_ini
-    Ini.load_file(ini_path) rescue Ini.load("")
+    Ini.load_file(ini_path)
+  rescue Errno::ENOENT
+    Ini.load("")
   end
 
   #
