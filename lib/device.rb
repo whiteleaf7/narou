@@ -40,8 +40,8 @@ class Device
   attr_reader :name, :ebook_file_ext, :display_name
 
   DEVICES = {}.tap do |h|
-    [Narou.get_root_dir, File.dirname(__FILE__)].each do |dir|
-      next unless dir   # narou init 前だと get_root_dir は nil
+    [Narou.root_dir, File.dirname(__FILE__)].each do |dir|
+      next unless dir # narou init 前だと root_dir は nil
       Dir.glob(File.join(dir, "device", "*.rb")).each do |path|
         name = File.basename(path, ".rb")
         unless h[name]

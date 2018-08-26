@@ -42,7 +42,7 @@ module Narou
     2018
   end
 
-  def get_root_dir
+  def root_dir
     root_dir = nil
     path = Dir.pwd
     drive_letter = ""
@@ -60,15 +60,15 @@ module Narou
     end
     Pathname(root_dir) if root_dir
   end
-  memoize :get_root_dir
+  memoize :root_dir
 
   def local_setting_dir
-    get_root_dir&.join(LOCAL_SETTING_DIR_NAME)
+    root_dir&.join(LOCAL_SETTING_DIR_NAME)
   end
   memoize :local_setting_dir
 
   def global_setting_dir
-    root_dir = get_root_dir
+    root_dir = root_dir
     if root_dir
       dir = root_dir.join(GLOBAL_SETTING_DIR_NAME)
       return dir if dir.directory?
@@ -79,22 +79,22 @@ module Narou
   end
   memoize :global_setting_dir
 
-  def get_script_dir
+  def script_dir
     Pathname(__dir__).join("..").expand_path
   end
-  memoize :get_script_dir
+  memoize :script_dir
 
   def log_dir
-    get_root_dir&.join(LOG_DIR)
+    root_dir&.join(LOG_DIR)
   end
 
   def preset_dir
-    get_script_dir&.join(PRESET_DIR)
+    script_dir&.join(PRESET_DIR)
   end
   memoize :preset_dir
 
   def already_init?
-    get_root_dir.present?
+    root_dir.present?
   end
 
   def init
@@ -149,7 +149,7 @@ module Narou
   end
 
   def load_global_replace_pattern
-    path = get_root_dir.join(GLOBAL_REPLACE_NAME)
+    path = root_dir.join(GLOBAL_REPLACE_NAME)
     pairs =
       if path.exist?
         Helper::CacheLoader.memo(path) do |text|
@@ -167,7 +167,7 @@ module Narou
   end
 
   def save_global_replace_pattern
-    path = get_root_dir.join(GLOBAL_REPLACE_NAME)
+    path = root_dir.join(GLOBAL_REPLACE_NAME)
     write_replace_txt(path, @@global_replace_pattern_pairs)
   end
 
@@ -175,8 +175,8 @@ module Narou
   # AozoraEpub3 の実行ファイル(.jar)のフルパス取得
   # 検索順序
   # 1. グローバルセッティング (global_setting aozoraepub3dir)
-  # 2. 小説保存ディレクトリ(Narou.get_root_dir) 直下の AozoraEpub3
-  # 3. スクリプト保存ディレクトリ(Narou.get_script_dir) 直下の AozoraEpub3
+  # 2. 小説保存ディレクトリ(Narou.root_dir) 直下の AozoraEpub3
+  # 3. スクリプト保存ディレクトリ(Narou.script_dir) 直下の AozoraEpub3
   #
   def get_aozoraepub3_path
     global_setting_aozora_path = Inventory.load("global_setting", :global)["aozoraepub3dir"]
@@ -186,7 +186,7 @@ module Narou
         return aozora_jar_path
       end
     end
-    [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
+    [Narou.root_dir, Narou.script_dir].each do |dir|
       aozora_jar_path = create_aozoraepub3_jar_path(dir, AOZORAEPUB3_DIR)
       return aozora_jar_path if aozora_jar_path.exist?
     end
@@ -259,7 +259,7 @@ module Narou
   end
 
   def get_misc_dir
-    get_root_dir.join(MISC_DIR)
+    root_dir.join(MISC_DIR)
   end
 
   require_relative "device"
@@ -293,7 +293,7 @@ module Narou
   end
 
   def get_theme_dir(name = nil)
-    Pathname(File.join([get_script_dir, "lib/web/public/theme", name].compact))
+    Pathname(File.join([script_dir, "lib/web/public/theme", name].compact))
   end
 
   def get_theme_names
@@ -327,7 +327,7 @@ module Narou
   end
 
   def commit_version
-    cv_path = File.expand_path("commitversion", get_script_dir)
+    cv_path = File.expand_path("commitversion", script_dir)
     File.read(cv_path) if File.exist?(cv_path)
   end
   memoize :commit_version

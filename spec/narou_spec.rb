@@ -19,7 +19,7 @@ describe Narou do
   describe ".global_setting_dir" do
     before :all do
       @original_name = Narou::GLOBAL_SETTING_DIR_NAME.replace(".narousetting_dummy")
-      @global_dir_in_root = Pathname(".narousetting_dummy").expand_path(Narou.get_root_dir)
+      @global_dir_in_root = Pathname(".narousetting_dummy").expand_path(Narou.root_dir)
     end
 
     after :all do

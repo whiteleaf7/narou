@@ -348,7 +348,7 @@ module Command
     end
 
     def self.hotentry_dirname
-      @@__hotentry_dirname ||= File.join(Narou.get_root_dir, HOTENTRY_DIR_NAME)
+      @@__hotentry_dirname ||= File.join(Narou.root_dir, HOTENTRY_DIR_NAME)
     end
 
     def self.get_newest_hotentry_file_path(device)

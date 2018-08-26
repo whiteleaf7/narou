@@ -44,7 +44,7 @@ class Narou::AppServer < Sinatra::Base
 
     if $debug
       use BetterErrors::Middleware
-      BetterErrors.application_root = Narou.get_script_dir
+      BetterErrors.application_root = Narou.script_dir
     end
   end
 
