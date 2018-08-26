@@ -258,6 +258,7 @@ class Narou::AppServer < Sinatra::Base
         end
       end
       setting.execute!(built_arguments, io: Narou::NullIO.new)
+      Inventory.clear
     end
 
     # 置換設定保存
@@ -277,7 +278,7 @@ class Narou::AppServer < Sinatra::Base
     else
       session[:alert] = [ "#{@error_list.size}個の設定にエラーがありました", "danger" ]
     end
-    haml :settings
+    redirect to "/settings"
   end
 
   get "/settings" do

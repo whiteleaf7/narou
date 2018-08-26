@@ -19,6 +19,7 @@ module Helper
         original_print_horizontal_rule($stdout)
       end
     else
+      # 標準出力には表示されないが、ログには出力される様に
       io.original_stream.silence do
         original_print_horizontal_rule(io.original_stream)
       end

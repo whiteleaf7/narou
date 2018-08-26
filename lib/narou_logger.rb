@@ -20,21 +20,25 @@ end
 module Narou end unless defined?(Narou)
 
 module Narou::LoggerModule
-  attr_accessor :capturing, :stream
-  attr_reader :enable_logging, :format_file, :format_timestamp
+  attr_accessor :capturing, :stream, :log_postfix
+  attr_reader :enable_logging, :format_filename, :format_timestamp
 
   LOG_DIR = "log"
-  LOG_FORMAT_FILE = "%Y%m%d.txt"
+  LOG_FORMAT_FILENAME = "%Y%m%d.txt"
   LOG_FORMAT_TIMESTAMP = "[%H:%M:%S]"
 
   def initialize
     super
     @is_silent = false
     @capturing = false
+    init_logs
+  end
+
+  def init_logs
     inv = Inventory.load("local_setting")
     inv_logging = inv.group("logging")
     @enable_logging = inv["logging"]
-    @format_file = inv_logging.format_file || LOG_FORMAT_FILE
+    @format_filename = inv_logging.format_filename || LOG_FORMAT_FILENAME
     @format_timestamp = inv_logging.format_timestamp || LOG_FORMAT_TIMESTAMP
     create_log_dir
   end
@@ -135,10 +139,6 @@ module Narou::LoggerModule
     append_log(str) unless force_disable_logging
   end
 
-  def logging?
-    enable_logging && ENV["NAROU_ENV"] != "test"
-  end
-
   def warn(str)
     self.puts str
   end
@@ -147,7 +147,12 @@ module Narou::LoggerModule
     self.puts "<bold><red>[ERROR]</red></bold> ".termcolor + str
   end
 
+  def logging?
+    enable_logging && ENV["NAROU_ENV"] != "test"
+  end
+
   def create_log_dir
+    return unless logging?
     dir = Narou.log_dir
     dir.mkdir unless dir.exist?
   end
@@ -162,8 +167,11 @@ module Narou::LoggerModule
   end
 
   def log_filename
-    # TODO: 並列変換時には変換ログに postfix をつける（混ざるので）
-    "#{Time.now.strftime(format_file)}"
+    name = Time.now.strftime(format_filename)
+    return name unless log_postfix
+    ext = File.extname(name)
+    basename = File.basename(name, ext)
+    "#{basename}#{log_postfix}#{ext}"
   end
 
   def embed_timestamp(str)
@@ -182,9 +190,10 @@ end
 class Narou::Logger < StringIO
   include Narou::LoggerModule
 
-  def initialize
-    super
+  def initialize(log_postfix = nil)
+    super()
     self.stream = STDOUT
+    self.log_postfix = log_postfix
   end
   
   def write(str)
@@ -231,5 +240,8 @@ def error(str)
 end
 
 $stdout = Narou::Logger.new
-# $stderr = Narou::LoggerError.new
-$stdout2 = $stdout
+if Inventory.load["concurrency"]
+  $stdout2 = Narou::Logger.new("_convert")
+else
+  $stdout2 = $stdout
+end

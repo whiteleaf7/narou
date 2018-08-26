@@ -246,6 +246,7 @@ module Command
       result = ""
       SETTING_VARIABLES[scope].each do |name, info|
         if @options["all"] || !info[:invisible]
+          raise "変数名「#{name}」のtypeが未設定です" unless info[:type]
           type_description = Helper.variable_type_to_description(info[:type])
           result << "    <bold><green>#{name.ljust(18)}</green></bold> #{type_description} #{info[:help]}\n".termcolor
         end
@@ -354,13 +355,18 @@ module Command
           type: :boolean, help: "hotentryをメールで送る(mail設定済みの場合)",
           tab: :detail
         },
+        "concurrency" => {
+          help: "ダウンロードと変換の同時実行を有効にする。有効にするとログの出力方式が変更される。※試験実装",
+          type: :boolean,
+          tab: :general
+        },
         "logging" => {
           help: "ログの保存を有効にする",
           type: :boolean,
           tab: :general
         },
-        "logging.format-file" => {
-          help: "ログファイル名のフォーマット。デフォルトは #{Narou::LoggerModule::LOG_FORMAT_FILE} 。日付でファイルを分けたくなければ固定ファイル名にする。書式は http://bit.ly/date_format 参照",
+        "logging.format-filename" => {
+          help: "ログファイル名のフォーマット。デフォルトは #{Narou::LoggerModule::LOG_FORMAT_FILENAME} 。日付でファイルを分けたくなければ固定ファイル名にする。書式は http://bit.ly/date_format 参照",
           type: :string,
           tab: :detail
         },
@@ -405,23 +411,19 @@ module Command
           type: :directory, help: "copy-toの昔の書き方(非推奨)", invisible: true
         },
         "convert.no-epub" => {
-          type: :boolean, help: "EPUB変換を無効にする", invisible: true,
-          tab: :detail
+          type: :boolean, help: "EPUB変換を無効にする", invisible: true
         },
         "convert.no-mobi" => {
-          type: :boolean, help: "MOBI変換を無効にする", invisible: true,
-          tab: :detail
+          type: :boolean, help: "MOBI変換を無効にする", invisible: true
         },
         "convert.no-strip" => {
           type: :boolean,
           help: "MOBIのstripを無効にする\n" \
                 "      ※注意：KDP用のMOBIはstripしないでください",
-          invisible: true,
-          tab: :detail
+          invisible: true
         },
         "convert.no-zip" => {
-          type: :boolean, help: "i文庫用のzipファイル作成を無効にする", invisible: true,
-          tab: :detail
+          type: :boolean, help: "i文庫用のzipファイル作成を無効にする", invisible: true
         },
         "convert.no-open" => {
           type: :boolean, help: "変換時に保存フォルダを開かないようにする",
@@ -524,7 +526,7 @@ module Command
           type: :float, help: "行間サイズ(narou init から指定しないと反映されません)", invisible: true
         },
         "difftool" => {
-          type: :string, help: "Diffで使うツールのパスを指定する",
+          type: :string, help: "diffで使うツールのパスを指定する",
           tab: :global
         },
         "difftool.arg" => {
@@ -581,10 +583,6 @@ module Command
         },
         "over18" => {
           type: :boolean, help: "18歳以上かどうか", invisible: true,
-          tab: :global
-        },
-        "dismiss-notice" => {
-          type: :boolean, help: "お知らせを消す", invisible: true,
           tab: :global
         },
       }
