@@ -112,15 +112,14 @@ module Narou
 
     def stack_to_history(message)
       return if message[:no_history]
-      if message[:body] == "." && @history[-1][:body] =~ /\A\.+\z/
+      if message[:body] == "." && (last = @history[-1])[:body] =~ /\A\.+\z/
         # 進行中を表す .... の出力でヒストリーが消費されるのを防ぐため、
         # 連続した . は一つにまとめる
-        @history[-1][:body] << "."
+        last[:body] = "#{last[:body]}."
       else
         @history.push(message)
         @history.shift
       end
     end
-
   end
 end

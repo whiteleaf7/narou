@@ -705,7 +705,7 @@ class Narou::AppServer < Sinatra::Base
 
   get "/api/tag_list" do
     result =
-      '<div><span class="tag tag-reset label label-default" data-tag="">タグ検索を解除</span></div>' \
+      +'<div><span class="tag tag-reset label label-default" data-tag="">タグ検索を解除</span></div>' \
       '<div class="text-muted" style="font-size:10px">Altキーを押しながらで除外検索</div>'
     tagname_list = Command::Tag.get_tag_list.keys
     tagname_list.sort.each do |tagname|
