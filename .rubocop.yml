@@ -213,7 +213,7 @@ Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
-  Enabled: false
+  Enabled: true
 
 Layout/MultilineOperationIndentation:
   Enabled: false

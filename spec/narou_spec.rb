@@ -1,4 +1,5 @@
-# -*- Encoding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -18,12 +19,13 @@ describe Narou do
 
   describe ".global_setting_dir" do
     before :all do
-      @original_name = Narou::GLOBAL_SETTING_DIR_NAME.replace(".narousetting_dummy")
+      @original_name = Narou::GLOBAL_SETTING_DIR_NAME
+      Narou.const_replace :GLOBAL_SETTING_DIR_NAME, ".narousetting_dummy"
       @global_dir_in_root = Pathname(".narousetting_dummy").expand_path(Narou.root_dir)
     end
 
     after :all do
-      Narou::GLOBAL_SETTING_DIR_NAME.replace(@original_name)
+      Narou.const_replace :GLOBAL_SETTING_DIR_NAME, @original_name
     end
 
     after do

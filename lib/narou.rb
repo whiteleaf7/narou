@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -43,7 +44,7 @@ module Narou
   end
 
   def root_dir
-    root_dir = nil
+    root = nil
     path = Dir.pwd
     drive_letter = ""
     if Helper.os_windows?
@@ -53,12 +54,12 @@ module Narou
     end
     while path != ""
       if File.directory?("#{drive_letter}#{path}/#{LOCAL_SETTING_DIR_NAME}")
-        root_dir = drive_letter + path
+        root = drive_letter + path
         break
       end
       path.gsub!(%r!/[^/]*$!, "")
     end
-    Pathname(root_dir) if root_dir
+    Pathname(root) if root
   end
   memoize :root_dir
 
@@ -68,7 +69,6 @@ module Narou
   memoize :local_setting_dir
 
   def global_setting_dir
-    root_dir = root_dir
     if root_dir
       dir = root_dir.join(GLOBAL_SETTING_DIR_NAME)
       return dir if dir.directory?
