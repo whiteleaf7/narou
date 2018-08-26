@@ -15,9 +15,9 @@ describe Helper do
       it { expect(Helper.string_cast_to_type("false", :boolean)).to eq false }
       it { expect(Helper.string_cast_to_type("FALSE", :boolean)).to eq false }
       it "should be error" do
-        expect { Helper.string_cast_to_type("1", :boolean) }.to raise_error
-        expect { Helper.string_cast_to_type("abc", :boolean) }.to raise_error
-        expect { Helper.string_cast_to_type("TrueClass", :boolean) }.to raise_error
+        expect { Helper.string_cast_to_type("1", :boolean) }.to raise_error Helper::InvalidVariableType
+        expect { Helper.string_cast_to_type("abc", :boolean) }.to raise_error Helper::InvalidVariableType
+        expect { Helper.string_cast_to_type("TrueClass", :boolean) }.to raise_error Helper::InvalidVariableType
       end
     end
 
@@ -27,8 +27,8 @@ describe Helper do
       it { expect(Helper.string_cast_to_type("-100", :integer)).to eq -100 }
       it { expect(Helper.string_cast_to_type("+10_00", :integer)).to eq +1000 }
       it "should be error" do
-        expect { Helper.string_cast_to_type("10.0", :integer) }.to raise_error
-        expect { Helper.string_cast_to_type("abc", :integer) }.to raise_error
+        expect { Helper.string_cast_to_type("10.0", :integer) }.to raise_error Helper::InvalidVariableType
+        expect { Helper.string_cast_to_type("abc", :integer) }.to raise_error Helper::InvalidVariableType
       end
     end
 
@@ -38,7 +38,7 @@ describe Helper do
       it { expect(Helper.string_cast_to_type("-100.1", :float)).to eq -100.1 }
       it { expect(Helper.string_cast_to_type("-10.2e3", :float)).to eq -10200.0 }
       it "should be error" do
-        expect { Helper.string_cast_to_type("abc", :float) }.to raise_error
+        expect { Helper.string_cast_to_type("abc", :float) }.to raise_error Helper::InvalidVariableType
       end
     end
 
@@ -49,7 +49,7 @@ describe Helper do
         end
       end
       it "should be error" do
-        expect { Helper.string_cast_to_type("/foobarbazz", :directory) }.to raise_error
+        expect { Helper.string_cast_to_type("/foobarbazz", :directory) }.to raise_error Helper::InvalidVariableType
       end
     end
 
@@ -61,7 +61,7 @@ describe Helper do
         end
       end
       it "should be error" do
-        expect { Helper.string_cast_to_type("/foobarbazz.txt", :file) }.to raise_error
+        expect { Helper.string_cast_to_type("/foobarbazz.txt", :file) }.to raise_error Helper::InvalidVariableType
       end
     end
 

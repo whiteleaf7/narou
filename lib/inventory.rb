@@ -14,7 +14,7 @@ require_relative "narou"
 # scope に :global を指定するとユーザーディレクトリ/.narousetting に保存される
 #
 module Inventory
-  def self.load(name, scope = :local)
+  def self.load(name = "local_setting", scope = :local)
     @@cache ||= {}
     return @@cache[name] if @@cache[name]
     {}.tap { |h|

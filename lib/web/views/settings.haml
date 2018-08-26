@@ -26,7 +26,6 @@
   });
 
 :ruby
-  Inventory.clear
   inventory = Inventory.load("local_setting").merge(Inventory.load("global_setting", :global))
   local_and_global_variables = @setting_variables[:local].merge(@setting_variables[:global])
   tab_info = Command::Setting.get_setting_tab_info
@@ -68,12 +67,15 @@
                   = tab_info[key]
               .list-group
                 - local_and_global_variables.each do |name, value|
-                  - next if value[:tab] != key
-                  - item = inventory[name]
-                  - need_clear = false
-                  - message = Narou::SETTING_VARIABLES_WEBUI_MESSAGES[name] || value[:help]
-                  - message = message.strip.gsub("\n", "<br>")
-                  - error_style = {class: "has-error", style: "background-color:#f2dede"}
+                  :ruby
+                    next if value[:tab] != key
+                    item = inventory[name]
+                    need_clear = false
+                    msg_for_web = Narou::SETTING_VARIABLES_WEBUI_MESSAGES[name]
+                    message = msg_for_web || value[:help]
+                    message = message.gsub("%%ORIG%%", value[:help]) if msg_for_web
+                    message = message.strip.gsub("\n", "<br>")
+                    error_style = { class: "has-error", style: "background-color: #f2dede" }
                   .list-group-item.form-group{@error_list[name] ? error_style : {}}
                     %h4.list-group-item-heading #{name}
                     .list-group-item-text

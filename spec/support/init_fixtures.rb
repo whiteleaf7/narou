@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -11,9 +12,16 @@ require "time"
 require "narou"
 require "database"
 
-Narou::LOCAL_SETTING_DIR_NAME.replace(".test_dot_narou")
-Narou::GLOBAL_SETTING_DIR_NAME.replace(".test_dot_narousetting")
-Database::ARCHIVE_ROOT_DIR_PATH.replace(".test_novel_data/")
+class Module
+  def const_replace(name, value)
+    remove_const(name)
+    const_set(name, value)
+  end
+end
+
+Narou.const_replace :LOCAL_SETTING_DIR_NAME, ".test_dot_narou"
+Narou.const_replace :GLOBAL_SETTING_DIR_NAME, ".test_dot_narousetting"
+Database.const_replace :ARCHIVE_ROOT_DIR_PATH, ".test_novel_data/"
 
 Narou.flush_cache
 

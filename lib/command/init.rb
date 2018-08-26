@@ -111,7 +111,7 @@ module Command
 
     def rewrite_aozoraepub3_files(aozora_path, line_height)
       # chuki_tag.txt の書き換え
-      custom_chuki_tag_path = File.join(Narou.get_preset_dir, "custom_chuki_tag.txt")
+      custom_chuki_tag_path = File.join(Narou.preset_dir, "custom_chuki_tag.txt")
       chuki_tag_path = File.join(aozora_path, "chuki_tag.txt")
       custom_chuki_tag = File.read(custom_chuki_tag_path, mode: "r:BOM|UTF-8")
       chuki_tag = File.read(chuki_tag_path, mode: "r:BOM|UTF-8")
@@ -130,7 +130,7 @@ module Command
       dst = ["AozoraEpub3.ini", "template/OPS/css_custom/vertical_font.css"]
       puts "(次のファイルをコピーor上書きしました)"
       src.size.times do |i|
-        src_full_path = File.join(Narou.get_preset_dir, src[i])
+        src_full_path = File.join(Narou.preset_dir, src[i])
         dst_full_path = File.join(aozora_path, dst[i])
         Helper.erb_copy(src_full_path, dst_full_path, binding)
         puts dst_full_path

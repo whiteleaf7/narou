@@ -21,6 +21,9 @@ Metrics/ModuleLength:
 Metrics/AbcSize:
   Max: 30
 
+Metrics/BlockLength:
+  Max: 40
+
 Metrics/BlockNesting:
   Max: 3
 
@@ -81,9 +84,6 @@ Style/Documentation:
 
 Style/DoubleNegation:
   Enabled: false
-
-Style/FormatString:
-  EnforcedStyle: percent
 
 # 後置 if/unless を使わないほうがわかりやすい場合もある
 Style/IfUnlessModifier:
@@ -216,10 +216,25 @@ Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
-  Enabled: false
+  Enabled: true
 
 Layout/MultilineOperationIndentation:
   Enabled: false
 
 Layout/IndentHeredoc:
+  Enabled: true
+
+Style/NumericPredicate:
   Enabled: false
+
+Lint/HandleExceptions:
+  Enabled: false
+
+Lint/RescueException:
+  Enabled: false
+
+Lint/EmptyWhen:
+  Enabled: false
+
+Style/FormatStringToken:
+  EnforcedStyle: unannotated

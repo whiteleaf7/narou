@@ -93,8 +93,8 @@ module Helper
     end
   end
 
-  def print_horizontal_rule
-    puts "―" * 35
+  def print_horizontal_rule(io = $stdout)
+    io.puts "―" * 35
   end
 
   def replace_filename_special_chars(str, invalid_replace = false)
@@ -398,11 +398,10 @@ module Helper
           loop do
             block.call if block
             sleep(sleep_time)
-            if Narou::Worker.canceled?
-              Process.kill("KILL", pid)
-              Process.detach(pid)
-              break
-            end
+            next unless Narou::WebWorker.canceled?
+            Process.kill("KILL", pid)
+            Process.detach(pid)
+            break
           end
         end
         looper.join

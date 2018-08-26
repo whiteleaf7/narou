@@ -5,12 +5,15 @@
 
 require "optparse"
 require "termcolorlight"
-require_relative "web/worker"
+require_relative "web/web_worker"
 
 module Command
   class CommandBase
+    attr_accessor :stream_io
+
     # postfixies は改行で区切ることで2パターン以上記述できる
     def initialize(postfixies = "")
+      self.stream_io = $stdout
       @opt = OptionParser.new(nil, 20)
       command_name = self.class.to_s.scan(/::(.+)$/)[0][0].downcase
       banner = postfixies.split("\n").map.with_index { |postfix, i|
@@ -103,7 +106,8 @@ module Command
     # コマンドを実行するが、アプリケーションは終了させない
     # (SystemExit を補足し、終了コードを返り値とする)
     #
-    def execute!(*argv)
+    def execute!(*argv, io: $stdout)
+      self.stream_io = io
       argv.flatten!
       execute(argv)
     rescue SystemExit => e
@@ -112,8 +116,9 @@ module Command
       0
     end
 
-    def self.execute!(*argv)
-      self.new.execute!(*argv)
+    def self.execute!(*argv, io: $stdout)
+      cmd = new
+      cmd.execute!(*argv, io: io)
     end
 
     def self.oneline_help

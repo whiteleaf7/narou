@@ -88,7 +88,7 @@ module Command
         @novel_data = latest
       else
         target = argv.shift
-        @novel_data = Downloader.get_data_by_target(target)
+        @novel_data = Downloader.get_data_by_target(target) || {}
         id = @novel_data["id"]
       end
       unless id
