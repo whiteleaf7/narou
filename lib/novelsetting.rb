@@ -389,15 +389,15 @@ class NovelSetting
       name: "title_date_format",
       type: :string,
       value: "(%-m/%-d)",
-      help: <<-EOS
-enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/date_format を参照。
-Narou.rb専用の書式として下記のものも使用可能。
-$s 2045年までの残り時間(10分単位の4桁の36進数)
-$t 小説のタイトル
-$ns 小説が掲載されているサイト名
-$nt 小説種別（短編 or 連載）
-$ntag 小説のタグをカンマ区切りにしたもの
-      EOS
+      help: <<~HELP
+        enable_add_date_to_title で付与する日付のフォーマット。書式は http://bit.ly/date_format を参照。
+        Narou.rb専用の書式として下記のものも使用可能。
+        $t 小説のタイトル($tを使った場合はtitle_date_alignは無視される)
+        $s 2045年までの残り時間(10分単位の4桁の36進数)
+        $ns 小説が掲載されているサイト名
+        $nt 小説種別（短編 or 連載）
+        $ntag 小説のタグをカンマ区切りにしたもの
+      HELP
     },
     {
       name: "title_date_align",

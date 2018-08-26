@@ -54,14 +54,14 @@ module Narou
 
     def silent
       if block_given?
-        if /^(.+?):(\d+)/ =~ caller.first
+        if /^(.+?):(\d+)/ =~ caller(1..1).first
           file = $1
           line = $2.to_i
           error_msg = "Did you mean: silence\n"
-          str = File.read(file).split("\n")[line-1]
+          str = File.read(file).split("\n")[line - 1]
           error_msg += "in #{file}:#{line}\n"
           error_msg += str + "\n"
-          error_msg +=  " " * str.index("silent") + "~~~~~~"
+          error_msg += " " * str.index("silent") + "~~~~~~"
           raise error_msg
         end
       end
@@ -72,7 +72,7 @@ module Narou
       raise "need a block" unless block
       tmp = self.silent
       self.silent = true
-      block.call
+      yield
       self.silent = tmp
     end
 
@@ -92,9 +92,9 @@ module Narou
       $stdout = (self == $stdout ? copy_instance : self)
       $stdout.capturing = true
       if options[:quiet]
-        $stdout.silence { block.call }
+        $stdout.silence { yield }
       else
-        block.call
+        yield
       end
       $stdout.capturing = false
       buffer = $stdout.string
@@ -120,12 +120,11 @@ module Narou
     end
 
     def write_console(str, target)
-      unless @is_silent
-        if $disable_color
-          target.write(str)
-        else
-          write_color(str, target)
-        end
+      return if @is_silent
+      if $disable_color
+        target.write(str)
+      else
+        write_color(str, target)
       end
     end
 
@@ -194,7 +193,7 @@ module Narou
       self.stream = STDOUT
       self.log_postfix = log_postfix
     end
-    
+
     def write(str)
       write_base(str, stream)
       super(str)

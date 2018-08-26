@@ -235,3 +235,6 @@ Lint/RescueException:
 
 Lint/EmptyWhen:
   Enabled: false
+
+Style/FormatStringToken:
+  EnforcedStyle: unannotated
