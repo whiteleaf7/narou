@@ -1,4 +1,8 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
+#
+# Copyright 2013 whiteleaf. All rights reserved.
+#
 
 require "fileutils"
 require_relative "../downloader"

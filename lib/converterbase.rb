@@ -1,4 +1,5 @@
-﻿# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -55,7 +56,7 @@ class ConverterBase
     @request_insert_blank_next_line = false
     @request_skip_output_line = false
     @before_line = ""
-    @delay_outputs_buffer = ""
+    @delay_outputs_buffer = +""
     @in_comment_block = false
     @english_sentences = []
     @url_list = []
@@ -657,7 +658,7 @@ class ConverterBase
   end
 
   def insert_blank_before_line_and_behind_to_special_chapter(line)
-    result = ""
+    result = +""
     if line =~ /［＃章見出しっぽい文＝/
       unless blank_line?(@before_line)
         result << "\n"
@@ -687,7 +688,7 @@ class ConverterBase
   # ■などの区切りの前後には空行が必ず存在するようにする
   #
   def insert_blank_line_to_border_symbol(line)
-    result = ""
+    result = +""
     if border_symbol?(line)
       unless blank_line?(@before_line)
         result << "\n"
@@ -816,8 +817,8 @@ class ConverterBase
   # 改行がひとつもなかった場合は nil を返す
   #
   def join_inner_bracket(str)
-    joined_str = str.dup
     return nil if str.count("\n") == 0
+    joined_str = str.dup
     joined_str.gsub!(/([…―])\n/, "\\1。\n")
     joined_str = joined_str.split("\n").map { |s|
       s.sub(/^　+/, "")
@@ -1202,7 +1203,7 @@ class ConverterBase
   # 単語単位でzwsを挿入する
   #
   def insert_word_separator(str)
-    buffer = ""
+    buffer = +""
     ss = StringScanner.new(str)
     before_symbol = false
 
@@ -1263,7 +1264,7 @@ class ConverterBase
   # 文字単位でzwsを挿入する
   #
   def insert_char_separator(str)
-    buffer = ""
+    buffer = +""
     ss = StringScanner.new(str)
     before_symbol = false
     while char = ss.getch
@@ -1376,7 +1377,7 @@ class ConverterBase
         unless @delay_outputs_buffer.empty?
           @write_fp.write(@delay_outputs_buffer)
           @before_line = @delay_outputs_buffer
-          @delay_outputs_buffer = ""
+          @delay_outputs_buffer.clear
         else
           @before_line = line
         end
