@@ -17,7 +17,7 @@ class Device
 
     # 栞データを管理するディレクトリのパスを取得
     def get_storage_path
-      File.join(Narou.get_misc_dir, "bookmark", @name)
+      File.join(Narou.misc_dir, "bookmark", @name)
     end
     memoize :get_storage_path
   end

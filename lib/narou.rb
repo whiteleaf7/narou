@@ -178,7 +178,7 @@ module Narou
   # 2. 小説保存ディレクトリ(Narou.root_dir) 直下の AozoraEpub3
   # 3. スクリプト保存ディレクトリ(Narou.script_dir) 直下の AozoraEpub3
   #
-  def get_aozoraepub3_path
+  def aozoraepub3_path
     global_setting_aozora_path = Inventory.load("global_setting", :global)["aozoraepub3dir"]
     if global_setting_aozora_path
       aozora_jar_path = create_aozoraepub3_jar_path(global_setting_aozora_path)
@@ -192,7 +192,7 @@ module Narou
     end
     nil
   end
-  memoize :get_aozoraepub3_path
+  memoize :aozoraepub3_path
 
   #
   # 書籍ファイル名を生成する
@@ -258,7 +258,7 @@ module Narou
     paths
   end
 
-  def get_misc_dir
+  def misc_dir
     root_dir.join(MISC_DIR)
   end
 
@@ -334,7 +334,7 @@ module Narou
 
   def kindlegen_path
     postfix = Helper.os_windows? ? ".exe" : ""
-    get_aozoraepub3_path.dirname.join("kindlegen#{postfix}")
+    aozoraepub3_path.dirname.join("kindlegen#{postfix}")
   end
   memoize :kindlegen_path
 

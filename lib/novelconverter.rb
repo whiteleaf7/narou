@@ -90,7 +90,7 @@ class NovelConverter
 
   def self.activate_dakuten_font_files
     preset_dir = Narou.preset_dir
-    aozora_dir = File.dirname(Narou.get_aozoraepub3_path)
+    aozora_dir = File.dirname(Narou.aozoraepub3_path)
     line_height = Narou.line_height
 
     DAKUTEN_FROM.each_with_index do |name, i|
@@ -106,7 +106,7 @@ class NovelConverter
 
   def self.inactivate_dakuten_font_files
     preset_dir = Narou.preset_dir
-    aozora_dir = File.dirname(Narou.get_aozoraepub3_path)
+    aozora_dir = File.dirname(Narou.aozoraepub3_path)
     path_normal_vertical_css = File.join(preset_dir, "vertical_font.css")
     line_height = Narou.line_height
 
@@ -155,7 +155,7 @@ class NovelConverter
 
     pwd = Dir.pwd
 
-    aozoraepub3_path = Narou.get_aozoraepub3_path
+    aozoraepub3_path = Narou.aozoraepub3_path
     unless aozoraepub3_path
       error "AozoraEpub3が見つからなかったのでEPUBが出力出来ませんでした。" +
             "narou initでAozoraEpub3の設定を行なって下さい"
