@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -10,7 +11,7 @@ require "socket"
 require "sinatra/base"
 require "sinatra/json"
 require "sinatra/reloader" if $development
-require "better_errors" if $debug
+# require "better_errors" if $debug
 require "tilt/erubis"
 require "tilt/haml"
 require "tilt/sass"

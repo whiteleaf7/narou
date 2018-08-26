@@ -17,217 +17,217 @@ if $disable_color
   end
 end
 
-module Narou end unless defined?(Narou)
+module Narou
+  module LoggerModule
+    attr_accessor :capturing, :stream, :log_postfix
+    attr_reader :enable_logging, :format_filename, :format_timestamp
 
-module Narou::LoggerModule
-  attr_accessor :capturing, :stream, :log_postfix
-  attr_reader :enable_logging, :format_filename, :format_timestamp
+    LOG_DIR = "log"
+    LOG_FORMAT_FILENAME = "%Y%m%d.txt"
+    LOG_FORMAT_TIMESTAMP = "[%H:%M:%S]"
 
-  LOG_DIR = "log"
-  LOG_FORMAT_FILENAME = "%Y%m%d.txt"
-  LOG_FORMAT_TIMESTAMP = "[%H:%M:%S]"
-
-  def initialize
-    super
-    @is_silent = false
-    @capturing = false
-    init_logs
-  end
-
-  def init_logs
-    inv = Inventory.load("local_setting")
-    inv_logging = inv.group("logging")
-    @enable_logging = inv["logging"]
-    @format_filename = inv_logging.format_filename || LOG_FORMAT_FILENAME
-    @format_timestamp = inv_logging.format_timestamp || LOG_FORMAT_TIMESTAMP
-    create_log_dir
-  end
-
-  def copy_instance
-    self.class.new.tap { |obj|
-      obj.silent = silent
-    }
-  end
-
-  def silent=(enable)
-    @is_silent = !!enable
-  end
-
-  def silent
-    if block_given?
-      if /^(.+?):(\d+)/ =~ caller.first
-        file = $1
-        line = $2.to_i
-        error_msg = "Did you mean: silence\n"
-        str = File.read(file).split("\n")[line-1]
-        error_msg += "in #{file}:#{line}\n"
-        error_msg += str + "\n"
-        error_msg +=  " " * str.index("silent") + "~~~~~~"
-        raise error_msg
-      end
+    def initialize
+      super
+      @is_silent = false
+      @capturing = false
+      init_logs
     end
-    @is_silent
-  end
 
-  def silence(&block)
-    raise "need a block" unless block
-    tmp = self.silent
-    self.silent = true
-    block.call
-    self.silent = tmp
-  end
+    def init_logs
+      inv = Inventory.load("local_setting")
+      inv_logging = inv.group("logging")
+      @enable_logging = inv["logging"]
+      @format_filename = inv_logging.format_filename || LOG_FORMAT_FILENAME
+      @format_timestamp = inv_logging.format_timestamp || LOG_FORMAT_TIMESTAMP
+      create_log_dir
+    end
 
-  #
-  # 標準出力($stdout)のバッファリング＋取得
-  #
-  # キャプチャー用途なので標準エラーはキャプチャーしない
-  # quiet :: 標準出力に出力をしないかどうか
-  # ansicolor_strip :: エスケープシーケンスを除去するか
-  #
-  def capture(options = {}, &block)
-    options = {
-      quiet: true, ansicolor_strip: true
-    }.merge(options)
-    raise "#capture block given" unless block
-    temp_stream = $stdout
-    $stdout = (self == $stdout ? copy_instance : self)
-    $stdout.capturing = true
-    if options[:quiet]
-      $stdout.silence { block.call }
-    else
+    def copy_instance
+      self.class.new.tap { |obj|
+        obj.silent = silent
+      }
+    end
+
+    def silent=(enable)
+      @is_silent = !!enable
+    end
+
+    def silent
+      if block_given?
+        if /^(.+?):(\d+)/ =~ caller.first
+          file = $1
+          line = $2.to_i
+          error_msg = "Did you mean: silence\n"
+          str = File.read(file).split("\n")[line-1]
+          error_msg += "in #{file}:#{line}\n"
+          error_msg += str + "\n"
+          error_msg +=  " " * str.index("silent") + "~~~~~~"
+          raise error_msg
+        end
+      end
+      @is_silent
+    end
+
+    def silence(&block)
+      raise "need a block" unless block
+      tmp = self.silent
+      self.silent = true
       block.call
+      self.silent = tmp
     end
-    $stdout.capturing = false
-    buffer = $stdout.string
-    $stdout = temp_stream
-    result = options[:ansicolor_strip] ? strip_color(buffer) : buffer
-    if $stdout.capturing && !options[:quiet]
-      # 多段キャプチャ中かつ quiet: false の場合は外側にも伝播する
-      $stdout.string << result
-    end
-    result
-  end
 
-  def strip_color(str)
-    if $disable_color
-      str
-    else
-      str.gsub(/(?:\e\[\d*[a-zA-Z])+/, "")
-    end
-  end
-
-  def save(path)
-    File.write(path, strip_color(string))
-  end
-
-  def write_console(str, target)
-    unless @is_silent
-      if $disable_color
-        target.write(str)
+    #
+    # 標準出力($stdout)のバッファリング＋取得
+    #
+    # キャプチャー用途なので標準エラーはキャプチャーしない
+    # quiet :: 標準出力に出力をしないかどうか
+    # ansicolor_strip :: エスケープシーケンスを除去するか
+    #
+    def capture(options = {}, &block)
+      options = {
+        quiet: true, ansicolor_strip: true
+      }.merge(options)
+      raise "#capture block given" unless block
+      temp_stream = $stdout
+      $stdout = (self == $stdout ? copy_instance : self)
+      $stdout.capturing = true
+      if options[:quiet]
+        $stdout.silence { block.call }
       else
-        write_color(str, target)
+        block.call
+      end
+      $stdout.capturing = false
+      buffer = $stdout.string
+      $stdout = temp_stream
+      result = options[:ansicolor_strip] ? strip_color(buffer) : buffer
+      if $stdout.capturing && !options[:quiet]
+        # 多段キャプチャ中かつ quiet: false の場合は外側にも伝播する
+        $stdout.string << result
+      end
+      result
+    end
+
+    def strip_color(str)
+      if $disable_color
+        str
+      else
+        str.gsub(/(?:\e\[\d*[a-zA-Z])+/, "")
       end
     end
-  end
 
-  def write_base(str, stream, force_disable_logging = false)
-    str = str.to_s
-    if str.encoding == Encoding::ASCII_8BIT
-      str.force_encoding(Encoding::UTF_8)
+    def save(path)
+      File.write(path, strip_color(string))
     end
-    write_console(str, stream)
-    append_log(str) unless force_disable_logging
-  end
 
-  def warn(str)
-    self.puts str
-  end
-
-  def error(str)
-    self.puts "<bold><red>[ERROR]</red></bold> ".termcolor + str
-  end
-
-  def logging?
-    enable_logging && ENV["NAROU_ENV"] != "test"
-  end
-
-  def create_log_dir
-    return unless logging?
-    dir = Narou.log_dir
-    dir.mkdir unless dir.exist?
-  end
-
-  def append_log(str)
-    return unless logging?
-    File.write(log_filepath, strip_color(embed_timestamp(str)), mode: "a")
-  end
-
-  def log_filepath
-    Narou.log_dir.join(log_filename)
-  end
-
-  def log_filename
-    name = Time.now.strftime(format_filename)
-    return name unless log_postfix
-    ext = File.extname(name)
-    basename = File.basename(name, ext)
-    "#{basename}#{log_postfix}#{ext}"
-  end
-
-  def embed_timestamp(str)
-    unless @before_head_ln
-      str = "\n#{str}"
-      @before_head_ln = true
+    def write_console(str, target)
+      unless @is_silent
+        if $disable_color
+          target.write(str)
+        else
+          write_color(str, target)
+        end
+      end
     end
-    if str.end_with?("\n")
-      str = str.sub(/\n\z/, "")
-      @before_head_ln = false
+
+    def write_base(str, stream, force_disable_logging = false)
+      str = str.to_s
+      if str.encoding == Encoding::ASCII_8BIT
+        str.force_encoding(Encoding::UTF_8)
+      end
+      write_console(str, stream)
+      append_log(str) unless force_disable_logging
     end
-    str.gsub("\n", "\n#{Time.now.strftime(format_timestamp)} ")
+
+    def warn(str)
+      self.puts str
+    end
+
+    def error(str)
+      self.puts "<bold><red>[ERROR]</red></bold> ".termcolor + str
+    end
+
+    def logging?
+      enable_logging && ENV["NAROU_ENV"] != "test"
+    end
+
+    def create_log_dir
+      return unless logging?
+      dir = Narou.log_dir
+      dir.mkdir unless dir.exist?
+    end
+
+    def append_log(str)
+      return unless logging?
+      File.write(log_filepath, strip_color(embed_timestamp(str)), mode: "a")
+    end
+
+    def log_filepath
+      Narou.log_dir.join(log_filename)
+    end
+
+    def log_filename
+      name = Time.now.strftime(format_filename)
+      return name unless log_postfix
+      ext = File.extname(name)
+      basename = File.basename(name, ext)
+      "#{basename}#{log_postfix}#{ext}"
+    end
+
+    def embed_timestamp(str)
+      unless @before_head_ln
+        str = "\n#{str}"
+        @before_head_ln = true
+      end
+      if str.end_with?("\n")
+        str = str.sub(/\n\z/, "")
+        @before_head_ln = false
+      end
+      str.gsub("\n", "\n#{Time.now.strftime(format_timestamp)} ")
+    end
   end
-end
 
-class Narou::Logger < StringIO
-  include Narou::LoggerModule
+  class Logger < StringIO
+    include LoggerModule
 
-  def initialize(log_postfix = nil)
-    super()
-    self.stream = STDOUT
-    self.log_postfix = log_postfix
-  end
-  
-  def write(str)
-    write_base(str, stream)
-    super(str)
-  end
+    def initialize(log_postfix = nil)
+      super()
+      self.stream = STDOUT
+      self.log_postfix = log_postfix
+    end
+    
+    def write(str)
+      write_base(str, stream)
+      super(str)
+    end
 
-  def tty?
-    STDOUT.tty?
-  end
-end
-
-class Narou::LoggerError < StringIO
-  include Narou::LoggerModule
-
-  def initialize
-    super
-    self.stream = STDERR
+    def tty?
+      STDOUT.tty?
+    end
   end
 
-  def write(str)
-    write_base(str, stream, false)
-    super(str)
+  class LoggerError < StringIO
+    include LoggerModule
+
+    def initialize
+      super
+      self.stream = STDERR
+    end
+
+    def write(str)
+      write_base(str, stream, false)
+      super(str)
+    end
+
+    def tty?
+      STDERR.tty?
+    end
   end
 
-  def tty?
-    STDERR.tty?
+  class NullIO < StringIO
+    include LoggerModule
+
+    def write(_str); end
   end
-end
-
-class Narou::NullIO < StringIO
-  include Narou::LoggerModule
-
-  def write(_str); end
 end
 
 def warn(str, trace = nil)
