@@ -704,12 +704,10 @@ $console-color: white;
   }
 }
 
-.console-col-left {
-  padding-right: 2px;
-}
-
+.console-col-left,
 .console-col-right {
-  padding-left: 2px;
+  padding-left: 1px;
+  padding-right: 1px;
 }
 
 /*
