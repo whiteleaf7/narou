@@ -51,26 +51,22 @@ novel_info_url: \\k<toc_url>
 t: *title
 
 # novel_type 小説種別
-nt: <dt><span>執筆状況</span></dt>\n        <dd>(?<novel_type>.+?)</dd>
+nt: '<dt><span>執筆状況</span></dt>\n *?<dd>(?<novel_type>.+?)</dd>'
 novel_type_string:
   連載中: 1
   完結済: 3
 
 # general_all_no 掲載話数
-ga: <dt><span>エピソード</span></dt>\n        <dd>(?<general_all_no>\d+)話</dd>
+ga: '<dt><span>エピソード</span></dt>\n *?<dd>(?<general_all_no>\d+)話</dd>'
 
 # story あらすじ
 s: *story
 
 # general_firstup 初回掲載日
-gf: |-2
-              <dt><span>公開日</span></dt>
-              <dd><time itemprop="datePublished" datetime="(?<general_firstup>.+?)">.+?</time>
+gf: '<dt><span>公開日</span></dt>\n *?<dd><time itemprop="datePublished" datetime="(?<general_firstup>.+?)">.+?</time>'
 
 # novelupdated_at 小説の更新時刻。最終掲載日で代用
-nu: |-2
-              <dt><span>最終更新日</span></dt>
-              <dd><time itemprop="dateModified" datetime="(?<novelupdated_at>.+?)">.+?</time>
+nu: '<dt><span>最終更新日</span></dt>\n *?<dd><time itemprop="dateModified" datetime="(?<novelupdated_at>.+?)">.+?</time>'
 
 # general_lastup 最新話掲載日
 gl: null
@@ -80,6 +76,4 @@ w: |-
   (?:<span class="activityName" itemprop="author">(?<writer>.+?)</span>)|(?:<span class="screenName.*?">(?<writer>.+?)</span>)
 
 # length 文字数
-l: |-2
-              <dt><span>総文字数</span></dt>
-              <dd>(?<length>.+?)文字</dd>
+l: '<dt><span>総文字数</span></dt>\n *?<dd>(?<length>.+?)文字</dd>'
