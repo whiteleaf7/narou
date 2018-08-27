@@ -22,7 +22,6 @@ module Narou
     attr_accessor :capturing, :stream, :log_postfix
     attr_reader :enable_logging, :format_filename, :format_timestamp
 
-    LOG_DIR = "log"
     LOG_FORMAT_FILENAME = "%Y%m%d.txt"
     LOG_FORMAT_TIMESTAMP = "[%H:%M:%S]"
 
@@ -188,10 +187,9 @@ module Narou
   class Logger < StringIO
     include LoggerModule
 
-    def initialize(log_postfix = nil)
-      super()
+    def initialize
+      super
       self.stream = STDOUT
-      self.log_postfix = log_postfix
     end
 
     def write(str)
@@ -239,4 +237,9 @@ def error(str)
 end
 
 $stdout = Narou::Logger.new
-$stdout2 = Inventory.load["concurrency"] ? Narou::Logger.new("_convert") : $stdout
+if Inventory.load["concurrency"]
+  $stdout2 = Narou::Logger.new
+  $stdout2.log_postfix = "_convert"
+else
+  $stdout2 = $stdout
+end

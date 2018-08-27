@@ -34,6 +34,7 @@ module Narou
       @push_server = push_server
       @target_console = target_console
       @original_stream = original_stream
+      self.log_postfix = original_stream.log_postfix
     end
 
     def tty?
