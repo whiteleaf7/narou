@@ -694,13 +694,13 @@ class Narou::AppServer < Sinatra::Base
 
   post "/api/puts_all_logs" do
     $stdout.push_streaming($stdout.string, no_history: true)
-    $stdout2.push_streaming($stdout2.string, no_history: true) if $stdout != $stdout2
+    $stdout2.push_streaming($stdout2.string, no_history: true) if Narou.concurrency_enabled?
   end
 
   post "/api/clear_history" do
     Narou::PushServer.instance.clear_history
     $stdout.string.clear
-    $stdout2.string.clear if $stdout != $stdout2
+    $stdout2.string.clear if Narou.concurrency_enabled?
   end
 
   get "/api/tag_list" do

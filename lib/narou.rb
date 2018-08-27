@@ -342,5 +342,9 @@ module Narou
     global_setting = Inventory.load("global_setting", :global)
     global_setting["line-height"] || default
   end
+
+  def concurrency_enabled?
+    $stdout != $stdout2
+  end
  end
 end

@@ -207,18 +207,23 @@
 
   -# コンソール
   #console-container
-    .row
-      .col-xs-7.console-col-left
-        #console.console
-        #console-buttons.console-buttons
-          %span.queue-cancel.glyphicon.glyphicon-remove-circle(data-toggle="tooltip" title="処理を中断")
-          %span.console-history.glyphicon.glyphicon-cloud-download(data-toggle="tooltip" title="過去ログを取得")
-          %span.console-trash.glyphicon.glyphicon-trash(data-toggle="tooltip" title="過去ログと表示をクリア")
-          %span.console-expand
-            %span.glyphicon.glyphicon-resize-full(data-toggle="tooltip" title="拡大")
-            %span.glyphicon.glyphicon-resize-small.hide(data-toggle="tooltip" title="縮小")
-      .col-xs-5.console-col-right
-        #console-stdout2.console
+    - console_stdout = capture_haml do
+      #console.console
+      #console-buttons.console-buttons
+        %span.queue-cancel.glyphicon.glyphicon-remove-circle(data-toggle="tooltip" title="処理を中断")
+        %span.console-history.glyphicon.glyphicon-cloud-download(data-toggle="tooltip" title="過去ログを取得")
+        %span.console-trash.glyphicon.glyphicon-trash(data-toggle="tooltip" title="過去ログと表示をクリア")
+        %span.console-expand
+          %span.glyphicon.glyphicon-resize-full(data-toggle="tooltip" title="拡大")
+          %span.glyphicon.glyphicon-resize-small.hide(data-toggle="tooltip" title="縮小")
+    - if Narou.concurrency_enabled?
+      .row
+        .col-xs-7.console-col-left
+          = console_stdout
+        .col-xs-5.console-col-right
+          #console-stdout2.console
+    - else
+      = console_stdout
 
   -# 操作パネル
   #control-panel
