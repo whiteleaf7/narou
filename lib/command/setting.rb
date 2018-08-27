@@ -363,7 +363,7 @@ module Command
           tab: :general
         },
         "logging" => {
-          help: "ログの保存を有効にする",
+          help: "ログの保存を有効にする。保存場所は#{Narou.log_dir.basename}フォルダ。concurrencyが有効な場合、変換ログだけ別ファイルに出力される",
           type: :boolean,
           tab: :general
         },
