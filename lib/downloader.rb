@@ -418,7 +418,8 @@ class Downloader
 
     save_novel_data(TOC_FILE_NAME, latest_toc)
     tags = @new_novel ? [] : @@database[@id]["tags"] || []
-    if novel_end?
+    case novel_end?
+    when true
       unless tags.include?("end")
         update_database if update_subtitles.count == 0
         $stdout.silence do
@@ -428,7 +429,7 @@ class Downloader
         @stream.puts "<cyan>#{id_and_title.escape} は#{msg}</cyan>".termcolor
         return_status = :ok
       end
-    else
+    when false
       if tags.include?("end")
         update_database if update_subtitles.size == 0
         $stdout.silence do
@@ -634,7 +635,7 @@ class Downloader
     unless novel_status
       novel_status = {
         "novel_type" => NOVEL_TYPE_SERIES,
-        "end" => false
+        "end" => nil # nil で完結状態が定義されていなかったことを示す（扱いとしては未完結と同じ）
       }
     end
     novel_status
