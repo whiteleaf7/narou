@@ -156,5 +156,15 @@ module Command
       end
       settings.save if modified
     end
+
+    #
+    # コマンド出力のログ保存を抑制する
+    #
+    # コマンドの中で、stream_io に対して出力している必要がある
+    #
+    def stop_logging
+      self.stream_io = stream_io.copy_instance
+      stream_io.enable_logging = false
+    end
   end
 end

@@ -27,6 +27,8 @@ module Command
     # rubocop:disable Metrics/MethodLength
     def initialize
       super("[<limit>] [options]")
+      stop_logging
+
       @opt.separator <<-EOS
 
   ・現在管理している小説の一覧を表示します
@@ -133,8 +135,8 @@ module Command
                 when "nonfrozen"
                   !frozen
                 else
-                  error "不明なフィルターです(#{item})"
-                  warn "filters = #{filter_type_help}"
+                  stream_io.error "不明なフィルターです(#{item})"
+                  stream_io.puts "filters = #{filter_type_help}"
                   exit Narou::EXIT_ERROR_CODE
                 end
         sum + (apply ? 1 : 0)
@@ -204,15 +206,15 @@ module Command
 
     def output_lines(took_lines)
       if STDOUT.tty?
-        puts header
-        puts took_lines.values.join("\n").termcolor
+        stream_io.puts header
+        stream_io.puts took_lines.values.join("\n").termcolor
       elsif @options["echo"]
         # pipeにそのまま出力するときはansicolorコードが邪魔なので削除
-        puts header
-        puts TermColorLight.strip_tag(took_lines.values.join("\n"))
+        stream_io.puts header
+        stream_io.puts TermColorLight.strip_tag(took_lines.values.join("\n"))
       else
         # pipeに接続するときはIDを渡す
-        puts took_lines.keys.join(" ")
+        stream_io.puts took_lines.keys.join(" ")
       end
     end
 

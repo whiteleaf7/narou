@@ -19,8 +19,8 @@ end
 
 module Narou
   module LoggerModule
-    attr_accessor :capturing, :stream, :log_postfix
-    attr_reader :enable_logging, :format_filename, :format_timestamp
+    attr_accessor :capturing, :stream, :log_postfix, :enable_logging
+    attr_reader :format_filename, :format_timestamp
 
     def self.included(klass)
       klass.class_eval do

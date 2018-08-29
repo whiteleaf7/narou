@@ -32,12 +32,8 @@ class DiffViewer
     build
   end
 
-  def to_s
+  def result
     @builded_buffer
-  end
-
-  def view
-    puts @builded_buffer
   end
 
   private
