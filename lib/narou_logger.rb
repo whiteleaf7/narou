@@ -22,6 +22,12 @@ module Narou
     attr_accessor :capturing, :stream, :log_postfix
     attr_reader :enable_logging, :format_filename, :format_timestamp
 
+    def self.included(klass)
+      klass.class_eval do
+        alias :original_write :write
+      end
+    end
+
     LOG_FORMAT_FILENAME = "%Y%m%d.txt"
     LOG_FORMAT_TIMESTAMP = "[%H:%M:%S]"
 

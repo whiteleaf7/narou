@@ -6,12 +6,18 @@
 
 require "singleton"
 require_relative "pushserver"
+require_relative "../mixin/all"
 
 module Narou
   class WebWorker
     include Singleton
+    include Mixin::OutputError
 
     attr_reader :size
+
+    def self.run!
+      instance.start
+    end
 
     def initialize
       @queue = Queue.new
@@ -46,10 +52,7 @@ module Narou
           rescue SystemExit
           rescue Exception => e
             # WebWorkerスレッド内での例外は表示するだけしてスレッドは生かしたままにする
-            STDOUT.puts $@.shift + ": #{e.message} (#{e.class})"
-            $@.each do |b|
-              STDOUT.puts "  from #{b}"
-            end
+            output_error($stdout, e)
           ensure
             if q && q[:counting]
               countdown
@@ -70,9 +73,9 @@ module Narou
           @cancel_signal = true
           @size = 0
           @thread_of_block_executing&.raise(Interrupt)
-          Thread.pass
         end
       end
+      Thread.pass
     end
 
     def self.canceled?
@@ -81,6 +84,10 @@ module Narou
 
     def canceled?
       @cancel_signal
+    end
+
+    def self.stop
+      instance.stop
     end
 
     def stop

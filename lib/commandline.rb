@@ -12,7 +12,7 @@ require_relative "inventory"
 module CommandLine
   module_function
 
-  def run(*argv)
+  def run(*argv, exception: false)
     argv.flatten!
     if Helper.os_windows?
       argv.map! do |arg|
@@ -44,8 +44,14 @@ module CommandLine
       # pipeで接続された場合、標準入力からIDリストを受け取って引数に繋げる
       argv += (STDIN.gets || "").split
     end
-    Command.get_list[arg].new.execute(argv)
+    command = Command.get_list[arg]
+    if exception
+      command.execute!(argv)
+    else
+      command.new.execute(argv)
+    end
   ensure
+    # TODO: 変換同時実行の場合にここが処理できないのをどうにか
     if Command::Convert.exists_sending_error_list?
       Command::Convert.display_sending_error_list
     end
@@ -55,11 +61,7 @@ module CommandLine
   # exit を捕捉して終了コードを返す
   #
   def run!(*argv)
-    run(*argv)
-  rescue SystemExit => e
-    e.status
-  else
-    0
+    run(*argv, exception: true)
   end
 
   def load_default_arguments(cmd)

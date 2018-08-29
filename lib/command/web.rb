@@ -90,6 +90,7 @@ module Command
         argv << "--no-color" if $disable_color
         argv << "--boot"
         argv_copy = argv.dup
+        kill_threads
         begin
           loop do
             if $development
@@ -107,6 +108,10 @@ module Command
           sleep 2
         end
       end
+    end
+
+    def kill_threads
+      Narou::Worker.stop
     end
 
     def boot
@@ -134,9 +139,11 @@ module Command
                  end
       ProgressBar.push_server = push_server
       Narou::AppServer.push_server = push_server
-      Narou::WebWorker.instance.start
+      Narou::WebWorker.run!
       Narou::AppServer.run!
       push_server.quit
+      Narou::WebWorker.stop
+      Narou::Worker.stop
       if Narou::AppServer.request_reboot?
         exit Narou::EXIT_REQUEST_REBOOT
       end

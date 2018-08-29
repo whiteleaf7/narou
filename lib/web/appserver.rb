@@ -518,12 +518,18 @@ class Narou::AppServer < Sinatra::Base
 
   post "/api/cancel" do
     Narou::WebWorker.cancel
+    Narou::Worker.cancel if Narou.concurrency_enabled?
   end
 
   post "/api/convert" do
     ids = select_valid_novel_ids(params["ids"]) or pass
-    Narou::WebWorker.push do
+    block = proc do
       CommandLine.run!("convert", "--no-open", ids)
+    end
+    if Narou.concurrency_enabled?
+      block.call
+    else
+      Narou::WebWorker.push(&block)
     end
   end
 

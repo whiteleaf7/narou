@@ -69,7 +69,7 @@ module Command
               "general_lastup" => downloader.get_general_lastup,
               "length" => downloader.novel_length
             }
-          rescue OpenURI::HTTPError, Errno::ECONNRESET
+          rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout
             next
           end
           data = @database[id]

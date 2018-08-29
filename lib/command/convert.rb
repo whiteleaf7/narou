@@ -9,6 +9,7 @@ require_relative "../downloader"
 require_relative "../novelconverter"
 require_relative "../inventory"
 require_relative "../kindlestrip"
+require_relative "../worker"
 
 module Command
   class Convert < CommandBase
@@ -106,8 +107,23 @@ module Command
       EOS
     end
 
+    def self.execute!(argv)
+      if Narou.concurrency_enabled?
+        Narou::Worker.push do
+          super
+        end
+        0 # Worker に積んだ場合は成功したものとして先に進む
+      else
+        super
+      end
+    end
+
     def execute(argv)
       super
+      main(argv)
+    end
+
+    def main(argv)
       if argv.empty?
         $stdout2.puts @opt.help
         return

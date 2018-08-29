@@ -9,6 +9,8 @@ require_relative "../helper"
 module Helper
   module_function
 
+  HR = "<hr>"
+
   class << self
     alias :original_print_horizontal_rule :print_horizontal_rule
   end
@@ -25,6 +27,7 @@ module Helper
         original_print_horizontal_rule(io.original_stream)
       end
     end
-    io.push_streaming("<hr>")
+    io.push_streaming(HR)
+    io.original_write(HR)
   end
 end
