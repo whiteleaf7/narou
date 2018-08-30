@@ -654,12 +654,13 @@ class Narou::AppServer < Sinatra::Base
   post "/api/diff" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     number = params["number"] || "1"
+    disabled_log_io = $stdout.dup_with_disabled_logging
     Narou::WebWorker.push do
-      # diff コマンドは１度に一つのIDしか受け取らないので
+      # diff コマンドは１度に一つのIDしか受け取らないので一つずつ表示する
       ids.each do |id|
         # セキュリティ的にWEB UIでは独自の差分表示のみ使う
         CommandLine.run!("diff", "--no-tool", id, "--number", number)
-        Helper.print_horizontal_rule
+        Helper.print_horizontal_rule(disabled_log_io)
       end
     end
   end

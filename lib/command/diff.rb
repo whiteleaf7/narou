@@ -21,8 +21,6 @@ module Command
 
     def initialize
       super("[<target>] [options]")
-      stop_logging
-
       @opt.separator <<-EOS
 
   ・指定した小説の更新前後の変更点の差分を表示します。
@@ -81,6 +79,7 @@ module Command
     end
 
     def execute(argv)
+      disable_logging
       short_number_option_parse(argv)
       super
       @options["number"] ||= 1

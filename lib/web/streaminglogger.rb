@@ -27,13 +27,14 @@ module Narou
   class StreamingLogger < StringIO
     include Narou::LoggerModule
 
-    attr_reader :push_server, :target_console, :original_stream
+    attr_accessor :original_stream
+    attr_reader :push_server, :target_console
 
     def initialize(push_server, original_stream = $stdout, target_console: "stdout")
       super()
       @push_server = push_server
       @target_console = target_console
-      @original_stream = original_stream
+      self.original_stream = original_stream
       self.log_postfix = original_stream.log_postfix
     end
 

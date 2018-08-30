@@ -374,7 +374,7 @@ module Command
           tab: :detail
         },
         "logging.format-timestamp" => {
-          help: "ログ内のタイムスタンプのフォーマット。デフォルトは #{Narou::LoggerModule::LOG_FORMAT_TIMESTAMP}",
+          help: "ログ内のタイムスタンプのフォーマット。デフォルトは #{Narou::LoggerModule::LOG_FORMAT_TIMESTAMP}。タイムスタンプを記録したくなければ $none とだけ入力",
           type: :string,
           tab: :detail
         },

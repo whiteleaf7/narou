@@ -19,8 +19,8 @@ end
 
 module Narou
   module LoggerModule
-    attr_accessor :capturing, :stream, :log_postfix, :enable_logging
-    attr_reader :format_filename, :format_timestamp
+    attr_accessor :capturing, :stream, :log_postfix
+    attr_reader :logging_enabled, :format_filename, :format_timestamp, :format_timestamp_disabled
 
     def self.included(klass)
       klass.class_eval do
@@ -41,9 +41,10 @@ module Narou
     def init_logs
       inv = Inventory.load("local_setting")
       inv_logging = inv.group("logging")
-      @enable_logging = inv["logging"]
+      @logging_enabled = inv["logging"]
       @format_filename = inv_logging.format_filename || LOG_FORMAT_FILENAME
       @format_timestamp = inv_logging.format_timestamp || LOG_FORMAT_TIMESTAMP
+      @format_timestamp_disabled = format_timestamp.blank? || format_timestamp.strip == "$none"
       create_log_dir
     end
 
@@ -51,6 +52,16 @@ module Narou
       self.class.new.tap { |obj|
         obj.silent = silent
       }
+    end
+
+    def dup_with_disabled_logging
+      obj = dup
+      obj.disable_logging
+      if obj.respond_to?(:original_stream)
+        obj.original_stream = obj.original_stream.dup
+        obj.original_stream&.disable_logging
+      end
+      obj
     end
 
     def silent=(enable)
@@ -151,13 +162,17 @@ module Narou
     end
 
     def logging?
-      enable_logging && ENV["NAROU_ENV"] != "test"
+      logging_enabled && ENV["NAROU_ENV"] != "test"
     end
 
     def create_log_dir
       return unless logging?
       dir = Narou.log_dir
       dir.mkdir unless dir.exist?
+    end
+
+    def disable_logging
+      @logging_enabled = false
     end
 
     def append_log(str)
@@ -186,6 +201,7 @@ module Narou
         str = str.sub(/\n\z/, "")
         @before_head_ln = false
       end
+      return str if format_timestamp_disabled
       str.gsub("\n", "\n#{Time.now.strftime(format_timestamp)} ")
     end
   end

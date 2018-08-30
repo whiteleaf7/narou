@@ -27,8 +27,6 @@ module Command
     # rubocop:disable Metrics/MethodLength
     def initialize
       super("[<limit>] [options]")
-      stop_logging
-
       @opt.separator <<-EOS
 
   ・現在管理している小説の一覧を表示します
@@ -219,6 +217,7 @@ module Command
     end
 
     def execute(argv)
+      disable_logging
       super
       database_values = Database.instance.get_object.values
       limit =
