@@ -120,10 +120,11 @@ module Command
 
     def execute(argv)
       super
+      init(argv)
       main(argv)
     end
 
-    def main(argv)
+    def init(argv)
       if argv.empty?
         $stdout2.puts @opt.help
         return
@@ -135,36 +136,14 @@ module Command
       else
         @basename = nil
       end
-      if @options["encoding"]
-        @enc = Encoding.find(@options["encoding"]) rescue nil
-        unless @enc
-          $stdout2.error "--enc で指定された文字コードは存在しません。sjis, eucjp, utf-8 等を指定して下さい"
-          return
-        end
-      end
+      return unless @options["encoding"]
+      @enc = Encoding.find(@options["encoding"]) rescue nil
+      return if @enc
+      $stdout2.error "--enc で指定された文字コードは存在しません。sjis, eucjp, utf-8 等を指定して下さい"
+    end
 
-      @multi_device = @options["multi-device"]
-      device_names = if @multi_device
-                       @multi_device.split(",").map(&:strip).map(&:downcase).select { |name|
-                         Device.exists?(name).tap { |this|
-                           unless this
-                             $stdout2.error "[convert.multi-device] #{name} は有効な端末名ではありません"
-                           end
-                         }
-                       }
-                     else
-                       [nil]   # nil で device 設定が読まれる
-                     end
-      # kindle用のmobiを作る過程でepubが作成され、上書きされてしまうので、最初に作るようにする
-      kindle = device_names.delete("kindle")
-      device_names.unshift(kindle) if kindle
-
-      if @multi_device && device_names.empty?
-        $stdout2.error "有効な端末名がひとつもありませんでした"
-        exit Narou::EXIT_ERROR_CODE
-      end
-
-      device_names.each do |name|
+    def main(argv)
+      build_device_names.each do |name|
         @device = Narou.get_device(name)
         if name
           $stdout2.puts "<bold><magenta>&gt;&gt; #{@device.display_name}用に変換します</magenta></bold>".termcolor
@@ -173,17 +152,38 @@ module Command
         hook_call(:change_settings)
         convert_novels(argv)
       end
-
+      return unless @options["multi-device"]
       # device の設定に戻す
-      if @multi_device
-        device = Narou.get_device
-        force_change_settings_function(device.get_relative_variables) if device
+      device = Narou.get_device
+      force_change_settings_function(device.get_relative_variables) if device
+    end
+
+    def build_device_names
+      multi_device = @options["multi-device"]
+      device_names = if multi_device
+                       multi_device.split(",").map(&:strip).map(&:downcase).select do |name|
+                         Device.exists?(name).tap do |this|
+                           unless this
+                             $stdout2.error "[convert.multi-device] #{name} は有効な端末名ではありません"
+                           end
+                         end
+                       end
+                     else
+                       [nil] # nil で device 設定が読まれる
+                     end
+      # kindle用のmobiを作る過程でepubが作成され、上書きされてしまうので、最初に作るようにする
+      kindle = device_names.delete("kindle")
+      device_names.unshift(kindle) if kindle
+      if multi_device && device_names.empty?
+        $stdout2.error "有効な端末名がひとつもありませんでした"
+        exit Narou::EXIT_ERROR_CODE
       end
+      device_names
     end
 
     def change_settings
       return unless @device
-      if @multi_device
+      if @options["multi-device"]
         force_change_settings_function(@device.get_relative_variables)
       end
     end

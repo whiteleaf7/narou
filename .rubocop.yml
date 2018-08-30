@@ -19,7 +19,7 @@ Metrics/ModuleLength:
   Max: 300
 
 Metrics/AbcSize:
-  Max: 30
+  Max: 40
 
 Metrics/BlockLength:
   Max: 40

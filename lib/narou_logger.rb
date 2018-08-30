@@ -24,7 +24,7 @@ module Narou
 
     def self.included(klass)
       klass.class_eval do
-        alias :original_write :write
+        alias_method :original_write, :write
       end
     end
 
