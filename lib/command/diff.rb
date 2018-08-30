@@ -94,13 +94,13 @@ module Command
         id = @novel_data["id"]
       end
       unless id
-        stream_io.error "#{target} は存在しません"
+        error "#{target} は存在しません"
         return
       end
       view_diff_version = argv.shift
       if view_diff_version
         if invalid_diff_version_string?(view_diff_version)
-          stream_io.error "差分指定の書式が違います(正しい例:2013.02.21@01.39.46)"
+          error "差分指定の書式が違います(正しい例:2013.02.21@01.39.46)"
           return
         end
         @options["view_diff_version"] = view_diff_version
@@ -157,13 +157,13 @@ module Command
       begin
         res = Helper::AsyncCommand.exec(diff_cmd)
       rescue Errno::ENOENT => e
-        stream_io.error e.message
+        error e.message
         exit Narou::EXIT_ERROR_CODE
       ensure
         temp_paths.map(&:delete)
       end
       stream_io.puts res[0] unless res[0].empty?
-      stream_io.error res[1] unless res[1].empty?
+      error res[1] unless res[1].empty?
     end
 
     def create_difftool_command_string(temp_old_path, temp_new_path)
