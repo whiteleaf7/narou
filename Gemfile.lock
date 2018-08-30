@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    narou (3.2.5.1)
+    narou (3.3.0)
       activesupport (~> 5.2)
       diff-lcs (~> 1.2, >= 1.2.5)
       erubis (~> 2.7)
