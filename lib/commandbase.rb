@@ -6,7 +6,14 @@
 
 require "optparse"
 require "termcolorlight"
-require_relative "web/web_worker"
+
+# help をログに記録しないために STDOUT に直接出力する
+OptionParser::Officious["help"] = proc do |parser|
+  OptionParser::Switch::NoArgument.new do |arg|
+    STDOUT.puts parser.help
+    exit
+  end
+end
 
 module Command
   class CommandBase
