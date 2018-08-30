@@ -24,7 +24,7 @@ debug
 trash/
 .ruby-version
 .sass-cache/
-log/
+log/**/*
 misc/
 hotentry/
 replace.txt
