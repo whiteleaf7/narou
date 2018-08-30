@@ -9,7 +9,7 @@ require "termcolorlight"
 
 # help をログに記録しないために STDOUT に直接出力する
 OptionParser::Officious["help"] = proc do |parser|
-  OptionParser::Switch::NoArgument.new do |arg|
+  OptionParser::Switch::NoArgument.new do |_arg|
     STDOUT.puts parser.help
     exit
   end
