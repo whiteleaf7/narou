@@ -567,6 +567,7 @@ class Narou::AppServer < Sinatra::Base
       opt_arguments << "--force"
     end
     Narou::WebWorker.push do
+      puts "<white>更新を開始します</white>".termcolor
       cmd = Command::Update.new
       if table_reload_timing == "every"
         cmd.on(:success) do
@@ -766,9 +767,9 @@ class Narou::AppServer < Sinatra::Base
   end
 
   get "/api/get_queue_size" do
-    res = {
-      size: Narou::WebWorker.instance.size
-    }
+    res = [
+      Narou::WebWorker.instance.size, Narou::Worker.instance.size
+    ]
     json res
   end
 

@@ -138,8 +138,9 @@ module Command
                    $stdout
                  end
       ProgressBar.push_server = push_server
+      Narou::Worker.push_server = push_server
       Narou::AppServer.push_server = push_server
-      Narou::WebWorker.run!
+      Narou::WebWorker.run
       Narou::AppServer.run!
       push_server.quit
       Narou::WebWorker.stop

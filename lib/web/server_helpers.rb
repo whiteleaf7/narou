@@ -133,4 +133,10 @@ module Narou::ServerHelpers
       haml(template_file_name, options)
     end
   end
+
+  def embed_concurrency_enabled
+    <<~HTML
+      <input type="hidden" id="concurrency-enabled" value="#{Narou.concurrency_enabled?}">
+    HTML
+  end
 end

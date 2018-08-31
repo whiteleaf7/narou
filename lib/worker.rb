@@ -12,10 +12,15 @@ module Narou
     include Singleton
     include Mixin::OutputError
 
-    attr_accessor :queue, :mutex, :size, :worker_thread, :cancel_signal, :thread_of_block_executing
+    attr_accessor :queue, :mutex, :size, :worker_thread, :cancel_signal, :thread_of_block_executing,
+                  :push_server
 
-    def self.run!
+    def self.run
       instance.start
+    end
+
+    def self.push_server=(server)
+      instance.push_server = server
     end
 
     def initialize
@@ -119,9 +124,14 @@ module Narou
       queue.push(block: block)
     end
 
+    def notification_queue
+      push_server&.send_all("notification.queue" => [Narou::WebWorker.instance.size, size])
+    end
+
     def countup
       mutex.synchronize do
         self.size += 1
+        notification_queue
       end
     end
 
@@ -129,6 +139,7 @@ module Narou
       mutex.synchronize do
         self.size -= 1
         self.size = 0 if size < 0
+        notification_queue
       end
     end
   end
@@ -136,7 +147,7 @@ end
 
 if Narou.concurrency_enabled?
   Thread.abort_on_exception = true
-  Narou::Worker.run!
+  Narou::Worker.run
 
   at_exit do
     unless Narou.web?

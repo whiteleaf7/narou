@@ -66,9 +66,7 @@
           %input.btn.btn-info(type="submit" value="設定を保存" style="margin-left: 50px")
           %button#btn-convert.btn.btn-default この小説を変換
           %button#btn-folder.btn.btn-default フォルダを開く
-        %p#queue-text.navbar-text.navbar-right(data-toggle="tooltip" title="キューに積まれた処理の数" data-placement="bottom")
-          %span.glyphicon.glyphicon-inbox
-          %span#queue 0
+        = partial :queue
 
   .container.container-main.theme-showcase(role="main")
     %p.visible-xs-inline

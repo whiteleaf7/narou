@@ -15,7 +15,7 @@ module Narou
 
     attr_reader :size
 
-    def self.run!
+    def self.run
       instance.start
     end
 
@@ -56,7 +56,6 @@ module Narou
           ensure
             if q && q[:counting]
               countdown
-              notification_queue
             end
           end
         end
@@ -108,17 +107,17 @@ module Narou
 
     def push(counting = true, &block)
       countup if counting
-      notification_queue
       @queue.push(block: block, counting: counting)
     end
 
     def notification_queue
-      @push_server.send_all("notification.queue" => @size)
+      @push_server.send_all("notification.queue" => [@size, Narou::Worker.instance.size])
     end
 
     def countup
       @mutex.synchronize do
         @size += 1
+        notification_queue
       end
     end
 
@@ -126,6 +125,7 @@ module Narou
       @mutex.synchronize do
         @size -= 1
         @size = 0 if @size < 0
+        notification_queue
       end
     end
   end

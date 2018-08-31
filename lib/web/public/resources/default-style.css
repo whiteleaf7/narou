@@ -27,11 +27,10 @@
   font-weight: bold;
 }
 
-#queue-text.active {
+.queue.active {
   color: #d9534f !important;
 }
 
-#queue-text.active #queue {
+.queue.active .queue__sizes {
   background-color: #d9534f !important;
 }
-

@@ -24,10 +24,11 @@
   }
 }
 
-#queue-text {
+.queue {
   color: #fff !important;
 }
-#queue {
+
+.queue__sizes {
   color: #DD4814 !important;
   background-color: #fff !important;
 }
@@ -37,11 +38,10 @@
   font-weight: bold;
 }
 
-#queue-text.active {
+.queue.active {
   color: yellow !important;
 }
 
-#queue-text.active #queue {
+.queue.active .queue__sizes {
   background-color: yellow !important;
 }
-

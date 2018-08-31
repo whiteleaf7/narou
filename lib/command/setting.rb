@@ -358,7 +358,7 @@ module Command
           tab: :detail
         },
         "concurrency" => {
-          help: "ダウンロードと変換の同時実行を有効にする。有効にするとログの出力方式が変更される。※試験実装",
+          help: "ダウンロードと変換の同時実行を有効にする。有効にするとログの出力方式が変更される。※β版",
           type: :boolean,
           tab: :general
         },
