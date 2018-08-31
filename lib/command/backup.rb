@@ -61,10 +61,7 @@ module Command
 
     def execute(argv)
       super
-      if argv.empty?
-        puts @opt.help
-        return
-      end
+      display_help! if argv.empty?
       tagname_to_ids(argv)
       require "zip"
       argv.each_with_index do |target, i|

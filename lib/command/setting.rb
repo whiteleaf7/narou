@@ -158,10 +158,7 @@ module Command
         burn_default_settings(argv)
         return
       end
-      if argv.empty?
-        stream_io.puts @opt.help
-        return
-      end
+      display_help! if argv.empty?
       settings = {
         local: Inventory.load("local_setting", :local),
         global: Inventory.load("global_setting", :global)

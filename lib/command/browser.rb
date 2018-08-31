@@ -33,10 +33,7 @@ module Command
 
     def execute(argv)
       super
-      if argv.empty?
-        puts @opt.help
-        return
-      end
+      display_help! if argv.empty?
       tagname_to_ids(argv)
       argv.each do |target|
         data = Downloader.get_data_by_target(target)

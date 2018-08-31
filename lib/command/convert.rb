@@ -125,10 +125,7 @@ module Command
     end
 
     def init(argv)
-      if argv.empty?
-        $stdout2.puts @opt.help
-        return
-      end
+      display_help! if argv.empty?
       @output_filename = @options["output"]
       if @output_filename
         @ext = File.extname(@output_filename)

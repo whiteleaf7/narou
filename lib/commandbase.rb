@@ -48,6 +48,11 @@ module Command
       end
     end
 
+    def display_help!
+      STDOUT.puts @opt.help
+      exit
+    end
+
     def execute(argv)
       @options.clear
       load_local_settings

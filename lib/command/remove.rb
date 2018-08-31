@@ -61,10 +61,7 @@ module Command
         end
         argv += novels.map { |n| n["id"].to_s }
       end
-      if argv.empty?
-        puts @opt.help
-        return
-      end
+      display_help! if argv.empty?
       tagname_to_ids(argv)
       argv.each_with_index do |target, i|
         Helper.print_horizontal_rule if i > 0
