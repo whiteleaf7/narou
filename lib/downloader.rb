@@ -423,7 +423,7 @@ class Downloader
     when true
       unless tags.include?("end")
         update_database if update_subtitles.count == 0
-        Command::Tag.execute!(%W(#{id} --add end --color white --no-overwrite-color), io: Naoru::NullIO.new)
+        Command::Tag.execute!(%W(#{id} --add end --color white --no-overwrite-color), io: Narou::NullIO.new)
         msg = old_toc.empty? ? "完結しているようです" : "完結したようです"
         @stream.puts "<cyan>#{id_and_title.escape} は#{msg}</cyan>".termcolor
         return_status = :ok
