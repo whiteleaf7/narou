@@ -700,9 +700,13 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
-  post "/api/puts_all_logs" do
-    $stdout.push_streaming($stdout.string, no_history: true)
-    $stdout2.push_streaming($stdout2.string, no_history: true) if Narou.concurrency_enabled?
+  get "/api/history" do
+    case params["stream"]
+    when "stdout2"
+      $stdout2.string
+    else
+      $stdout.string
+    end
   end
 
   post "/api/clear_history" do
