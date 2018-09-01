@@ -111,7 +111,7 @@ module Narou
     end
 
     def notification_queue
-      @push_server.send_all("notification.queue" => [@size, Narou::Worker.instance.size])
+      @push_server.send_all("notification.queue" => [@size, Narou::Worker.size])
     end
 
     def countup

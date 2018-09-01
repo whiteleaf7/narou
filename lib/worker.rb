@@ -15,12 +15,14 @@ module Narou
     attr_accessor :queue, :mutex, :size, :worker_thread, :cancel_signal, :thread_of_block_executing,
                   :push_server
 
-    def self.run
-      instance.start
-    end
+    class << self
+      extend Forwardable
 
-    def self.push_server=(server)
-      instance.push_server = server
+      def_delegators :instance, :push_server=, :join, :cancel, :canceled?, :stop, :push, :size
+
+      def run
+        instance.start
+      end
     end
 
     def initialize
@@ -62,10 +64,6 @@ module Narou
       end
     end
 
-    def self.join
-      instance.join
-    end
-
     def join
       until size.zero?
         unless thread_of_block_executing
@@ -78,10 +76,6 @@ module Narou
       thread_of_block_executing&.raise(Interrupt)
       self.thread_of_block_executing = nil
       sleep 0.1
-    end
-
-    def self.cancel
-      instance.cancel
     end
 
     def cancel
@@ -97,26 +91,14 @@ module Narou
       Thread.pass
     end
 
-    def self.canceled?
-      instance.canceled?
-    end
-
     def canceled?
       cancel_signal
-    end
-
-    def self.stop
-      instance.stop
     end
 
     def stop
       cancel
       worker_thread&.kill
       self.worker_thread = nil
-    end
-
-    def self.push(&block)
-      instance.push(&block)
     end
 
     def push(&block)
@@ -151,6 +133,8 @@ if Narou.concurrency_enabled?
 
   at_exit do
     unless Narou.web?
+      # ここまでたどり着いた時点でダウンロードとかは終わってるので変換のログを普通に表示する
+      $stdout2.silent = false
       Narou::Worker.join
       Narou::Worker.stop
     end

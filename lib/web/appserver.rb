@@ -772,7 +772,7 @@ class Narou::AppServer < Sinatra::Base
 
   get "/api/get_queue_size" do
     res = [
-      Narou::WebWorker.instance.size, Narou::Worker.instance.size
+      Narou::WebWorker.instance.size, Narou::Worker.size
     ]
     json res
   end
