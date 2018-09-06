@@ -12,7 +12,7 @@ require_relative "inventory"
 module CommandLine
   module_function
 
-  def run(*argv, exception: false)
+  def run(*argv, catch_exit: false)
     argv.flatten!
     argv_for_windows(argv)
     cmd_name = take_command_name(argv)
@@ -25,13 +25,14 @@ module CommandLine
       argv += (STDIN.gets || "").split
     end
     command = Command.get_list[cmd_name]
-    if exception
+    if catch_exit
       command.execute!(argv)
     else
       command.new.execute(argv)
     end
   ensure
     # TODO: 変換同時実行の場合にここが処理できないのをどうにか
+    # at_exit でもチェックすればいいか？
     if Command::Convert.exists_sending_error_list?
       Command::Convert.display_sending_error_list
     end
@@ -41,7 +42,7 @@ module CommandLine
   # exit を捕捉して終了コードを返す
   #
   def run!(*argv)
-    run(*argv, exception: true)
+    run(*argv, catch_exit: true)
   end
 
   def load_default_arguments(cmd)

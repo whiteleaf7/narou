@@ -44,7 +44,7 @@ module Narou
 
     def copy_instance
       self.class.new(@push_server).tap do |obj|
-        obj.silent = silent
+        obj.silent = silent?
       end
     end
 
@@ -57,7 +57,7 @@ module Narou
     end
 
     def push_streaming(str, no_history: false)
-      return if @is_silent
+      return if silent?
       @push_server&.send_all(echo: build_echo(str, no_history))
     end
 

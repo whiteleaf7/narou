@@ -19,7 +19,7 @@ class ProgressBar
   end
 
   def output(num)
-    return if silence?
+    return if silent?
     if num > @max
       raise OverRangeError, "`#{num}` over `#{@max}(max)`"
     end
@@ -32,15 +32,15 @@ class ProgressBar
   end
 
   def clear
-    return if silence?
-    io.stream.print " " * 79 + "\r"
+    return if silent?
+    io.stream.print "\e[2K\r" # 行削除して行頭へ移動
   end
 
   def calc_ratio(num)
     num / @max
   end
 
-  def silence?
-    ENV["NAROU_ENV"] == "test" || !io.tty?
+  def silent?
+    ENV["NAROU_ENV"] == "test" || !io.tty? || io.silent?
   end
 end

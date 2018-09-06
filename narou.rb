@@ -44,6 +44,6 @@ require_relative "lib/narou_logger"
 require_relative "lib/version"
 require_relative "lib/commandline"
 
-Narou::Backtracer.capture do
-  CommandLine.run(ARGV.map(&:dup))
-end
+exit Narou::Backtracer.capture {
+  CommandLine.run!(ARGV.map(&:dup))
+}

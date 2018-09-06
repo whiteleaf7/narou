@@ -33,7 +33,7 @@ module Narou
 
     def initialize
       super
-      @is_silent = false
+      self.silent = false
       @capturing = false
       init_logs
     end
@@ -49,9 +49,9 @@ module Narou
     end
 
     def copy_instance
-      self.class.new.tap { |obj|
-        obj.silent = silent
-      }
+      self.class.new.tap do |obj|
+        obj.silent = silent?
+      end
     end
 
     def dup_with_disabled_logging
@@ -65,28 +65,16 @@ module Narou
     end
 
     def silent=(enable)
-      @is_silent = !!enable
+      @silent = enable.present?
     end
 
-    def silent
-      if block_given?
-        if /^(.+?):(\d+)/ =~ caller(1..1).first
-          file = $1
-          line = $2.to_i
-          error_msg = +"Did you mean: silence\n"
-          str = File.read(file).split("\n")[line - 1]
-          error_msg += "in #{file}:#{line}\n"
-          error_msg += str + "\n"
-          error_msg += " " * str.index("silent") + "~~~~~~"
-          raise error_msg
-        end
-      end
-      @is_silent
+    def silent?
+      @silent
     end
 
     def silence(&block)
       raise "need a block" unless block
-      tmp = self.silent
+      tmp = self.silent?
       self.silent = true
       yield
       self.silent = tmp
@@ -136,7 +124,7 @@ module Narou
     end
 
     def write_console(str, target)
-      return if @is_silent
+      return if silent?
       if $disable_color
         target.write(str)
       else
@@ -247,6 +235,49 @@ module Narou
 
     def write(_str); end
   end
+
+  # 同時実行時のデフォルト側ロガー
+  # 変換中のキューを表示出来るようにする（キュー表示部分はログに保存しない）
+  class ConcurrencyDefaultLogger < Logger
+    attr_accessor :end_with_new_line
+
+    require "unicode/display_width/string_ext"
+    require "io/console/size"
+
+    def initialize
+      super
+      self.end_with_new_line = true
+    end
+
+    def write_console(str, target)
+      str.each_line do |line|
+        size = Worker.size
+        if size > 0 && end_with_new_line
+          text = "変換中:#{size}"
+          text_width = text.display_width
+          console_width = IO.console_size[1]
+          left = console_width - text_width
+          stream.print "\e[#{left}G"
+          stream.print "<blue>#{text}</blue>".termcolor
+          stream.print "\e[1G"
+        end
+        super(line, target)
+      end
+      self.end_with_new_line = str.end_with?("\n")
+    end
+  end
+
+  # 同時実行時の変換側ロガー
+  # デフォルトロガーが出力中の間は標準出力には表示しない
+  class ConcurrencyConvertLogger < Logger
+    attr_accessor :end_with_new_line
+
+    def initialize
+      super
+      self.silent = true
+      self.log_postfix = "_convert"
+    end
+  end
 end
 
 def warn(str, trace = nil)
@@ -258,10 +289,10 @@ def error(str)
   $stdout.error str
 end
 
-$stdout = Narou::Logger.new
 if Inventory.load["concurrency"]
-  $stdout2 = Narou::Logger.new
-  $stdout2.log_postfix = "_convert"
+  $stdout = Narou::ConcurrencyDefaultLogger.new
+  $stdout2 = Narou::ConcurrencyConvertLogger.new
 else
+  $stdout = Narou::Logger.new
   $stdout2 = $stdout
 end

@@ -135,7 +135,7 @@ module Command
     end
 
     def self.oneline_help
-      ""
+      raise "implement #{self}.oneline_help"
     end
 
     #
