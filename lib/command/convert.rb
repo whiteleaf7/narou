@@ -22,18 +22,23 @@ module Command
     @@sending_error_list = []
 
     def self.display_sending_error_list
-      $stdout2.puts
-      $stdout2.puts "-" * 79
-      $stdout2.puts "・送信失敗リスト"
-      $stdout2.puts @@sending_error_list
-      $stdout2.puts
+      return unless exists_sending_error_list?
+      $stdout2.puts <<~MSG
+        #{"=" * 79}
+        ・送信失敗リスト
+        #{@@sending_error_list.join("\n")}
+
+      MSG
       $stdout2.puts "<red><bold>上記のファイルの送信に失敗しました。</bold></red>".termcolor
-      $stdout2.puts "送信出来なかった原因を解消し、send コマンドを実行して下さい。"
+      $stdout2.puts <<~MSG
+        送信出来なかった原因を解消し、send コマンドを実行して下さい。
+        #{"=" * 79}
+      MSG
       @@sending_error_list.clear
     end
 
     def self.exists_sending_error_list?
-      @@sending_error_list.empty?.!
+      @@sending_error_list.present?
     end
 
     def initialize

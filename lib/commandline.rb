@@ -31,11 +31,7 @@ module CommandLine
       command.new.execute(argv)
     end
   ensure
-    # TODO: 変換同時実行の場合にここが処理できないのをどうにか
-    # at_exit でもチェックすればいいか？
-    if Command::Convert.exists_sending_error_list?
-      Command::Convert.display_sending_error_list
-    end
+    Command::Convert.display_sending_error_list
   end
 
   #
