@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -17,16 +18,19 @@ class ProgressBar
 
   def initialize(*args)
     original_initialize(*args)
-    @@push_server.send_all("progressbar.init" => true)
+    @@push_server.send_all("progressbar.init" => { target_console: io.target_console })
   end
 
   def output(num)
     percent = calc_ratio(num) * 100
-    @@push_server.send_all("progressbar.step" => percent)
+    @@push_server.send_all("progressbar.step" => {
+      percent: percent,
+      target_console: io.target_console
+    })
   end
 
   def clear
-    @@push_server.send_all("progressbar.clear" => true)
+    @@push_server.send_all("progressbar.clear" => { target_console: io.target_console })
   end
 end
 

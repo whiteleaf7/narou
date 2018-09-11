@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -93,8 +94,8 @@ module Helper
     end
   end
 
-  def print_horizontal_rule
-    puts "―" * 35
+  def print_horizontal_rule(io = $stdout)
+    io.puts "―" * 35
   end
 
   def replace_filename_special_chars(str, invalid_replace = false)
@@ -330,7 +331,7 @@ module Helper
   # 数字やスペース、句読点、感嘆符はそのままにする
   #
   def to_unprintable_words(string, mask = "●")
-    result = "".dup
+    result = +""
     string.each_char do |char|
       result += case char
                 when /[0-9０-９ 　、。!?！？]/
@@ -398,11 +399,11 @@ module Helper
           loop do
             block.call if block
             sleep(sleep_time)
-            if Narou::Worker.canceled?
-              Process.kill("KILL", pid)
-              Process.detach(pid)
-              break
-            end
+            next unless Narou::Worker.canceled?
+            next unless Narou::WebWorker.canceled?
+            Process.kill("KILL", pid)
+            Process.detach(pid)
+            break
           end
         end
         looper.join

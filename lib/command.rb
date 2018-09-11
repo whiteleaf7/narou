@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require "optparse"
 require_relative "commandbase"
 Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), "command", "*.rb"))) do |path|
   require path
@@ -38,6 +38,7 @@ module Command
     "backup" => Backup,
     "csv" => Csv,
     "clean" => Clean,
+    "log" => Log,
     "trace" => Trace,
     "help" => Help,
     "version" => Version,

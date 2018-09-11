@@ -4,15 +4,15 @@
 #
 
 module Narou end
-require_relative "../lib/web/worker"
+require_relative "../lib/web/web_worker"
 
-describe Narou::Worker do
+describe Narou::WebWorker do
   before :all do
-    @worker = Narou::Worker.instance
+    @worker = Narou::WebWorker.instance
   end
 
   it "instance is a singleton object" do
-    expect(@worker).to be Narou::Worker.instance
+    expect(@worker).to be Narou::WebWorker.instance
   end
 
   context "not running yet" do
@@ -40,8 +40,8 @@ describe Narou::Worker do
         @worker.push(&block2)
       end
 
-      it "should call blocks", retry: 3, retry_wait: 3 do
-        # 確実にWorkerスレッドが実行されるように
+      it "should call blocks", retry: 5, retry_wait: 5 do
+        # 確実にWebWorkerスレッドが実行されるように
         Thread.pass
         sleep 0.001
         expect(@result1).to be true
@@ -49,7 +49,7 @@ describe Narou::Worker do
       end
     end
 
-    it "canceling", retry: 3, retry_wait: 3 do
+    it "canceling", retry: 5, retry_wait: 5 do
       @worker.stop
       expect(@worker.canceled?).to be_falsey
       _execute = false

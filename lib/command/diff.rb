@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -78,6 +79,7 @@ module Command
     end
 
     def execute(argv)
+      disable_logging
       short_number_option_parse(argv)
       super
       @options["number"] ||= 1
@@ -88,7 +90,7 @@ module Command
         @novel_data = latest
       else
         target = argv.shift
-        @novel_data = Downloader.get_data_by_target(target)
+        @novel_data = Downloader.get_data_by_target(target) || {}
         id = @novel_data["id"]
       end
       unless id
@@ -134,13 +136,13 @@ module Command
 
     def clean_diff(id)
       cache_root_dir = Downloader.get_cache_root_dir(id)
-      print @novel_data["title"] + " の"
+      stream_io.print @novel_data["title"] + " の"
       unless File.exist?(cache_root_dir)
-        puts "差分はひとつもありません"
+        stream_io.puts "差分はひとつもありません"
         return
       end
       FileUtils.remove_entry_secure(cache_root_dir)
-      puts "差分を削除しました"
+      stream_io.puts "差分を削除しました"
     end
 
     def exec_difftool(id)
@@ -160,7 +162,7 @@ module Command
       ensure
         temp_paths.map(&:delete)
       end
-      puts res[0] unless res[0].empty?
+      stream_io.puts res[0] unless res[0].empty?
       error res[1] unless res[1].empty?
     end
 
@@ -195,14 +197,14 @@ module Command
         cache_dir = list ? list[nth - 1] : nil
       end
       unless cache_dir
-        puts "#{@novel_data["title"]} の差分データがありません"
+        stream_io.puts "#{@novel_data["title"]} の差分データがありません"
         return nil
       end
       cache_section_list = Dir.glob("#{cache_dir}/*.yaml").sort_by { |path|
         File.basename(path, ".yaml").split(" ", 2)[0].to_i
       }
       if cache_section_list.length == 0
-        puts "#{@novel_data["title"]} は最新話のみのアップデートのようです"
+        stream_io.puts "#{@novel_data["title"]} は最新話のみのアップデートのようです"
         return nil
       end
       novel_dir = Downloader.get_novel_section_save_dir(Downloader.get_novel_data_dir_by_target(id))
@@ -273,19 +275,19 @@ module Command
 
     def display_diff_list(id)
       list = get_diff_list(id)
-      print "#{list[:title]} の"
+      stream_io.print "#{list[:title]} の"
       if list[:list].empty?
-        puts "差分はひとつもありません"
+        stream_io.puts "差分はひとつもありません"
         return
       end
-      puts "差分一覧"
+      stream_io.puts "差分一覧"
       list[:list].each do |data|
-        puts "<bold><yellow>#{data[:version_string]}   -#{data[:number]}</yellow></bold>".termcolor
+        stream_io.puts "<bold><yellow>#{data[:version_string]}   -#{data[:number]}</yellow></bold>".termcolor
         data[:objects].each do |object|
-          puts "   第#{object[:index]}部分　#{object[:subtitle]}"
+          stream_io.puts "   第#{object[:index]}部分　#{object[:subtitle]}"
         end
         if data[:objects].empty?
-          puts "   (最新話のみのアップデート)"
+          stream_io.puts "   (最新話のみのアップデート)"
         end
       end
     end
@@ -296,7 +298,7 @@ module Command
         cache_root_dir = Downloader.get_cache_root_dir(id)
         next unless File.exist?(cache_root_dir)
         FileUtils.remove_entry_secure(cache_root_dir)
-        puts "#{data["title"]} の差分を削除しました"
+        stream_io.puts "#{data["title"]} の差分を削除しました"
       end
     end
 
@@ -306,8 +308,8 @@ module Command
     def display_diff_on_oneself(id)
       require_relative "../diffviewer"
       temp_paths = create_temp_files(id) or return
-      puts "#{@novel_data["title"]} の差分を表示します"
-      DiffViewer.new(*temp_paths).view
+      stream_io.puts "#{@novel_data["title"]} の差分を表示します"
+      stream_io.puts DiffViewer.new(*temp_paths).result
     ensure
       temp_paths.map(&:delete) if temp_paths
     end

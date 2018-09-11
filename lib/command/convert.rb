@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -8,6 +9,7 @@ require_relative "../downloader"
 require_relative "../novelconverter"
 require_relative "../inventory"
 require_relative "../kindlestrip"
+require_relative "../worker"
 
 module Command
   class Convert < CommandBase
@@ -20,23 +22,23 @@ module Command
     @@sending_error_list = []
 
     def self.display_sending_error_list
-      puts
-      puts "-" * 79
-      puts "・送信失敗リスト"
-      puts @@sending_error_list
-      puts
-      puts "<red><bold>上記のファイルの送信に失敗しました。</bold></red>".termcolor
-      puts "送信出来なかった原因を解消し、send コマンドを実行して下さい。"
+      return unless exists_sending_error_list?
+      $stdout2.puts <<~MSG
+        #{"=" * 79}
+        ・送信失敗リスト
+        #{@@sending_error_list.join("\n")}
+
+      MSG
+      $stdout2.puts "<red><bold>上記のファイルの送信に失敗しました。</bold></red>".termcolor
+      $stdout2.puts <<~MSG
+        送信出来なかった原因を解消し、send コマンドを実行して下さい。
+        #{"=" * 79}
+      MSG
       @@sending_error_list.clear
-      if $stdin.tty? && Narou.web?.!
-        puts
-        puts "（何かキーを押して下さい）"
-        $stdin.getch
-      end
     end
 
     def self.exists_sending_error_list?
-      @@sending_error_list.empty?.!
+      @@sending_error_list.present?
     end
 
     def initialize
@@ -110,12 +112,25 @@ module Command
       EOS
     end
 
+    def self.execute!(argv)
+      if Narou.concurrency_enabled?
+        Narou::Worker.push do
+          super
+        end
+        0 # Worker に積んだ場合は成功したものとして先に進む
+      else
+        super
+      end
+    end
+
     def execute(argv)
       super
-      if argv.empty?
-        puts @opt.help
-        return
-      end
+      init(argv)
+      main(argv)
+    end
+
+    def init(argv)
+      display_help! if argv.empty?
       @output_filename = @options["output"]
       if @output_filename
         @ext = File.extname(@output_filename)
@@ -123,55 +138,54 @@ module Command
       else
         @basename = nil
       end
-      if @options["encoding"]
-        @enc = Encoding.find(@options["encoding"]) rescue nil
-        unless @enc
-          error "--enc で指定された文字コードは存在しません。sjis, eucjp, utf-8 等を指定して下さい"
-          return
-        end
-      end
+      return unless @options["encoding"]
+      @enc = Encoding.find(@options["encoding"]) rescue nil
+      return if @enc
+      $stdout2.error "--enc で指定された文字コードは存在しません。sjis, eucjp, utf-8 等を指定して下さい"
+    end
 
-      @multi_device = @options["multi-device"]
-      device_names = if @multi_device
-                       @multi_device.split(",").map(&:strip).map(&:downcase).select { |name|
-                         Device.exists?(name).tap { |this|
-                           unless this
-                             error "[convert.multi-device] #{name} は有効な端末名ではありません"
-                           end
-                         }
-                       }
-                     else
-                       [nil]   # nil で device 設定が読まれる
-                     end
-      # kindle用のmobiを作る過程でepubが作成され、上書きされてしまうので、最初に作るようにする
-      kindle = device_names.delete("kindle")
-      device_names.unshift(kindle) if kindle
-
-      if @multi_device && device_names.empty?
-        error "有効な端末名がひとつもありませんでした"
-        exit Narou::EXIT_ERROR_CODE
-      end
-
-      device_names.each do |name|
+    def main(argv)
+      build_device_names.each do |name|
         @device = Narou.get_device(name)
         if name
-          puts "<bold><magenta>&gt;&gt; #{@device.display_name}用に変換します</magenta></bold>".termcolor
+          $stdout2.puts "<bold><magenta>&gt;&gt; #{@device.display_name}用に変換します</magenta></bold>".termcolor
         end
         self.extend(@device.get_hook_module) if @device
         hook_call(:change_settings)
         convert_novels(argv)
       end
-
+      return unless @options["multi-device"]
       # device の設定に戻す
-      if @multi_device
-        device = Narou.get_device
-        force_change_settings_function(device.get_relative_variables) if device
+      device = Narou.get_device
+      force_change_settings_function(device.get_relative_variables) if device
+    end
+
+    def build_device_names
+      multi_device = @options["multi-device"]
+      device_names = if multi_device
+                       multi_device.split(",").map(&:strip).map(&:downcase).select do |name|
+                         Device.exists?(name).tap do |this|
+                           unless this
+                             $stdout2.error "[convert.multi-device] #{name} は有効な端末名ではありません"
+                           end
+                         end
+                       end
+                     else
+                       [nil] # nil で device 設定が読まれる
+                     end
+      # kindle用のmobiを作る過程でepubが作成され、上書きされてしまうので、最初に作るようにする
+      kindle = device_names.delete("kindle")
+      device_names.unshift(kindle) if kindle
+      if multi_device && device_names.empty?
+        $stdout2.error "有効な端末名がひとつもありませんでした"
+        exit Narou::EXIT_ERROR_CODE
       end
+      device_names
     end
 
     def change_settings
       return unless @device
-      if @multi_device
+      if @options["multi-device"]
         force_change_settings_function(@device.get_relative_variables)
       end
     end
@@ -182,7 +196,7 @@ module Command
         @target = target
         @novel_data = nil
 
-        Helper.print_horizontal_rule if i > 1
+        Helper.print_horizontal_rule($stdout2) if i > 1
         if @basename
           @basename << " (#{i})" if argv.length > 1
           @output_filename = @basename + @ext
@@ -202,7 +216,7 @@ module Command
           # start novel conversion
           @argument_target_type = :novel
           unless Downloader.novel_exists?(target)
-            error "#{target} は存在しません"
+            $stdout2.error "#{target} は存在しません"
             next
           end
           res = NovelConverter.convert(target, {
@@ -236,7 +250,7 @@ module Command
         end
       end
     rescue Interrupt
-      puts "変換を中断しました"
+      $stdout2.puts "変換を中断しました"
       exit Narou::EXIT_INTERRUPT
     end
 
@@ -253,17 +267,19 @@ module Command
              })
     rescue ArgumentError => e
       if e.message =~ /invalid byte sequence in UTF-8/
-        error "テキストファイルの文字コードがUTF-8ではありません。" +
-              "--enc オプションでテキストの文字コードを指定して下さい"
+        $stdout2.error "テキストファイルの文字コードがUTF-8ではありません。" \
+                       "--enc オプションでテキストの文字コードを指定して下さい"
         warn "(#{e.message})"
         return nil
       else
         raise
       end
     rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
-      warn "#{target}:"
-      error "テキストファイルの文字コードは#{@options["encoding"]}ではありませんでした。" +
-            "正しい文字コードを指定して下さい"
+      $stdout2.error <<~ERR
+        #{target}:
+        テキストファイルの文字コードは#{@options["encoding"]}ではありませんでした。
+        正しい文字コードを指定して下さい
+      ERR
       return nil
     end
 
@@ -293,10 +309,10 @@ module Command
       return nil unless copy_to_dir
       FileUtils.copy(src_path, copy_to_dir)
       copied_file_path = File.join(copy_to_dir, File.basename(src_path))
-      puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
+      $stdout2.puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
       copied_file_path
     rescue NoSuchDirectory => e
-      error "#{e.message} はフォルダではないかすでに削除されています。コピー出来ませんでした"
+      $stdout2.error "#{e.message} はフォルダではないかすでに削除されています。コピー出来ませんでした"
       nil
     end
 
@@ -349,20 +365,20 @@ module Command
       if @device && @device.physical_support? &&
         @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
         if @argument_target_type == :novel
-          if Send.execute!(@device.name, @target) > 0
+          if Send.execute!(@device.name, @target, io: $stdout2) > 0
             @@sending_error_list << ebook_file
           end
         else
-          puts @device.name + "へ送信しています"
+          $stdout2.puts @device.name + "へ送信しています"
           copy_to_path = nil
           begin
             copy_to_path = @device.copy_to_documents(ebook_file)
           rescue Device::SendFailure
           end
           if copy_to_path
-            puts copy_to_path.encode(Encoding::UTF_8) + " へコピーしました"
+            $stdout2.puts copy_to_path.encode(Encoding::UTF_8) + " へコピーしました"
           else
-            error "送信に失敗しました"
+            $stdout2.error "送信に失敗しました"
             @@sending_error_list << ebook_file
           end
         end

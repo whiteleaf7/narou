@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -45,7 +46,7 @@ class Template
   def self.get(src_filename, _binding, binary_version)
     @@binary_version = binary_version
     @@src_filename = src_filename
-    [Narou.get_root_dir, Narou.get_script_dir].each do |dir|
+    [Narou.root_dir, Narou.script_dir].each do |dir|
       path = File.join(dir, TEMPLATE_DIR, src_filename + ".erb")
       next unless File.exist?(path)
       src = Helper::CacheLoader.load(path)

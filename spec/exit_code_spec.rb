@@ -11,7 +11,10 @@ require "downloader"
 describe "exit code" do
   before do
     $stdout.silent = true
-    $stderr.silent = true
+  end
+
+  after do
+    $stdout.silent = false
   end
 
   let(:frozen_ids) do

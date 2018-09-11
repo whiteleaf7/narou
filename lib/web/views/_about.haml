@@ -153,12 +153,15 @@
 
   }();
 
-%div.link-to-changelog-in-about
+.link-to-changelog-in-about
+  %a.btn.btn-default.btn-sm{ href: "https://jbbs.shitaraba.net/computer/44668/", target: "_blank" }
+    掲示板
+    %span.glyphicon.glyphicon-new-window
   %a.btn.btn-default.btn-sm(href="https://github.com/whiteleaf7/narou/blob/master/ChangeLog.md" target="_blank")
     更新履歴
     %span.glyphicon.glyphicon-new-window
 
-%div(style="text-align:center")
+.text-center
   %h1
     %strong Narou.rb
   %div
@@ -167,7 +170,7 @@
     Copyright © 2013-#{Narou.last_commit_year} whiteleaf. All rights reserved.
   #result-of-version-checking(style="margin-top:10px")
     .checking
-      %span.rotate-progress
+      %p.rotate-progress
         %span.icon
         %span.text アップデートを確認しています...
     .version-is-latest

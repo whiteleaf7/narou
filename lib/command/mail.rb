@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -121,15 +122,15 @@ module Command
     end
 
     def install_mailer_setting
-      setting_file_path = File.join(Narou.get_preset_dir, Mailer::SETTING_FILE)
-      install_path = File.join(Narou.get_root_dir, Mailer::SETTING_FILE)
+      setting_file_path = File.join(Narou.preset_dir, Mailer::SETTING_FILE)
+      install_path = File.join(Narou.root_dir, Mailer::SETTING_FILE)
       FileUtils.cp(setting_file_path, install_path)
       alter_database_add_column_last_mail_date
       puts "created #{install_path}"
       puts "メールの設定用ファイルを作成しました。設定ファイルを書き換えることで mail コマンドが有効になります。"
       puts "注意：次回以降のupdateで新着があった場合に送信可能フラグが立ちます"
       unless Narou.web?
-        Helper.open_directory(Narou.get_root_dir, "設定ファイルがあるフォルダを開きますか")
+        Helper.open_directory(Narou.root_dir, "設定ファイルがあるフォルダを開きますか")
       end
     end
 

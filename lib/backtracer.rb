@@ -42,8 +42,8 @@ module Narou
     end
 
     def log_path
-      if Narou.get_root_dir
-        File.join(Narou.get_root_dir, LOG_NAME)
+      if Narou.root_dir
+        File.join(Narou.root_dir, LOG_NAME)
       else
         LOG_NAME
       end

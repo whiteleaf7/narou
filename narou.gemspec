@@ -87,7 +87,7 @@ Gem::Specification.new do |gem|
   EOS
   gem.post_install_message = install_message.gsub("\t", "  ")
 
-  gem.required_ruby_version = ">=2.1.0"
+  gem.required_ruby_version = ">=2.3.0"
 
   gem.files = `git ls-files`.split("\n").reject { |fn| fn =~ %r!^spec/|^"spec! } << Narou.create_git_commit_version
   gem.executables = gem.files.grep(%r!^bin/!).map { |f| File.basename(f) }
@@ -107,5 +107,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'erubis', '~> 2.7'
   gem.add_runtime_dependency 'open_uri_redirections', '~> 0.2', '>= 0.2.1'
   gem.add_runtime_dependency 'activesupport', '~> 5.2'
+  gem.add_runtime_dependency 'unicode-display_width'
 end
 

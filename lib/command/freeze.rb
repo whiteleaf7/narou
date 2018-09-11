@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -46,10 +47,7 @@ module Command
 
     def execute(argv)
       super
-      if argv.empty?
-        puts @opt.help
-        return
-      end
+      display_help! if argv.empty?
       tagname_to_ids(argv)
       frozen_list = Inventory.load("freeze")
       argv.each do |target|

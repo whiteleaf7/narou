@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -20,7 +21,7 @@ class Mailer
   def self.create
     this = instance
     this.clear
-    setting_file_path = File.join(Narou.get_root_dir, SETTING_FILE)
+    setting_file_path = File.join(Narou.root_dir, SETTING_FILE)
     if File.exist?(setting_file_path)
       options = YAML.load_file(setting_file_path)
       unless options.delete(:complete)

@@ -1,0 +1,7 @@
+%p.queue.navbar-text.navbar-right(data-toggle="tooltip" title="キューに積まれた処理の数" data-placement="bottom")
+  %span.glyphicon.glyphicon-inbox
+  %span.queue__sizes
+    %span.queue__size.queue__size--default> 0
+    - if Narou.concurrency_enabled?
+      %span.queue__size.queue__size--divider
+      %span.queue__size.queue__size--convert> 0

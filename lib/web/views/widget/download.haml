@@ -22,7 +22,7 @@
         margin: 0;
         padding: 0;
       }
-      #queue-text {
+      .queue {
         position: absolute;
         top: 3px;
         right: 3px;
@@ -31,10 +31,16 @@
         padding: 0;
       }
 
+    = embed_concurrency_enabled
+
     #console.console.fullscreen
-    #queue-text.navbar-text.navbar-right
+    .queue.navbar-text.navbar-right
       %span.glyphicon.glyphicon-inbox
-      %span#queue 0
+      %span.queue__sizes
+        %span.queue__size.queue__size--default> 0
+        - if Narou.concurrency_enabled?
+          %span.queue__size.queue__size--divider
+          %span.queue__size.queue__size--convert> 0
 
     %script{:src => "//code.jquery.com/jquery-1.11.1.min.js"}
     %script{:src => "//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"}

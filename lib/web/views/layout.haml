@@ -30,6 +30,7 @@
       var local_initialize_functions = [];
       var slideNavbar;
   %body
+    = embed_concurrency_enabled
     - if session[:alert]
       - message, type = session[:alert]
       - session[:alert] = nil

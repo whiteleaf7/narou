@@ -1,16 +1,27 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
 require "optparse"
 require "termcolorlight"
-require_relative "web/worker"
+
+# help をログに記録しないために STDOUT に直接出力する
+OptionParser::Officious["help"] = proc do |parser|
+  OptionParser::Switch::NoArgument.new do |_arg|
+    STDOUT.puts parser.help
+    exit
+  end
+end
 
 module Command
   class CommandBase
+    attr_accessor :stream_io
+
     # postfixies は改行で区切ることで2パターン以上記述できる
     def initialize(postfixies = "")
+      self.stream_io = $stdout
       @opt = OptionParser.new(nil, 20)
       command_name = self.class.to_s.scan(/::(.+)$/)[0][0].downcase
       banner = postfixies.split("\n").map.with_index { |postfix, i|
@@ -35,6 +46,11 @@ module Command
         end
         msg
       end
+    end
+
+    def display_help!
+      STDOUT.puts @opt.help
+      exit
     end
 
     def execute(argv)
@@ -103,7 +119,8 @@ module Command
     # コマンドを実行するが、アプリケーションは終了させない
     # (SystemExit を補足し、終了コードを返り値とする)
     #
-    def execute!(*argv)
+    def execute!(*argv, io: $stdout)
+      self.stream_io = io
       argv.flatten!
       execute(argv)
     rescue SystemExit => e
@@ -112,12 +129,13 @@ module Command
       0
     end
 
-    def self.execute!(*argv)
-      self.new.execute!(*argv)
+    def self.execute!(*argv, io: $stdout)
+      cmd = new
+      cmd.execute!(*argv, io: io)
     end
 
     def self.oneline_help
-      ""
+      raise "implement #{self}.oneline_help"
     end
 
     #
@@ -149,6 +167,15 @@ module Command
         end
       end
       settings.save if modified
+    end
+
+    #
+    # コマンド出力のログ保存を抑制する
+    #
+    # コマンドの中で、stream_io に対して出力している必要がある
+    #
+    def disable_logging
+      self.stream_io = stream_io.dup_with_disabled_logging
     end
   end
 end

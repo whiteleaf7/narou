@@ -691,6 +691,7 @@ $console-color: white;
     margin-bottom: 7px;
   }
 }
+
 .console-buttons {
   position: absolute;
   top: 3px;
@@ -701,6 +702,12 @@ $console-color: white;
   span:hover {
     color: mix($console-color, red, 80%);
   }
+}
+
+.console-col-left,
+.console-col-right {
+  padding-left: 1px;
+  padding-right: 1px;
 }
 
 /*
@@ -836,12 +843,13 @@ $console-color: white;
 /*
  * キュー
  */
-#queue-text {
+.queue {
   position: relative;
   margin-right: 0;
   cursor: default;
 }
-#queue {
+
+.queue__sizes {
   position: relative;
   font-size: 0.8em;
   vertical-align: top;
@@ -856,6 +864,26 @@ $console-color: white;
   border-radius: 14px;
   left: -3px;
   top: -3px;
+}
+
+.queue__size {
+}
+
+.queue__size--default {
+}
+
+.queue__size--divider {
+  padding-right: 1px;
+  padding-left: 1px;
+  position: relative;
+  top: -1px;
+
+  &::before {
+    content: ':';
+  }
+}
+
+.queue__size--convert {
 }
 
 /*

@@ -24,22 +24,19 @@ debug
 trash/
 .ruby-version
 .sass-cache/
-log/
+log/**/*
 misc/
 hotentry/
 replace.txt
 tags
 trace_dump.txt
-
 \#*\#
-
 archive
 commitversion
-
 .test_dot_narou/
 .test_novel_data/
-
 mail_setting.yaml
+.byebug_history
 
 #
 # for gem

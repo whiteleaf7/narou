@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -89,6 +90,7 @@ module Command
         argv << "--no-color" if $disable_color
         argv << "--boot"
         argv_copy = argv.dup
+        kill_threads
         begin
           loop do
             if $development
@@ -106,6 +108,10 @@ module Command
           sleep 2
         end
       end
+    end
+
+    def kill_threads
+      Narou::Worker.stop
     end
 
     def boot
@@ -126,11 +132,19 @@ module Command
       send_rebooted_event_when_connection_recover(push_server)
 
       $stdout = Narou::StreamingLogger.new(push_server)
+      $stdout2 = if Inventory.load["concurrency"]
+                   Narou::StreamingLogger.new(push_server, $stdout2, target_console: "stdout2")
+                 else
+                   $stdout
+                 end
       ProgressBar.push_server = push_server
+      Narou::Worker.push_server = push_server
       Narou::AppServer.push_server = push_server
-      Narou::Worker.instance.start
+      Narou::WebWorker.run
       Narou::AppServer.run!
       push_server.quit
+      Narou::WebWorker.stop
+      Narou::Worker.stop
       if Narou::AppServer.request_reboot?
         exit Narou::EXIT_REQUEST_REBOOT
       end

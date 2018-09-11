@@ -1,4 +1,5 @@
-# -*- Encoding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -18,12 +19,13 @@ describe Narou do
 
   describe ".global_setting_dir" do
     before :all do
-      @original_name = Narou::GLOBAL_SETTING_DIR_NAME.replace(".narousetting_dummy")
-      @global_dir_in_root = File.expand_path(".narousetting_dummy", Narou.get_root_dir)
+      @original_name = Narou::GLOBAL_SETTING_DIR_NAME
+      Narou.const_replace :GLOBAL_SETTING_DIR_NAME, ".narousetting_dummy"
+      @global_dir_in_root = Pathname(".narousetting_dummy").expand_path(Narou.root_dir)
     end
 
     after :all do
-      Narou::GLOBAL_SETTING_DIR_NAME.replace(@original_name)
+      Narou.const_replace :GLOBAL_SETTING_DIR_NAME, @original_name
     end
 
     after do
@@ -32,7 +34,7 @@ describe Narou do
 
     context ".narou があるディレクトリにはない場合" do
       it "ユーザーディレクトリにあるべき" do
-        expect(Narou.global_setting_dir).to eq File.expand_path(".narousetting_dummy", "~")
+        expect(Narou.global_setting_dir).to eq Pathname(".narousetting_dummy").expand_path("~")
       end
     end
 
@@ -41,7 +43,9 @@ describe Narou do
         FileUtils.mkdir(@global_dir_in_root)
       end
 
-      it { expect(Narou.global_setting_dir).to eq @global_dir_in_root }
+      it "同じディレクトリにあるほうが優先されるべき" do
+        expect(Narou.global_setting_dir).to eq @global_dir_in_root
+      end
     end
   end
 end

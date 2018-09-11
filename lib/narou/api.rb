@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -15,8 +16,6 @@ module Narou
   # 小説家になろうデベロッパーAPI操作クラス
   #
   class API
-    extend Memoist
-
     # 一度に問い合わせする件数
     BATCH_LIMIT = 300
 
@@ -82,7 +81,6 @@ module Narou
     def has_of?(type)
       @splited_of.include?(type)
     end
-    memoize :has_of?
 
     def private_novels
       (@ncodes - @stores.map { |st| st["ncode"] }).map do |ncode|

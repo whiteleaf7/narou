@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -11,31 +12,11 @@ require_relative "inventory"
 module CommandLine
   module_function
 
-  def run(*argv)
+  def run(*argv, catch_exit: false)
     argv.flatten!
-    if Helper.os_windows?
-      argv.map! do |arg|
-        arg&.encode(Encoding::UTF_8)
-      end
-    end
-    argv.unshift("help") if argv.empty?
-    arg = argv.shift.downcase
-    arg = Command::Shortcuts[arg] || arg
-    arg = "help" if arg == "-h" || arg == "--help"
-    arg = "version" if arg == "-v" || arg == "--version"
-    unless Narou.already_init?
-      unless ["help", "version", "init"].include?(arg)
-        arg = "help"
-      end
-    end
-    unless Command.get_list.include?(arg)
-      error "不明なコマンドです"
-      puts
-      arg = "help"
-    end
-    if argv.empty? && STDIN.tty?
-      argv += load_default_arguments(arg)
-    end
+    argv_for_windows(argv)
+    cmd_name = take_command_name(argv)
+    proc_default_arguments(argv, cmd_name)
     if argv.delete("--multiple")
       multiple_argument_extract(argv)
     end
@@ -43,27 +24,63 @@ module CommandLine
       # pipeで接続された場合、標準入力からIDリストを受け取って引数に繋げる
       argv += (STDIN.gets || "").split
     end
-    Command.get_list[arg].new.execute(argv)
-  ensure
-    if Command::Convert.exists_sending_error_list?
-      Command::Convert.display_sending_error_list
+    command = Command.get_list[cmd_name]
+    if catch_exit
+      command.execute!(argv)
+    else
+      command.new.execute(argv)
     end
+  ensure
+    Command::Convert.display_sending_error_list
   end
 
   #
   # exit を捕捉して終了コードを返す
   #
   def run!(*argv)
-    run(*argv)
-  rescue SystemExit => e
-    e.status
-  else
-    0
+    run(*argv, catch_exit: true)
   end
 
   def load_default_arguments(cmd)
     default_arguments_list = Inventory.load("local_setting")
     (default_arguments_list["default_args.#{cmd}"] || "").split
+  end
+
+  def argv_for_windows(argv)
+    return unless Helper.os_windows?
+    argv.map! do |arg|
+      arg&.encode(Encoding::UTF_8)
+    end
+  end
+
+  def take_command_name(argv)
+    argv.unshift("help") if argv.empty?
+    name = argv.shift.downcase
+    name = Command::Shortcuts[name] || name
+    name = case name
+           when "-v", "--version"
+             "version"
+           when "-h", "--help"
+             "help"
+           else
+             name
+           end
+    unless Narou.already_init?
+      unless %w(help version init).include?(name)
+        name = "help"
+      end
+    end
+    unless Command.get_list.include?(name)
+      error "不明なコマンドです。narou help を確認してください"
+      exit Narou::EXIT_ERROR_CODE
+    end
+    name
+  end
+
+  def proc_default_arguments(argv, name)
+    if argv.empty? && STDIN.tty?
+      argv.concat(load_default_arguments(name))
+    end
   end
 
   #
