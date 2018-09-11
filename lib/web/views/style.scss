@@ -878,8 +878,8 @@ $console-color: white;
   position: relative;
   top: -1px;
 
-  &:before {
-    content: ":";
+  &::before {
+    content: ':';
   }
 }
 
