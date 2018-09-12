@@ -208,17 +208,17 @@ module Command
           res = convert_txt(target)
         else
           using_send_command = true
-          # remove output files for novel conversion
-          NovelConverter.extensions_of_converted_files(@device).each do |ext|
-            ebook_paths = Narou.get_ebook_file_paths(target, ext)
-            NovelConverter.clean_up_temp_files(ebook_paths)
-          end
-          # start novel conversion
-          @argument_target_type = :novel
           unless Downloader.novel_exists?(target)
             $stdout2.error "#{target} は存在しません"
             next
           end
+          # remove output files for novel conversion
+          NovelConverter.extensions_of_converted_files(@device).each do |ext|
+            ebook_paths = Narou.get_ebook_file_paths(target, ext)
+            NovelConverter.clean_up_temp_files(ebook_paths) if ebook_paths
+          end
+          # start novel conversion
+          @argument_target_type = :novel
           res = NovelConverter.convert(target, {
                   output_filename: @output_filename,
                   display_inspector: @options["inspect"],
