@@ -359,19 +359,32 @@ module Command
           type: :boolean,
           tab: :general
         },
+        "concurrency.format-queue-text" => {
+          help: "同時実行時の変換キュー表示テキストのフォーマット。CUI専用。" \
+                "デフォルトは #{Narou::ConcurrencyDefaultLogger::FORMAT_TEXT.inspect.escape}",
+          type: :string,
+          tab: :detail
+        },
+        "concurrency.format-queue-style" => {
+          help: "同時実行時の変換キュー表示スタイルのフォーマット。CUI専用。" \
+                "デフォルトは #{Narou::ConcurrencyDefaultLogger::FORMAT_STYLE.inspect.escape}。" \
+                "left:右寄せする場合に必要な幅。text:表示テキスト。space:半角スペース",
+          type: :string,
+          tab: :detail
+        },
         "logging" => {
           help: "ログの保存を有効にする。保存場所は#{Narou.log_dir.basename}フォルダ。concurrencyが有効な場合、変換ログだけ別ファイルに出力される",
           type: :boolean,
           tab: :general
         },
         "logging.format-filename" => {
-          help: "ログファイル名のフォーマット。デフォルトは #{Narou::LoggerModule::LOG_FORMAT_FILENAME} 。" \
+          help: "ログファイル名のフォーマット。デフォルトは\"#{Narou::LoggerModule::LOG_FORMAT_FILENAME}\" 。" \
                 "日付でファイルを分けたくなければ固定ファイル名にする。書式は http://bit.ly/date_format 参照",
           type: :string,
           tab: :detail
         },
         "logging.format-timestamp" => {
-          help: "ログ内のタイムスタンプのフォーマット。デフォルトは #{Narou::LoggerModule::LOG_FORMAT_TIMESTAMP}。タイムスタンプを記録したくなければ $none とだけ入力",
+          help: "ログ内のタイムスタンプのフォーマット。デフォルトは\"#{Narou::LoggerModule::LOG_FORMAT_TIMESTAMP}\"。タイムスタンプを記録したくなければ $none とだけ入力",
           type: :string,
           tab: :detail
         },

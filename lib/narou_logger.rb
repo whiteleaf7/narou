@@ -6,6 +6,8 @@
 
 require "stringio"
 require "termcolorlight"
+require "io/console/size"
+require "unicode/display_width/string_ext"
 require_relative "color"
 require_relative "inventory"
 
@@ -239,27 +241,28 @@ module Narou
   # 同時実行時のデフォルト側ロガー
   # 変換中のキューを表示出来るようにする（キュー表示部分はログに保存しない）
   class ConcurrencyDefaultLogger < Logger
-    attr_accessor :end_with_new_line
+    attr_accessor :end_with_new_line, :format_text, :format_style
 
-    require "unicode/display_width/string_ext"
-    require "io/console/size"
+    FORMAT_TEXT = "変換中:%<size>d"
+    FORMAT_STYLE = "\e[%<left>dG<blue>%<text>s</blue>\e[1G"
 
     def initialize
       super
       self.end_with_new_line = true
+      concurrency = Inventory.load.group("concurrency")
+      self.format_text = concurrency.format_queue_text || FORMAT_TEXT
+      self.format_style = concurrency.format_queue_style || FORMAT_STYLE
     end
 
     def write_console(str, target)
       str.each_line do |line|
         size = Worker.size
         if size > 0 && end_with_new_line
-          text = "変換中:#{size}"
+          text = format(format_text, size: size)
           text_width = text.display_width
           console_width = IO.console_size[1]
           left = console_width - text_width
-          stream.print "\e[#{left}G"
-          stream.print "<blue>#{text}</blue>".termcolor
-          stream.print "\e[1G"
+          stream.print format(format_style, left: left, text: text, space: " ").termcolor
         end
         super(line, target)
       end
