@@ -7,7 +7,7 @@
 require "stringio"
 require "termcolorlight"
 require "io/console/size"
-require "unicode/display_width/string_ext"
+require "unicode/display_width"
 require_relative "color"
 require_relative "inventory"
 
