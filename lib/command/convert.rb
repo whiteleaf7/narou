@@ -215,7 +215,7 @@ module Command
           # remove output files for novel conversion
           NovelConverter.extensions_of_converted_files(@device).each do |ext|
             ebook_paths = Narou.get_ebook_file_paths(target, ext)
-            NovelConverter.clean_up_temp_files(ebook_paths) if ebook_paths
+            NovelConverter.clean_up_temp_files(ebook_paths)
           end
           # start novel conversion
           @argument_target_type = :novel

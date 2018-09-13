@@ -358,6 +358,7 @@ class NovelConverter
   end
 
   def self.clean_up_temp_files(path_list)
+    return unless path_list
     path_list.each do |path|
       FileUtils.rm_f(path)
     end
