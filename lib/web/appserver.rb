@@ -728,7 +728,7 @@ class Narou::AppServer < Sinatra::Base
     result
   end
 
-  get "/api/taginfo.json" do
+  post "/api/taginfo.json" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     ids.map!(&:to_i)
     database = Database.instance
