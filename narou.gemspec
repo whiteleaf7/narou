@@ -107,6 +107,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'erubis', '~> 2.7'
   gem.add_runtime_dependency 'open_uri_redirections', '~> 0.2', '>= 0.2.1'
   gem.add_runtime_dependency 'activesupport', '~> 5.2'
-  gem.add_runtime_dependency 'unicode-display_width'
+  gem.add_runtime_dependency 'unicode-display_width', '~> 1.4'
 end
 
