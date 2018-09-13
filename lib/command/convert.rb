@@ -113,12 +113,7 @@ module Command
     end
 
     def self.execute!(argv)
-      if Narou.concurrency_enabled?
-        Narou::Worker.push do
-          super
-        end
-        0 # Worker に積んだ場合は成功したものとして先に進む
-      else
+      Narou.concurrency_call do
         super
       end
     end

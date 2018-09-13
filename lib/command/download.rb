@@ -149,14 +149,16 @@ module Command
             raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
           end
         end
-        if @options["mail"]
-          Mail.execute!(download_target)
-        end
-        if @options["freeze"]
-          Freeze.execute!(download_target)
-        elsif @options["remove"]
-          # --freeze オプションが指定された場合は --remove オプションは無視する
-          Remove.execute!(download_target, "-y")
+        Narou.concurrency_call do
+          if @options["mail"]
+            Mail.execute!(download_target)
+          end
+          if @options["freeze"]
+            Freeze.execute!(download_target)
+          elsif @options["remove"]
+            # --freeze オプションが指定された場合は --remove オプションは無視する
+            Remove.execute!(download_target, "-y")
+          end
         end
       end
       exit mistook_count if mistook_count > 0

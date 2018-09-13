@@ -23,6 +23,7 @@ module Narou
   MISC_DIR = "misc"
   LOG_DIR = "log"
   GLOBAL_REPLACE_NAME = "replace.txt"
+  EXIT_SUCCESS = 0
   EXIT_ERROR_CODE = 127
   EXIT_INTERRUPT = 126
   EXIT_REQUEST_REBOOT = 125
@@ -345,6 +346,17 @@ module Narou
 
   def concurrency_enabled?
     $stdout != $stdout2
+  end
+  memoize :concurrency_enabled?
+
+  # 同時実行が有効ならキューに積んで、無効なら普通に実行する
+  def concurrency_call(&block)
+    if concurrency_enabled?
+      Worker.push(&block)
+      EXIT_SUCCESS
+    else
+      block.call
+    end
   end
  end
 end
