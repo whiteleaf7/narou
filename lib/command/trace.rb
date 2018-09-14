@@ -11,7 +11,7 @@ module Command
     end
 
     def initialize
-      super(" ")
+      super()
       @opt.separator <<-MSG
 
   ・エラーが発生した際に保存されたバックトレースログを表示します。

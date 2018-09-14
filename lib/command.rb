@@ -45,6 +45,10 @@ module Command
     "init" => Init
   }
 
+  if $development
+    COMMAND_LIST["console"] = Console
+  end
+
   # ショートカット定義
   # COMMAND_LIST の上から順に優先度が高い
   Shortcuts = Hash[*get_list.keys.reverse.map { |s|
