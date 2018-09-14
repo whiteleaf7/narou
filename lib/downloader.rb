@@ -631,7 +631,7 @@ class Downloader
     else
       database[@id] = data
     end
-    @@database.save_database
+    database.save_database
   end
 
   def get_novel_status
