@@ -282,7 +282,6 @@ class NovelConverter
       end
     else
       $stdout2.puts
-      $stdout2.error "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
       return :abort
     end
     $stdout2.puts "変換しました"
