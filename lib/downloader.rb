@@ -111,15 +111,12 @@ class Downloader
     use_subdirectory = data["use_subdirectory"] || false
     subdirectory = use_subdirectory ? create_subdirecotry_name(file_title) : ""
     path = Database.archive_root_path.join(data["sitename"], subdirectory, file_title)
-    if path.exist?
-      return path
-    else
-      @@database.delete(id)
-      @@database.save_database
-      error "#{path} が見つかりません。\n" \
-            "保存フォルダが消去されていたため、データベースのインデックスを削除しました。"
-      return nil
-    end
+    return path if path.exist?
+    @@database.delete(id)
+    @@database.save_database
+    error "#{path} が見つかりません。\n" \
+          "保存フォルダが消去されていたため、データベースのインデックスを削除しました。"
+    nil
   end
 
   #
@@ -1040,11 +1037,8 @@ class Downloader
   #
   def different_section?(old_relative_path, new_subtitle_info)
     path = get_novel_data_dir.join(old_relative_path)
-    if path.exist?
-      return YAML.load_file(path)["element"] != new_subtitle_info["element"]
-    else
-      return true
-    end
+    return true unless path.exist?
+    YAML.load_file(path)["element"] != new_subtitle_info["element"]
   end
 
   #
@@ -1172,13 +1166,13 @@ class Downloader
     raw
   end
 
-  def get_raw_dir
+  def raw_dir
     @raw_dir ||= get_novel_data_dir.join(RAW_DATA_DIR_NAME)
   end
 
   def init_raw_dir
     return if @nosave_raw
-    path = get_raw_dir
+    path = raw_dir
     FileUtils.mkdir_p(path) unless path.exist?
   end
 
@@ -1189,7 +1183,7 @@ class Downloader
     return if @nosave_raw
     index = subtitle_info["index"]
     file_subtitle = subtitle_info["file_subtitle"]
-    path = get_raw_dir.join("#{index} #{file_subtitle}#{ext}")
+    path = raw_dir.join("#{index} #{file_subtitle}#{ext}")
     File.write(path, raw_data)
   end
 
