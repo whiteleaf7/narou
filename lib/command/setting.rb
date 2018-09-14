@@ -362,15 +362,13 @@ module Command
         "concurrency.format-queue-text" => {
           help: "同時実行時の変換キュー表示テキストのフォーマット。CUI専用。" \
                 "デフォルトは #{Narou::ConcurrencyDefaultLogger::FORMAT_TEXT.inspect.escape}",
-          type: :string,
-          tab: :detail
+          type: :string
         },
         "concurrency.format-queue-style" => {
           help: "同時実行時の変換キュー表示スタイルのフォーマット。CUI専用。" \
                 "デフォルトは #{Narou::ConcurrencyDefaultLogger::FORMAT_STYLE.inspect.escape}。" \
                 "left:右寄せする場合に必要な幅。text:表示テキスト。space:半角スペース",
-          type: :string,
-          tab: :detail
+          type: :string
         },
         "logging" => {
           help: "ログの保存を有効にする。保存場所は#{Narou.log_dir.basename}フォルダ。concurrencyが有効な場合、変換ログだけ別ファイルに出力される",
