@@ -69,7 +69,7 @@ module Helper
     end
     case determine_os
     when :windows
-      system(%!explorer "file:///#{path.encode(Encoding::Windows_31J)}"!)
+      system(%!explorer "file:///#{path}"!.encode(Encoding::Windows_31J))
     when :cygwin
       system(%!cygstart "#{path}"!)
     when :mac
