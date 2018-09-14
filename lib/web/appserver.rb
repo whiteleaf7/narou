@@ -500,6 +500,7 @@ class Narou::AppServer < Sinatra::Base
             is_frozen ? "凍結" : nil,
             tags.include?("end") ? "完結" : nil,
             tags.include?("404") ? "削除" : nil,
+            data["suspend"] ? "中断" : nil
           ].compact.join(", "),
           download: %!<a href="/novels/#{id}/download" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-download-alt"></span></a>!,
           frozen: is_frozen,

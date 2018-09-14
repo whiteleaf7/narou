@@ -22,14 +22,15 @@ require_relative "input"
 #
 class Downloader
   include Narou::Eventable
+  extend Memoist
 
   SECTION_SAVE_DIR_NAME = "本文"    # 本文を保存するディレクトリ名
   CACHE_SAVE_DIR_NAME = "cache"   # 差分用キャッシュ保存用ディレクトリ名
   RAW_DATA_DIR_NAME = "raw"    # 本文の生データを保存するディレクトリ名
   TOC_FILE_NAME = "toc.yaml"
   STEPS_WAIT_TIME = 5   # 数話ごとにかかるwaitの秒数
-  WAITING_TIME_FOR_503 = 20   # 503 のときに待機する秒数
-  RETRY_MAX_FOR_503 = 5   # 503 のときに何回再試行するか
+  WAIT_TIME_TO_RETRY_NETWORK = 10 # タイムアウト等でリトライするまでの待機時間
+  LIMIT_TO_RETRY_NETWORK = 5 # タイムアウト等でリトライする回数上限
   NOVEL_TYPE_SERIES = 1   # 連載
   NOVEL_TYPE_SS = 2       # 短編
   DISPLAY_LIMIT_DIGITS = 4   # indexの表示桁数限界
@@ -38,6 +39,7 @@ class Downloader
   attr_reader :id, :setting
 
   class InvalidTarget < StandardError; end
+  class SuspendDownload < StandardError; end
 
   def initialize(target, options = {})
     id = Downloader.get_id_by_target(target)
@@ -77,7 +79,7 @@ class Downloader
   # 本文格納用ディレクトリを取得
   #
   def self.get_novel_section_save_dir(archive_path)
-    File.join(archive_path, SECTION_SAVE_DIR_NAME)
+    Pathname(File.join(archive_path, SECTION_SAVE_DIR_NAME))
   end
 
   #
@@ -108,8 +110,8 @@ class Downloader
     file_title = data["file_title"] || data["title"]   # 互換性維持のための処理
     use_subdirectory = data["use_subdirectory"] || false
     subdirectory = use_subdirectory ? create_subdirecotry_name(file_title) : ""
-    path = File.join(Database.archive_root_path, data["sitename"], subdirectory, file_title)
-    if File.exist?(path)
+    path = Database.archive_root_path.join(data["sitename"], subdirectory, file_title)
+    if path.exist?
       return path
     else
       @@database.delete(id)
@@ -207,7 +209,7 @@ class Downloader
       puts "#{data_dir} を完全に削除しました"
     else
       # TOCは消しておかないと再DL時に古いデータがあると誤認する
-      File.delete(File.join(data_dir, TOC_FILE_NAME))
+      data_dir.join(TOC_FILE_NAME).delete
     end
     @@database.delete(data["id"])
     @@database.save_database
@@ -220,7 +222,7 @@ class Downloader
   def self.get_cache_root_dir(target)
     dir = get_novel_data_dir_by_target(target)
     if dir
-      return File.join(dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME)
+      return dir.join(SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME)
     end
     nil
   end
@@ -252,18 +254,17 @@ class Downloader
   # 変数初期化
   #
   def initialize_variables(id, setting, options)
+    @id = id || database.create_new_id
     @title = nil
     @file_title = nil
     @setting = setting
     @force = options[:force]
-    @from_download = options[:from_download]
     @stream = options[:stream]
     @cache_dir = nil
     @new_arrivals = false
-    @novel_data_dir = nil
     @novel_status = nil
-    @id = id || @@database.create_new_id
-    @new_novel = @@database[@id].!
+    @new_novel = record.!
+    @from_download = options[:from_download]
     @section_download_cache = {}
     @download_wait_steps = Inventory.load("local_setting")["download.wait-steps"] || 0
     @download_use_subdirectory = use_subdirectory?
@@ -274,6 +275,14 @@ class Downloader
     @nosave_raw = Narou.economy?("nosave_raw")
     @gurad_spoiler = Inventory.load("local_setting")["guard-spoiler"]
     initialize_wait_counter
+  end
+
+  def database
+    @@database
+  end
+
+  def record
+    database[@id]
   end
 
   #
@@ -300,7 +309,7 @@ class Downloader
       Inventory.load("local_setting")["download.use-subdirectory"] || false
     else
       # すでにDL済みの小説
-      @@database[@id]["use_subdirectory"] || false
+      record["use_subdirectory"] || false
     end
   end
 
@@ -366,6 +375,8 @@ class Downloader
       update_subtitles = update_body_check(old_toc["subtitles"], latest_toc_subtitles)
     end
 
+    save_toc_once(latest_toc)
+
     if old_toc.empty? && update_subtitles.size.zero?
       @stream.error "#{@setting['title']} の目次がありません"
       return :failed
@@ -383,14 +394,9 @@ class Downloader
       case
       when update_subtitles.size > 0
         @cache_dir = create_cache_dir if old_toc.length > 0
-        begin
-          sections_download_and_save(update_subtitles)
-          if @cache_dir && Dir.glob(File.join(@cache_dir, "*")).count == 0
-            remove_cache_dir
-          end
-        rescue Interrupt
+        sections_download_and_save(update_subtitles)
+        if @cache_dir && @cache_dir.glob("*").count == 0
           remove_cache_dir
-          raise
         end
         update_database
         :ok
@@ -415,10 +421,9 @@ class Downloader
         :none
       end
 
-    @@database[@id]["general_all_no"] = latest_toc_subtitles.size
+    record["general_all_no"] = latest_toc_subtitles.size
 
-    save_novel_data(TOC_FILE_NAME, latest_toc)
-    tags = @new_novel ? [] : @@database[@id]["tags"] || []
+    tags = @new_novel ? [] : record["tags"] || []
     case novel_end?
     when true
       unless tags.include?("end")
@@ -437,7 +442,11 @@ class Downloader
       end
     end
     return_status
+  rescue Interrupt, SuspendDownload
+    update_database(suspend: true)
+    raise Interrupt
   ensure
+    save_toc_once(latest_toc)
     @setting.clear
   end
 
@@ -534,7 +543,7 @@ class Downloader
     return nil if @nosave_diff
     now = Time.now
     name = now.strftime("%Y.%m.%d@%H.%M.%S")
-    cache_dir = File.join(get_novel_data_dir, SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME, name)
+    cache_dir = get_novel_data_dir.join(SECTION_SAVE_DIR_NAME, CACHE_SAVE_DIR_NAME, name)
     FileUtils.mkdir_p(cache_dir)
     cache_dir
   end
@@ -600,7 +609,7 @@ class Downloader
   #
   # データベース更新
   #
-  def update_database
+  def update_database(suspend: false)
     info = @setting["info"] || {}
     data = {
       "id" => @id,
@@ -612,17 +621,18 @@ class Downloader
       "novel_type" => get_novel_type,
       "end" => novel_end?,
       "last_update" => Time.now,
-      "new_arrivals_date" => (@new_arrivals ? Time.now : @@database[@id]["new_arrivals_date"]),
+      "new_arrivals_date" => (@new_arrivals ? Time.now : record["new_arrivals_date"]),
       "use_subdirectory" => @download_use_subdirectory,
       "general_firstup" => info["general_firstup"],
       "novelupdated_at" => get_novelupdated_at,
       "general_lastup" => get_general_lastup,
       "length" => novel_length,
+      "suspend" => suspend
     }
-    if @@database[@id]
-      @@database[@id].merge!(data)
+    if record
+      database[@id].merge!(data)
     else
-      @@database[@id] = data
+      database[@id] = data
     end
     @@database.save_database
   end
@@ -667,10 +677,8 @@ class Downloader
   def get_file_title
     return @file_title if @file_title
     # すでにデータベースに登録されているならそれを引き続き使うようにする
-    if @@database[@id] && @@database[@id]["file_title"]
-      @file_title = @@database[@id]["file_title"]
-      return @file_title
-    end
+    @file_title = record&.dig("file_title")
+    return @file_title if @file_title
     @file_title = @setting["ncode"]
     if @setting["append_title_to_folder_name"]
       @file_title += " " + Helper.replace_filename_special_chars(get_title, true).strip
@@ -683,7 +691,7 @@ class Downloader
   #
   def get_title
     return @title if @title
-    @title = @setting["title"] || @@database[@id]["title"]
+    @title = @setting["title"] || record["title"]
     if @setting["title_strip_pattern"]
       @title = @title.gsub(/#{@setting["title_strip_pattern"]}/, "").gsub(/^[　\s]*(.+?)[　\s]*?$/, "\\1")
     end
@@ -791,7 +799,7 @@ class Downloader
     raise if through_error   # エラー処理はしなくていいからそのまま例外を受け取りたい時用
     if e.message.include?("404")
       @stream.error "小説が削除されているか非公開な可能性があります"
-      if @@database.novel_exists?(@id)
+      if database.novel_exists?(@id)
         Command::Tag.execute!(%W(#{@id} --add 404 --color white --no-overwrite-color), io: Narou::NullIO.new)
         Command::Freeze.execute!(@id, "--on")
       end
@@ -834,7 +842,7 @@ class Downloader
       # 前回ダウンロードしたはずの本文ファイルが存在するか
       section_file_name = "#{index} #{old["file_subtitle"]}.yaml"
       section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
-      unless File.exist?(File.join(get_novel_data_dir, section_file_relative_path))
+      unless get_novel_data_dir.join(section_file_relative_path).exist?
         # あるはずのファイルが存在しなかったので、再ダウンロードが必要
         next true
       end
@@ -858,8 +866,7 @@ class Downloader
           unless deffer
             # 差分がある場合はこのあと保存されて更新されるので、差分がない場合のみ
             # タイムスタンプを更新しておく
-            now = Time.now
-            File.utime(now, now, File.join(get_novel_data_dir, section_file_relative_path))
+            FileUtils.touch(get_novel_data_dir.join(section_file_relative_path))
           end
           deffer
         end
@@ -894,7 +901,7 @@ class Downloader
   def get_section_file_timestamp(old_subtitles_info, latest_subtitles_info)
     download_time = old_subtitles_info["download_time"]
     unless download_time
-      download_time = File.mtime(create_section_file_path(old_subtitles_info))
+      download_time = File.mtime(section_file_path(old_subtitles_info))
     end
     latest_subtitles_info["download_time"] = download_time
     download_time
@@ -1001,8 +1008,8 @@ class Downloader
 
       section_file_name = "#{index} #{file_subtitle}.yaml"
       section_file_relative_path = File.join(SECTION_SAVE_DIR_NAME, section_file_name)
-      section_file_full_path = File.join(get_novel_data_dir, section_file_relative_path)
-      if File.exist?(section_file_full_path)
+      section_file_full_path = get_novel_data_dir.join(section_file_relative_path)
+      if section_file_full_path.exist?
         if @force
           if different_section?(section_file_relative_path, info)
             @stream.print " (更新あり)"
@@ -1032,8 +1039,8 @@ class Downloader
   # すでに保存されている内容とDLした内容が違うかどうか
   #
   def different_section?(old_relative_path, new_subtitle_info)
-    path = File.join(get_novel_data_dir, old_relative_path)
-    if File.exist?(path)
+    path = get_novel_data_dir.join(old_relative_path)
+    if path.exist?
       return YAML.load_file(path)["element"] != new_subtitle_info["element"]
     else
       return true
@@ -1045,8 +1052,8 @@ class Downloader
   #
   def move_to_cache_dir(relative_path)
     return if @nosave_diff
-    path = File.join(get_novel_data_dir, relative_path)
-    if File.exist?(path) && @cache_dir
+    path = get_novel_data_dir.join(relative_path)
+    if path.exist? && @cache_dir
       FileUtils.mv(path, @cache_dir)
     end
   end
@@ -1089,14 +1096,13 @@ class Downloader
       raw = Helper.restore_entity(raw)
       save_raw_data(raw, subtitle_info)
       element = extract_elements_in_section(raw, subtitle_info["subtitle"])
-      element["data_type"] = "text"
     else
       save_raw_data(raw, subtitle_info, ".html")
-      %w(introduction body postscript).each { |type| @setting[type] = nil }
+      %w(introduction postscript body).each { |type| @setting[type] = nil }
       @setting.multi_match(raw, "body_pattern", "introduction_pattern", "postscript_pattern")
       element = { "data_type" => "html" }
-      %w(introduction body postscript).each { |type|
-        element[type] = @setting[type] || ""
+      %w(introduction postscript body).each { |type|
+        element[type] = @setting[type].to_s
       }
     end
     subtitle_info["download_time"] = Time.now
@@ -1105,23 +1111,25 @@ class Downloader
   end
 
   def display_hint
-    @stream.warn <<-EOS
-ヒント:
-503 がでた場合はしばらくアクセスが規制される場合があります。
-設定を変更してサーバーに対する負荷を軽減させましょう。
-（メンテナンス等でも503になる場合があります）
+    @stream.puts <<~HINT
+      ヒント:
+      503 がでた場合はしばらくアクセスが規制される場合があります。
+      設定を変更してサーバーに対する負荷を軽減させましょう。(下記参照)
+      小説家になろう系列の場合、10分程度時間を置く必要があります。
+      (メンテナンス等でも503になる場合があります。公式サイトを確認してください)
 
-下記の設定のどれか、もしくは全てを変更することで調整できます。
+      下記の設定のどれか、もしくは全てを変更することで調整できます。
+      (download.interval が最重要設定。１話ごとの間隔が短すぎると規制されやすい)
 
-# Update時の作品間の待機時間を変更する
-narou s update.interval=3.0
+      # 1話ごとに入るウェイトを変更する(単位：秒)
+      narou s download.interval=1.0
 
-# 1話ごとに入るウェイトを変更する
-narou s download.interval=1.0
+      # 10話ごとに通常より長いウェイトを入れる
+      narou s download.wait-steps=10
 
-# 5話ごとに通常より長いウェイトを入れる
-narou s download.wait-steps=5
-    EOS
+      # Update時の作品間の待機時間を変更する(単位：秒)
+      narou s update.interval=3.0
+    HINT
   end
 
   #
@@ -1129,7 +1137,7 @@ narou s download.wait-steps=5
   #
   def download_raw_data(url)
     raw = nil
-    retry_count = RETRY_MAX_FOR_503
+    retry_count = LIMIT_TO_RETRY_NETWORK
     cookie = @setting["cookie"] || ""
     begin
       open_uri_options = make_open_uri_options("Cookie" => cookie, allow_redirections: :safe)
@@ -1137,40 +1145,41 @@ narou s download.wait-steps=5
         raw = Helper.pretreatment_source(fp.read, @setting["encoding"])
       end
     rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout => e
-      if e.message =~ /^503/
+      case e.message
+      when /^503/
+        # 503 はアクセス規制やメンテ等でリトライしてもほぼ意味がないことが多いため一度で諦める
+        @stream.error "server message: #{e.message}"
+        display_hint
+        raise SuspendDownload
+      when /^404/
+        @stream.error "server message: #{e.message}"
+        @stream.puts "#{url} がダウンロード出来ませんでした。時間をおいて再度試してみてください"
+        raise SuspendDownload
+      else
         if retry_count == 0
           @stream.error "上限までリトライしましたがファイルがダウンロード出来ませんでした"
-          exit Narou::EXIT_ERROR_CODE
+          raise SuspendDownload
         end
         retry_count -= 1
-        @stream.puts
-        @stream.warn "server message: #{e.message}"
-        @stream.warn "リトライ待機中……"
-        @@display_hint_once ||= false
-        unless @@display_hint_once
-          display_hint
-          @@display_hint_once = true
-        end
-        sleep(WAITING_TIME_FOR_503)
+        @stream.puts <<~MSG
+          server message: #{e.message}
+          リトライ待機中...
+        MSG
+        sleep(WAIT_TIME_TO_RETRY_NETWORK)
         retry
-      elsif e.message =~ /^404/
-        @stream.error "#{url} がダウンロード出来ませんでした。時間をおいて再度試してみてください"
-        exit Narou::EXIT_ERROR_CODE
-      else
-        raise
       end
     end
     raw
   end
 
   def get_raw_dir
-    @raw_dir ||= File.join(get_novel_data_dir, RAW_DATA_DIR_NAME)
+    @raw_dir ||= get_novel_data_dir.join(RAW_DATA_DIR_NAME)
   end
 
   def init_raw_dir
     return if @nosave_raw
     path = get_raw_dir
-    FileUtils.mkdir_p(path) unless File.exist?(path)
+    FileUtils.mkdir_p(path) unless path.exist?
   end
 
   #
@@ -1180,7 +1189,7 @@ narou s download.wait-steps=5
     return if @nosave_raw
     index = subtitle_info["index"]
     file_subtitle = subtitle_info["file_subtitle"]
-    path = File.join(get_raw_dir, "#{index} #{file_subtitle}#{ext}")
+    path = get_raw_dir.join("#{index} #{file_subtitle}#{ext}")
     File.write(path, raw_data)
   end
 
@@ -1201,9 +1210,10 @@ narou s download.wait-steps=5
       end
     end
     {
+      "data_type" => "text",
       "introduction" => introduction,
-      "body" => lines.join("\n"),
-      "postscript" => postscript
+      "postscript" => postscript,
+      "body" => lines.join("\n")
     }
   end
 
@@ -1231,28 +1241,33 @@ narou s download.wait-steps=5
   # 小説データの格納ディレクトリパス
   #
   def get_novel_data_dir
-    return @novel_data_dir if @novel_data_dir
     raise "小説名がまだ設定されていません" unless get_file_title
     subdirectory = @download_use_subdirectory ? Downloader.create_subdirecotry_name(get_file_title) : ""
-    @novel_data_dir = File.join(Database.archive_root_path, @setting["name"], subdirectory, get_file_title)
-    @novel_data_dir
+    Database.archive_root_path.join(@setting["name"], subdirectory, get_file_title)
   end
+  memoize :get_novel_data_dir
 
   #
   # 小説本文の保存パスを生成
   #
-  def create_section_file_path(subtitle_info)
+  def section_file_path(subtitle_info)
     filename = "#{subtitle_info["index"]} #{subtitle_info["file_subtitle"]}.yaml"
-    File.join(get_novel_data_dir, SECTION_SAVE_DIR_NAME, filename)
+    get_novel_data_dir.join(SECTION_SAVE_DIR_NAME, filename)
+  end
+
+  def save_toc_once(toc)
+    return if @save_toc_once
+    save_novel_data(TOC_FILE_NAME, toc)
+    @save_toc_once = true
   end
 
   #
   # 小説データの格納ディレクトリに保存
   #
   def save_novel_data(filename, object)
-    path = File.join(get_novel_data_dir, filename)
-    dir_path = File.dirname(path)
-    unless File.exist?(dir_path)
+    path = get_novel_data_dir.join(filename)
+    dir_path = path.dirname
+    unless dir_path.exist?
       FileUtils.mkdir_p(dir_path)
     end
     File.write(path, YAML.dump(object))
@@ -1261,8 +1276,7 @@ narou s download.wait-steps=5
   #
   # 小説データの格納ディレクトリから読み込む
   def load_novel_data(filename)
-    dir_path = get_novel_data_dir
-    YAML.load_file(File.join(dir_path, filename))
+    YAML.load_file(get_novel_data_dir.join(filename))
   rescue Errno::ENOENT
     nil
   end
@@ -1272,13 +1286,13 @@ narou s download.wait-steps=5
   #
   def init_novel_dir
     novel_dir_path = get_novel_data_dir
-    file_title = File.basename(novel_dir_path)
-    FileUtils.mkdir_p(novel_dir_path) unless File.exist?(novel_dir_path)
+    file_title = novel_dir_path.basename.to_s
+    FileUtils.mkdir_p(novel_dir_path) unless novel_dir_path.exist?
     original_settings = NovelSetting.get_original_settings
     default_settings = NovelSetting.load_default_settings
     novel_setting = NovelSetting.new(@id, true, true)
-    special_preset_dir = File.join(Narou.preset_dir, @setting["domain"], @setting["ncode"])
-    exists_special_preset_dir = File.exist?(special_preset_dir)
+    special_preset_dir = Narou.preset_dir.join(@setting["domain"], @setting["ncode"])
+    exists_special_preset_dir = special_preset_dir.exist?
     templates = [
       [NovelSetting::INI_NAME, NovelSetting::INI_ERB_BINARY_VERSION],
       ["converter.rb", 1.0],
@@ -1286,9 +1300,9 @@ narou s download.wait-steps=5
     ]
     templates.each do |(filename, binary_version)|
       if exists_special_preset_dir
-        preset_file_path = File.join(special_preset_dir, filename)
-        if File.exist?(preset_file_path)
-          unless File.exist?(File.join(novel_dir_path, filename))
+        preset_file_path = special_preset_dir.join(filename)
+        if preset_file_path.exist?
+          unless novel_dir_path.join(filename).exist?
             FileUtils.cp(preset_file_path, novel_dir_path)
           end
           next

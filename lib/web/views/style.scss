@@ -692,6 +692,10 @@ $console-color: white;
   }
 }
 
+#console-stdout2 .progress {
+  width: 100%;
+}
+
 .console-buttons {
   position: absolute;
   top: 3px;
