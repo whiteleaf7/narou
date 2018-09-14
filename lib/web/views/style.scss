@@ -692,12 +692,18 @@ $console-color: white;
   }
 }
 
+#console-stdout2 .progress {
+  width: 100%;
+}
+
 .console-buttons {
   position: absolute;
   top: 3px;
   right: 15px;
   color: $console-color;
   cursor: pointer;
+
+  text-shadow: 1px 1px 2px #000, -1px 1px 2px #000, 1px -1px 2px #000, -1px -1px 2px #000;
 
   span:hover {
     color: mix($console-color, red, 80%);
