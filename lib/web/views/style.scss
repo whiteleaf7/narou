@@ -703,6 +703,8 @@ $console-color: white;
   color: $console-color;
   cursor: pointer;
 
+  text-shadow: 1px 1px 2px #000, -1px 1px 2px #000, 1px -1px 2px #000, -1px -1px 2px #000;
+
   span:hover {
     color: mix($console-color, red, 80%);
   }
