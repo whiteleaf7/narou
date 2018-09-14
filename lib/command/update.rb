@@ -220,10 +220,9 @@ module Command
             data.delete("_convert_failure")
           end
         end
-
-        process_hotentry(hotentry_manager.hotentries)
       ensure
         Database.instance.save_database
+        process_hotentry(hotentry_manager.hotentries)
       end
 
       exit mistook_count if mistook_count > 0

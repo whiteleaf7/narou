@@ -432,11 +432,13 @@ class NovelConverter
 
   def load_novel_section(subtitle_info, section_save_dir)
     file_subtitle = subtitle_info["file_subtitle"] || subtitle_info["subtitle"]   # 互換性維持のため
-    path = File.join(section_save_dir, "#{subtitle_info["index"]} #{file_subtitle}.yaml")
+    path = section_save_dir.join("#{subtitle_info["index"]} #{file_subtitle}.yaml")
     YAML.load_file(path)
   rescue Errno::ENOENT => e
-    $stdout2.error "#{path} を見つけることが出来ませんでした。narou update #{@novel_id} を実行することで、" \
-                   "削除されてしまったファイルを再ダウンロードすることが出来ます"
+    $stdout2.error(<<~MSG.termcolor)
+      <yellow>"#{path.basename}"</yellow> を見つけることが出来ませんでした。
+      対象の小説を一度 Update を実行することで、ファイルをダウンロード出来ます。
+    MSG
     exit Narou::EXIT_ERROR_CODE
   end
 
