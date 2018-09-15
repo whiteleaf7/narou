@@ -253,7 +253,6 @@ class Downloader
   def initialize_variables(id, setting, options)
     @id = id || database.create_new_id
     @title = nil
-    @file_title = nil
     @setting = setting
     @force = options[:force]
     @stream = options[:stream]
@@ -671,17 +670,15 @@ class Downloader
   # 小説を格納するためのディレクトリ名を取得する
   #
   def get_file_title
-    return @file_title if @file_title
     # すでにデータベースに登録されているならそれを引き続き使うようにする
-    @file_title = record&.dig("file_title")
-    return @file_title if @file_title
-    @file_title = @setting["ncode"]
-    if @setting["append_title_to_folder_name"]
-      scrubbed_title = Helper.replace_filename_special_chars(get_title, true).strip
-      @file_title = Helper.truncate_folder_title("#{@file_title} #{scrubbed_title}")
-    end
-    @file_title
+    file_title = record&.dig("file_title")
+    return file_title if file_title
+    ncode = @setting["ncode"]
+    return ncode unless @setting["append_title_to_folder_name"]
+    scrubbed_title = Helper.replace_filename_special_chars(get_title, true).strip
+    Helper.truncate_folder_title("#{ncode} #{scrubbed_title}")
   end
+  memoize :get_file_title
 
   #
   # 小説のタイトルを取得する
