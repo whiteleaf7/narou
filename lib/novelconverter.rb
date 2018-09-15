@@ -246,7 +246,7 @@ class NovelConverter
   def self.epub_to_mobi(epub_path, verbose = false)
     kindlegen_path = Narou.kindlegen_path
     unless File.exist?(kindlegen_path)
-      $stdout2.error "kindlegenが見つかりませんでした。AozoraEpub3と同じディレクトリにインストールして下さい"
+      $stdout2.error "kindlegenが見つかりませんでした。AozoraEpub3と同じフォルダにインストールして下さい"
       return :error
     end
 

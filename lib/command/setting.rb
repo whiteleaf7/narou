@@ -492,10 +492,6 @@ module Command
           type: :string, help:  "--multiple指定時の区切り文字",
           tab: :detail
         },
-        "filename-length-limit" => {
-          type: :integer, help:  "ファイル名の長さを制限する。ファイル名の長さでエラーが出ない限り基本的にはいじらないこと。デフォルトは#{Helper::FILENAME_LENGTH_LIMIT}文字",
-          tab: :detail
-        },
         "economy" => {
           type: :multiple,
           help: "容量節約に関する設定。カンマ区切りで設定\n" \
@@ -512,8 +508,21 @@ module Command
           tab: :detail
         },
         "normalize-filename" => {
-          type: :boolean, help: "ファイル名の文字列をNFCで正規化する。※既存データとの互換性が無くなる可能性があるので、バックアップを取った上で機能を理解の上有効にして下さい",
+          type: :boolean,
+          help: "ファイル名の文字列をNFCで正規化する。※既存データとの互換性が無くなる可能性があるので、" \
+                "バックアップを取った上で機能を理解の上有効にして下さい",
           tab: :detail,
+        },
+        "folder-length-limit" => {
+          type: :integer,
+          help: "小説を格納するフォルダ名の長さを制限する。デフォルトは#{Helper::FOLDER_LENGTH_LIMIT}文字",
+          tab: :detail
+        },
+        "filename-length-limit" => {
+          type: :integer,
+          help: "各話保存時のファイル名の長さを制限する。※この設定は既存小説にも影響が出るので" \
+                "ファイル名の長さでエラーが出ない限り基本的にはいじらないこと。デフォルトは#{Helper::FILENAME_LENGTH_LIMIT}文字",
+          tab: :detail
         },
         "webui.theme" => {
           type: :select, help: "WEB UI 用テーマ選択",

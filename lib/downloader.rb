@@ -253,7 +253,6 @@ class Downloader
   def initialize_variables(id, setting, options)
     @id = id || database.create_new_id
     @title = nil
-    @file_title = nil
     @setting = setting
     @force = options[:force]
     @stream = options[:stream]
@@ -372,8 +371,6 @@ class Downloader
       update_subtitles = update_body_check(old_toc["subtitles"], latest_toc_subtitles)
     end
 
-    save_toc_once(latest_toc)
-
     if old_toc.empty? && update_subtitles.size.zero?
       @stream.error "#{@setting['title']} の目次がありません"
       return :failed
@@ -420,6 +417,7 @@ class Downloader
 
     record["general_all_no"] = latest_toc_subtitles.size
 
+    save_toc_once(latest_toc)
     tags = @new_novel ? [] : record["tags"] || []
     case novel_end?
     when true
@@ -440,10 +438,10 @@ class Downloader
     end
     return_status
   rescue Interrupt, SuspendDownload
+    save_toc_once(latest_toc) if latest_toc.present?
     update_database(suspend: true)
     raise Interrupt
   ensure
-    save_toc_once(latest_toc)
     @setting.clear
   end
 
@@ -672,16 +670,15 @@ class Downloader
   # 小説を格納するためのディレクトリ名を取得する
   #
   def get_file_title
-    return @file_title if @file_title
     # すでにデータベースに登録されているならそれを引き続き使うようにする
-    @file_title = record&.dig("file_title")
-    return @file_title if @file_title
-    @file_title = @setting["ncode"]
-    if @setting["append_title_to_folder_name"]
-      @file_title += " " + Helper.replace_filename_special_chars(get_title, true).strip
-    end
-    @file_title
+    file_title = record&.dig("file_title")
+    return file_title if file_title
+    ncode = @setting["ncode"]
+    return ncode unless @setting["append_title_to_folder_name"]
+    scrubbed_title = Helper.replace_filename_special_chars(get_title, true).strip
+    Helper.truncate_folder_title("#{ncode} #{scrubbed_title}")
   end
+  memoize :get_file_title
 
   #
   # 小説のタイトルを取得する

@@ -16,6 +16,7 @@ module Helper
 
   HOST_OS = RbConfig::CONFIG["host_os"]
   FILENAME_LENGTH_LIMIT = 50
+  FOLDER_LENGTH_LIMIT = 50
 
   def os_windows?
     @@os_is_windows ||= HOST_OS =~ /mswin(?!ce)|mingw|bccwin/i
@@ -359,6 +360,12 @@ module Helper
     else
       path
     end
+  end
+
+  def truncate_folder_title(title, limit = Inventory.load["folder-length-limit"])
+    limit ||= FOLDER_LENGTH_LIMIT
+    return title if title.length <= limit
+    title[0...limit]
   end
 
   #
