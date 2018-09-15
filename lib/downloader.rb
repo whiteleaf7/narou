@@ -905,8 +905,8 @@ class Downloader
   end
 
   def title_to_filename(title)
-    Helper.replace_filename_special_chars(
-      Helper.truncate_path(
+    Helper.truncate_path(
+      Helper.replace_filename_special_chars(
         HTML.new(title).delete_ruby_tag
       )
     )
@@ -967,7 +967,6 @@ class Downloader
   end
 
   def slim_subtitle(string)
-    # HTML.new(string).delete_ruby_tag.delete("\n")
     HTML.new(string).delete_ruby_tag.delete("\n")
   end
 

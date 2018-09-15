@@ -244,7 +244,7 @@ module Narou
     attr_accessor :end_with_new_line, :format_text, :format_style
 
     FORMAT_TEXT = "変換中:%<size>d"
-    FORMAT_STYLE = "\e[%<left>dG<blue>%<text>s</blue>\e[1G"
+    FORMAT_STYLE = "\e[%<left>dG<cyan>%<text>s</cyan>\e[1G"
 
     def initialize
       super
@@ -261,7 +261,7 @@ module Narou
           text = format(format_text, size: size)
           text_width = text.display_width
           console_width = IO.console_size[1]
-          left = console_width - text_width
+          left = console_width - text_width - 1
           stream.print format(format_style, left: left, text: text, space: " ").termcolor
         end
         super(line, target)

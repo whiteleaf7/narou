@@ -38,7 +38,8 @@ File.write(output_path, result)
 puts "#{output_path} を出力しました"
 
 __END__
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -64,7 +65,7 @@ describe "convert" do
   after :all do
     # 変換した際に出力される各ファイルを削除
     unless $debug
-      glob_path = "*/\\[#{AUTHOR}\\]*.txt\0*/{見出しリスト,調査ログ}.txt"
+      glob_path = +"*/\\[#{AUTHOR}\\]*.txt\0*/{見出しリスト,調査ログ}.txt"
       glob_path.encode!("Windows-31J") if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i
       Dir.glob(glob_path) do |path|
         File.delete(path)

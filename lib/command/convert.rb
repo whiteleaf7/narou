@@ -304,7 +304,7 @@ module Command
       return nil unless copy_to_dir
       FileUtils.copy(src_path, copy_to_dir)
       copied_file_path = File.join(copy_to_dir, File.basename(src_path))
-      $stdout2.puts copied_file_path.encode(Encoding::UTF_8) + " へコピーしました"
+      $stdout2.puts copied_file_path.to_s.encode(Encoding::UTF_8) + " へコピーしました"
       copied_file_path
     rescue NoSuchDirectory => e
       $stdout2.error "#{e.message} はフォルダではないかすでに削除されています。コピー出来ませんでした"
@@ -371,7 +371,7 @@ module Command
           rescue Device::SendFailure
           end
           if copy_to_path
-            $stdout2.puts copy_to_path.encode(Encoding::UTF_8) + " へコピーしました"
+            $stdout2.puts copy_to_path.to_s.encode(Encoding::UTF_8) + " へコピーしました"
           else
             $stdout2.error "送信に失敗しました"
             @@sending_error_list << ebook_file

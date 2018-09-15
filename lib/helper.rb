@@ -69,7 +69,7 @@ module Helper
     end
     case determine_os
     when :windows
-      system(%!explorer "file:///#{path.encode(Encoding::Windows_31J)}"!)
+      system(%!explorer "file:///#{path}"!.encode(Encoding::Windows_31J))
     when :cygwin
       system(%!cygstart "#{path}"!)
     when :mac
@@ -347,7 +347,8 @@ module Helper
   # 長過ぎるファイルパスを詰める
   # ファイル名部分のみを詰める。拡張子は維持する
   #
-  def truncate_path(path, limit = FILENAME_LENGTH_LIMIT)
+  def truncate_path(path, limit = Inventory.load["filename-length-limit"])
+    limit ||= FILENAME_LENGTH_LIMIT
     dirname = File.dirname(path)
     extname = File.extname(path)
     basename = File.basename(path, extname)

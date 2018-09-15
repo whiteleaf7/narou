@@ -174,7 +174,7 @@ class NovelConverter
     command = %!java #{java_encoding} -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 -of #{device_option} ! +
               %!#{cover_option} #{dst_option} #{ext_option} #{yokogaki_option} "#{abs_srcpath}"!
     if Helper.os_windows?
-      command = "cmd /c " + command.encode(Encoding::Windows_31J)
+      command = "cmd /c #{command}".encode(Encoding::Windows_31J)
     end
     activate_dakuten_font_files if use_dakuten_font
     $stdout2.print "AozoraEpub3でEPUBに変換しています"
@@ -253,7 +253,7 @@ class NovelConverter
     if Helper.os_cygwin?
       epub_path = Helper.convert_to_windows_path(epub_path)
     end
-    command = %!"#{kindlegen_path}" -locale ja "#{epub_path}"!
+    command = +%!"#{kindlegen_path}" -locale ja "#{epub_path}"!
     if Helper.os_windows?
       command.encode!(Encoding::Windows_31J)
     end
@@ -282,7 +282,6 @@ class NovelConverter
       end
     else
       $stdout2.puts
-      $stdout2.error "kindlegenが中断させられたぽいのでMOBIは出力出来ませんでした"
       return :abort
     end
     $stdout2.puts "変換しました"
@@ -435,6 +434,7 @@ class NovelConverter
     path = section_save_dir.join("#{subtitle_info["index"]} #{file_subtitle}.yaml")
     YAML.load_file(path)
   rescue Errno::ENOENT => e
+    $stdout2.puts
     $stdout2.error(<<~MSG.termcolor)
       <yellow>"#{path.basename}"</yellow> を見つけることが出来ませんでした。
       対象の小説を一度 Update を実行することで、ファイルをダウンロード出来ます。

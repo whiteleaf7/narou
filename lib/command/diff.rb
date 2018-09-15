@@ -150,7 +150,7 @@ module Command
       diff_cmd = create_difftool_command_string(*temp_paths.map { |temp|
         path = temp.path
         if Helper.os_windows?
-          path.encode!(Encoding::Windows_31J)
+          path = path.encode(Encoding::Windows_31J)
         end
         %!"#{path}"!
       })

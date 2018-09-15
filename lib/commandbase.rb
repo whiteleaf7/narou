@@ -20,7 +20,7 @@ module Command
     attr_accessor :stream_io
 
     # postfixies は改行で区切ることで2パターン以上記述できる
-    def initialize(postfixies = "")
+    def initialize(postfixies = " ")
       self.stream_io = $stdout
       @opt = OptionParser.new(nil, 20)
       command_name = self.class.to_s.scan(/::(.+)$/)[0][0].downcase
