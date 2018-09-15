@@ -677,7 +677,8 @@ class Downloader
     return @file_title if @file_title
     @file_title = @setting["ncode"]
     if @setting["append_title_to_folder_name"]
-      @file_title += " " + Helper.replace_filename_special_chars(get_title, true).strip
+      scrubbed_title = Helper.replace_filename_special_chars(get_title, true).strip
+      @file_title = Helper.truncate_folder_title("#{@file_title} #{scrubbed_title}")
     end
     @file_title
   end
