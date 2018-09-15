@@ -372,8 +372,6 @@ class Downloader
       update_subtitles = update_body_check(old_toc["subtitles"], latest_toc_subtitles)
     end
 
-    save_toc_once(latest_toc)
-
     if old_toc.empty? && update_subtitles.size.zero?
       @stream.error "#{@setting['title']} の目次がありません"
       return :failed
@@ -420,6 +418,7 @@ class Downloader
 
     record["general_all_no"] = latest_toc_subtitles.size
 
+    save_toc_once(latest_toc)
     tags = @new_novel ? [] : record["tags"] || []
     case novel_end?
     when true
@@ -440,10 +439,10 @@ class Downloader
     end
     return_status
   rescue Interrupt, SuspendDownload
+    save_toc_once(latest_toc) if latest_toc.present?
     update_database(suspend: true)
     raise Interrupt
   ensure
-    save_toc_once(latest_toc)
     @setting.clear
   end
 
