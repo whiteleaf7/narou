@@ -13,10 +13,10 @@ if $development
 
       def initialize
         super()
-        @opt.separator <<~EOS
+        @opt.separator <<~HELP
 
           ・開発時のみ有効になるコンソール。pry のインストール必須
-        EOS
+        HELP
       end
 
       def execute(argv)
