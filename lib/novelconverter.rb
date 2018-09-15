@@ -434,6 +434,7 @@ class NovelConverter
     path = section_save_dir.join("#{subtitle_info["index"]} #{file_subtitle}.yaml")
     YAML.load_file(path)
   rescue Errno::ENOENT => e
+    $stdout2.puts
     $stdout2.error(<<~MSG.termcolor)
       <yellow>"#{path.basename}"</yellow> を見つけることが出来ませんでした。
       対象の小説を一度 Update を実行することで、ファイルをダウンロード出来ます。

@@ -492,6 +492,10 @@ module Command
           type: :string, help:  "--multiple指定時の区切り文字",
           tab: :detail
         },
+        "filename-length-limit" => {
+          type: :integer, help:  "ファイル名の長さを制限する。ファイル名の長さでエラーが出ない限り基本的にはいじらないこと。デフォルトは#{Helper::FILENAME_LENGTH_LIMIT}文字",
+          tab: :detail
+        },
         "economy" => {
           type: :multiple,
           help: "容量節約に関する設定。カンマ区切りで設定\n" \
