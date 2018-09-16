@@ -38,6 +38,7 @@
         .fadeout-alert.alert(class="alert-#{type}")
           &= message
     != yield
+    = partial :move_to_top
     %script{:src => "//code.jquery.com/jquery-1.11.1.min.js"}
     %script{:src => "//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"}
     %script{:src => "//cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"}

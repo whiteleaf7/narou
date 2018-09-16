@@ -1191,3 +1191,20 @@ $console-color: white;
 .popover {
   max-width: 50%;
 }
+
+.move-to-top {
+  position: fixed;
+  right: 6px;
+  bottom: 6px;
+  width: 40px;
+  height: 40px;
+  background-color: black;
+  border-radius: 5px;
+  font-size: 26px;
+  color: white;
+  padding-top: 3px;
+  padding-left: 6px;
+  cursor: pointer;
+  @include opacity(0.3);
+  z-index: 1040;
+}
