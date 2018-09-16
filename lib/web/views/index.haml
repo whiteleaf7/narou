@@ -326,20 +326,6 @@
   %li#rect-select-menu-cancel
     %a(href="#") キャンセル
 
--# 個別表示用コンソール
-#console-dialog.modal.fade(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true")
-  .modal-dialog
-    .modal-content
-      .modal-header
-        %button(type="button" class="close" data-dismiss="modal")
-          %span(aria-hidden="true") &times;
-          %span.sr-only Close
-        %h4.modal-title サブコンソール
-      .modal-body
-        #each-console.console
-      .modal-footer
-        %button.btn.btn-primary(type="button" data-dismiss="modal") 閉じる
-
 %ul#select-color-menu.dropdown-menu(role="menu")
   %li
     %a#select-color-menu-green(href="#")
