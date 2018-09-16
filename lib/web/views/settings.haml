@@ -1,6 +1,10 @@
 -# このページ内専用のjavascriptでjQueryオブジェクトを参照したい場合この関数に記述
 :javascript
   local_initialize_functions.push(function($) {
+    var storage = new Narou.Storage;
+    var action = new Narou.Action(null);
+    var notification = Narou.Notification.instance();
+
     $("[data-toggle=tooltip]").tooltip({
       animation: false,
       container: "body",
@@ -11,7 +15,6 @@
       width: "100%"
     });
 
-    var storage = new Narou.Storage;
     // 直前に開いていたタブを復元
     var related_active_tab = storage.get("related_active_tab");
     if (related_active_tab) {
@@ -23,6 +26,15 @@
       storage.set("related_active_tab", active_tab);
       storage.save();
     })
+
+    notification.on("server.rebooted", function() {
+      location.href = "/";
+    });
+
+    $("#btn-reboot").on("click", function(e) {
+      e.preventDefault();
+      action.rebootDialog();
+    });
   });
 
 :ruby

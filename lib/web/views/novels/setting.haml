@@ -2,7 +2,8 @@
 :javascript
   local_initialize_functions.push(function($) {
     var stream_console = new Narou.Console({
-      restore: false, buttons: false
+      restore: false, buttons: false,
+      stream_id: Narou.concurrencyIsEnabled() ? "stdout2" : "stdout"
     });
     var action = new Narou.Action(null);
     var storage = new Narou.Storage;
