@@ -7,7 +7,7 @@ top_url: \\k<scheme>://\\k<domain>
 url: \\k<top_url>/works/(?<ncode>\d+)
 encoding: UTF-8
 confirm_over18: no
-append_title_to_folder_name: no
+append_title_to_folder_name: yes
 title_strip_pattern: null
 
 # ------------------------------------------------------------
