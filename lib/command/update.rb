@@ -270,18 +270,21 @@ module Command
       use_dakuten_font = false
 
       Helper.print_horizontal_rule
-      $stdout2.puts "hotentry の変換を開始"
+      puts "hotentry の変換を開始"
 
       subtitles_size = hotentry.inject(0) { |sum, (_, subtitles)| subtitles.size + sum }
-      progressbar = ProgressBar.new(subtitles_size, io: $stdout2)
+      progressbar = ProgressBar.new(subtitles_size)
       total_progress = 0
 
       begin
         hotentry.each do |id, subtitles|
           setting = NovelSetting.load(id, ignore_force, ignore_default)
           setting.enable_illust = false   # 挿絵はパス解決が煩雑なので強制無効
-          novel_converter = NovelConverter.new(setting, output_filename,
-                                               display_inspector, Update.hotentry_dirname)
+          novel_converter = NovelConverter.new(
+            setting, output_filename,
+            display_inspector, Update.hotentry_dirname,
+            stream_io: stream_io
+          )
           last_num = 0
           novel_converter.on(:"convert_main.loop") do |i|
             progressbar.output(total_progress + i)
@@ -298,7 +301,7 @@ module Command
       ensure
         progressbar.clear
       end
-      $stdout2.puts "縦書用の変換が終了しました"
+      puts "縦書用の変換が終了しました"
 
       device = Narou.get_device
       now = Time.now
@@ -311,10 +314,12 @@ module Command
       File.write(txt_output_path, hotentry_text)
       # テキストを書籍データに変換
       relay_proc = -> {
-        NovelConverter.convert_txt_to_ebook_file(txt_output_path, {
+        NovelConverter.convert_txt_to_ebook_file(
+          txt_output_path,
           use_dakuten_font: use_dakuten_font,
-          device: device
-        })
+          device: device,
+          stream_io: stream_io
+        )
       }
       if device
         cmd_convert.extend(device.get_hook_module)
@@ -334,11 +339,11 @@ module Command
     end
 
     def copy_hotentry(ebook_path, cmd_convert)
-      cmd_convert.copy_to_converted_file(ebook_path)
+      cmd_convert.copy_to_converted_file(ebook_path, io: stream_io)
     end
 
     def send_hotentry(ebook_path, cmd_convert)
-      cmd_convert.send_file_to_device(ebook_path)
+      cmd_convert.send_file_to_device(ebook_path, io: stream_io)
     end
 
     def mail_hotentry

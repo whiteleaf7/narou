@@ -51,7 +51,7 @@ module Command
         install_mailer_setting
         return
       rescue Mailer::SettingUncompleteError => e
-        error e.message
+        stream_io.error e.message
         exit Narou::EXIT_ERROR_CODE
       end
       if argv.empty?
@@ -77,11 +77,11 @@ module Command
           end
         end
         unless ebook_paths[0]
-          error "#{target} は存在しません" unless send_all
+          stream_io.error "#{target} は存在しません" unless send_all
           next
         end
         unless File.exist?(ebook_paths[0])
-          error "まだファイル(#{File.basename(ebook_paths[0])})が無いようです" unless send_all
+          stream_io.error "まだファイル(#{File.basename(ebook_paths[0])})が無いようです" unless send_all
           next
         end
         if target == "hotentry"
@@ -91,8 +91,8 @@ module Command
           title = data["title"]
           display_target = "ID:#{id}　#{TermColorLight.escape(title)}"
         end
-        puts "<bold><green>#{display_target}</green></bold>".termcolor
-        print "メールを送信しています"
+        stream_io.puts "<bold><green>#{display_target}</green></bold>".termcolor
+        stream_io.print "メールを送信しています"
         ebook_paths.each do |ebook_path|
           exit_mail = false
           mail_result = nil
@@ -101,21 +101,21 @@ module Command
             exit_mail = true
           end
           until exit_mail
-            print "."
+            stream_io.print "."
             sleep(0.5)
           end
-          puts
+          stream_io.puts
           if mail_result
-            puts File.basename(ebook_path) + " をメールで送信しました"
+            stream_io.puts File.basename(ebook_path) + " をメールで送信しました"
             database[id]["last_mail_date"] = Time.now if target != "hotentry"
           else
-            error mailer.error_message
+            stream_io.error mailer.error_message
             exit Narou::EXIT_ERROR_CODE # next しても次も失敗する可能性が高いのでここで終了
           end
         end
       end
     rescue Interrupt
-      puts "メール送信を中断しました"
+      stream_io.puts "メール送信を中断しました"
       exit Narou::EXIT_INTERRUPT
     ensure
       database.save_database if database
@@ -126,9 +126,11 @@ module Command
       install_path = File.join(Narou.root_dir, Mailer::SETTING_FILE)
       FileUtils.cp(setting_file_path, install_path)
       alter_database_add_column_last_mail_date
-      puts "created #{install_path}"
-      puts "メールの設定用ファイルを作成しました。設定ファイルを書き換えることで mail コマンドが有効になります。"
-      puts "注意：次回以降のupdateで新着があった場合に送信可能フラグが立ちます"
+      stream_io.puts <<~MSG
+        created #{install_path}
+        メールの設定用ファイルを作成しました。設定ファイルを書き換えることで mail コマンドが有効になります。
+        注意：次回以降のupdateで新着があった場合に送信可能フラグが立ちます
+      MSG
       unless Narou.web?
         Helper.open_directory(Narou.root_dir, "設定ファイルがあるフォルダを開きますか")
       end

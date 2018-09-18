@@ -112,7 +112,7 @@ module Command
       EOS
     end
 
-    def self.execute!(argv)
+    def self.execute!(*argv, io: $stdout)
       Narou.concurrency_call do
         super
       end
@@ -299,15 +299,15 @@ module Command
     #
     # convert.copy-to で指定されたディレクトリに書籍データをコピーする
     #
-    def copy_to_converted_file(src_path)
+    def copy_to_converted_file(src_path, io: $stdout2)
       copy_to_dir = get_copy_to_directory
       return nil unless copy_to_dir
       FileUtils.copy(src_path, copy_to_dir)
       copied_file_path = File.join(copy_to_dir, File.basename(src_path))
-      $stdout2.puts copied_file_path.to_s.encode(Encoding::UTF_8) + " へコピーしました"
+      io.puts copied_file_path.to_s.encode(Encoding::UTF_8) + " へコピーしました"
       copied_file_path
     rescue NoSuchDirectory => e
-      $stdout2.error "#{e.message} はフォルダではないかすでに削除されています。コピー出来ませんでした"
+      io.error "#{e.message} はフォルダではないかすでに削除されています。コピー出来ませんでした"
       nil
     end
 
@@ -356,24 +356,24 @@ module Command
       result
     end
 
-    def send_file_to_device(ebook_file)
+    def send_file_to_device(ebook_file, io: $stdout2)
       if @device && @device.physical_support? &&
         @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
         if @argument_target_type == :novel
-          if Send.execute!(@device.name, @target, io: $stdout2) > 0
+          if Send.execute!(@device.name, @target, io: io) > 0
             @@sending_error_list << ebook_file
           end
         else
-          $stdout2.puts @device.name + "へ送信しています"
+          io.puts @device.name + "へ送信しています"
           copy_to_path = nil
           begin
             copy_to_path = @device.copy_to_documents(ebook_file)
           rescue Device::SendFailure
           end
           if copy_to_path
-            $stdout2.puts copy_to_path.to_s.encode(Encoding::UTF_8) + " へコピーしました"
+            io.puts copy_to_path.to_s.encode(Encoding::UTF_8) + " へコピーしました"
           else
-            $stdout2.error "送信に失敗しました"
+            io.error "送信に失敗しました"
             @@sending_error_list << ebook_file
           end
         end

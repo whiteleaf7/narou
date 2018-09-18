@@ -12,7 +12,7 @@ require_relative "inventory"
 module CommandLine
   module_function
 
-  def run(*argv, catch_exit: false)
+  def run(*argv, catch_exit: false, io: $stdout)
     argv.flatten!
     argv_for_windows(argv)
     cmd_name = take_command_name(argv)
@@ -26,9 +26,11 @@ module CommandLine
     end
     command = Command.get_list[cmd_name]
     if catch_exit
-      command.execute!(argv)
+      command.execute!(argv, io: io)
     else
-      command.new.execute(argv)
+      cmd = command.new
+      cmd.stream_io = io
+      cmd.execute(argv)
     end
   ensure
     Command::Convert.display_sending_error_list
@@ -37,8 +39,8 @@ module CommandLine
   #
   # exit を捕捉して終了コードを返す
   #
-  def run!(*argv)
-    run(*argv, catch_exit: true)
+  def run!(*argv, io: $stdout)
+    run(*argv, catch_exit: true, io: io)
   end
 
   def load_default_arguments(cmd)
