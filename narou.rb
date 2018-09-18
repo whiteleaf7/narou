@@ -6,6 +6,8 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "config/bootsnap_setup"
+
 require_relative "lib/extension"
 require_relative "lib/backtracer"
 
