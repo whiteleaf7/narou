@@ -151,7 +151,7 @@ module Command
         end
         Narou.concurrency_call do
           if @options["mail"]
-            Mail.execute!(download_target)
+            Mail.execute!(download_target, io: $stdout2)
           end
           if @options["freeze"]
             Freeze.execute!(download_target)
