@@ -112,9 +112,13 @@ module Command
       EOS
     end
 
-    def self.execute!(*argv, io: $stdout)
-      Narou.concurrency_call do
-        super
+    def self.execute!(*argv, io: $stdout2, sync: false)
+      if sync
+        super(*argv, io: io)
+      else
+        Narou.concurrency_call do
+          super(*argv, io: io)
+        end
       end
     end
 

@@ -522,7 +522,7 @@ class Downloader
         when "7"
           Helper.open_directory(Downloader.get_novel_data_dir_by_target(latest_toc["toc_url"]))
         when "8"
-          Command::Convert.execute!(latest_toc["toc_url"])
+          Command::Convert.execute!(latest_toc["toc_url"], sync: true)
         end
         unless Narou.web?
           message = ""   # 長いので二度は表示しない
