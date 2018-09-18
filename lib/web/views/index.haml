@@ -258,13 +258,22 @@
           %span.glyphicon.glyphicon-refresh
       .btn-group
         %button.button-send.btn.btn-warning(type="button" data-toggle="tooltip") Send
-        - if Inventory.load("local_setting")["hotentry"]
+        :ruby
+          menus = []
+          if Inventory.load["hotentry"]
+            menus << ["button-send-hotentry", "hotentry を送信"]
+          end
+          if Inventory.load["device"] == "kindle"
+            menus << ["button-send-backup-bookmark", "端末の栞データをバックアップ"]
+          end
+        - unless menus.empty?
           %button.btn.btn-warning.dropdown-toggle(type="button" data-toggle="dropdown")
             %span.caret
             %span.sr-only Toggle Dropdown
           %ul.dropdown-menu(role="menu")
-            %li
-              %a.button-send-hotentry(href="#") hotentry を送信
+            - menus.each do |klass, label|
+              %li
+                %a{ href: "#", class: klass }= label
       .btn-group
         %button.btn.btn-info.dropdown-toggle.enable-selected(type="button" data-toggle="dropdown")
           Freeze

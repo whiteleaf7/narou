@@ -608,6 +608,12 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  post "/api/backup_bookmark" do
+    Narou::WebWorker.push do
+      CommandLine.run!("send", "--backup-bookmark")
+    end
+  end
+
   post "/api/freeze" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::WebWorker.push do
