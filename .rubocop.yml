@@ -238,3 +238,6 @@ Lint/EmptyWhen:
 
 Style/FormatStringToken:
   EnforcedStyle: unannotated
+
+Bundler/OrderedGems:
+  Enabled: false

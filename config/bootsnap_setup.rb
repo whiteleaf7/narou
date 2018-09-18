@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 if ENV["NAROU_ENABLE_BOOTSNAP"]
   require "bootsnap"
   Bootsnap.setup(
