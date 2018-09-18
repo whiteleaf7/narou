@@ -438,8 +438,10 @@ class Downloader
     end
     return_status
   rescue Interrupt, SuspendDownload
-    save_toc_once(latest_toc) if latest_toc.present?
-    update_database(suspend: true)
+    if latest_toc.present?
+      save_toc_once(latest_toc)
+      update_database(suspend: true)
+    end
     raise Interrupt
   ensure
     @setting.clear

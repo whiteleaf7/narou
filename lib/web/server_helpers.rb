@@ -139,4 +139,12 @@ module Narou::ServerHelpers
       <input type="hidden" id="concurrency-enabled" value="#{Narou.concurrency_enabled?}">
     HTML
   end
+
+  def concurrency_push(&block)
+    if Narou.concurrency_enabled?
+      yield
+    else
+      Narou::WebWorker.push(&block)
+    end
+  end
 end

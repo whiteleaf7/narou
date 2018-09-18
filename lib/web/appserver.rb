@@ -524,13 +524,8 @@ class Narou::AppServer < Sinatra::Base
 
   post "/api/convert" do
     ids = select_valid_novel_ids(params["ids"]) or pass
-    block = proc do
+    concurrency_push do
       CommandLine.run!("convert", "--no-open", ids)
-    end
-    if Narou.concurrency_enabled?
-      block.call
-    else
-      Narou::WebWorker.push(&block)
     end
   end
 
@@ -557,7 +552,9 @@ class Narou::AppServer < Sinatra::Base
   post "/api/mail" do
     ids = select_valid_novel_ids(params["ids"]) || []
     Narou::WebWorker.push do
-      CommandLine.run!("mail", ids)
+      Narou.concurrency_call do
+        CommandLine.run!("mail", ids, io: $stdout2)
+      end
     end
   end
 
@@ -605,7 +602,9 @@ class Narou::AppServer < Sinatra::Base
   post "/api/send" do
     ids = select_valid_novel_ids(params["ids"]) || []
     Narou::WebWorker.push do
-      CommandLine.run!("send", ids)
+      Narou.concurrency_call do
+        CommandLine.run!("send", ids, io: $stdout2)
+      end
     end
   end
 
@@ -891,7 +890,7 @@ class Narou::AppServer < Sinatra::Base
     end
     if params["enqueue"] == "true"
       Narou::WebWorker.push do
-        do_eject.call
+        Narou.concurrency_call(&do_eject)
       end
     else
       do_eject.call
