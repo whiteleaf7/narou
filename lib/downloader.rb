@@ -614,7 +614,7 @@ class Downloader
       "title" => get_title,
       "file_title" => get_file_title,
       "toc_url" => @setting["toc_url"],
-      "sitename" => @setting["name"],
+      "sitename" => sitename,
       "novel_type" => get_novel_type,
       "end" => novel_end?,
       "last_update" => Time.now,
@@ -635,30 +635,39 @@ class Downloader
   end
 
   def get_novel_status
-    novel_status = NovelInfo.load(@setting, of: "nt-e")
-    unless novel_status
-      novel_status = {
-        "novel_type" => NOVEL_TYPE_SERIES,
-        "end" => nil # nil で完結状態が定義されていなかったことを示す（扱いとしては未完結と同じ）
-      }
+    @novel_status ||= begin
+      novel_status = NovelInfo.load(@setting, of: "nt-e-sitename")
+      unless novel_status
+        novel_status = {
+          "novel_type" => NOVEL_TYPE_SERIES,
+          "end" => nil # nil で完結状態が定義されていなかったことを示す（扱いとしては未完結と同じ）
+        }
+      end
+      novel_status
     end
-    novel_status
   end
 
   #
   # 小説の種別を取得（連載か短編）
   #
   def get_novel_type
-    @novel_status ||= get_novel_status
-    @novel_status["novel_type"]
+    get_novel_status["novel_type"]
   end
 
   #
   # 小説が完結しているか調べる
   #
   def novel_end?
-    @novel_status ||= get_novel_status
-    @novel_status["end"]
+    get_novel_status["end"]
+  end
+
+  #
+  # 掲載サイト名
+  #
+  # すでにレコードに登録されている場合はそちらを優先する
+  #
+  def sitename
+    record&.dig("sitename") || get_novel_status["sitename"]
   end
 
   #
@@ -1235,7 +1244,7 @@ class Downloader
   def get_novel_data_dir
     raise "小説名がまだ設定されていません" unless get_file_title
     subdirectory = @download_use_subdirectory ? Downloader.create_subdirecotry_name(get_file_title) : ""
-    Database.archive_root_path.join(@setting["name"], subdirectory, get_file_title)
+    Database.archive_root_path.join(sitename, subdirectory, get_file_title)
   end
   memoize :get_novel_data_dir
 
