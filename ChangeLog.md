@@ -11,6 +11,8 @@
     なり、WEB UIではコンソールが物理的に２つになります。CUI の表示については
     concurrency.format-queue-text, concurrency.format-queue-style で調整出来ま
     す。詳細は narou s -h を参照
+  + アップデート時の変換を中断した場合に、次回更新時に変換を再試行する機能が
+    concurrency が有効な場合は動きません。これは現時点での仕様です
 
 - ログが保存出来るようになりました
   + 環境設定 logging オプションを追加しました。有効にすることでほぼすべての
