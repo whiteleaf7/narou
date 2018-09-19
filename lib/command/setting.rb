@@ -355,14 +355,15 @@ module Command
           tab: :detail
         },
         "concurrency" => {
-          help: "ダウンロードと変換の同時実行を有効にする。有効にするとログの出力方式が変更される。※β版",
+          help: "ダウンロードと変換の同時実行を有効にする。有効にするとログの出力方式が変更される",
           type: :boolean,
           tab: :general
         },
         "concurrency.format-queue-text" => {
           help: "同時実行時の変換キュー表示テキストのフォーマット。CUI専用。" \
                 "デフォルトは #{Narou::ConcurrencyDefaultLogger::FORMAT_TEXT.inspect.escape}",
-          type: :string
+          type: :string,
+          invisible: true # 送信キュー実装時に変わる可能性があるので一旦隠しておく
         },
         "concurrency.format-queue-style" => {
           help: "同時実行時の変換キュー表示スタイルのフォーマット。CUI専用。" \
