@@ -10,6 +10,11 @@ append_title_to_folder_name: yes
 title_strip_pattern: null
 cookie: over18=yes
 
+# 掲載サイト名は動的に取得する
+sitename: |-
+  <th>掲載サイト</th>
+  <td>(?<sitename>.+?)\(.+\)</td>
+
 # ------------------------------------------------------------
 # 目次取得設定
 toc_url: https://\\k<domain>/\\k<ncode>/

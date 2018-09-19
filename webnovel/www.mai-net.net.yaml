@@ -1,6 +1,6 @@
 # ------------------------------------------------------------
 # 小説サイト定義
-name: Arcadia
+name: &name Arcadia
 domain: www.mai-net.net
 top_url: http://\\k<domain>
 category: '' # カテゴリ無しの場合を考慮する
@@ -11,6 +11,7 @@ encoding: UTF-8
 confirm_over18: no
 append_title_to_folder_name: yes
 title_strip_pattern: (【.+?】|\(.+?\)|（.+?）)
+sitename: *name
 
 # ------------------------------------------------------------
 # 書籍情報取得設定
