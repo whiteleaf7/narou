@@ -59,7 +59,7 @@ module Command
       @opt.on("-n", "--no-convert", "変換をせずアップデートのみ実行する") {
         @options["no-convert"] = true
       }
-      @opt.on("-a", "--convert-only-new-arrival", "新着のみ変換を実行する") {
+      @opt.on("-a", "--convert-only-new-arrival", "新着がある場合のみ変換を実行する") {
         @options["convert-only-new-arrival"] = true
       }
       @opt.on("--gl [OPT]", <<-EOS) { |option|

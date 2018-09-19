@@ -395,7 +395,7 @@ module Command
           tab: :general
         },
         "update.convert-only-new-arrival" => {
-          type: :boolean, help: "更新時に新着のみ変換を実行する",
+          type: :boolean, help: "更新時に新着がある場合のみ変換を実行する",
           tab: :general
         },
         "update.sort-by" => {
