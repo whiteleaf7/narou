@@ -258,7 +258,6 @@ class Downloader
     @stream = options[:stream]
     @cache_dir = nil
     @new_arrivals = false
-    @novel_status = nil
     @new_novel = record.!
     @from_download = options[:from_download]
     @section_download_cache = {}
@@ -635,17 +634,15 @@ class Downloader
   end
 
   def get_novel_status
-    @novel_status ||= begin
-      novel_status = NovelInfo.load(@setting, of: "nt-e-sitename")
-      unless novel_status
-        novel_status = {
-          "novel_type" => NOVEL_TYPE_SERIES,
-          "end" => nil # nil で完結状態が定義されていなかったことを示す（扱いとしては未完結と同じ）
-        }
-      end
-      novel_status
-    end
+    novel_status = NovelInfo.load(@setting, of: "nt-e-sitename")
+    novel_status ||= {
+      "novel_type" => NOVEL_TYPE_SERIES,
+      "end" => nil, # nil で完結状態が定義されていなかったことを示す（扱いとしては未完結と同じ）
+      "sitename" => @setting["sitename"]
+    }
+    novel_status
   end
+  memoize :get_novel_status
 
   #
   # 小説の種別を取得（連載か短編）
