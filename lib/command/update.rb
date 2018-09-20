@@ -228,6 +228,7 @@ module Command
       exit mistook_count if mistook_count > 0
     rescue Interrupt
       puts "アップデートを中断しました"
+      Narou::Worker.cancel if Narou.concurrency_enabled?
       exit Narou::EXIT_INTERRUPT
     end
 
