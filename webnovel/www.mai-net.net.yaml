@@ -13,6 +13,8 @@ append_title_to_folder_name: yes
 title_strip_pattern: (【.+?】|\(.+?\)|（.+?）)
 sitename: *name
 
+version: 1.0
+
 # ------------------------------------------------------------
 # 書籍情報取得設定
 title: <font size=4 color=4444aa>(?<title>.+?)</font>

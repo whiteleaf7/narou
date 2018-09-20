@@ -11,6 +11,8 @@ title_strip_pattern: null
 cookie: over18=yes
 sitename: *name
 
+version: 1.0
+
 # ------------------------------------------------------------
 # 目次取得設定
 toc_url: https://\\k<domain>/\\k<ncode>/

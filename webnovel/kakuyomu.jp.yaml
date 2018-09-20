@@ -11,6 +11,8 @@ append_title_to_folder_name: yes
 title_strip_pattern: null
 sitename: *name
 
+version: 1.0
+
 # ------------------------------------------------------------
 # 書籍情報取得設定
 title: &title |-

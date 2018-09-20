@@ -11,6 +11,8 @@ title_strip_pattern: null
 cookie: CakeCookie[ALLOWED_ADULT_NOVEL]=on
 sitename: *name
 
+version: 1.0
+
 # ------------------------------------------------------------
 # 書籍情報取得設定
 title: id="LookNovel">(?<title>.+?)</a>
