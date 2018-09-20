@@ -1,6 +1,6 @@
 # ------------------------------------------------------------
 # 小説サイト定義
-name: ノクターン・ムーンライト
+name: 小説家になろうR18
 domain: novel18.syosetu.com
 top_url: https://\\k<domain>
 url: https?://\\k<domain>/(?<ncode>n\d+[a-z]+)
