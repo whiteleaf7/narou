@@ -30,7 +30,7 @@ class SiteSetting
         name = setting["name"]
         @narou ||= setting if name == "小説家になろう"
         origin = result[name]
-        origin.merge(setting) if origin
+        origin&.merge(setting)
         result[name] ||= setting
       end
       if result.empty?
@@ -169,6 +169,7 @@ class SiteSetting
     version = setting.yaml["version"]
     return true unless version # version が指定されていない場合は常に上書きを許可する
     return true if version >= yaml["version"]
+
     error "#{setting.path} の内容が古いため読み込みをスキップしました"
     false
   end
