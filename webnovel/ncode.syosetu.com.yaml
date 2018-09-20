@@ -10,6 +10,7 @@ append_title_to_folder_name: yes
 title_strip_pattern: null
 cookie: over18=yes
 sitename: *name
+version: 1.0
 
 # ------------------------------------------------------------
 # 目次取得設定

@@ -10,6 +10,7 @@ append_title_to_folder_name: yes
 title_strip_pattern: null
 cookie: CakeCookie[ALLOWED_ADULT_NOVEL]=on
 sitename: *name
+version: 1.0
 
 # ------------------------------------------------------------
 # 書籍情報取得設定
