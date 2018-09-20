@@ -95,8 +95,10 @@ module Helper
     end
   end
 
+  HR_TEXT = "―" * 35
+
   def print_horizontal_rule(io = $stdout)
-    io.puts "―" * 35
+    io.puts HR_TEXT
   end
 
   def replace_filename_special_chars(str, invalid_replace = false)

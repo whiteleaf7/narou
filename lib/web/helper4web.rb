@@ -9,7 +9,7 @@ require_relative "../helper"
 module Helper
   module_function
 
-  HR = "<hr>"
+  HR_TAG = "<hr>"
 
   class << self
     alias :original_print_horizontal_rule :print_horizontal_rule
@@ -22,12 +22,9 @@ module Helper
         original_print_horizontal_rule($stdout)
       end
     else
-      # 標準出力には表示されないが、ログには出力される様に
-      io.original_stream.silence do
-        original_print_horizontal_rule(io.original_stream)
-      end
+      io.append_log("#{HR_TEXT}\n")
     end
-    io.push_streaming(HR)
-    io.original_write(HR)
+    io.push_streaming(HR_TAG)
+    io.original_write(HR_TAG)
   end
 end
