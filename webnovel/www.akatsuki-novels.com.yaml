@@ -1,6 +1,6 @@
 # ------------------------------------------------------------
 # 小説サイト定義
-name: 暁
+name: &name 暁
 domain: www.akatsuki-novels.com
 top_url: https://\\k<domain>
 url: https?://\\k<domain>/stories/index/novel_id\~(?<ncode>\d+)
@@ -9,6 +9,8 @@ confirm_over18: no
 append_title_to_folder_name: yes
 title_strip_pattern: null
 cookie: CakeCookie[ALLOWED_ADULT_NOVEL]=on
+sitename: *name
+version: 1.0
 
 # ------------------------------------------------------------
 # 書籍情報取得設定
@@ -26,7 +28,7 @@ subtitles: |-
 # subdate(初投稿日)がない場合、一番最初のsubupdateで代用する
 subdate: no
 
-error_message: この小説は作者の諸事情により非公開にしています
+error_message: この作品は作者の諸事情により非公開にしています
 
 # ------------------------------------------------------------
 # 本文取得設定

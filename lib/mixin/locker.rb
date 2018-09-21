@@ -1,0 +1,40 @@
+# frozen_string_literal: true
+
+#
+# Copyright 2013 whiteleaf. All rights reserved.
+#
+
+module Narou
+  module Mixin
+    module Locker
+      def locked?(target)
+        id = Downloader.get_id_by_target(target) or return false
+        Inventory.load("lock").include?(id)
+      end
+
+      def lock(target)
+        id = Downloader.get_id_by_target(target)
+        unless id
+          yield if block_given?
+          return
+        end
+        locked_list = Inventory.load("lock")
+        locked_list[id] = Time.now
+        locked_list.save
+        return unless block_given?
+        begin
+          yield
+        ensure
+          unlock(target)
+        end
+      end
+
+      def unlock(target)
+        id = Downloader.get_id_by_target(target) or return
+        locked_list = Inventory.load("lock")
+        return unless locked_list.delete(id)
+        locked_list.save
+      end
+    end
+  end
+end

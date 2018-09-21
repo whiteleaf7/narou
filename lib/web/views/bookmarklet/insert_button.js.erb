@@ -2,7 +2,7 @@
 var insertButtonBookmarklet = (function() {
   "DLボタン設置ブックマークレット v2.0";
   var site_settings = [
-    <%- SiteSetting.settings.each.with_index do |s, i| -%>
+    <%- SiteSetting.settings.each_value.with_index do |s, i| -%>
       <% setting = s.clone %>
       {
         <%- case setting["domain"] -%>

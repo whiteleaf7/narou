@@ -95,8 +95,10 @@ module Helper
     end
   end
 
+  HR_TEXT = "―" * 35
+
   def print_horizontal_rule(io = $stdout)
-    io.puts "―" * 35
+    io.puts HR_TEXT
   end
 
   def replace_filename_special_chars(str, invalid_replace = false)
@@ -420,17 +422,22 @@ module Helper
       stdout.force_encoding(Encoding::UTF_8)
       stderr.force_encoding(Encoding::UTF_8)
       return [stdout, stderr, status]
+    rescue RuntimeError => e
+      raise unless e.message.include?("interrupted")
+      process_kill(_pid)
+      raise Interrupt
     rescue Interrupt
-      if _pid
-        begin
-          Process.kill("KILL", _pid)
-          Process.detach(_pid)    # 死亡確認しないとゾンビ化する
-        rescue
-        end
-      end
+      process_kill(_pid)
       raise
     ensure
-      looper.kill if looper
+      looper&.kill
+    end
+
+    def self.process_kill(pid)
+      return unless pid
+      Process.kill("KILL", pid)
+      Process.detach(pid) # 死亡確認しないとゾンビ化する
+    rescue
     end
   end
 

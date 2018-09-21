@@ -7,8 +7,7 @@
 module Narou
   module Mixin
     module OutputError
-      def output_error(stdout, exception)
-        io = stdout.original_stream || stdout
+      def output_error(io, exception)
         outputter = proc do
           io.puts "#{$@.shift}: #{exception.message} (#{exception.class})"
           $@.each do |b|

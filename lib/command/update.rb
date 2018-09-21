@@ -59,7 +59,7 @@ module Command
       @opt.on("-n", "--no-convert", "変換をせずアップデートのみ実行する") {
         @options["no-convert"] = true
       }
-      @opt.on("-a", "--convert-only-new-arrival", "新着のみ変換を実行する") {
+      @opt.on("-a", "--convert-only-new-arrival", "新着がある場合のみ変換を実行する") {
         @options["convert-only-new-arrival"] = true
       }
       @opt.on("--gl [OPT]", <<-EOS) { |option|
@@ -184,7 +184,7 @@ module Command
           when :ok
             delete_modified_tag.call
             trigger(:success, data)
-            puts "#{data["title"]} の更新が完了しました"
+            puts "#{data["title"]} の更新チェックが完了しました"
             if @options["no-convert"] ||
                  (@options["convert-only-new-arrival"] && !result.new_arrivals)
               interval.force_wait
@@ -228,6 +228,7 @@ module Command
       exit mistook_count if mistook_count > 0
     rescue Interrupt
       puts "アップデートを中断しました"
+      Narou::Worker.cancel if Narou.concurrency_enabled?
       exit Narou::EXIT_INTERRUPT
     end
 

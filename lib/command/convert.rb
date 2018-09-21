@@ -114,10 +114,13 @@ module Command
 
     def self.execute!(*argv, io: $stdout2, sync: false)
       if sync
+        # cocurrency が有効だろうが必ず同期実行する
         super(*argv, io: io)
+        yield if block_given?
       else
         Narou.concurrency_call do
           super(*argv, io: io)
+          yield if block_given?
         end
       end
     end
@@ -191,66 +194,72 @@ module Command
 
     def convert_novels(argv)
       tagname_to_ids(argv)
-      argv.each.with_index(1) do |target, i|
-        @target = target
-        @novel_data = nil
-
-        Helper.print_horizontal_rule($stdout2) if i > 1
-        if @basename
-          @basename << " (#{i})" if argv.length > 1
-          @output_filename = @basename + @ext
-        end
-
-        if File.file?(target.to_s)
-          using_send_command = false
-          # not remove output files for text file conversion
-          res = convert_txt(target)
-        else
-          using_send_command = true
-          unless Downloader.novel_exists?(target)
-            $stdout2.error "#{target} は存在しません"
-            next
-          end
-          # remove output files for novel conversion
-          NovelConverter.extensions_of_converted_files(@device).each do |ext|
-            ebook_paths = Narou.get_ebook_file_paths(target, ext)
-            NovelConverter.clean_up_temp_files(ebook_paths)
-          end
-          # start novel conversion
-          @argument_target_type = :novel
-          res = NovelConverter.convert(target, {
-                  output_filename: @output_filename,
-                  display_inspector: @options["inspect"],
-                  ignore_force: @options["ignore-force"],
-                  ignore_default: @options["ignore-default"],
-                })
-          @novel_data = Downloader.get_data_by_target(target)
-          @options["yokogaki"] = NovelSetting.load(target)["enable_yokogaki"]
-        end
-        next unless res
-        array_of_converted_txt_path = res[:converted_txt_paths]
-        ebook_file = nil
-        array_of_converted_txt_path.each do |converted_txt_path|
-          @converted_txt_path = converted_txt_path
-          @use_dakuten_font = res[:use_dakuten_font]
-
-          ebook_file = hook_call(:convert_txt_to_ebook_file)
-          next if ebook_file.nil?
-          if ebook_file
-            copy_to_converted_file(ebook_file)
-            send_file_to_device(ebook_file) unless using_send_command
-          end
-        end
-        send_file_to_device(ebook_file) if
-          using_send_command && ebook_file
-
-        if @options["no-open"].! && Narou.web?.!
-          Helper.open_directory(File.dirname(@converted_txt_path), "小説の保存フォルダを開きますか")
+      argv.each.with_index(1) do |target, index|
+        Narou.lock(target) do
+          convert_novel_main(target, index)
         end
       end
     rescue Interrupt
       $stdout2.puts "変換を中断しました"
       exit Narou::EXIT_INTERRUPT
+    end
+
+    def convert_novel_main(target, index)
+      @target = target
+      @novel_data = nil
+
+      Helper.print_horizontal_rule($stdout2) if index > 1
+      if @basename
+        @basename << " (#{index})" if argv.length > 1
+        @output_filename = @basename + @ext
+      end
+
+      if File.file?(target.to_s)
+        using_send_command = false
+        # not remove output files for text file conversion
+        res = convert_txt(target)
+      else
+        using_send_command = true
+        unless Downloader.novel_exists?(target)
+          $stdout2.error "#{target} は存在しません"
+          return
+        end
+        # remove output files for novel conversion
+        NovelConverter.extensions_of_converted_files(@device).each do |ext|
+          ebook_paths = Narou.get_ebook_file_paths(target, ext)
+          NovelConverter.clean_up_temp_files(ebook_paths)
+        end
+        # start novel conversion
+        @argument_target_type = :novel
+        res = NovelConverter.convert(target, {
+                output_filename: @output_filename,
+                display_inspector: @options["inspect"],
+                ignore_force: @options["ignore-force"],
+                ignore_default: @options["ignore-default"],
+              })
+        @novel_data = Downloader.get_data_by_target(target)
+        @options["yokogaki"] = NovelSetting.load(target)["enable_yokogaki"]
+      end
+      return unless res
+      array_of_converted_txt_path = res[:converted_txt_paths]
+      ebook_file = nil
+      array_of_converted_txt_path.each do |converted_txt_path|
+        @converted_txt_path = converted_txt_path
+        @use_dakuten_font = res[:use_dakuten_font]
+
+        ebook_file = hook_call(:convert_txt_to_ebook_file)
+        next if ebook_file.nil?
+        if ebook_file
+          copy_to_converted_file(ebook_file)
+          send_file_to_device(ebook_file) unless using_send_command
+        end
+      end
+      send_file_to_device(ebook_file) if
+        using_send_command && ebook_file
+
+      if @options["no-open"].! && Narou.web?.!
+        Helper.open_directory(File.dirname(@converted_txt_path), "小説の保存フォルダを開きますか")
+      end
     end
 
     #

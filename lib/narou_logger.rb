@@ -59,10 +59,6 @@ module Narou
     def dup_with_disabled_logging
       obj = dup
       obj.disable_logging
-      if obj.respond_to?(:original_stream)
-        obj.original_stream = obj.original_stream.dup
-        obj.original_stream&.disable_logging
-      end
       obj
     end
 

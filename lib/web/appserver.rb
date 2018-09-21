@@ -608,6 +608,12 @@ class Narou::AppServer < Sinatra::Base
     end
   end
 
+  post "/api/backup_bookmark" do
+    Narou::WebWorker.push do
+      CommandLine.run!("send", "--backup-bookmark")
+    end
+  end
+
   post "/api/freeze" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     Narou::WebWorker.push do
@@ -850,7 +856,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   get "/api/validate_url_regexp_list" do
-    json SiteSetting.settings.map { |setting|
+    json SiteSetting.settings.values.map { |setting|
       Array(setting["url"]).map do |url|
         "(#{url.gsub(/\?<.+?>/, "?:").gsub("\\", "\\\\")})"
       end
@@ -935,7 +941,7 @@ class Narou::AppServer < Sinatra::Base
   end
 
   ALLOW_HOSTS = [].tap do |hosts|
-    SiteSetting.settings.each do |s|
+    SiteSetting.settings.each_value do |s|
       hosts << s["domain"]
     end
     hosts.freeze

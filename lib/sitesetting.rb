@@ -10,6 +10,8 @@ require_relative "narou/api"
 class SiteSetting
   NOVEL_SITE_SETTING_DIR = "webnovel/"
 
+  attr_reader :yaml, :path
+
   class << self
     #
     # 小説サイトの定義ファイルを全部読み込む
@@ -18,17 +20,18 @@ class SiteSetting
     # webnovel ディレクトリからも定義ファイルを読み込む
     #
     def load_settings
-      result = []
+      result = {}
       load_paths = [
-        File.join(Narou.script_dir, NOVEL_SITE_SETTING_DIR, "*.yaml"),
-        File.join(Narou.root_dir, NOVEL_SITE_SETTING_DIR, "*.yaml")
+        Narou.script_dir.join(NOVEL_SITE_SETTING_DIR, "*.yaml"),
+        Narou.root_dir.join(NOVEL_SITE_SETTING_DIR, "*.yaml")
       ].uniq.join("\0")
       Dir.glob(load_paths) do |path|
         setting = SiteSetting.load_file(path)
-        if setting["name"] == "小説家になろう"
-          @narou = setting
-        end
-        result << setting
+        name = setting["name"]
+        @narou ||= setting if name == "小説家になろう"
+        origin = result[name]
+        origin&.merge(setting)
+        result[name] ||= setting
       end
       if result.empty?
         error "小説サイトの定義ファイルがひとつもありません"
@@ -38,8 +41,6 @@ class SiteSetting
         error "小説家になろうの定義ファイルが見つかりませんでした"
         exit Narou::EXIT_ERROR_CODE
       end
-      # TODO: 配列の並び順で先頭をなろうにしておく。find するときになろうがすぐ引っかかるので効率的
-      # 設定ファイルに priority を追加して、それでソートする
       result
     end
 
@@ -54,7 +55,7 @@ class SiteSetting
 
     def find(toc_url)
       result = nil
-      settings.each do |s|
+      settings.each_value do |s|
         setting = s.clone
         if setting.multi_match(toc_url, "url")
           result = setting
@@ -69,6 +70,12 @@ class SiteSetting
     end
   end
 
+  def initialize(path)
+    @match_values = {}
+    @yaml = YAML.load_file(path)
+    @path = path
+  end
+
   def [](key)
     replace_group_values(key)
   end
@@ -79,11 +86,6 @@ class SiteSetting
 
   def clear
     @match_values.clear
-  end
-
-  def initialize(path)
-    @match_values = {}
-    @yaml_setting = YAML.load_file(path).freeze
   end
 
   def initialize_copy(_obj)
@@ -128,7 +130,7 @@ class SiteSetting
   end
 
   def replace_group_values(key, option_values = {})
-    buf = option_values[key] || @match_values[key] || @yaml_setting[key]
+    buf = option_values[key] || @match_values[key] || yaml[key]
     return buf if is_container?(buf)
     if buf.is_a?(Array)
       buf.map do |dest|
@@ -141,7 +143,7 @@ class SiteSetting
 
   def do_replace(dest, option_values)
     return dest unless dest.respond_to?(:gsub)
-    values = @yaml_setting.merge(@match_values).merge(option_values)
+    values = yaml.merge(@match_values).merge(option_values)
     dest.gsub(/\\\\k<(.+?)>/) do |match|
       value = values[$1]
       if value
@@ -152,5 +154,23 @@ class SiteSetting
         match
       end
     end
+  end
+
+  EXCLUDE_KEYS = %w(name version)
+
+  def merge(setting)
+    validate_version(setting) or return
+    (setting.yaml.keys - EXCLUDE_KEYS).each do |key|
+      yaml[key] = setting.yaml[key]
+    end
+  end
+
+  def validate_version(setting)
+    version = setting.yaml["version"]
+    return true unless version # version が指定されていない場合は常に上書きを許可する
+    return true if version >= yaml["version"]
+
+    error "#{setting.path} の内容が古いため読み込みをスキップしました"
+    false
   end
 end
