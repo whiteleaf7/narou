@@ -114,10 +114,13 @@ module Command
 
     def self.execute!(*argv, io: $stdout2, sync: false)
       if sync
+        # cocurrency が有効だろうが必ず同期実行する
         super(*argv, io: io)
+        yield if block_given?
       else
         Narou.concurrency_call do
           super(*argv, io: io)
+          yield if block_given?
         end
       end
     end

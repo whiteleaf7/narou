@@ -26,7 +26,7 @@ if $development
           error "gem install pry をが必要です"
           exit Narou::EXIT_ERROR_CODE
         end
-        TOPLEVEL_BINDING.pry
+        Pry.start(TOPLEVEL_BINDING)
       end
     end
   end

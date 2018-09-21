@@ -12,6 +12,10 @@ module Command
   class Download < CommandBase
     SUPPORT_NOVEL_SITES = %w(小説家になろう(小説を読もう) ノクターンノベルズ ムーンライトノベルズ Arcadia ハーメルン 暁 カクヨム)
 
+    def self.oneline_help
+      "指定した小説をダウンロードします"
+    end
+
     def initialize
       super("[<target> <target2> ...] [options]")
       @opt.separator <<-EOS
@@ -139,25 +143,20 @@ module Command
           mistook_count += 1
           next
         end
-        unless @options["no-convert"]
-          convert_status = Convert.execute!(download_target)
+        if @options["no-convert"]
+          Narou.concurrency_call do
+            after_process(download_target)
+          end
+        else
+          convert_status = Convert.execute!(download_target) do
+            after_process(download_target)
+          end
           if convert_status > 0
             # 変換に失敗したか、中断された
             data = Downloader.get_data_by_target(download_target)   # 新規はDL後に取得しないとデータが存在しない
             data["_convert_failure"] = true
             # 中断された場合には残りのダウンロードも中止する
             raise Interrupt if convert_status == Narou::EXIT_INTERRUPT
-          end
-        end
-        Narou.concurrency_call do
-          if @options["mail"]
-            Mail.execute!(download_target, io: $stdout2)
-          end
-          if @options["freeze"]
-            Freeze.execute!(download_target)
-          elsif @options["remove"]
-            # --freeze オプションが指定された場合は --remove オプションは無視する
-            Remove.execute!(download_target, "-y")
           end
         end
       end
@@ -170,8 +169,16 @@ module Command
       Database.instance.save_database
     end
 
-    def self.oneline_help
-      "指定した小説をダウンロードします"
+    def after_process(target)
+      if @options["mail"]
+        Mail.execute!(target, io: $stdout2)
+      end
+      if @options["freeze"]
+        Freeze.execute!(target)
+      elsif @options["remove"]
+        # --freeze オプションが指定された場合は --remove オプションは無視する
+        Remove.execute!(target, "-y")
+      end
     end
   end
 end
