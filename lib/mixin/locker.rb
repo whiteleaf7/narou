@@ -13,7 +13,11 @@ module Narou
       end
 
       def lock(target)
-        id = Downloader.get_id_by_target(target) or return
+        id = Downloader.get_id_by_target(target)
+        unless id
+          yield if block_given?
+          return
+        end
         locked_list = Inventory.load("lock")
         locked_list[id] = Time.now
         locked_list.save
