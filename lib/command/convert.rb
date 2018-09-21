@@ -195,10 +195,12 @@ module Command
     def convert_novels(argv)
       tagname_to_ids(argv)
       argv.each.with_index(1) do |target, index|
-        Narou.lock(target)
-        convert_novel_main(target, index)
-      ensure
-        Narou.unlock(target)
+        begin
+          Narou.lock(target)
+          convert_novel_main(target, index)
+        ensure
+          Narou.unlock(target)
+        end
       end
     rescue Interrupt
       $stdout2.puts "変換を中断しました"

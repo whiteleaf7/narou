@@ -1,5 +1,6 @@
 #! /usr/bin/env ruby
-# -*- coding: utf-8 -*-
+# frozen_string_literal: true
+
 #
 # Narou.rb ― 小説家になろうダウンロード＆整形スクリプト
 #
@@ -7,6 +8,7 @@
 #
 
 require_relative "lib/extension"
+require_relative "lib/extensions/monkey_patches"
 require_relative "lib/backtracer"
 
 script_dir = File.expand_path(File.dirname(__FILE__))

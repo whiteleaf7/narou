@@ -238,3 +238,6 @@ Lint/EmptyWhen:
 
 Style/FormatStringToken:
   EnforcedStyle: unannotated
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
