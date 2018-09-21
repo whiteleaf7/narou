@@ -248,7 +248,7 @@ module Command
         @use_dakuten_font = res[:use_dakuten_font]
 
         ebook_file = hook_call(:convert_txt_to_ebook_file)
-        return if ebook_file.nil?
+        next if ebook_file.nil?
         if ebook_file
           copy_to_converted_file(ebook_file)
           send_file_to_device(ebook_file) unless using_send_command
