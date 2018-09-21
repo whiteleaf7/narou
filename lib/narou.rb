@@ -10,6 +10,7 @@ require "pathname"
 require "active_support/core_ext/object/blank"
 require_relative "helper"
 require_relative "inventory"
+require_relative "mixin/all"
 if Helper.engine_jruby?
   require_relative "extensions/jruby"
 end
@@ -34,6 +35,8 @@ module Narou
     "id" => "ID", "last_update" => "更新日", "title" => "タイトル", "author" => "作者名",
     "new_arrivals_date" => "新着日", "general_lastup" => "最新話掲載日"
   }
+
+  extend Mixin::Locker
 
  class << self
   extend Memoist
