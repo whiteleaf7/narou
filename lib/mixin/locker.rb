@@ -17,6 +17,12 @@ module Narou
         locked_list = Inventory.load("lock")
         locked_list[id] = Time.now
         locked_list.save
+        return unless block_given?
+        begin
+          yield
+        ensure
+          unlock(target)
+        end
       end
 
       def unlock(target)

@@ -195,11 +195,8 @@ module Command
     def convert_novels(argv)
       tagname_to_ids(argv)
       argv.each.with_index(1) do |target, index|
-        begin
-          Narou.lock(target)
+        Narou.lock(target) do
           convert_novel_main(target, index)
-        ensure
-          Narou.unlock(target)
         end
       end
     rescue Interrupt
