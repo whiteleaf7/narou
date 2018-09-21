@@ -71,7 +71,10 @@ module Command
           next
         end
         title = data["title"]
-        if Narou.novel_frozen?(target)
+        if Narou.locked?(target)
+          error "#{title} は変換中なため削除出来ませんでした"
+          next
+        elsif Narou.novel_frozen?(target)
           puts "#{title} は凍結中です\n削除を中止しました"
           next
         end

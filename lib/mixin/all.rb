@@ -5,3 +5,4 @@
 #
 
 require_relative "output_error"
+require_relative "locker"
