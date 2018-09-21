@@ -239,5 +239,8 @@ Lint/EmptyWhen:
 Style/FormatStringToken:
   EnforcedStyle: unannotated
 
+Bundler/OrderedGems:
+  Enabled: false
+
 Layout/EmptyLineAfterGuardClause:
   Enabled: false

@@ -109,4 +109,3 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'activesupport', '~> 5.2'
   gem.add_runtime_dependency 'unicode-display_width', '~> 1.4'
 end
-
