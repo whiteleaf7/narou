@@ -1,17 +1,17 @@
-Narou.rb ― 「小説家になろう」「小説を読もう！」ダウンローダ＆縦書用整形スクリプト
-============================================================
+Narou.rb - 小説家になろうダウンローダー＆電子書籍端末での利用に超特化した管理ツール
+===================================================================================
 
 [![Gem Version](https://badge.fury.io/rb/narou.svg)](http://badge.fury.io/rb/narou)
 [![Join the chat at https://gitter.im/whiteleaf7/narou](https://badges.gitter.im/whiteleaf7/narou.svg)](https://gitter.im/whiteleaf7/narou?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 概要 - Summary
 --------------
-このアプリは[小説家になろう](http://syosetu.com/)、[小説を読もう！](http://yomou.syosetu.com/)で公開されている小説の管理、
+このアプリは[小説家になろう](http://syosetu.com/)などで公開されている小説の管理、
 及び電子書籍データへの変換を支援します。縦書き用に特化されており、
-横書き用に特化されたWEB小説を違和感なく縦書きで読むことが出来るようになります。
+横書きに最適化されたWEB小説を違和感なく縦書きで読むことが出来るようになります。
 また、校正機能もありますので、小説としての一般的な整形ルールに矯正します。（例：感嘆符のあとにはスペースが必ずくる）
 
-対応小説サイト：
+小説家になろうを含めて、下記のサイトに対応しています。
 + 小説家になろう http://syosetu.com/
 + ノクターンノベルズ http://noc.syosetu.com/
 + ムーンライトノベルズ http://mnlt.syosetu.com/
@@ -23,7 +23,8 @@ Narou.rb ― 「小説家になろう」「小説を読もう！」ダウンロ�
 
 コンソールで操作するアプリケーションですが、ブラウザを使って直感的に操作することができる WEB UI も搭載！（[デモページ](http://whiteleaf7.github.io/narou/demo/)）
 
-主な機能は小説家になろうの小説のダウンロード、更新管理、テキスト整形、AozoraEpub3・kindlegen連携によるEPUB/MOBI出力です。
+主な機能は小説家になろうの小説のダウンロード、更新管理、テキスト整形、AozoraEpub3・kindlegen連携によるEPUB/MOBI出力です。  
+その他にも変換したデータを直接電子書籍端末へ送信する機能は、メールで送信する機能などもあります。
 
 詳細な説明やインストール方法は **[Narou.rb 説明書](https://github.com/whiteleaf7/narou/wiki)** を御覧ください。
 
