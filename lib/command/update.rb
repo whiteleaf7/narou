@@ -184,7 +184,7 @@ module Command
           when :ok
             delete_modified_tag.call
             trigger(:success, data)
-            puts "#{data["title"]} の更新チェックが完了しました"
+            puts "#{data["title"]} の更新が完了しました" if Narou.concurrency_enabled?
             if @options["no-convert"] ||
                  (@options["convert-only-new-arrival"] && !result.new_arrivals)
               interval.force_wait
