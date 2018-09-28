@@ -647,9 +647,9 @@ class ConverterBase
         top = "― "
         bottom = " ―"
       end
-      str = +"　　　［＃ゴシック体］#{top}"
+      str = +"　　　#{top}"
       str += hankaku_num_to_zenkaku_num(chapter.tr("０-９", "0-9"))
-      str += "#{bottom}［＃ゴシック体終わり］"
+      str += "#{bottom}"
       # 前後に空行を入れたいが、それは行処理ループ中に行う
       symbols_to_zenkaku(str)
       index = @@count_of_rebuild_container += 1
