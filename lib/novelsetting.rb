@@ -46,7 +46,7 @@ class NovelSetting
     if File.directory?(target.to_s)
       archive_path = target
     else
-      archive_path = Downloader.get_novel_data_dir_by_target(target).to_s
+      archive_path = Downloader.get_novel_data_dir_by_target(target) || ""
     end
     @archive_path = File.expand_path(archive_path)
     @ignore_force = ignore_force
