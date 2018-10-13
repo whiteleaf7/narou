@@ -36,27 +36,31 @@ module Command
 
     def create_backup(data)
       zipfilename = create_backup_filename(data)
-      pwd = Dir.pwd
       novel_dir = Downloader.get_novel_data_dir_by_target(data["id"])
-      Dir.chdir(novel_dir)
-      paths = Dir.glob("**/*").keep_if { |path|
-        File.file?(path) && path.split("/", 2)[0] != BACKUP_DIR_NAME
+      paths = novel_dir.glob("**/*").keep_if { |path|
+        relative_path = path_to_relative(novel_dir, path)
+        path.file? && relative_path.to_s.split("/", 2)[0] != BACKUP_DIR_NAME
       }
-      FileUtils.mkdir(BACKUP_DIR_NAME) unless File.exist?(BACKUP_DIR_NAME)
+      backup_dir = novel_dir.join(BACKUP_DIR_NAME)
+      backup_dir.mkdir unless backup_dir.exist?
       Zip.unicode_names = true unless Helper.os_windows?
-      Zip::File.open(File.join(BACKUP_DIR_NAME, zipfilename), Zip::File::CREATE) do |zip|
+      Zip::File.open(backup_dir.join(zipfilename), Zip::File::CREATE) do |zip|
         paths.each do |path|
-          if Helper.os_windows?
-            zipped_filename = path.encode(Encoding::Windows_31J,
-                                          invalid: :replace, undef: :replace, replace: "_")
-          else
-            zipped_filename = path
-          end
+          relative_path = path_to_relative(novel_dir, path).to_s
+          zipped_filename =
+            if Helper.os_windows?
+              relative_path.encode(Encoding::Windows_31J, invalid: :replace, undef: :replace, replace: "_")
+            else
+              relative_path
+            end
           zip.add(zipped_filename, path)
         end
       end
-      Dir.chdir(pwd)
       zipfilename
+    end
+
+    def path_to_relative(base, path)
+      path.sub("#{base}/", "")
     end
 
     def execute(argv)
