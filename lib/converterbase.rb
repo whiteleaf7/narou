@@ -1408,11 +1408,11 @@ class ConverterBase
     rebuild_english_sentences(data)
     rebuild_hankaku_num_and_comma(data)
     rebuild_kome_to_gaiji(data)
-    rebuild_force_indent_special_chapter(data)
     if @text_type == "body" || @text_type == "textfile"
       half_indent_bracket(data)
       auto_indent(data)
     end
+    rebuild_force_indent_special_chapter(data)
     # 再構築された文章にルビがふられる可能性を考慮して、
     # この位置でルビの処理を行う
     narou_ruby(data) if @setting.enable_ruby
