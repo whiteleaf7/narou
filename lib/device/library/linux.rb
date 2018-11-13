@@ -55,14 +55,17 @@ class Device
 
       def eject(volume_name)
         device, uhelper = device_mount_info(volume_name)
+        # Kindle第10世代への対応
+        # https://github.com/whiteleaf7/narou/issues/314
+        device_chopped = device.gsub(/\d+$/, "")
 
         case uhelper
         when "udisks"
           commands = ["udisks --unmount #{device}",
-                      "udisks --detach #{device.chop}"]
+                      "udisks --detach #{device_chopped}"]
         when "udisks2"
           commands = ["udisksctl unmount -b #{device} --no-user-interaction",
-                      "udisksctl power-off -b #{device.chop} --no-user-interaction"]
+                      "udisksctl power-off -b #{device_chopped} --no-user-interaction"]
         else
           raise Device::CantEject, "udisks または udisks2 によって自動マウントされたデバイスではありません。"
         end
