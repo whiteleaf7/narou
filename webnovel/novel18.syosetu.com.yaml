@@ -15,7 +15,7 @@ sitename: |-
   <th>掲載サイト</th>
   <td>(?<sitename>.+?)\(.+\)</td>
 
-version: 1.0
+version: 2.0
 
 # ------------------------------------------------------------
 # 目次取得設定
@@ -35,10 +35,26 @@ subtitles: |-
   </dl>
 
 # ------------------------------------------------------------
+# 本文取得設定
+body_pattern: |-
+  <div id="novel_honbun" class="novel_view">
+  (?<body>.+?)
+  ?</div>
+introduction_pattern: |-
+  <div id="novel_p" class="novel_view">
+  (?<introduction>.+?)
+  ?</div>
+postscript_pattern: |-
+  <div id="novel_a" class="novel_view">
+  (?<postscript>.+?)
+  ?</div>
+
+illust_current_url: null
+illust_grep_pattern: null
+
+# ------------------------------------------------------------
 # 特殊な設定
 is_narou: true
-tcode: <li><a href="\\k<top_url>/txtdownload/top/ncode/(?<tcode>\d+?)/" onclick
-txtdownload_url: \\k<top_url>/txtdownload/dlstart/ncode/\\k<tcode>/?no=\\k<index>
 narou_api_url: https://api.syosetu.com/novel18api/api/
 
 # ------------------------------------------------------------
