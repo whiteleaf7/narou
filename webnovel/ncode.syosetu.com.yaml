@@ -31,7 +31,6 @@ subtitles: |-
 
 # ------------------------------------------------------------
 # 本文取得設定
-
 body_pattern: |-
   <div id="novel_honbun" class="novel_view">
   (?<body>.+?)
