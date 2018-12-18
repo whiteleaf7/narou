@@ -1082,11 +1082,12 @@ class Downloader
     return @section_download_cache[index] if @section_download_cache[index]
     sleep_for_download
     href = subtitle_info["href"]
-    if href[0] == "/"
-      subtitle_url = @setting["top_url"] + href
-    else
-      subtitle_url = @setting["toc_url"] + href
-    end
+    subtitle_url =
+      if href&.start_with?("/")
+        "#{@setting["top_url"]}#{href}"
+      else
+        "#{@setting["toc_url"]}#{href}"
+      end
     raw = download_raw_data(subtitle_url)
     save_raw_data(raw, subtitle_info, ".html")
     %w(introduction postscript body).each { |type| @setting[type] = nil }
