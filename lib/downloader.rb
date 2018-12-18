@@ -1082,27 +1082,19 @@ class Downloader
     return @section_download_cache[index] if @section_download_cache[index]
     sleep_for_download
     href = subtitle_info["href"]
-    if @setting["is_narou"]
-      subtitle_url = @setting.replace_group_values("txtdownload_url", subtitle_info)
-    elsif href[0] == "/"
+    if href[0] == "/"
       subtitle_url = @setting["top_url"] + href
     else
       subtitle_url = @setting["toc_url"] + href
     end
     raw = download_raw_data(subtitle_url)
-    if @setting["is_narou"]
-      raw = Helper.restore_entity(raw)
-      save_raw_data(raw, subtitle_info)
-      element = extract_elements_in_section(raw, subtitle_info["subtitle"])
-    else
-      save_raw_data(raw, subtitle_info, ".html")
-      %w(introduction postscript body).each { |type| @setting[type] = nil }
-      @setting.multi_match(raw, "body_pattern", "introduction_pattern", "postscript_pattern")
-      element = { "data_type" => "html" }
-      %w(introduction postscript body).each { |type|
-        element[type] = @setting[type].to_s
-      }
-    end
+    save_raw_data(raw, subtitle_info, ".html")
+    %w(introduction postscript body).each { |type| @setting[type] = nil }
+    @setting.multi_match(raw, "body_pattern", "introduction_pattern", "postscript_pattern")
+    element = { "data_type" => "html" }
+    %w(introduction postscript body).each { |type|
+      element[type] = @setting[type].to_s
+    }
     subtitle_info["download_time"] = Time.now
     @section_download_cache[index] = element
     element
