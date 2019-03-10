@@ -43,10 +43,10 @@ illust_grep_pattern: <a href="(?<src>.+?)" alt="挿絵" name='img'>【挿絵表�
 novel_info_url: https://syosetu.org/?mode=ss_detail&nid=\\k<ncode>
 
 # タイトル
-t: タイトル</td><td bgcolor=#FFFFFF><a href=.+?>(?<title>.+?)</a>
+t: タイトル</td><td.*?><a href=.+?>(?<title>.+?)</a>
 
 # novel_type 小説種別
-nt: 話数</td><td>(?<novel_type>.+?) .+?話</td>
+nt: 話数</td><td.*?>(?<novel_type>.+?) .+?話</td>
 novel_type_string:
   連載(連載中): 1
   連載(未完): 1
@@ -54,22 +54,22 @@ novel_type_string:
   短編: 2
 
 # general_all_no 掲載話数
-ga: 話数</td><td>.+? (?<general_all_no>\d+)話</td>
+ga: 話数</td><td.*?>.+? (?<general_all_no>\d+)話</td>
 
 # story あらすじ
-s: "あらすじ</td><td colspan=3 bgcolor=#FFFFFF>(?<story>.+?)</td>"
+s: "あらすじ</td><td.*?>(?<story>.+?)</td>"
 
 # general_firstup 初回掲載日
-gf: 掲載開始</td><td>(?<general_firstup>.+?)</td>
+gf: 掲載開始</td><td.*?>(?<general_firstup>.+?)</td>
 
 # novelupdated_at 小説の更新時刻
 nu: null
 
 # general_lastup 最終掲載日
-gl: 最新投稿</td><td>(?<general_lastup>.+?)</td>
+gl: 最新投稿</td><td.*?>(?<general_lastup>.+?)</td>
 
 # writer 作者名
-w: 作者</td><td bgcolor=\#FFFFFF>(?:<a href=.+?>)?(?<writer>.+?)(?:</a>)?</td>
+w: 作者</td><td.*?>(?:<a href=.+?>)?(?<writer>.+?)(?:</a>)?</td>
 
 # length 文字数
-l: 合計文字数</td><td>(?<length>.+?)文字
+l: 合計文字数</td><td.*?>(?<length>.+?)文字
