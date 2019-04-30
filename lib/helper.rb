@@ -367,7 +367,7 @@ module Helper
   def truncate_folder_title(title, limit = Inventory.load["folder-length-limit"])
     limit ||= FOLDER_LENGTH_LIMIT
     return title if title.length <= limit
-    title[0...limit]
+    title[0...limit].strip
   end
 
   #
