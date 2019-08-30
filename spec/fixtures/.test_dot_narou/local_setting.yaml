@@ -22,3 +22,4 @@ default.author_comment_style: simple
 device: kindle
 update.interval: 2.5
 download.interval: 0.5
+filename-length-limit: 100

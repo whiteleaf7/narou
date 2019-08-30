@@ -116,7 +116,7 @@ Naming/PredicateName:
 Style/GlobalVars:
   Enabled: false
 
-Layout/IndentHash:
+Layout/IndentFirstHashElement:
   Enabled: false
 
 Layout/LeadingCommentSpace:

@@ -235,7 +235,8 @@ module Narou
         novel_setting.novel_title.presence || novel_data["title"],
         true
       )
-      "[#{author}] #{title}#{ext}"
+      filename = "[#{author}] #{title}#{ext}"
+      Helper.truncate_path(filename)
     end
   end
 
