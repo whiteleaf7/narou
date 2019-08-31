@@ -236,7 +236,8 @@ module Narou
         true
       )
       filename = "[#{author}] #{title}#{ext}"
-      Helper.truncate_path(filename)
+      length_limit = Inventory.load["ebook-filename-length-limit"]
+      length_limit ?  Helper.truncate_path(filename, length_limit) : filename
     end
   end
 

@@ -521,8 +521,17 @@ module Command
         },
         "filename-length-limit" => {
           type: :integer,
-          help: "各話保存時のファイル名の長さを制限する。※この設定は既存小説にも影響が出るので" \
+          help: "各話保存時のファイル名の長さを制限する。出力される電子書籍ファイル名の長さを制限する場合は " \
+                "ebook-filename-length-limit を設定すること。※この設定は既存小説にも影響が出るので" \
                 "ファイル名の長さでエラーが出ない限り基本的にはいじらないこと。デフォルトは#{Helper::FILENAME_LENGTH_LIMIT}文字",
+          tab: :detail
+        },
+        "ebook-filename-length-limit" => {
+          type: :integer,
+          help: "出力される電子書籍ファイル名の長さを制限する。ファイルシステムによって長さの最大値が" \
+                "制限されており、保存時にエラーが出るような場合などに設定する。※デフォルトは無制限" \
+                "（Kindle端末を使っている場合85以下推奨。Kindle端末の場合長さ制限に引っかかっても" \
+                "エラーは出ないが読めなくなる）",
           tab: :detail
         },
         "webui.theme" => {
