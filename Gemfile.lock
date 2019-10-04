@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    narou (3.4.3)
+    narou (3.4.6)
       activesupport (~> 5.2)
       diff-lcs (~> 1.2, >= 1.2.5)
       erubis (~> 2.7)
@@ -10,7 +10,7 @@ PATH
       memoist (~> 0.11.0)
       open_uri_redirections (~> 0.2, >= 0.2.1)
       pony (~> 1, >= 1.11)
-      rubyzip (~> 1.1, >= 1.1.0)
+      rubyzip (~> 2.0, >= 2.0.0)
       sass (~> 3.4, >= 3.4.18)
       sinatra (~> 1.4, >= 1.4.5)
       sinatra-contrib (~> 1.4, >= 1.4.2)
@@ -22,13 +22,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (5.2.2.1)
+    activesupport (5.2.3)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     awesome_print (1.8.0)
-    backports (3.12.0)
+    backports (3.15.0)
     better_errors (2.5.0)
       coderay (>= 1.0.0)
       erubi (>= 1.0.0)
@@ -55,13 +55,13 @@ GEM
       mime-types (>= 1.16, < 4)
     memoist (0.11.0)
     method_source (0.9.2)
-    mime-types (3.2.2)
+    mime-types (3.3)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2018.0812)
-    minitest (5.11.3)
+    mime-types-data (3.2019.0904)
+    minitest (5.12.2)
     multi_json (1.13.1)
     open_uri_redirections (0.2.1)
-    pony (1.13)
+    pony (1.13.1)
       mail (>= 2.0)
     pry (0.12.2)
       coderay (~> 1.1.0)
@@ -98,8 +98,8 @@ GEM
     rspec-support (3.8.0)
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rubyzip (1.2.2)
-    sass (3.7.3)
+    rubyzip (2.0.0)
+    sass (3.7.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -125,11 +125,12 @@ GEM
     systemu (2.6.5)
     termcolorlight (1.1.1)
     thread_safe (0.3.6)
-    tilt (2.0.9)
+    thread_safe (0.3.6-java)
+    tilt (2.0.10)
     timecop (0.9.1)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
-    unicode-display_width (1.5.0)
+    unicode-display_width (1.6.0)
 
 PLATFORMS
   java
