@@ -47,7 +47,7 @@ Gem::Specification.new do |gem|
   gem.executables = gem.files.grep(%r!^bin/!).map { |f| File.basename(f) }
 
   gem.add_runtime_dependency 'termcolorlight', '~> 1.0', '>= 1.1.1'
-  gem.add_runtime_dependency 'rubyzip', '~> 1.1', '>= 1.1.0'
+  gem.add_runtime_dependency 'rubyzip', '~> 2.0', '>= 2.0.0'
   gem.add_runtime_dependency 'mail', '~> 2.6.0', '>= 2.6.6'
   gem.add_runtime_dependency 'pony', '~> 1', '>= 1.11'
   gem.add_runtime_dependency 'diff-lcs', '~> 1.2', '>= 1.2.5'
