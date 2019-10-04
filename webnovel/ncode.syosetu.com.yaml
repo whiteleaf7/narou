@@ -25,8 +25,7 @@ subtitles: |-
   <dt class="long_update">
   (?<subdate>.+?)(?:
   <span title="(?<subupdate>.+?) 改稿">
-  （<u>改</u>）</span>)?
-  </dt>
+  （<u>改</u>）</span>)?</dt>
   </dl>
 
 # ------------------------------------------------------------
