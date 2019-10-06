@@ -43,7 +43,7 @@ module Command
     "help" => Help,
     "version" => Version,
     "init" => Init,
-    "restore" => Restore
+    "restore346" => Restore346
   }
 
   if $development
