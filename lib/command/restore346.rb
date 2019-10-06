@@ -15,16 +15,15 @@ module Command
 
     def initialize
       super("<target> [<target2> ...]")
-      @opt.separator <<-EOS
+      @opt.separator <<-HELP
 
   ・ver 3.4.6 で更新して壊れた toc.yaml の更新日時部分を復元します
   ・このコマンドを実行しなくても更新は出来ますが、改稿がある話のDLが走ってしまいます
 
   Examples:
     narou restore346
-      EOS
+      HELP
     end
-
 
     def execute(argv)
       super
