@@ -31,6 +31,7 @@ module Command
       database_values = Database.instance.get_object.values
       database_values.each do |data|
         begin
+          puts "<gray>#{data["title"].escape}</gray>".termcolor
           downloader = Downloader.new(data["id"])
           toc = downloader.load_toc_file
           modified = restore(toc)
@@ -56,7 +57,7 @@ module Command
       end
 
       if modified
-        puts "#{toc["title"]} の目次データを復元中しました"
+        puts "<green>#{toc["title"].escape} の目次データを復元しました</green>".termcolor
       end
 
       modified
