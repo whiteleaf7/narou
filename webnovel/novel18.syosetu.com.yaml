@@ -28,9 +28,7 @@ subtitles: |-
   <a href="(?<href>/.+?/(?<index>\d+?)/)">(?<subtitle>.+?)</a>
   </dd>
   <dt class="long_update">
-  (?<subdate>.+?)(?:
-  <span title="(?<subupdate>.+?) 改稿">
-  （<u>改</u>）</span>)?</dt>
+  (?<subdate>.+?)(?:<span title="(?<subupdate>.+?) 改稿">（<u>改</u>）</span>)?</dt>
   </dl>
 
 # ------------------------------------------------------------

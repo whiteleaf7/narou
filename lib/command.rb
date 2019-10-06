@@ -42,7 +42,8 @@ module Command
     "trace" => Trace,
     "help" => Help,
     "version" => Version,
-    "init" => Init
+    "init" => Init,
+    "restore" => Restore
   }
 
   if $development
