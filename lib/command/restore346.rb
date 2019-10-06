@@ -32,12 +32,12 @@ module Command
       database_values.each do |data|
         begin
           downloader = Downloader.new(data["id"])
-        rescue Downloader::InvalidTarget
+          toc = downloader.load_toc_file
+          modified = restore(toc)
+          downloader.save_toc_once(toc) if modified
+        rescue StandardError
           next
         end
-        toc = downloader.load_toc_file
-        modified = restore(toc)
-        downloader.save_toc_once(toc) if modified
       end
     end
 
