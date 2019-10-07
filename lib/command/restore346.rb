@@ -22,7 +22,12 @@ module Command
 
   Examples:
     narou restore346
+
       HELP
+
+      @opt.on('-f') do
+        @options["f"] = true
+      end
     end
 
     def execute(argv)
@@ -33,7 +38,7 @@ module Command
           puts "<gray>#{data["title"].escape}</gray>".termcolor
           downloader = Downloader.new(data["id"])
           toc = downloader.load_toc_file
-          modified = restore(toc)
+          modified = @options["f"] ? restore_subupdate(toc) : restore(toc)
           downloader.save_toc_once(toc) if modified
         rescue StandardError
           next
@@ -50,8 +55,35 @@ module Command
         subdate = Regexp.last_match[:subdate]
         subupdate = Regexp.last_match[:subupdate]
 
+        download_time = subtitle["download_time"]
+        if Time.parse(subupdate) > download_time
+          subupdate = ''
+        end
+
         subtitle["subdate"] = subdate
         subtitle["subupdate"] = subupdate
+        modified = true
+      end
+
+      if modified
+        puts "<green>#{toc["title"].escape} の目次データを復元しました</green>".termcolor
+      end
+
+      modified
+    end
+
+    def restore_subupdate(toc)
+      subtitles = toc["subtitles"]
+      modified = false
+      subtitles.each do |subtitle|
+        subupdate = subtitle["subupdate"]
+
+        next if subupdate.blank?
+
+        download_time = subtitle["download_time"]
+        next if Time.parse(subupdate) <= download_time
+
+        subtitle["subupdate"] = ''
         modified = true
       end
 
