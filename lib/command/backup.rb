@@ -31,7 +31,9 @@ module Command
     end
 
     def create_backup_filename(data)
-      Helper.replace_filename_special_chars(data["title"]) + "_" + Time.now.strftime("%Y%m%d%H%M%S") + ".zip"
+      name = Helper.replace_filename_special_chars(data["title"])
+      name.slice!(-1) while name.bytesize > 180
+      "#{name}_#{Time.now.strftime("%Y%m%d%H%M%S")}.zip"
     end
 
     def create_backup(data)
