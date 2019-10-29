@@ -61,7 +61,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'sinatra-contrib', '~> 1.4', '>= 1.4.2'
   gem.add_runtime_dependency 'tilt', '~> 2.0', '>= 2.0.1'
   gem.add_runtime_dependency 'sass', '~> 3.4', '>= 3.4.18'
-  gem.add_runtime_dependency 'haml', '~> 4.0', '>= 4.0.7'
+  gem.add_runtime_dependency 'haml', '>= 4.0.7', '< 6'
   gem.add_runtime_dependency 'memoist', '~> 0.11.0'
   gem.add_runtime_dependency 'systemu', '~> 2.6', '>= 2.6.5'
   gem.add_runtime_dependency 'erubis', '~> 2.7'
