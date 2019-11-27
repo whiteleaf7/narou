@@ -6,7 +6,7 @@
 # 作者: 愛七ひろ
 # URL: http://ncode.syosetu.com/n9902bn/
 #
-converter "n9902bn デスマーチからはじまる異世界狂想曲（ web版 ）"
+converter "n9902bn デスマーチからはじまる異世界狂想曲（ web版 ）" do
   def before(io, text_type)
     super
   end
