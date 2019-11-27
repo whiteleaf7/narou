@@ -1,11 +1,11 @@
 PATH
   remote: .
   specs:
-    narou (3.4.6)
+    narou (3.4.8)
       activesupport (~> 5.2)
       diff-lcs (~> 1.2, >= 1.2.5)
       erubis (~> 2.7)
-      haml (>= 4.0.7, < 6)
+      haml (>= 5.1.2, < 6)
       mail (~> 2.6.0, >= 2.6.6)
       memoist (~> 0.11.0)
       open_uri_redirections (~> 0.2, >= 0.2.1)
@@ -16,7 +16,7 @@ PATH
       sinatra-contrib (~> 1.4, >= 1.4.2)
       systemu (~> 2.6, >= 2.6.5)
       termcolorlight (~> 1.0, >= 1.1.1)
-      tilt (~> 2.0, >= 2.0.1)
+      tilt (~> 2.0, >= 2.0.10)
       unicode-display_width (~> 1.4)
 
 GEM
@@ -59,7 +59,7 @@ GEM
     mime-types (3.3)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2019.1009)
-    minitest (5.12.2)
+    minitest (5.13.0)
     multi_json (1.14.1)
     open_uri_redirections (0.2.1)
     pony (1.13.1)
