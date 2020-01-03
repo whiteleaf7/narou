@@ -698,15 +698,16 @@ class NovelConverter
       if section["chapter"].length > 0
         section["chapter"] = @converter.convert(section["chapter"], "chapter")
       end
+
       @inspector.subtitle = section["subtitle"]
       section["subtitle"] = @converter.convert(section["subtitle"], "subtitle")
       element = section["element"]
       data_type = element.delete("data_type") || "text"
       @converter.data_type = data_type
       element.each do |text_type, elm_text|
-        if data_type == "html"
+        if data_type != "text"
           html.string = elm_text
-          elm_text = html.to_aozora
+          elm_text = html.to_aozora(pre_html: data_type == "pre_html")
         end
         element[text_type] = @converter.convert(elm_text, text_type)
       end

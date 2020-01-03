@@ -42,8 +42,8 @@ class HTML
   #
   # 青空文庫形式に変換
   #
-  def to_aozora
-    @string = br_to_aozora
+  def to_aozora(pre_html: false)
+    @string = br_to_aozora unless pre_html
     @string = p_to_aozora
     @string = ruby_to_aozora
     unless @strip_decoration_tag

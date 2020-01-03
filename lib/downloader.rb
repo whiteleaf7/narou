@@ -1092,7 +1092,7 @@ class Downloader
     save_raw_data(raw, subtitle_info, ".html")
     %w(introduction postscript body).each { |type| @setting[type] = nil }
     @setting.multi_match(raw, "body_pattern", "introduction_pattern", "postscript_pattern")
-    element = { "data_type" => "html" }
+    element = { "data_type" => @setting["data_type"] || "html" }
     %w(introduction postscript body).each { |type|
       element[type] = @setting[type].to_s
     }
