@@ -21,7 +21,7 @@ describe Narou::WebWorker do
     end
   end
 
-  context "alrady running" do
+  context "already running" do
     before do
       @worker.start
     end
