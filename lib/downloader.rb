@@ -725,7 +725,7 @@ class Downloader
     cookie = @setting["cookie"] || ""
     open_uri_options = make_open_uri_options("Cookie" => cookie, allow_redirections: :safe)
     begin
-      open(toc_url, open_uri_options) do |toc_fp|
+      URI.open(toc_url, open_uri_options) do |toc_fp|
         if toc_fp.base_uri.to_s != toc_url
           # リダイレクトされた場合。
           # ノクターン・ムーンライトのNコードを ncode.syosetu.com に渡すと、年齢認証のクッションページに飛ばされる
@@ -1132,7 +1132,7 @@ class Downloader
     cookie = @setting["cookie"] || ""
     begin
       open_uri_options = make_open_uri_options("Cookie" => cookie, allow_redirections: :safe)
-      open(url, "r:#{@setting["encoding"]}", open_uri_options) do |fp|
+      URI.open(url, "r:#{@setting["encoding"]}", open_uri_options) do |fp|
         raw = Helper.pretreatment_source(fp.read, @setting["encoding"])
       end
     rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout => e
