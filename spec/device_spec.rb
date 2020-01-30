@@ -8,11 +8,14 @@ require_relative "../lib/device"
 if Helper.os_windows?
   describe "Windowsの場合" do
     describe Device::Library::Windows do
-      it "Windows7_OSなボリュームネームのドライブは C:/" do
-        module Dummy
+      it "Windows7_OS または Windows なボリュームネームのドライブは C:/" do
+        module Dummy2
           extend Device::Library::Windows
         end
-        expect(Dummy.get_device_root_dir("Windows7_OS")).to eq("C:/")
+        device_root_dir = Dummy2.get_device_root_dir("Windows7_OS")
+        device_root_dir ||= Dummy2.get_device_root_dir("Windows10_OS")
+        device_root_dir ||= Dummy2.get_device_root_dir("Windows")
+        expect(device_root_dir).to eq("C:/")
       end
     end
 
