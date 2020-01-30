@@ -51,7 +51,7 @@ module CommandLine
   def argv_for_windows(argv)
     return unless Helper.os_windows?
     argv.map! do |arg|
-      arg&.encode(Encoding::UTF_8)
+      arg.class == Integer ? arg : arg&.encode(Encoding::UTF_8)
     end
   end
 
