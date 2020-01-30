@@ -464,7 +464,7 @@ module Helper
         fullpath = File.expand_path(path)
         cache_data = @@caches[fullpath]
         if Helper.file_latest?(fullpath) || !cache_data
-          body = File.read(fullpath, options)
+          body = File.read(fullpath, **options)
           @@caches[fullpath] = body
           return body
         else
@@ -493,7 +493,7 @@ module Helper
         key = generate_key(fullpath, block)
         cache = @@result_caches[key]
         if Helper.file_latest?(fullpath) || !cache
-          data = File.read(fullpath, options)
+          data = File.read(fullpath, **options)
           @@result_caches[key] = result = block.call(data)
           return result
         else
