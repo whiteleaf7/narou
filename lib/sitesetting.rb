@@ -24,7 +24,7 @@ class SiteSetting
       load_paths = [
         Narou.script_dir.join(NOVEL_SITE_SETTING_DIR, "*.yaml"),
         Narou.root_dir.join(NOVEL_SITE_SETTING_DIR, "*.yaml")
-      ].uniq.join("\0")
+      ].uniq
       Dir.glob(load_paths) do |path|
         setting = SiteSetting.load_file(path)
         name = setting["name"]
