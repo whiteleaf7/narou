@@ -65,5 +65,9 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'open_uri_redirections', '~> 0.2', '>= 0.2.1'
   gem.add_runtime_dependency 'activesupport', '~> 5.2'
   gem.add_runtime_dependency 'unicode-display_width', '~> 1.4'
+  gem.add_development_dependency 'pry'
+  gem.add_development_dependency 'rspec'
+  gem.add_development_dependency 'rubocop'
+  gem.add_development_dependency 'simplecov'
+  gem.add_development_dependency 'timecop'
 end
-
