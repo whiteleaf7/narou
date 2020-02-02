@@ -25,8 +25,12 @@ describe "convert" do
   after :all do
     # 変換した際に出力される各ファイルを削除
     unless $debug
-      glob_path = +"*/\\[#{AUTHOR}\\]*.txt\0*/{見出しリスト,調査ログ}.txt"
-      glob_path.encode!("Windows-31J") if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i
+      glob_path = []
+      glob_path << +"*/\\[#{AUTHOR}\\]*.txt"
+      glob_path << +"*/{見出しリスト,調査ログ}.txt"
+      glob_path.each do |path|
+        path.encode!("Windows-31J") if RbConfig::CONFIG["host_os"] =~ /mswin(?!ce)|mingw|bccwin/i
+      end
       Dir.glob(glob_path) do |path|
         File.delete(path)
       end
