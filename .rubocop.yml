@@ -137,7 +137,7 @@ Style/NegatedIf:
 Style/Not:
   Enabled: true
 
-PercentLiteralDelimiters:
+Style/PercentLiteralDelimiters:
   PreferredDelimiters:
     "%":  "!!"
     "%i": "()"
@@ -158,7 +158,7 @@ Style/RedundantReturn:
 Style/RedundantSelf:
   Enabled: false
 
-SignalException:
+Style/SignalException:
   EnforcedStyle: only_raise
 
 Layout/SpaceAfterComma:
@@ -197,7 +197,7 @@ Style/TrivialAccessors:
 Style/UnlessElse:
   Enabled: true
 
-VariableName:
+Naming/VariableName:
   EnforcedStyle: snake_case
 
 Style/WordArray:
