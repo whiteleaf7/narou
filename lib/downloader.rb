@@ -89,7 +89,7 @@ class Downloader
   #
   def self.get_target_type(target)
     case target
-    when URI.regexp
+    when /^[Hh][Tt][Tt][Pp][Ss]?:\/\//
       :url
     when /^n\d+[a-z]+$/i
       target.downcase!
