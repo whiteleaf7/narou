@@ -60,7 +60,7 @@ describe Narou::WebWorker do
       expect(@worker.canceled?).to be_truthy
       @worker.start
       Thread.pass
-      sleep 0.001
+      sleep 0.1
       expect(@worker.running?).to be_truthy
       expect(@worker.canceled?).to be_falsey
       expect(_execute).to be false

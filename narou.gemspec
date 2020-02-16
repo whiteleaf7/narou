@@ -32,13 +32,10 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 60}
 
-3.4.8: 2019/11/27
+3.5.0: 2020/02/16
 -----------------
 #### 修正内容
-- 小説タイトルが長すぎる場合、backup コマンドでファイルを作成した際にエラーが
-  出るため、ファイル名を端折る処理を導入
-- `デスマーチからはじまる異世界狂想曲` のプリセットファイルにバグが混入していた
-  のを修正
+- Ruby 2.7 に対応
 
 #{"*" * 60}
   EOS
@@ -65,5 +62,14 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'open_uri_redirections', '~> 0.2', '>= 0.2.1'
   gem.add_runtime_dependency 'activesupport', '~> 5.2'
   gem.add_runtime_dependency 'unicode-display_width', '~> 1.4'
+
+  gem.add_development_dependency 'rspec', '~> 3.9'
+  gem.add_development_dependency 'rspec-retry', '~> 0.6'
+  gem.add_development_dependency 'rspec_junit_formatter', '~> 0.4'
+  gem.add_development_dependency 'timecop', '~> 0.9'
+  gem.add_development_dependency 'pry', '~> 0.12'
+  gem.add_development_dependency 'pry-byebug', '~> 3.8'
+  gem.add_development_dependency 'awesome_print', '~> 1.8'
+  gem.add_development_dependency 'simplecov', '~> 0.18'
 end
 
