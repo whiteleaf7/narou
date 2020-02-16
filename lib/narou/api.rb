@@ -54,7 +54,7 @@ module Narou
 
     def request_api(ncodes, limit = BATCH_LIMIT)
       url = "#{@api_url}?gzip=#{GZIP_LEVEL}&ncode=#{ncodes.join("-")}&of=#{@of}&lim=#{limit}&out=json"
-      open(url) do |fp|
+      URI.open(url) do |fp|
         data = Zlib::GzipReader.wrap(fp).read.force_encoding(Encoding::UTF_8)
         results = JSON.parse(data)
         return if results[0]["allcount"].zero?
