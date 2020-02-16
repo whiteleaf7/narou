@@ -65,5 +65,14 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'open_uri_redirections', '~> 0.2', '>= 0.2.1'
   gem.add_runtime_dependency 'activesupport', '~> 5.2'
   gem.add_runtime_dependency 'unicode-display_width', '~> 1.4'
+
+  gem.add_development_dependency 'rspec', '~> 3.9'
+  gem.add_development_dependency 'rspec-retry', '~> 0.6'
+  gem.add_development_dependency 'rspec_junit_formatter', '~> 0.4'
+  gem.add_development_dependency 'timecop', '~> 0.9'
+  gem.add_development_dependency 'pry', '~> 0.12'
+  gem.add_development_dependency 'pry-byebug', '~> 3.8'
+  gem.add_development_dependency 'awesome_print', '~> 1.8'
+  gem.add_development_dependency 'simplecov', '~> 0.18'
 end
 
