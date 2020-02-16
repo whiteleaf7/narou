@@ -8,10 +8,10 @@ require_relative "helper"
 
 BlankConverter = Class.new(ConverterBase) {}
 
-$converter_container = {}
+$latest_converter = nil
 
 def converter(title, &block)
-  $converter_container[title] = Class.new(ConverterBase, &block)
+  $latest_converter = Class.new(ConverterBase, &block)
 end
 
 #
@@ -61,11 +61,13 @@ end
 def load_converter(title, archive_path)
   converter_path = File.join(archive_path, "converter.rb")
   if File.exist?(converter_path)
+    $latest_converter = nil
     eval(File.read(converter_path, mode: "r:BOM|UTF-8"), binding, converter_path)
   else
     return BlankConverter
   end
-  conv = $converter_container[title] || $converter_container[File.basename(archive_path)]
+
+  conv = $latest_converter
   if conv
     return conv
   else
