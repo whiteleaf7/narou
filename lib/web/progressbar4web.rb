@@ -16,8 +16,8 @@ class ProgressBar
 
   alias :original_initialize :initialize
 
-  def initialize(*args)
-    original_initialize(*args)
+  def initialize(*args, **opt)
+    original_initialize(*args, **opt)
     @@push_server.send_all("progressbar.init" => { target_console: io.target_console })
   end
 
