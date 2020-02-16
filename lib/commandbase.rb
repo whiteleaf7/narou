@@ -89,7 +89,7 @@ module Command
       tag_index = database.tag_indexies
       all_ids = database.ids
       expanded_array = array.map { |arg|
-        if arg =~ /\A\d+\z/
+        if arg.to_s =~ /\A\d+\z/
           # 優先度はID＞タグのため、数字のみ指定されたら
           # そのIDが存在した場合はIDとみなす
           id = arg.to_i
