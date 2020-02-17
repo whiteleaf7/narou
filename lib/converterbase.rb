@@ -995,7 +995,7 @@ class ConverterBase
   # URL っぽい文字列を一旦別のIDに置き換えてあとで復元することで、変換処理の影響を受けさせない
   #
   def replace_url(data)
-    data.gsub!(URI.regexp(%w(http https))) do |match|
+    data.gsub!(URI::DEFAULT_PARSER.make_regexp(%w(http https))) do |match|
       @url_list << match
       "［＃ＵＲＬ＝#{@url_list.size - 1}］"
     end
