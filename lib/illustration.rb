@@ -27,7 +27,7 @@ class Illustration
     source.gsub!(/［＃挿絵（(.+?)）入る］/) do |match|
       url = $1
       url = "https:#{url}" if url.start_with?("//")
-      if url =~ URI.regexp
+      if url =~ URI::DEFAULT_PARSER.make_regexp
         path = download_image(url)
         path ? block.call(make_illust_chuki(path)) : ""
       else
