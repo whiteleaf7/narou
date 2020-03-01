@@ -43,11 +43,11 @@ class NovelSetting
   end
 
   def initialize(target, ignore_force, ignore_default)
-    if File.directory?(target.to_s)
-      archive_path = target
-    else
-      archive_path = Downloader.get_novel_data_dir_by_target(target) || ""
-    end
+    archive_path = if File.directory?(target.to_s)
+                     target
+                   else
+                     Downloader.get_novel_data_dir_by_target(target) || ""
+                   end
     @archive_path = File.expand_path(archive_path)
     @ignore_force = ignore_force
     @ignore_default = ignore_default
@@ -80,16 +80,18 @@ class NovelSetting
     force_settings = @ignore_force ? {} : NovelSetting.load_force_settings
     default_settings = @ignore_default ? {} : NovelSetting.load_default_settings
     ORIGINAL_SETTINGS.each do |element|
-      name, value, type = element[:name], element[:value], element[:type]
-      if force_settings.include?(name)
-        @settings[name] = force_settings[name]
-      elsif ini["global"].include?(name) && type_eq_value(type, ini["global"][name])
-        @settings[name] = ini["global"][name]
-      elsif default_settings.include?(name)
-        @settings[name] = default_settings[name]
-      else
-        @settings[name] = value
-      end
+      name = element[:name]
+      value = element[:value]
+      type = element[:type]
+      @settings[name] = if force_settings.include?(name)
+                          force_settings[name]
+                        elsif ini["global"].include?(name) && type_eq_value(type, ini["global"][name])
+                          ini["global"][name]
+                        elsif default_settings.include?(name)
+                          default_settings[name]
+                        else
+                          value
+                        end
     end
     # デフォルト設定以外を読み込む
     ini["global"].each do |key, value|
@@ -108,8 +110,6 @@ class NovelSetting
     res = Inventory.load("local_setting").map { |name, value|
       if name =~ /^#{pattern}\.(.+)$/
         [$1, value]
-      else
-        nil
       end
     }.compact.flatten
     Hash[*res]

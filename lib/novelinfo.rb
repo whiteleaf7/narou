@@ -34,7 +34,7 @@ class NovelInfo
       # WEB UI でプロセスが常駐している間に小説情報（タイトルやあらすじ等）が
       # 変更される場合があるので、一定時間過ぎたら再取得をする必要がある
       if Time.now < result["last_load_time"] + REFRESH_INTERVAL
-        return result   # まだ一定時間過ぎていないのでキャッシュを返す
+        return result # まだ一定時間過ぎていないのでキャッシュを返す
       end
       need_reload = true
     end

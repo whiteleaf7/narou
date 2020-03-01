@@ -26,15 +26,15 @@ class Downloader
 
   SECTION_SAVE_DIR_NAME = "本文"    # 本文を保存するディレクトリ名
   CACHE_SAVE_DIR_NAME = "cache"   # 差分用キャッシュ保存用ディレクトリ名
-  RAW_DATA_DIR_NAME = "raw"    # 本文の生データを保存するディレクトリ名
+  RAW_DATA_DIR_NAME = "raw" # 本文の生データを保存するディレクトリ名
   TOC_FILE_NAME = "toc.yaml"
-  STEPS_WAIT_TIME = 5   # 数話ごとにかかるwaitの秒数
+  STEPS_WAIT_TIME = 5 # 数話ごとにかかるwaitの秒数
   WAIT_TIME_TO_RETRY_NETWORK = 10 # タイムアウト等でリトライするまでの待機時間
   LIMIT_TO_RETRY_NETWORK = 5 # タイムアウト等でリトライする回数上限
   NOVEL_TYPE_SERIES = 1   # 連載
   NOVEL_TYPE_SS = 2       # 短編
-  DISPLAY_LIMIT_DIGITS = 4   # indexの表示桁数限界
-  DEFAULT_INTERVAL_WAIT = 0.7   # download.interval のデフォルト値(秒)
+  DISPLAY_LIMIT_DIGITS = 4 # indexの表示桁数限界
+  DEFAULT_INTERVAL_WAIT = 0.7 # download.interval のデフォルト値(秒)
 
   attr_reader :id, :setting
 
@@ -107,7 +107,7 @@ class Downloader
   def self.get_novel_data_dir_by_target(target)
     data = get_data_by_target(target) or return nil
     id = data["id"]
-    file_title = data["file_title"] || data["title"]   # 互換性維持のための処理
+    file_title = data["file_title"] || data["title"] # 互換性維持のための処理
     use_subdirectory = data["use_subdirectory"] || false
     subdirectory = use_subdirectory ? create_subdirecotry_name(file_title) : ""
     path = Database.archive_root_path.join(data["sitename"], subdirectory, file_title)
@@ -319,9 +319,9 @@ class Downloader
     if Narou::Input.confirm("年齢認証：あなたは18歳以上ですか")
       global_setting["over18"] = true
       global_setting.save
-      return true
+      true
     else
-      return false
+      false
     end
   end
 
@@ -331,10 +331,10 @@ class Downloader
   def start_download
     @status = run_download
     OpenStruct.new(
-      :id => @id,
-      :new_arrivals => @new_arrivals,
-      :status => @status
-      ).freeze
+      id: @id,
+      new_arrivals: @new_arrivals,
+      status: @status
+    ).freeze
   end
 
   def load_toc_file
@@ -364,11 +364,11 @@ class Downloader
       @new_arrivals = true
     end
     init_raw_dir
-    if old_toc.empty? || @force
-      update_subtitles = latest_toc_subtitles
-    else
-      update_subtitles = update_body_check(old_toc["subtitles"], latest_toc_subtitles)
-    end
+    update_subtitles = if old_toc.empty? || @force
+                         latest_toc_subtitles
+                       else
+                         update_body_check(old_toc["subtitles"], latest_toc_subtitles)
+                       end
 
     if old_toc.empty? && update_subtitles.size.zero?
       @stream.error "#{@setting['title']} の目次がありません"
@@ -384,8 +384,7 @@ class Downloader
     id_and_title = "ID:#{@id}　#{@title}"
 
     return_status =
-      case
-      when update_subtitles.size > 0
+      if update_subtitles.size > 0
         @cache_dir = create_cache_dir if old_toc.length > 0
         sections_download_and_save(update_subtitles)
         if @cache_dir && @cache_dir.glob("*").count == 0
@@ -393,20 +392,20 @@ class Downloader
         end
         update_database
         :ok
-      when old_toc["subtitles"].size > latest_toc_subtitles.size
+      elsif old_toc["subtitles"].size > latest_toc_subtitles.size
         # 削除された節がある（かつ更新がない）場合
         @stream.puts "#{id_and_title} は一部の話が削除されています"
         :ok
-      when old_toc["title"] != latest_toc["title"]
+      elsif old_toc["title"] != latest_toc["title"]
         # タイトルが更新されている場合
         @stream.puts "#{id_and_title} のタイトルが更新されています"
         update_database
         :ok
-      when old_toc["story"] != latest_toc["story"]
+      elsif old_toc["story"] != latest_toc["story"]
         # あらすじが更新されている場合
         @stream.puts "#{id_and_title} のあらすじが更新されています"
         :ok
-      when old_toc["author"] != latest_toc["author"]
+      elsif old_toc["author"] != latest_toc["author"]
         # 作者名が更新されている場合
         @stream.puts "#{id_and_title} の作者名が更新されています"
         update_database
@@ -475,12 +474,12 @@ class Downloader
     old_subtitles_count = old_toc["subtitles"].size
     if latest_subtitles_count < old_subtitles_count
       title = latest_toc["title"]
-      message = <<-EOS
-更新後の話数が保存されている話数より減少していることを検知しました。
-ダイジェスト化されている可能性があるので、更新に関しての処理を選択して下さい。
+      message = <<~EOS
+        更新後の話数が保存されている話数より減少していることを検知しました。
+        ダイジェスト化されている可能性があるので、更新に関しての処理を選択して下さい。
 
-保存済み話数: #{old_subtitles_count}
-更新後の話数: #{latest_subtitles_count}
+        保存済み話数: #{old_subtitles_count}
+        更新後の話数: #{latest_subtitles_count}
 
       EOS
 
@@ -524,11 +523,11 @@ class Downloader
           Command::Convert.execute!(latest_toc["toc_url"], sync: true)
         end
         unless Narou.web?
-          message = ""   # 長いので二度は表示しない
+          message = "" # 長いので二度は表示しない
         end
       end
     else
-      return false
+      false
     end
   end
 
@@ -569,11 +568,7 @@ class Downloader
   #
   def get_novelupdated_at
     info = @setting["info"] || {}
-    if info["novelupdated_at"]
-      info["novelupdated_at"]
-    else
-      __search_latest_update_time("subupdate", @setting["subtitles"], subkey: "subdate")
-    end
+    info["novelupdated_at"] || __search_latest_update_time("subupdate", @setting["subtitles"], subkey: "subdate")
   end
 
   #
@@ -584,11 +579,7 @@ class Downloader
   #
   def get_general_lastup
     info = @setting["info"] || {}
-    if info["general_lastup"]
-      info["general_lastup"]
-    else
-      __search_latest_update_time("subdate", @setting["subtitles"])
-    end
+    info["general_lastup"] || __search_latest_update_time("subdate", @setting["subtitles"])
   end
 
   #
@@ -733,12 +724,12 @@ class Downloader
           uri = URI.parse(toc_fp.base_uri.to_s)
           if uri.host == "nl.syosetu.com"
             decode = Hash[URI.decode_www_form(uri.query)]
-            toc_url = decode["url"]   # 年齢認証確認ページからの転送先
+            toc_url = decode["url"] # 年齢認証確認ページからの転送先
             raise DownloaderForceRedirect
           end
           s = Downloader.get_sitesetting_by_target(toc_fp.base_uri.to_s)
-          raise DownloaderNotFoundError unless s   # 非公開や削除等でトップページへリダイレクトされる場合がある
-          @setting.clear   # 今まで使っていたのは一旦クリア
+          raise DownloaderNotFoundError unless s # 非公開や削除等でトップページへリダイレクトされる場合がある
+          @setting.clear # 今まで使っていたのは一旦クリア
           @setting = s
           toc_url = @setting["toc_url"]
         end
@@ -780,13 +771,13 @@ class Downloader
     @setting["info"] = info
 
     @setting["title"] = get_title
-    if series_novel?
-      # 連載小説
-      subtitles = get_subtitles(toc_source, old_toc)
-    else
-      # 短編小説
-      subtitles = create_short_story_subtitles(info)
-    end
+    subtitles = if series_novel?
+                  # 連載小説
+                  get_subtitles(toc_source, old_toc)
+                else
+                  # 短編小説
+                  create_short_story_subtitles(info)
+                end
     @setting["subtitles"] = subtitles
 
     toc_objects = {
@@ -798,7 +789,7 @@ class Downloader
     }
     toc_objects
   rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout => e
-    raise if through_error   # エラー処理はしなくていいからそのまま例外を受け取りたい時用
+    raise if through_error # エラー処理はしなくていいからそのまま例外を受け取りたい時用
     if e.message.include?("404")
       @stream.error "小説が削除されているか非公開な可能性があります"
       if database.novel_exists?(@id)
@@ -902,9 +893,7 @@ class Downloader
   #
   def get_section_file_timestamp(old_subtitles_info, latest_subtitles_info)
     download_time = old_subtitles_info["download_time"]
-    unless download_time
-      download_time = File.mtime(section_file_path(old_subtitles_info))
-    end
+    download_time ||= File.mtime(section_file_path(old_subtitles_info))
     latest_subtitles_info["download_time"] = download_time
     download_time
   end
@@ -993,8 +982,8 @@ class Downloader
       info = subtitle_info.dup
       info["element"] = a_section_download(subtitle_info)
 
-      @stream.puts "#{chapter}" unless chapter.to_s.empty?
-      @stream.puts "#{subchapter}" unless subchapter.to_s.empty?
+      @stream.puts chapter.to_s unless chapter.to_s.empty?
+      @stream.puts subchapter.to_s unless subchapter.to_s.empty?
 
       if get_novel_type == NOVEL_TYPE_SERIES
         if index.to_s.length <= DISPLAY_LIMIT_DIGITS

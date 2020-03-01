@@ -45,15 +45,14 @@ class Device
       next unless dir # narou init 前だと root_dir は nil
       Dir.glob(File.join(dir, "device", "*.rb")).each do |path|
         name = File.basename(path, ".rb")
-        unless h[name]
-          if Helper.os_windows?
-            # パスにマルチバイト文字が使われる可能性があるのでrequireは使えない
-            eval(File.read(path, encoding: Encoding::UTF_8), binding, path)
-          else
-            require path
-          end
-          h[name] = Device.const_get(name.capitalize)
+        next if h[name]
+        if Helper.os_windows?
+          # パスにマルチバイト文字が使われる可能性があるのでrequireは使えない
+          eval(File.read(path, encoding: Encoding::UTF_8), binding, path)
+        else
+          require path
         end
+        h[name] = Device.const_get(name.capitalize)
       end
     end
   end
@@ -70,7 +69,7 @@ class Device
   def self.create(device_name)
     @@device_cache ||= {}
     name = device_name.downcase
-    return @@device_cache[name] ||= new(name)
+    @@device_cache[name] ||= new(name)
   end
 
   private_class_method :new
@@ -166,8 +165,6 @@ class Device
         FileUtils.rm_f(src_file)
       end
       dst_path
-    else
-      nil
     end
   rescue SendFailure => e
     puts

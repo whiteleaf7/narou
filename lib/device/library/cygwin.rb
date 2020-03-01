@@ -12,7 +12,7 @@ module Device::Library
       mount_root = `mount -p`.split("\n").last.split(/\s+/).first
 
       Dir.glob("#{mount_root}/*") do |drive_path|
-        drive   = drive_path.sub(/.*\//,"")
+        drive   = drive_path.sub(%r!.*/!, "")
         # windowsのvolコマンドを利用してがんばってvolume_nameを探す。
         # 一行目にボリュームラベルが含まれる。
         # volume_nameが "volume" とか "hoge(*)" などだとはまる。

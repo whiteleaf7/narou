@@ -97,11 +97,10 @@ module Command
         end
       end
 
-      case
-      when @options["command-backup-bookmark"]
+      if @options["command-backup-bookmark"]
         process_backup_bookmark(device)
         exit
-      when @options["command-restore-bookmark"]
+      elsif @options["command-restore-bookmark"]
         process_restore_bookmark(device)
         exit
       end
@@ -115,11 +114,11 @@ module Command
            (!Narou.web? || (Narou.web? && send_all))
           next
         end
-        if target == "hotentry"
-          ebook_paths = [Update.get_newest_hotentry_file_path(device)]
-        else
-          ebook_paths = Narou.get_ebook_file_paths(target, device.ebook_file_ext)
-        end
+        ebook_paths = if target == "hotentry"
+                        [Update.get_newest_hotentry_file_path(device)]
+                      else
+                        Narou.get_ebook_file_paths(target, device.ebook_file_ext)
+                      end
         unless ebook_paths[0]
           stream_io.error "#{target} は存在しません"
           next

@@ -31,12 +31,11 @@ module Helper
   end
 
   def determine_os
-    case
-    when os_windows?
+    if os_windows?
       :windows
-    when os_mac?
+    elsif os_mac?
       :mac
-    when os_cygwin?
+    elsif os_cygwin?
       :cygwin
     else
       :other
@@ -46,7 +45,7 @@ module Helper
   def engine_jruby?
     @@engine_is_jruby ||= RUBY_ENGINE == "jruby"
   end
-  
+
   if engine_jruby? && os_windows?
     require_relative "extensions/windows"
     def $stdin.getch
@@ -228,13 +227,13 @@ module Helper
     when :integer
       begin
         result = Integer(value)
-      rescue
+      rescue StandardError
         raise InvalidVariableType, type
       end
     when :float
       begin
         result = Float(value)
-      rescue
+      rescue StandardError
         raise InvalidVariableType, type
       end
     when :directory, :file
@@ -251,7 +250,7 @@ module Helper
     result
   end
 
-  INTEGER_CLASS = RUBY_VERSION >= "2.4.0" ? Integer : Fixnum
+  INTEGER_CLASS = RUBY_VERSION >= "2.4.0" ? Integer : Integer
   TYPE_OF_VALUE = {
     TrueClass => :boolean, FalseClass => :boolean, INTEGER_CLASS => :integer,
     Float => :float, String => :string
@@ -407,7 +406,7 @@ module Helper
         _pid = pid
         looper = Thread.new(pid) do |pid|
           loop do
-            block.call if block
+            block&.call
             sleep(sleep_time)
             next unless Narou::Worker.canceled?
             next unless Narou::WebWorker.canceled?
@@ -421,7 +420,7 @@ module Helper
       end
       stdout.force_encoding(Encoding::UTF_8)
       stderr.force_encoding(Encoding::UTF_8)
-      return [stdout, stderr, status]
+      [stdout, stderr, status]
     rescue RuntimeError => e
       raise unless e.message.include?("interrupted")
       process_kill(_pid)
@@ -437,7 +436,7 @@ module Helper
       return unless pid
       Process.kill("KILL", pid)
       Process.detach(pid) # 死亡確認しないとゾンビ化する
-    rescue
+    rescue StandardError
     end
   end
 
@@ -488,7 +487,7 @@ module Helper
     #
     def memo(path, options = DEFAULT_OPTIONS, &block)
       @@mutex.synchronize do
-        fail ArgumentError, "need a block" unless block
+        raise ArgumentError, "need a block" unless block
         fullpath = File.expand_path(path)
         key = generate_key(fullpath, block)
         cache = @@result_caches[key]

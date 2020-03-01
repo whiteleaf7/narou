@@ -79,7 +79,8 @@ class Narou::AppServer < Sinatra::Base
   #
   def self.create_address(user_port = nil)
     global_setting = Inventory.load("global_setting", :global)
-    port, bind = global_setting["server-port"], global_setting["server-bind"]
+    port = global_setting["server-port"]
+    bind = global_setting["server-bind"]
     port = user_port if user_port
     ipaddress = my_ipaddress
     unless port
@@ -88,7 +89,7 @@ class Narou::AppServer < Sinatra::Base
       global_setting.save
     end
     bind = "127.0.0.1" if bind == "localhost"
-    host = bind ? bind : ipaddress
+    host = bind || ipaddress
     set :port, port
     set :bind, host
     {
@@ -136,7 +137,7 @@ class Narou::AppServer < Sinatra::Base
       loop do
         if @@push_server.connections.count > 0
           device = Narou.get_device
-          @@push_server.send_all(:"device.ejectable" => device && device.ejectable?)
+          @@push_server.send_all("device.ejectable": device&.ejectable?)
         end
 
         sleep 2
@@ -188,7 +189,7 @@ class Narou::AppServer < Sinatra::Base
     @bootstrap_theme = case params["webui.theme"]
                        when nil
                          Narou.get_theme
-                       when ""   # 環境設定画面で未設定が選択された時
+                       when "" # 環境設定画面で未設定が選択された時
                          nil
                        else
                          params["webui.theme"]
@@ -224,26 +225,26 @@ class Narou::AppServer < Sinatra::Base
   post "/settings" do
     built_arguments = []
     device = params.delete("device")
-    [:local, :global].each do |scope|
+    %i(local global).each do |scope|
       @setting_variables[scope].each do |name, info|
         param_data = params[name]
         argument = ""
-        if info[:type] == :boolean
-          # :boolean 用のフォームデータは on, off, nil で渡される。
-          # ただしチェックボックスはチェックした時だけ on が渡されるので、
-          # 何もデータが無い＝off を選択したと判断する。
-          # 隠しデータの場合は hidden として on, off, nil が必ず送信されるので、
-          # それで判断できる。
-          if param_data
-            argument = convert_on_off_to_boolean(param_data).to_s
-          else
-            argument = "false"
-          end
-        elsif param_data.kind_of?(Array)
-          argument = param_data.join(",")
-        else
-          argument = param_data
-        end
+        argument = if info[:type] == :boolean
+                     # :boolean 用のフォームデータは on, off, nil で渡される。
+                     # ただしチェックボックスはチェックした時だけ on が渡されるので、
+                     # 何もデータが無い＝off を選択したと判断する。
+                     # 隠しデータの場合は hidden として on, off, nil が必ず送信されるので、
+                     # それで判断できる。
+                     if param_data
+                       convert_on_off_to_boolean(param_data).to_s
+                     else
+                       "false"
+                                end
+                   elsif param_data.is_a?(Array)
+                     param_data.join(",")
+                   else
+                     param_data
+                   end
         built_arguments << "#{name}=#{argument}"
       end
     end
@@ -264,20 +265,21 @@ class Narou::AppServer < Sinatra::Base
     # 置換設定保存
     params_replace_pattern = params["replace_pattern"]
     @global_replace_pattern.clear
-    if params_replace_pattern.kind_of?(Array)
+    if params_replace_pattern.is_a?(Array)
       params_replace_pattern.each do |pattern|
-        left, right = pattern["left"].strip, pattern["right"].strip
+        left = pattern["left"].strip
+        right = pattern["right"].strip
         next if left == ""
         @global_replace_pattern << [left, right]
       end
     end
     Narou.save_global_replace_pattern
 
-    if @error_list.empty?
-      session[:alert] = [ "保存が完了しました", "success" ]
-    else
-      session[:alert] = [ "#{@error_list.size}個の設定にエラーがありました", "danger" ]
-    end
+    session[:alert] = if @error_list.empty?
+                        ["保存が完了しました", "success"]
+                      else
+                        ["#{@error_list.size}個の設定にエラーがありました", "danger"]
+                      end
     redirect to "/settings"
   end
 
@@ -343,7 +345,7 @@ class Narou::AppServer < Sinatra::Base
     @title = "小説の変換設定 - #{h @novel_title}"
     @setting_variables = []
     @error_list = {}
-    @novel_setting = NovelSetting.new(@id, true, true)    # 空っぽの設定を作成
+    @novel_setting = NovelSetting.new(@id, true, true) # 空っぽの設定を作成
     @novel_setting.settings = @novel_setting.load_setting_ini["global"]
     @original_settings = NovelSetting.get_original_settings
     @force_settings = NovelSetting.load_force_settings
@@ -354,17 +356,18 @@ class Narou::AppServer < Sinatra::Base
   post "/novels/:id/setting" do
     # 変換設定保存
     @original_settings.each do |info|
-      name, type = info[:name], info[:type]
+      name = info[:name]
+      type = info[:type]
       param_data = params[name]
       value = nil
       begin
         if type == :boolean
-          if param_data
-            value = convert_on_off_to_boolean(param_data)
-          else
-            value = false
-          end
-        elsif param_data.kind_of?(Array)
+          value = if param_data
+                    convert_on_off_to_boolean(param_data)
+                  else
+                    false
+                  end
+        elsif param_data.is_a?(Array)
           value = param_data.join(",")
         else
           if param_data.strip != ""
@@ -381,20 +384,21 @@ class Narou::AppServer < Sinatra::Base
     # 置換設定保存
     params_replace_pattern = params["replace_pattern"]
     @novel_setting.replace_pattern.clear
-    if params_replace_pattern.kind_of?(Array)
+    if params_replace_pattern.is_a?(Array)
       params_replace_pattern.each do |pattern|
-        left, right = pattern["left"].strip, pattern["right"].strip
+        left = pattern["left"].strip
+        right = pattern["right"].strip
         next if left == ""
         @novel_setting.replace_pattern << [left, right]
       end
     end
     @novel_setting.save_replace_pattern
 
-    if @error_list.empty?
-      session[:alert] = [ "保存が完了しました", "success" ]
-    else
-      session[:alert] = [ "#{@error_list.size}個の設定にエラーがありました", "danger" ]
-    end
+    session[:alert] = if @error_list.empty?
+                        ["保存が完了しました", "success"]
+                      else
+                        ["#{@error_list.size}個の設定にエラーがありました", "danger"]
+                      end
 
     haml :"novels/setting"
   end
@@ -421,28 +425,26 @@ class Narou::AppServer < Sinatra::Base
     introductions_count = 0
     postscripts_count = 0
     toc["subtitles"].each do |sub|
-      begin
-        element = YAML.load_file(downloader.section_file_path(sub))["element"]
-        data_type = element["data_type"] || "text"
-        introduction = element["introduction"] || ""
-        postscript = element["postscript"] || ""
-        if data_type == "html"
-          html = HTML.new
-          html.strip_decoration_tag = true
-          html.string = introduction
-          introduction = html.to_aozora
-          html.string = postscript
-          postscript = html.to_aozora
-        end
-        @comments.push(
-          sub: sub,
-          introduction: introduction,
-          postscript: postscript
-        )
-        introductions_count += 1 unless introduction.empty?
-        postscripts_count += 1 unless postscript.empty?
-      rescue Errno::ENOENT
+      element = YAML.load_file(downloader.section_file_path(sub))["element"]
+      data_type = element["data_type"] || "text"
+      introduction = element["introduction"] || ""
+      postscript = element["postscript"] || ""
+      if data_type == "html"
+        html = HTML.new
+        html.strip_decoration_tag = true
+        html.string = introduction
+        introduction = html.to_aozora
+        html.string = postscript
+        postscript = html.to_aozora
       end
+      @comments.push(
+        sub: sub,
+        introduction: introduction,
+        postscript: postscript
+      )
+      introductions_count += 1 unless introduction.empty?
+      postscripts_count += 1 unless postscript.empty?
+    rescue Errno::ENOENT
     end
     total = toc["subtitles"].count.to_f
     @introductions_ratio = (introductions_count / total * 100).round(2)
@@ -532,7 +534,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/download" do
     headers "Access-Control-Allow-Origin" => "*"
     targets = params["targets"] or error("need a parameter: `targets'")
-    targets = targets.kind_of?(Array) ? targets : targets.split
+    targets = targets.is_a?(Array) ? targets : targets.split
     opt_mail = "--mail" if query_to_boolean(params["mail"])
     pass if targets.size == 0
     Narou::WebWorker.push do
@@ -753,13 +755,13 @@ class Narou::AppServer < Sinatra::Base
         end
       end
     end
-    json Hash[tag_info.sort_by { |k, v| k }].values
+    json Hash[tag_info.sort_by { |k, _v| k }].values
   end
 
   post "/api/edit_tag" do
     ids = select_valid_novel_ids(params["ids"]) or pass
     # key と value を重複を維持したまま反転
-    invert_states = params["states"].inject({}) { |h,(k,v)| (h[v] ||= []) << k; h }
+    invert_states = params["states"].each_with_object({}) { |(k, v), h| (h[v] ||= []) << k; }
     invert_states.each do |state, tags|
       case state.to_i
       when 0
@@ -891,7 +893,7 @@ class Narou::AppServer < Sinatra::Base
   post "/api/eject" do
     do_eject = proc do
       device = Narou.get_device
-      device.eject if device
+      device&.eject
       puts "<bold><green>端末を取り外しました</green></bold>".termcolor
     end
     if params["enqueue"] == "true"
@@ -934,7 +936,7 @@ class Narou::AppServer < Sinatra::Base
     @params = params
     if BOOKMARKLET_MODE.include?(params["mode"])
       content_type :js
-      erb :"bookmarklet/#{params['mode']}.js"
+      erb :"bookmarklet/#{params["mode"]}.js"
     else
       error("invaid mode")
     end

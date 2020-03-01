@@ -62,13 +62,13 @@ module Command
       @opt.on("-a", "--convert-only-new-arrival", "新着がある場合のみ変換を実行する") {
         @options["convert-only-new-arrival"] = true
       }
-      @opt.on("--gl [OPT]", <<-EOS) { |option|
-データベースに最新話掲載日を反映させる
-                            |    OPT   |          概要
-                            | 指定なし | 全ての小説を対象にする
-                            |   narou  | なろうAPIを使える小説のみ対象
-                            |   other  | なろうAPIが使えない小説のみ対象
-        EOS
+      @opt.on("--gl [OPT]", <<~EOS) { |option|
+        データベースに最新話掲載日を反映させる
+                                    |    OPT   |          概要
+                                    | 指定なし | 全ての小説を対象にする
+                                    |   narou  | なろうAPIを使える小説のみ対象
+                                    |   other  | なろうAPIが使えない小説のみ対象
+      EOS
         if option && !["narou", "other"].include?(option)
           error "--gl で指定可能なオプションではありません。詳細は narou u -h を参照"
           exit Narou::EXIT_ERROR_CODE
@@ -90,7 +90,7 @@ module Command
     def get_data_value(target, key)
       data = Downloader.get_data_by_target(target) or return nil
       value = data[key]
-      value ? value : Time.new(0)
+      value || Time.new(0)
     end
     memoize :get_data_value
 
@@ -148,7 +148,7 @@ module Command
       end
       tagname_to_ids(update_target_list)
 
-      flush_cache    # memoist のキャッシュ削除
+      flush_cache # memoist のキャッシュ削除
 
       hotentry_manager = HotentryManager.new
       interval = Interval.new(@options["interval"])
@@ -280,7 +280,7 @@ module Command
       begin
         hotentry.each do |id, subtitles|
           setting = NovelSetting.load(id, ignore_force, ignore_default)
-          setting.enable_illust = false   # 挿絵はパス解決が煩雑なので強制無効
+          setting.enable_illust = false # 挿絵はパス解決が煩雑なので強制無効
           novel_converter = NovelConverter.new(
             setting, output_filename,
             display_inspector, Update.hotentry_dirname,
@@ -327,11 +327,11 @@ module Command
         cmd_convert.converted_txt_path = txt_output_path
         cmd_convert.hook_call(:change_settings)
       end
-      if cmd_convert.respond_to?(:hook_convert_txt_to_ebook_file)
-        ebook_path = cmd_convert.hook_convert_txt_to_ebook_file(&relay_proc)
-      else
-        ebook_path = relay_proc.call
-      end
+      ebook_path = if cmd_convert.respond_to?(:hook_convert_txt_to_ebook_file)
+                     cmd_convert.hook_convert_txt_to_ebook_file(&relay_proc)
+                   else
+                     relay_proc.call
+                   end
       ebook_path
     end
 
@@ -359,7 +359,7 @@ module Command
 
     def self.get_newest_hotentry_file_path(device)
       pattern = File.join(Update.hotentry_dirname, "hotentry_*#{device.ebook_file_ext}")
-      Dir.glob(pattern).sort.last
+      Dir.glob(pattern).max
     end
   end
 end

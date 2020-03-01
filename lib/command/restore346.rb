@@ -25,7 +25,7 @@ module Command
 
       HELP
 
-      @opt.on('-f') do
+      @opt.on("-f") do
         @options["f"] = true
       end
     end
@@ -34,15 +34,13 @@ module Command
       super
       database_values = Database.instance.get_object.values
       database_values.each do |data|
-        begin
-          puts "<gray>#{data["title"].escape}</gray>".termcolor
-          downloader = Downloader.new(data["id"])
-          toc = downloader.load_toc_file
-          modified = @options["f"] ? restore_subupdate(toc) : restore(toc)
-          downloader.save_toc_once(toc) if modified
-        rescue StandardError
-          next
-        end
+        puts "<gray>#{data["title"].escape}</gray>".termcolor
+        downloader = Downloader.new(data["id"])
+        toc = downloader.load_toc_file
+        modified = @options["f"] ? restore_subupdate(toc) : restore(toc)
+        downloader.save_toc_once(toc) if modified
+      rescue StandardError
+        next
       end
     end
 
@@ -57,7 +55,7 @@ module Command
 
         download_time = subtitle["download_time"]
         if Time.parse(subupdate) > download_time
-          subupdate = ''
+          subupdate = ""
         end
 
         subtitle["subdate"] = subdate
@@ -83,7 +81,7 @@ module Command
         download_time = subtitle["download_time"]
         next if Time.parse(subupdate) <= download_time
 
-        subtitle["subupdate"] = ''
+        subtitle["subupdate"] = ""
         modified = true
       end
 

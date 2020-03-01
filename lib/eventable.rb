@@ -42,10 +42,8 @@ module Narou::Eventable
     @__events_container ||= {}
     if block_given?
       events = @__events_container[event_name]
-      if events
-        events.reject! do |values|
-          values[0] == block
-        end
+      events&.reject! do |values|
+        values[0] == block
       end
     else
       @__events_container.delete(event_name)
@@ -62,9 +60,9 @@ module Narou::Eventable
     end
   end
 
-  alias :on :add_event_listener
-  alias :off :remove_event_listener
-  alias :trigger :trigger_event
+  alias on add_event_listener
+  alias off remove_event_listener
+  alias trigger trigger_event
 
   def one(event_name, &block)
     add_event_listener(event_name, true, &block)

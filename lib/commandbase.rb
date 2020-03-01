@@ -145,7 +145,7 @@ module Command
     #
     def hook_call(target_method, *argv)
       hook = "hook_#{target_method}"
-      target_method_proc = self.method(target_method) rescue ->{}
+      target_method_proc = self.method(target_method) rescue -> {}
       if respond_to?(hook)
         self.__send__(hook, *argv, &target_method_proc)
       else
@@ -160,11 +160,10 @@ module Command
       settings = Inventory.load("local_setting")
       modified = false
       pairs.each do |name, value|
-        if settings[name].nil? || settings[name] != value
-          settings[name] = value
-          puts "<bold><cyan>#{name} を #{value} に強制変更しました</cyan></bold>".termcolor
-          modified = true
-        end
+        next unless settings[name].nil? || settings[name] != value
+        settings[name] = value
+        puts "<bold><cyan>#{name} を #{value} に強制変更しました</cyan></bold>".termcolor
+        modified = true
       end
       settings.save if modified
     end

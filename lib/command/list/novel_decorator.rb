@@ -7,7 +7,7 @@
 module Command
   class List < CommandBase
     class NovelDecorator
-      attr_accessor(*%i(id frozen novel_type novel options parent))
+      attr_accessor(:id, :frozen, :novel_type, :novel, :options, :parent)
 
       def initialize(novel, parent)
         self.id = novel["id"]

@@ -37,26 +37,24 @@ module Narou
       return if running?
       @worker_thread = Thread.new do
         loop do
-          begin
-            q = @queue.pop
-            if canceled?
-              @queue.clear
-              @cancel_signal = false
-            else
-              @thread_of_block_executing = Thread.new do
-                q[:block].call
-              end
-              @thread_of_block_executing.join
-              @thread_of_block_executing = nil
+          q = @queue.pop
+          if canceled?
+            @queue.clear
+            @cancel_signal = false
+          else
+            @thread_of_block_executing = Thread.new do
+              q[:block].call
             end
-          rescue SystemExit
-          rescue Exception => e
-            # WebWorkerスレッド内での例外は表示するだけしてスレッドは生かしたままにする
-            output_error($stdout, e)
-          ensure
-            if q && q[:counting]
-              countdown
-            end
+            @thread_of_block_executing.join
+            @thread_of_block_executing = nil
+          end
+        rescue SystemExit
+        rescue Exception => e
+          # WebWorkerスレッド内での例外は表示するだけしてスレッドは生かしたままにする
+          output_error($stdout, e)
+        ensure
+          if q && q[:counting]
+            countdown
           end
         end
       end

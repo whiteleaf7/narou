@@ -25,15 +25,14 @@ class Ini
   end
 
   def self.load_file(file)
-    case
-    when file.kind_of?(String)
+    if file.is_a?(String)
       text = File.read(file, mode: "r:BOM|UTF-8")
       ini = new(text)
       ini.filename = file
-      return ini.object
-    when file.respond_to?(:read)
+      ini.object
+    elsif file.respond_to?(:read)
       text = file.read
-      return load(text)
+      load(text)
     else
       raise NoFilenameError
     end
@@ -63,38 +62,35 @@ class Ini
         @data[section][key] = cast(value)
         next
       end
-      if /^\[(.+?)\]/ =~ line
-        section = $1.strip
-        @data[section] ||= {}
-        next
-      end
+      next unless /^\[(.+?)\]/ =~ line
+      section = $1.strip
+      @data[section] ||= {}
+      next
     end
   end
 
   def cast(str)
     value = nil
-    case str
-    when /^[+-]?\d+$/
-      value = str.to_i
-    when /^[+-]?\d*\.\d+$/
-      value = str.to_f
-    when /^true$/i
-      value = true
-    when /^false$/i
-      value = false
-    when /^(?:nil|null)$/i
-      value = nil
-    else
-      if str.length > 0
-        if str =~ /^(["'])(.+)\1$/
-          value = $2
-        else
-          value = str
-        end
-      else
-        value = nil
-      end
-    end
+    value = case str
+            when /^[+-]?\d+$/
+              str.to_i
+            when /^[+-]?\d*\.\d+$/
+              str.to_f
+            when /^true$/i
+              true
+            when /^false$/i
+              false
+            when /^(?:nil|null)$/i
+              nil
+            else
+              if str.length > 0
+                if str =~ /^(["'])(.+)\1$/
+                  $2
+                else
+                  str
+                        end
+                      end
+            end
     value
   end
 
@@ -109,7 +105,7 @@ class Ini
           fp.puts("[#{section}]")
         end
         values.each do |key, value|
-          value = "\"#{value}\"" if value.kind_of?(String)
+          value = "\"#{value}\"" if value.is_a?(String)
           fp.puts("#{key} #{DELIMITER} #{value}")
         end
       end

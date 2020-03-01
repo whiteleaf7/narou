@@ -4,8 +4,6 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
-require "thread"
-
 module Narou
   #
   # 入力確認機能を WEB UI 用に差し替える
@@ -13,7 +11,7 @@ module Narou
   module Input
     module_function
 
-    TIMEOUT_FOR_PONG = 2   # モーダルの生存確認を送って返答を待つ時間(s)
+    TIMEOUT_FOR_PONG = 2 # モーダルの生存確認を送って返答を待つ時間(s)
 
     @@modal_id = 0
     @@mutex = Mutex.new
@@ -40,14 +38,14 @@ module Narou
       pong_event_id = "pong.modal.#{id}"
       answer_event_id = "answer.modal.#{id}"
 
-      answer_handler = ->(value, connection) do
-        if value.kind_of?(Hash)
+      answer_handler = ->(value, _connection) do
+        if value.is_a?(Hash)
           que.push(value["result"])
         else
           que.push(nil)
         end
       end
-      pong_handler = ->(value, connection) do
+      pong_handler = ->(_value, _connection) do
         ponged = true
       end
 
@@ -79,7 +77,7 @@ module Narou
       result
     end
 
-    def confirm(message, default = false, nontty_default = true)
+    def confirm(message, default = false, _nontty_default = true)
       result = request_show_modal_for_client("modal.confirm", message: message + "?")
       if result.nil?
         default

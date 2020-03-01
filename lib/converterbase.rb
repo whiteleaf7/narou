@@ -16,23 +16,23 @@ require_relative "inspector"
 class ConverterBase
   KANJI_NUM = "〇一二三四五六七八九"
   ENGLISH_SENTENCES_CHARACTERS = /[\w.,!?'" &:;_-]+/
-  ENGLISH_SENTENCES_MIN_LENGTH = 8   # この文字数以上アルファベットが続くと半角のまま
+  ENGLISH_SENTENCES_MIN_LENGTH = 8 # この文字数以上アルファベットが続くと半角のまま
 
   attr_reader :use_dakuten_font
   attr_accessor :output_text_dir, :subtitles, :data_type
-  attr_accessor :current_index   # 現在処理してる subtitles 内でのインデックス
+  attr_accessor :current_index # 現在処理してる subtitles 内でのインデックス
 
-  def before(io, text_type)
+  def before(io, _text_type)
     data = io.string
     convert_page_break(data) if @text_type == "body" || @text_type == "textfile"
     if @text_type != "story" && @setting.enable_pack_blank_line
       data.gsub!("\n\n", "\n")
-      data.gsub!(/(^\n){3}/m, "\n\n")   # 改行のみの行３つを２つに削減
+      data.gsub!(/(^\n){3}/m, "\n\n") # 改行のみの行３つを２つに削減
     end
     io
   end
 
-  def after(io, text_type)
+  def after(io, _text_type)
     io
   end
 
@@ -186,11 +186,11 @@ class ConverterBase
       break if num + units == ""
       num = "1" if num.empty?
       num_tr = num.tr(KANJI_NUM, "0-9")
-      if units.empty?
-        total += num_tr.to_i
-      else
-        total += (num_tr + __calc_sum_unit(units).to_s[1, 99]).to_i
-      end
+      total += if units.empty?
+                 num_tr.to_i
+               else
+                 (num_tr + __calc_sum_unit(units).to_s[1, 99]).to_i
+               end
     end
     total
   end
@@ -215,7 +215,7 @@ class ConverterBase
       next match if total.to_s.length > KANJI_NUM_UNITS_DIGIT["京"] + 4
       m1 = total.to_s.tr("0-9", KANJI_NUM)
       if m1 =~ /〇{#{lower_digit_zero},}$/
-        digits = m1.reverse.scan(/.{1,4}/).map(&:reverse).reverse   # 下の桁から4桁ずつ区切った配列を作成
+        digits = m1.reverse.scan(/.{1,4}/).map(&:reverse).reverse # 下の桁から4桁ずつ区切った配列を作成
         keta = digits.size - 1
         digits.map.with_index { |nums, keta_i|
           four_digit_num = nums.scan(/./).map.with_index { |d, di|
@@ -249,7 +249,7 @@ class ConverterBase
   #
   def exception_reconvert_kanji_to_num(data)
     return unless @setting.enable_convert_num_to_kanji
-    data.gsub!(/([Ａ-Ｚａ-ｚ])([#{KANJI_NUM}・～]+)/) do   # ｖｅｒ１・０１ のようなパターンも許容する
+    data.gsub!(/([Ａ-Ｚａ-ｚ])([#{KANJI_NUM}・～]+)/) do # ｖｅｒ１・０１ のようなパターンも許容する
       $1 + $2.tr(KANJI_NUM, "０-９")
     end
     data.gsub!(/([#{KANJI_NUM}・～]+)([Ａ-Ｚａ-ｚ#{RECONVERT_KANJI_TO_NUM_PATTERN_UNIT}])/) do
@@ -267,8 +267,8 @@ class ConverterBase
       return
     end
     target_num = "\d０-９#{KANJI_NUM}十百千万億兆京垓"
-    data.gsub!(/[#{target_num}\/／]+/) do |match|
-      numerics = match.split(/[\/／]/)
+    data.gsub!(%r![#{target_num}/／]+!) do |match|
+      numerics = match.split(%r![/／]!)
       case numerics.size
       when 2
         # 分数
@@ -302,7 +302,8 @@ class ConverterBase
   #
   def insert_separate_space(data)
     data.gsub!(/([!?！？]+)([^!?！？])/) do
-      m1, m2 = $1, $2
+      m1 = $1
+      m2 = $2
       m2 = "　" if m2 =~ /[ 、。]/
       if m2 =~ /[^」］｝\]\}』】〉》〕＞>≫)）"”’〟　☆★♪［―]/
         "#{m1}　#{m2}"
@@ -339,7 +340,7 @@ class ConverterBase
   #
   def convert_special_characters(data)
     stash_kome(data)
-    convert_double_angle_quotation_to_gaiji(data)   # 最初からギュメなのはルビ対象外なので外字注記に
+    convert_double_angle_quotation_to_gaiji(data) # 最初からギュメなのはルビ対象外なので外字注記に
     symbols_to_zenkaku(data)
     convert_tatechuyoko(data)
     convert_novel_rule(data)
@@ -420,10 +421,10 @@ class ConverterBase
 
   #
   # おかしくなりやすい矢印文字の変換
-  # 
+  #
   def convert_arrow(data)
     # Kindle PW でしか確認してないのでとりあえず device=kindle の場合のみ変換
-    if @device && @device.kindle?
+    if @device&.kindle?
       data.tr!("⇒⇐", "→←")
     end
   end
@@ -592,7 +593,7 @@ class ConverterBase
     end
     data
   end
-  
+
   HALF_INDENT_TARGET = /^[ 　\t]*((?:[〔「『(（【〈《≪〝])|(?:※［＃始め二重山括弧］))/
   FULL_INDENT_TARGET = /^[ 　\t]*(――)/
   AUTO_INDENT_IGNORE_INDENT_CHAR = Inspector::IGNORE_INDENT_CHAR.sub("・", "")
@@ -642,19 +643,21 @@ class ConverterBase
     return unless @text_type == "body" || @text_type == "textfile"
     @@count_of_rebuild_container ||= 0
     data.gsub!(/^[ 　\t]*([－―<＜〈-]*)([0-9０-９#{KANJI_NUM}]{1,3})([－―>＞〉-]*)$/) do
-      top, chapter, bottom = $1, $2, $3
-      if top != "" && "―－-".include?(top)   # include?は空文字("")だとtrueなのでチェック必須
+      top = $1
+      chapter = $2
+      bottom = $3
+      if top != "" && "―－-".include?(top) # include?は空文字("")だとtrueなのでチェック必須
         top = "― "
         bottom = " ―"
       end
       str = +"　　　#{top}"
       str += hankaku_num_to_zenkaku_num(chapter.tr("０-９", "0-9"))
-      str += "#{bottom}"
+      str += bottom.to_s
       # 前後に空行を入れたいが、それは行処理ループ中に行う
       symbols_to_zenkaku(str)
       index = @@count_of_rebuild_container += 1
-      @force_indent_special_chapter_list[convert_numbers(index.to_s.rjust(10,"0"))] = str
-      "［＃章見出しっぽい文＝#{index.to_s.rjust(10,"0")}］"
+      @force_indent_special_chapter_list[convert_numbers(index.to_s.rjust(10, "0"))] = str
+      "［＃章見出しっぽい文＝#{index.to_s.rjust(10, "0")}］"
     end
   end
 
@@ -748,7 +751,7 @@ class ConverterBase
         if inclusion_author_comment_block?(line)
           # outputs を使うと改ページより前に注記が入ってしまうため、
           # delay_outputs を使って出力を line 出力の後に遅らせる
-          delay_outputs(AUTHOR_COMMENT_CHUKI[@in_author_comment_block][:open]) 
+          delay_outputs(AUTHOR_COMMENT_CHUKI[@in_author_comment_block][:open])
           if @in_author_comment_block == :postscript
             @request_skip_output_line = true
             line.clear
@@ -815,7 +818,7 @@ class ConverterBase
   # ネストに対応したかぎ括弧の正規表現
   OPENCLOSE_REGEXPS = BRACKETS.map { |bracket|
     bo, bc = bracket
-    /(?<oc>#{bo}[^#{bo+bc}]*(?:\g<oc>[^#{bo+bc}]*)*#{bc})/m
+    /(?<oc>#{bo}[^#{bo + bc}]*(?:\g<oc>[^#{bo + bc}]*)*#{bc})/m
   }
 
   #
@@ -927,21 +930,20 @@ class ConverterBase
 
   def to_ruby(match, m1, m2, openclose_symbols)
     last_char = m1[-1]
-    case
-    when m2[0] == " "
+    if m2[0] == " "
       # 先頭が半角スペースはNG
       match
-    when m2 =~ / {2,}$/
+    elsif m2 =~ / {2,}$/
       # 末尾の半角スペースが2個以上はNG（1個はOK）
       match
-    when last_char == "｜"
+    elsif last_char == "｜"
       # 直前に｜がある場合ルビ化は抑制される
       "#{m1[0...-1]}#{openclose_symbols[0]}#{m2}#{openclose_symbols[1]}"
-    when is_sesame?(m1, m2, last_char)
+    elsif is_sesame?(m1, m2, last_char)
       sesame(m1)
-    when m1.include?("｜")
+    elsif m1.include?("｜")
       "#{m1.sub(/｜([^｜]*)$/, "［＃ルビ用縦線］\\1")}《#{ruby_youon_to_big(m2)}》"
-    when object_of_ruby?(last_char)
+    elsif object_of_ruby?(last_char)
       if openclose_symbols[0] == "≪" && m2 !~ /^#{AUTO_RUBY_CHARACTERS}$/
         # 《 》タイプのルビであっても、｜が存在しない場合の自動ルビ化対象はひらがな等だけである
         match
@@ -1034,7 +1036,8 @@ class ConverterBase
               @text_type == "subtitle" || @text_type == "chapter"
     %w(・ 。 、 ．).each do |char|
       data.gsub!(/#{char}{3,}/) do |match|
-        pre_char, post_char = $`[-1], $'[0]
+        pre_char = $`[-1]
+        post_char = $'[0]
         if pre_char == "―" || post_char == "―"
           match
         else
@@ -1057,10 +1060,10 @@ class ConverterBase
         prefix = $`.tap { |it|
           break it[-10, 10] if it.length > 10
         }
-        @inspector.info(<<-EOS % (prefix + $1 + "ニ" + $2 + $'[0, 10]))
-カタカナのニを漢字の二に修正しました
-≫≫≫ 該当箇所
-...%s...
+        @inspector.info(format(<<~EOS, (prefix + $1 + "ニ" + $2 + $'[0, 10])))
+          カタカナのニを漢字の二に修正しました
+          ≫≫≫ 該当箇所
+          ...%s...
         EOS
         "#{$1}二#{$2}"
       end
@@ -1099,7 +1102,9 @@ class ConverterBase
     end
     # 前書きがある場合は、前書き→見出しの順番を見出し→前書きに入れ替えて置換
     data.gsub!(/(［＃改ページ］\n)(#{AUTHOR_COMMENT_CHUKI[:introduction][:open]}.+?#{AUTHOR_COMMENT_CHUKI[:introduction][:close]}\n)(.+?\n)/m) do
-      m1, m2, m3 = $1, $2, $3
+      m1 = $1
+      m2 = $2
+      m3 = $3
       add_tail = $' =~ /\A$/ ? "" : "\n"
       "#{m1 + midashi(m3) + m2}#{add_tail}"
     end
@@ -1189,13 +1194,13 @@ class ConverterBase
     after(io, @text_type)
   end
 
-  WORD_SEPARATOR = "［＃zws］"   # zws = zero width space
+  WORD_SEPARATOR = "［＃zws］" # zws = zero width space
 
   #
   # Kindle端末で単語選択がしやすいように０幅スペースを挿入する
   #
   def insert_separator_for_selection(str)
-    return str unless @device && @device.kindle?
+    return str unless @device&.kindle?
     return str if @text_type != "body" && @text_type != "textfile"
     if @setting.enable_insert_word_separator
       insert_word_separator(str)
@@ -1226,7 +1231,7 @@ class ConverterBase
       when "［"
         buffer << char
         if ss.scan(/^＃.+?］/)
-          buffer << "#{ss.matched}"
+          buffer << ss.matched.to_s
         else
           before_symbol = false
         end
@@ -1280,7 +1285,7 @@ class ConverterBase
       when "｜"
         buffer << char
         if ss.scan(/.+?》/)
-          buffer << "#{ss.matched}"
+          buffer << ss.matched.to_s
         else
           before_symbol = false
         end
@@ -1288,7 +1293,7 @@ class ConverterBase
       when "［"
         buffer << char
         if ss.scan(/^＃.+?］/)
-          buffer << "#{ss.matched}"
+          buffer << ss.matched.to_s
         else
           before_symbol = false
         end
@@ -1329,7 +1334,7 @@ class ConverterBase
     (io = after_convert(io)).rewind
     data = replace_by_replace_txt(io.read)
     data = insert_separator_for_selection(data)
-    return data
+    data
   end
 
   #
@@ -1368,7 +1373,7 @@ class ConverterBase
       @write_fp.write(data)
     else
       @read_fp.each_with_index do |line, i|
-        progressbar.output(i) if progressbar
+        progressbar&.output(i)
         @request_skip_output_line = false
         zenkaku_rstrip(line)
         if @request_insert_blank_next_line
@@ -1381,12 +1386,12 @@ class ConverterBase
         insert_blank_line_to_border_symbol(line)
 
         outputs(line)
-        unless @delay_outputs_buffer.empty?
+        if @delay_outputs_buffer.empty?
+          @before_line = line
+        else
           @write_fp.write(@delay_outputs_buffer)
           @before_line = @delay_outputs_buffer
           @delay_outputs_buffer.clear
-        else
-          @before_line = line
         end
       end
       author_comment_force_close if @text_type == "textfile"

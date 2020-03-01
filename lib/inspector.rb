@@ -18,10 +18,10 @@ class Inspector
   INFO = 4
   ALL = ERROR | WARNING | INFO
 
-  KLASS_TAG = { ERROR => "エラー", WARNING =>  "警告", INFO => "INFO" }
+  KLASS_TAG = { ERROR => "エラー", WARNING => "警告", INFO => "INFO" }
 
   IGNORE_INDENT_CHAR = "(（「『〈《≪【〔―・※［〝\n"
-  AUTO_INDENT_THRESHOLD_RATIO = 0.5   # 括弧等を除く全ての行のうちこの割合以上字下げされてなければ強制字下げする
+  AUTO_INDENT_THRESHOLD_RATIO = 0.5 # 括弧等を除く全ての行のうちこの割合以上字下げされてなければ強制字下げする
 
   attr_writer :messages, :subtitle
 
@@ -29,8 +29,6 @@ class Inspector
     inspect_log = File.join(setting.archive_path, INSPECT_LOG_NAME)
     if File.exist?(inspect_log)
       File.read(inspect_log)
-    else
-      nil
     end
   end
 
@@ -115,17 +113,15 @@ class Inspector
   #
   # 連結したかぎ括弧が正常かどうか
   #
-  def validate_joined_inner_brackets(raw_strings, joined_strings, brackets)
+  def validate_joined_inner_brackets(raw_strings, joined_strings, _brackets)
     error_result = false
-    case
-    # 連結前の文章の改行具合を調べて、改行が閾値を超えた場合意図的な改行とみなす
-    when raw_strings.count("\n") >= BRACKETS_RETURN_COUNT_THRESHOLD
+    if raw_strings.count("\n") >= BRACKETS_RETURN_COUNT_THRESHOLD
       warning("改行が規定の回数を超えて検出されました。" +
               "作者による意図的な改行とみなし、連結を中止しました。\n" +
               omit_message(raw_strings))
       error_result = true
     # 連結した文章があまりにも長い場合、特殊な用途で使われている可能性がある
-    when joined_strings.length >= LINE_LENGTH_THRESHOLD
+    elsif joined_strings.length >= LINE_LENGTH_THRESHOLD
       warning("連結結果が長過ぎます。連結を中止しました。" +
               "特殊な用途(手紙形式)等でかぎ括弧が使われている可能性があります。\n" +
             omit_message(raw_strings))
@@ -193,7 +189,7 @@ class Inspector
       end
     end
     info("カギ括弧内の改行状況:\n" +
-         "検出したカギ括弧数: #{brackets_num}、そのうち#{BRACKETS_RETURN_COUNT_THRESHOLD}個以上改行を含む数: #{brackets_num_over_threshould}\n" + 
+         "検出したカギ括弧数: #{brackets_num}、そのうち#{BRACKETS_RETURN_COUNT_THRESHOLD}個以上改行を含む数: #{brackets_num_over_threshould}\n" +
          "1つのカギ括弧内で最大の改行数: #{max}、全カギ括弧内での改行合計: #{total}")
   end
 
@@ -212,6 +208,6 @@ class Inspector
       end
     }
     ratio = dont_indent_line_count / target_line_count.to_f
-    return ratio > AUTO_INDENT_THRESHOLD_RATIO
+    ratio > AUTO_INDENT_THRESHOLD_RATIO
   end
 end

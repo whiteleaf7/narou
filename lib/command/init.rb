@@ -34,37 +34,35 @@ module Command
         @options["aozora_dirname"] = dirname
       }
       @opt.on("-l", "--line-height SIZE", "行の高さを変更する(単位em)。オススメは1.8") do |line_height|
-        begin
-          @options["line_height"] = Helper.string_cast_to_type(line_height, :float)
-        rescue Helper::InvalidVariableType => e
-          error e.message
-          exit Narou::EXIT_ERROR_CODE
-        end
+        @options["line_height"] = Helper.string_cast_to_type(line_height, :float)
+      rescue Helper::InvalidVariableType => e
+        error e.message
+        exit Narou::EXIT_ERROR_CODE
       end
     end
 
     def opt_message(description)
-      @opt.separator <<-MSG
+      @opt.separator <<~MSG
 
-#{description}
-  Examples:
-    narou init
-    narou init -p /opt/narou/aozora    # AozoraEpub3 のフォルダを直接指定
-    narou init -p :keep                # 設定済みと同じ場所を指定(既に初期化済の場合)
+        #{description}
+          Examples:
+            narou init
+            narou init -p /opt/narou/aozora    # AozoraEpub3 のフォルダを直接指定
+            narou init -p :keep                # 設定済みと同じ場所を指定(既に初期化済の場合)
 
-    # 行の高さの調整
-    narou init --line-height 1.8       # 行の高さを1.8emに設定(1.8文字分相当)
-    # 行の高さなので、行間を1文字分あけたいという場合は 1+1 で 2 を指定する
-    # (未設定のまま小説変換すると 1.6 で計算される)
-    # 参考情報：Kindle Voyage で文字サイズ４番目の大きさの場合、
-    #   1.6em : 1ページに15行
-    #   1.8em : 1ページに13行
-    # の表示行数になる
+            # 行の高さの調整
+            narou init --line-height 1.8       # 行の高さを1.8emに設定(1.8文字分相当)
+            # 行の高さなので、行間を1文字分あけたいという場合は 1+1 で 2 を指定する
+            # (未設定のまま小説変換すると 1.6 で計算される)
+            # 参考情報：Kindle Voyage で文字サイズ４番目の大きさの場合、
+            #   1.6em : 1ページに15行
+            #   1.8em : 1ページに13行
+            # の表示行数になる
 
-    # 入力を省略したい場合、-p と -l を両方指定してやる必要あり
-    narou init -p /path/to/aozora -l 1.8
+            # 入力を省略したい場合、-p と -l を両方指定してやる必要あり
+            narou init -p /path/to/aozora -l 1.8
 
-  Options:
+          Options:
       MSG
     end
 
@@ -161,13 +159,13 @@ module Command
       # オススメは 1.8 なので入力時のデフォルトは 1.8 にする
       line_height = Narou.line_height(default: 1.8)
       puts
-      puts(<<-MSG.termcolor)
-<bold><green>行間の調整を行います。小説の行の高さを設定して下さい(単位 em):</green></bold>
-1em = 1文字分の高さ
-行の高さ＝1文字分の高さ＋行間の高さ
-オススメは 1.8
-1.6 で若干行間狭め。1.8 だと一般的な小説程度。2.0 くらいにするとかなりスカスカ
-(未入力で #{line_height} を採用)
+      puts(<<~MSG.termcolor)
+        <bold><green>行間の調整を行います。小説の行の高さを設定して下さい(単位 em):</green></bold>
+        1em = 1文字分の高さ
+        行の高さ＝1文字分の高さ＋行間の高さ
+        オススメは 1.8
+        1.6 で若干行間狭め。1.8 だと一般的な小説程度。2.0 くらいにするとかなりスカスカ
+        (未入力で #{line_height} を採用)
       MSG
       print ">"
       while (input = $stdin.gets)

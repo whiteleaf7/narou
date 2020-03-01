@@ -17,8 +17,8 @@ class DiffViewer
   def initialize(old, new, source = :file)
     case source
     when :file
-      old_strings = File.read(old, :encoding => Encoding::UTF_8)
-      new_strings = File.read(new, :encoding => Encoding::UTF_8)
+      old_strings = File.read(old, encoding: Encoding::UTF_8)
+      new_strings = File.read(new, encoding: Encoding::UTF_8)
     when :string
       old_strings = old
       new_strings = new
@@ -42,19 +42,14 @@ class DiffViewer
     @buffer = {}
     pos = 0
     events_size = @events.size
-    while pos < events_size
-      pos = output_differing_line_and_before_and_behind(pos)
-    end
+    pos = output_differing_line_and_before_and_behind(pos) while pos < events_size
     before_index = -1000
-    @builded_buffer = @buffer.sort_by { |index|
-      # buffer の格納順はバラバラなのでソートしておく
-      index
-    }.map { |(index, (event, str))|
+    @builded_buffer = @buffer.sort.map { |(index, (event, str))|
       # index が途切れたら、ポジション情報を付与する
       result = +""
       if index - before_index >= 2
-        result += "<bold><cyan>@@ -#{event.old_position+1}, " \
-                  "+#{event.new_position+1} @@</cyan></bold>\n".termcolor
+        result += "<bold><cyan>@@ -#{event.old_position + 1}, " \
+                  "+#{event.new_position + 1} @@</cyan></bold>\n".termcolor
       end
       result += str
       before_index = index

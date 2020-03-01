@@ -42,24 +42,22 @@ module Narou
       return if running?
       self.worker_thread = Thread.new do
         loop do
-          begin
-            q = queue.pop
-            self.cancel_signal = false
-            self.thread_of_block_executing = Thread.new do
-              q[:block].call
-            end
-            thread_of_block_executing.join
-            self.thread_of_block_executing = nil
-          rescue SystemExit
-          rescue Interrupt
-            thread_of_block_executing&.raise(Interrupt)
-            self.thread_of_block_executing = nil
-            sleep 0.1
-          rescue Exception => e
-            output_error($stdout2, e)
-          ensure
-            countdown
+          q = queue.pop
+          self.cancel_signal = false
+          self.thread_of_block_executing = Thread.new do
+            q[:block].call
           end
+          thread_of_block_executing.join
+          self.thread_of_block_executing = nil
+        rescue SystemExit
+        rescue Interrupt
+          thread_of_block_executing&.raise(Interrupt)
+          self.thread_of_block_executing = nil
+          sleep 0.1
+        rescue Exception => e
+          output_error($stdout2, e)
+        ensure
+          countdown
         end
       end
     end

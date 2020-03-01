@@ -30,12 +30,12 @@ class HTML
   # 挿絵を置換するための設定を変更する
   #
   def set_illust_setting(options)
-    unless options.kind_of?(Hash)
+    unless options.is_a?(Hash)
       raise ArgumentError, "invalid parameter(s), need Hash"
     end
     @illust_current_url = options[:current_url] if options[:current_url]
     if grep_pattern = options[:grep_pattern]
-      @illust_grep_pattern = grep_pattern.kind_of?(Regexp) ? grep_pattern : /#{grep_pattern}/m
+      @illust_grep_pattern = grep_pattern.is_a?(Regexp) ? grep_pattern : /#{grep_pattern}/m
     end
   end
 
@@ -68,12 +68,12 @@ class HTML
 
   # p タグで段落を作ってる場合（brタグが無い場合）に改行されるように
   def p_to_aozora(text = @string)
-    text.gsub(/\n?<\/p>/i, "\n")
+    text.gsub(%r!\n?</p>!i, "\n")
   end
 
   def ruby_to_aozora(text = @string)
     text.tr("《》", "≪≫")
-        .gsub(/<ruby>(.+?)<\/ruby>/i) do
+        .gsub(%r!<ruby>(.+?)</ruby>!i) do
       splited_ruby = $1.split(/<rt>/i)
       next delete_tag(splited_ruby[0]) unless splited_ruby[1]
       ruby_base = delete_tag(splited_ruby[0].split(/<rp>/i)[0])
@@ -83,15 +83,15 @@ class HTML
   end
 
   def b_to_aozora(text = @string)
-    text.gsub(/<b>/i, "［＃太字］").gsub(/<\/b>/i, "［＃太字終わり］")
+    text.gsub(/<b>/i, "［＃太字］").gsub(%r!</b>!i, "［＃太字終わり］")
   end
 
   def i_to_aozora(text = @string)
-    text.gsub(/<i>/i, "［＃斜体］").gsub(/<\/i>/i, "［＃斜体終わり］")
+    text.gsub(/<i>/i, "［＃斜体］").gsub(%r!</i>!i, "［＃斜体終わり］")
   end
 
   def s_to_aozora(text = @string)
-    text.gsub(/<s>/i, "［＃取消線］").gsub(/<\/s>/i, "［＃取消線終わり］")
+    text.gsub(/<s>/i, "［＃取消線］").gsub(%r!</s>!i, "［＃取消線終わり］")
   end
 
   def img_to_aozora(text = @string)

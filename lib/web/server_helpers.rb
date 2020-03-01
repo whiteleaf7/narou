@@ -31,12 +31,10 @@ module Narou::ServerHelpers
   # Rubyバージョンを構築
   #
   def build_ruby_version
-    begin
-      `"#{RbConfig.ruby}" -v`.strip
-    rescue
-      config = RbConfig::CONFIG
-      "ruby #{RUBY_VERSION}p#{config["PATCHLEVEL"]} [#{RUBY_PLATFORM}]"
-    end
+    `"#{RbConfig.ruby}" -v`.strip
+  rescue StandardError
+    config = RbConfig::CONFIG
+    "ruby #{RUBY_VERSION}p#{config["PATCHLEVEL"]} [#{RUBY_PLATFORM}]"
   end
 
   #
@@ -44,7 +42,7 @@ module Narou::ServerHelpers
   # ID が指定されなかったか、１件も存在しない場合は nil を返す
   #
   def select_valid_novel_ids(ids)
-    return nil unless ids.kind_of?(Array)
+    return nil unless ids.is_a?(Array)
     result = ids.select do |id|
       id =~ /^\d+$/
     end
@@ -60,8 +58,6 @@ module Narou::ServerHelpers
       true
     when "off"
       false
-    else
-      nil
     end
   end
 

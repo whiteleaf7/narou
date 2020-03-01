@@ -268,7 +268,7 @@ module Command
     # 直接指定されたテキストファイルを変換する
     #
     def convert_txt(target)
-      return NovelConverter.convert_file(target, {
+      NovelConverter.convert_file(target, {
                encoding: @enc,
                output_filename: @output_filename,
                display_inspector: @options["inspect"],
@@ -280,7 +280,7 @@ module Command
         $stdout2.error "テキストファイルの文字コードがUTF-8ではありません。" \
                        "--enc オプションでテキストの文字コードを指定して下さい"
         warn "(#{e.message})"
-        return nil
+        nil
       else
         raise
       end
@@ -290,14 +290,14 @@ module Command
         テキストファイルの文字コードは#{@options["encoding"]}ではありませんでした。
         正しい文字コードを指定して下さい
       ERR
-      return nil
+      nil
     end
 
     #
     # 変換された整形済みテキストファイルをデバイスに対応した書籍データに変換する
     #
     def convert_txt_to_ebook_file
-      return NovelConverter.convert_txt_to_ebook_file(@converted_txt_path, {
+      NovelConverter.convert_txt_to_ebook_file(@converted_txt_path, {
         use_dakuten_font: @use_dakuten_font,
         device: @device,
         verbose: @options["verbose"],
@@ -372,8 +372,8 @@ module Command
     end
 
     def send_file_to_device(ebook_file, io: $stdout2)
-      if @device && @device.physical_support? &&
-        @device.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
+      if @device&.physical_support? &&
+        @device&.connecting? && File.extname(ebook_file) == @device.ebook_file_ext
         if @argument_target_type == :novel
           if Send.execute!(@device.name, @target, io: io) > 0
             @@sending_error_list << ebook_file

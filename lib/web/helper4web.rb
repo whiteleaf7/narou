@@ -12,7 +12,7 @@ module Helper
   HR_TAG = "<hr>"
 
   class << self
-    alias :original_print_horizontal_rule :print_horizontal_rule
+    alias original_print_horizontal_rule print_horizontal_rule
   end
 
   def print_horizontal_rule(io = $stdout)

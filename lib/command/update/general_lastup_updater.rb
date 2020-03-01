@@ -84,7 +84,7 @@ module Command
           downloader.setting.clear
         end
       ensure
-        progressbar.clear if progressbar
+        progressbar&.clear
       end
     end
   end

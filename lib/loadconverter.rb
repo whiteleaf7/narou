@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright 2013 whiteleaf. All rights reserved.
 #
@@ -10,7 +9,7 @@ BlankConverter = Class.new(ConverterBase) {}
 
 $latest_converter = nil
 
-def converter(title, &block)
+def converter(_title, &block)
   $latest_converter = Class.new(ConverterBase, &block)
 end
 
@@ -69,11 +68,11 @@ def load_converter(title, archive_path)
 
   conv = $latest_converter
   if conv
-    return conv
+    conv
   else
     title_for_converter = (title =~ /.txt\z/ ? title : File.basename(archive_path))
     error "converter.rbは見つかりましたが、`converter'で登録されていないようです。" +
           "変換処理は converter \"#{title_for_converter.gsub('"', '\\"')}\" として登録する必要があります"
-    return BlankConverter
+    BlankConverter
   end
 end

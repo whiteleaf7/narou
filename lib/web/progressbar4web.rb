@@ -14,7 +14,7 @@ class ProgressBar
     @@push_server = server
   end
 
-  alias :original_initialize :initialize
+  alias original_initialize initialize
 
   def initialize(*args, **opt)
     original_initialize(*args, **opt)

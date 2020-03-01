@@ -85,7 +85,7 @@ module Command
             sleep(0.5)
           end
         }.tap { |th|
-          zipfilename =  create_backup(data)
+          zipfilename = create_backup(data)
           th.kill
           puts
           puts "#{zipfilename} を作成しました"

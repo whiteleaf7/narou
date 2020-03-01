@@ -71,7 +71,7 @@ module Command
     end
 
     def get_scope_of_variable_name(name)
-      [:local, :global].each do |scope|
+      %i(local global).each do |scope|
         if SETTING_VARIABLES[scope].include?(name)
           return scope
         end
@@ -244,11 +244,10 @@ module Command
     def get_variable_list_strings(scope)
       result = +""
       SETTING_VARIABLES[scope].each do |name, info|
-        if @options["all"] || !info[:invisible]
-          raise "変数名「#{name}」のtypeが未設定です" unless info[:type]
-          type_description = Helper.variable_type_to_description(info[:type])
-          result << "    <bold><green>#{name.ljust(18)}</green></bold> #{type_description} #{info[:help]}\n".termcolor
-        end
+        next unless @options["all"] || !info[:invisible]
+        raise "変数名「#{name}」のtypeが未設定です" unless info[:type]
+        type_description = Helper.variable_type_to_description(info[:type])
+        result << "    <bold><green>#{name.ljust(18)}</green></bold> #{type_description} #{info[:help]}\n".termcolor
       end
       result
     end
@@ -283,20 +282,19 @@ module Command
           error "#{arg} は存在しません"
           next
         end
-        novel_setting = NovelSetting.new(arg, true, true)    # 空っぽの設定を作成
+        novel_setting = NovelSetting.new(arg, true, true) # 空っぽの設定を作成
         novel_setting.settings = novel_setting.load_setting_ini["global"]
         original_settings = NovelSetting.get_original_settings
         default_settings = NovelSetting.load_default_settings
 
         original_settings.each do |original|
           name = original[:name]
-          unless novel_setting.settings.include?(name)
-            if default_settings.include?(name)
-              novel_setting[name] = default_settings[name]
-            else
-              novel_setting[name] = original[:value]
-            end
-          end
+          next if novel_setting.settings.include?(name)
+          novel_setting[name] = if default_settings.include?(name)
+                                  default_settings[name]
+                                else
+                                  original[:value]
+                                end
         end
 
         novel_setting.save_settings

@@ -16,7 +16,7 @@ module Command
     #       nil.to_i → 0 という互換性維持のため
     NOVEL_TYPE_LABEL = %w(連載 連載 短編)
 
-    FILTERS_TYPE = Hash[*%w(series 連載 ss 短編 frozen 凍結 nonfrozen 非凍結)]
+    FILTERS_TYPE = Hash["series", "連載", "ss", "短編", "frozen", "凍結", "nonfrozen", "非凍結"]
 
     attr_reader :options
 

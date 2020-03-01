@@ -153,7 +153,7 @@ module Command
           end
           if convert_status > 0
             # 変換に失敗したか、中断された
-            data = Downloader.get_data_by_target(download_target)   # 新規はDL後に取得しないとデータが存在しない
+            data = Downloader.get_data_by_target(download_target) # 新規はDL後に取得しないとデータが存在しない
             data["_convert_failure"] = true
             # 中断された場合には残りのダウンロードも中止する
             raise Interrupt if convert_status == Narou::EXIT_INTERRUPT

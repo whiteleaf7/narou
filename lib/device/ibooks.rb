@@ -18,7 +18,7 @@ module Device::Ibooks
     "default.enable_half_indent_bracket" => false,
   }
 
-  def hook_change_settings(&original_func)
+  def hook_change_settings
     @@__already_exec_change_settings ||= false
     return if @@__already_exec_change_settings
     @@__ibooks_container_dir = File.expand_path(IBOOKS_CONTAINER_DIR)
@@ -62,11 +62,7 @@ module Device::Ibooks
 
   def get_epubdir_path_in_ibooks_container
     list = Inventory.load("ibooks_epubdir_path_list")
-    if list[@toc_url]
-      list[@toc_url]
-    else
-      nil
-    end
+    list[@toc_url] || nil
   end
 
   def extract_epub(ebook_file_path, epubdir_path)

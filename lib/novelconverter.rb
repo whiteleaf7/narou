@@ -66,11 +66,11 @@ class NovelConverter
       ignore_force: false, ignore_default: false
     }.merge(options)
     output_filename = options[:output_filename]
-    if output_filename
-      archive_path = File.dirname(output_filename) + "/"
-    else
-      archive_path = File.dirname(filename) + "/"
-    end
+    archive_path = if output_filename
+                     File.dirname(output_filename) + "/"
+                   else
+                     File.dirname(filename) + "/"
+                   end
     setting = NovelSetting.create(archive_path, options[:ignore_force], options[:ignore_default])
     setting.author = ""
     setting.title = File.basename(filename)
@@ -133,7 +133,7 @@ class NovelConverter
     # MEMO: 外部実行からだと -c FILENAME, -c 1 オプションはぬるぽが出て動かない
     cover_filename = get_cover_filename(src_dir)
     if cover_filename
-      cover_option = "-c 0"   # 先頭の挿絵を表紙として利用
+      cover_option = "-c 0" # 先頭の挿絵を表紙として利用
     end
 
     dst_option = ""
@@ -320,11 +320,11 @@ class NovelConverter
       stream_io: stream_io
     )
     return nil if status != :success
-    if device && device.kobo?
-      epub_ext = device.ebook_file_ext
-    else
-      epub_ext = ".epub"
-    end
+    epub_ext = if device&.kobo?
+                 device.ebook_file_ext
+               else
+                 ".epub"
+               end
     epub_path = txt_path.sub(/\.txt$/, epub_ext)
 
     if !device || !device.kindle? || options[:no_mobi]
@@ -351,7 +351,7 @@ class NovelConverter
     stream_io.puts File.basename(mobi_path).encode(Encoding::UTF_8) + " を出力しました"
     stream_io.puts "<bold><green>MOBIファイルを出力しました</green></bold>".termcolor
 
-    return mobi_path
+    mobi_path
   ensure
     if Narou.economy?("cleanup_temp")
       # 作業用ファイルを削除
@@ -417,10 +417,10 @@ class NovelConverter
       progressbar = ProgressBar.new(subtitles.size, io: stream_io)
     end
     on(:"convert_main.loop") do |i|
-      progressbar.output(i) if progressbar
+      progressbar&.output(i)
     end
     on(:"convert_main.finish") do
-      progressbar.clear if progressbar
+      progressbar&.clear
     end
   end
 
@@ -434,7 +434,7 @@ class NovelConverter
   end
 
   def load_novel_section(subtitle_info, section_save_dir)
-    file_subtitle = subtitle_info["file_subtitle"] || subtitle_info["subtitle"]   # 互換性維持のため
+    file_subtitle = subtitle_info["file_subtitle"] || subtitle_info["subtitle"] # 互換性維持のため
     path = section_save_dir.join("#{subtitle_info["index"]} #{file_subtitle}.yaml")
     YAML.load_file(path)
   rescue Errno::ENOENT => e
@@ -457,7 +457,7 @@ class NovelConverter
     processing_title = toc["title"]
     processing_title += "_#{index}" if index
     processed_title = decorate_title(processing_title)
-    tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
+    tempalte_name = (device&.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
     Template.get(tempalte_name, binding, 1.1)
   end
 
@@ -468,7 +468,7 @@ class NovelConverter
   # その小説がちょうど4桁の zzzz となるように調整してある
   #
   def calc_reverse_short_time(time)
-    ((2091149000 - time.to_i) / (10 * 60)).to_s(36).rjust(4, "0")
+    ((2_091_149_000 - time.to_i) / (10 * 60)).to_s(36).rjust(4, "0")
   end
 
   #
@@ -504,16 +504,16 @@ class NovelConverter
         date_str.gsub!(symbol, replace_text)
       end
 
-      if doller_t_included
-        # $t で任意の位置にタイトルを埋め込むために title_date_align は無視する
-        result = date_str
-      else
-        if @setting.title_date_align == "left"
-          result = date_str + result
-        else  # right
-          result = title + date_str
-        end
-      end
+      result = if doller_t_included
+                 # $t で任意の位置にタイトルを埋め込むために title_date_align は無視する
+                 date_str
+               else
+                 if @setting.title_date_align == "left"
+                   date_str + result
+                 else # right
+                   title + date_str
+                          end
+               end
     end
     result
   end
@@ -631,9 +631,7 @@ class NovelConverter
   #
   def convert_main_for_novel(subtitles = nil, is_hotentry = false)
     toc = Downloader.get_toc_data(@setting.archive_path)
-    unless subtitles
-      subtitles = cut_subtitles(toc["subtitles"])
-    end
+    subtitles ||= cut_subtitles(toc["subtitles"])
     if is_hotentry == false && @setting.slice_size > 0 && subtitles.length > @setting.slice_size
       stream_io.puts "#{@setting.slice_size}話ごとに分割して変換します"
       array_of_subtitles = subtitles.each_slice(@setting.slice_size).to_a

@@ -38,39 +38,37 @@ module Narou
       })
       Thread.new do
         @server.run do |ws|
-          begin
-            ws.handshake
-            que = Queue.new
-            @connections.push(que)
+          ws.handshake
+          que = Queue.new
+          @connections.push(que)
 
-            @history.compact.each do |message|
-              ws.send(JSON.generate(echo: message))
-            end
-
-            thread = Thread.new do
-              while true
-                data = que.pop
-                ws.send(data)
-              end
-            end
-
-            while data = ws.receive
-              begin
-                JSON.parse(data).each do |name, value|
-                  trigger(name, value, ws)
-                end
-              rescue JSON::ParserError => e
-                ws.send(JSON.generate(echo: {
-                  target_console: "#console",
-                  body: e.message
-                }))
-              end
-            end
-          rescue Errno::ECONNRESET => e
-          ensure
-            @connections.delete(que)
-            thread.terminate if thread
+          @history.compact.each do |message|
+            ws.send(JSON.generate(echo: message))
           end
+
+          thread = Thread.new do
+            loop do
+              data = que.pop
+              ws.send(data)
+            end
+          end
+
+          while data = ws.receive
+            begin
+              JSON.parse(data).each do |name, value|
+                trigger(name, value, ws)
+              end
+            rescue JSON::ParserError => e
+              ws.send(JSON.generate(echo: {
+                target_console: "#console",
+                body: e.message
+              }))
+            end
+          end
+        rescue Errno::ECONNRESET => e
+        ensure
+          @connections.delete(que)
+          thread&.terminate
         end
       end
     end
@@ -93,7 +91,7 @@ module Narou
     # 接続している全てのクライアントに対してメッセージを送信
     #
     def send_all(data)
-      if data.kind_of?(Symbol)
+      if data.is_a?(Symbol)
         # send_all(:"events.name") としてイベント名だけで送りたい場合の対応
         data = { data => true }
       end
@@ -107,7 +105,7 @@ module Narou
         stack_to_history(message)
       end
     rescue JSON::GeneratorError => e
-      STDERR.puts $@.shift + ": #{e.message} (#{e.class})"
+      warn $@.shift + ": #{e.message} (#{e.class})"
     end
 
     def stack_to_history(message)

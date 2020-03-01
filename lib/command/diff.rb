@@ -84,7 +84,7 @@ module Command
       super
       @options["number"] ||= 1
       if argv.empty?
-        latest = Database.instance.sort_by("last_update").first
+        latest = Database.instance.min_by("last_update")
         return unless latest
         id = latest["id"]
         @novel_data = latest
@@ -311,7 +311,7 @@ module Command
       stream_io.puts "#{@novel_data["title"]} の差分を表示します"
       stream_io.puts DiffViewer.new(*temp_paths).result
     ensure
-      temp_paths.map(&:delete) if temp_paths
+      temp_paths&.map(&:delete)
     end
   end
 end

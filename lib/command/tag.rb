@@ -12,7 +12,7 @@ module Command
   class Tag < CommandBase
     COLORS = %w(green yellow blue magenta cyan red white)
     # 禁止文字
-    BAN_CHAR = /[:;"'><$@&^\\\|%'\/`]/
+    BAN_CHAR = %r![:;"'><$@&^\\\|%'/`]!
     # 禁止ワード
     BAN_WORD = %w(hotentry)
 
@@ -73,7 +73,7 @@ module Command
       }
       @opt.on("-c", "--color COL", String,
               "タグの色を自分で指定する\n" \
-              "#{' '*25}COL=#{get_color_list}") { |color|
+              "#{' ' * 25}COL=#{get_color_list}") { |color|
         color.downcase!
         unless COLORS.include?(color)
           stream_io.error "#{color}という色は存在しません。色指定は無視されます"
@@ -96,7 +96,7 @@ module Command
       database = Database.instance
       tag_list = Hash.new(0)
       database.each_value do |data|
-        if ids.kind_of?(Array)
+        if ids.is_a?(Array)
           next unless ids.include?(data["id"])
         end
         tags = data["tags"] || []
@@ -118,7 +118,7 @@ module Command
       # タグの色がすでに決まっていた場合は変更しない隠しオプション
       no_overwrite_color = !!argv.delete("--no-overwrite-color")
       super
-      @options["no-overwrite-color"] = no_overwrite_color   # super で @options.clear されるのでここで代入
+      @options["no-overwrite-color"] = no_overwrite_color # super で @options.clear されるのでここで代入
       color_changed = change_colors
       @options["mode"] ||= :list
       if argv.empty?
@@ -129,7 +129,7 @@ module Command
         if color_changed
           stream_io.puts "タグの色を変更しました"
           display_taglist
-          return
+          nil
         else
           stream_io.error "対象の小説を指定して下さい"
           exit Narou::EXIT_ERROR_CODE

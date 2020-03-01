@@ -43,9 +43,9 @@ module Command
       setting = Inventory.load("server_setting", :global)
       is_first = !setting["already-server-boot"]
       if is_first
-        puts <<-EOS
-初めてサーバを起動します。ファイアウォールのアクセス許可を尋ねられた場合、許可をして下さい。
-また、起動したサーバを止めるにはコンソール上で Ctrl+C を入力するか、ブラウザ上で「設定(歯車マーク)→サーバをシャットダウン」を実行して下さい。
+        puts <<~EOS
+          初めてサーバを起動します。ファイアウォールのアクセス許可を尋ねられた場合、許可をして下さい。
+          また、起動したサーバを止めるにはコンソール上で Ctrl+C を入力するか、ブラウザ上で「設定(歯車マーク)→サーバをシャットダウン」を実行して下さい。
 
         EOS
         if @options["no-browser"]
@@ -61,7 +61,8 @@ module Command
     end
 
     def create_push_server(params)
-      host, port = params[:host], params[:port]
+      host = params[:host]
+      port = params[:port]
       push_server = Narou::PushServer.instance
       accepted_domains = (host == "0.0.0.0" ? "*" : host)
       if accepted_domains != "*"
@@ -150,13 +151,13 @@ module Command
       end
     rescue Errno::EADDRINUSE => e
       Helper.open_browser(address) unless @options["no-browser"]
-      STDOUT.puts <<-EOS
-#{e}
-ポートが使われています。サーバがすでに立ち上がっているかどうか確認して下さい。
-他のアプリケーションが使っているポートだった場合、ポートを変更して下さい。
+      STDOUT.puts <<~EOS
+        #{e}
+        ポートが使われています。サーバがすでに立ち上がっているかどうか確認して下さい。
+        他のアプリケーションが使っているポートだった場合、ポートを変更して下さい。
 
-ポートの変更方法
-  $ narou s server-port=5678
+        ポートの変更方法
+          $ narou s server-port=5678
       EOS
       exit Narou::EXIT_ERROR_CODE
     end

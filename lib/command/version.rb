@@ -10,7 +10,7 @@ module Command
       "バージョンを表示します"
     end
 
-    def execute(argv)
+    def execute(_argv)
       puts self.class.create_version_string
     end
 

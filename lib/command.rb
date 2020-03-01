@@ -26,7 +26,7 @@ module Command
     "diff" => Diff,
     "setting" => Setting,
     "alias" => Alias,
-    "inspect"=> Inspect,
+    "inspect" => Inspect,
     "send" => Send,
     "folder" => Folder,
     "browser" => Browser,

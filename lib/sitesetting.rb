@@ -102,13 +102,12 @@ class SiteSetting
       setting_value = self[key] or next
       [*setting_value].each do |value|
         match_data = source.match(/#{value}/m)
-        if match_data
-          @match_values[key] = value       # yamlのキーでもmatch_valuesに設定しておくが、
-          update_match_values(match_data)  # ←ここで同名のグループ名が定義されていたら上書きされるので注意
-                                           # 例えば、title: <title>(?<title>.+?)</title> と定義されていた場合、
-                                           # @match_values["title"] には (?<title>.+?) 部分の要素が反映される
-          break
-        end
+        next unless match_data
+        @match_values[key] = value       # yamlのキーでもmatch_valuesに設定しておくが、
+        update_match_values(match_data)  # ←ここで同名のグループ名が定義されていたら上書きされるので注意
+        # 例えば、title: <title>(?<title>.+?)</title> と定義されていた場合、
+        # @match_values["title"] には (?<title>.+?) 部分の要素が反映される
+        break
       end
     end
     match_data

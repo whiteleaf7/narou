@@ -56,7 +56,8 @@ module Command
           puts "#{target} は存在しません"
           next
         end
-        id, title = data["id"], data["title"]
+        id = data["id"]
+        title = data["title"]
         flag = !frozen_list.include?(id)
         flag = true if @options["on"]
         flag = false if @options["off"]
