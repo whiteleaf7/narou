@@ -457,8 +457,8 @@ class NovelConverter
     processing_title = toc["title"]
     processing_title += "_#{index}" if index
     processed_title = decorate_title(processing_title)
-    tempalte_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
-    Template.get(tempalte_name, binding, 1.1)
+    template_name = (device && device.ibunko? ? NOVEL_TEXT_TEMPLATE_NAME_FOR_IBUNKO : NOVEL_TEXT_TEMPLATE_NAME)
+    Template.get(template_name, binding, 1.1)
   end
 
   #
