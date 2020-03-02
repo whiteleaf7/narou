@@ -56,9 +56,6 @@ Style/AndOr:
 Style/BlockDelimiters:
   Enabled: false
 
-Style/BracesAroundHashParameters:
-  Enabled: false
-
 Style/CollectionMethods:
   PreferredMethods:
     detect: "detect"
