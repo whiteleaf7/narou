@@ -53,6 +53,8 @@ class Illustration
     if path = search_image(basename)
       return path
     end
+
+    url = transform_mitemin_url(url)
     URI.open(url, make_open_uri_options(allow_redirections: :safe)) do |fp|
       content_type = fp.meta["content-type"]
       ext = MIME[content_type] or raise UnknownMIMEType, content_type
@@ -75,6 +77,13 @@ class Illustration
   def search_image(basename)
     path = create_illust_path(basename) + ".*"
     Dir.glob(path)[0]
+  end
+
+  def transform_mitemin_url(url)
+    uri = URI.parse(url)
+    return url unless uri.host.end_with?(".mitemin.net")
+
+    url.sub("viewimagebig", "viewimage")
   end
 
   def create_illust_path(basename)
