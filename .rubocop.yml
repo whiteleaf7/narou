@@ -238,3 +238,6 @@ Style/FormatStringToken:
 
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
+
+Style/StderrPuts:
+  Enabled: false
