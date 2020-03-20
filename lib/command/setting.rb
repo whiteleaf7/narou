@@ -118,7 +118,7 @@ module Command
       settings.each do |scope, scoped_settings|
         stream_io.puts "[#{scope.capitalize} Variables]"
         scoped_settings.each do |name, value|
-          if value =~ / /
+          if value.to_s =~ / /
             value = "'#{value}'"
           end
           stream_io.puts "<bold><green>#{name}</green></bold>=#{value}".termcolor
