@@ -162,57 +162,55 @@ module Command
     end
 
     def output_list(novels, limit)
-      took_lines = Hash[decorate_lines(novels).take(limit)]
-      output_lines(took_lines)
+      stream_io.puts header if STDOUT.tty? || @options["echo"]
+      for novel in novels do
+        line = decorate_line(novel)
+        output_line(line, novel["id"]) unless line.nil? || !grep(line)
+      end
+      stream_io.puts unless STDOUT.tty? || @options["echo"]
     end
 
-    def decorate_lines(novels)
+    def decorate_line(novel)
       filters = @options["filters"] || []
-      selected_lines = {}
-      novels.each do |novel|
-        novel_decorator = NovelDecorator.new(novel, self)
-        novel_type = novel["novel_type"].to_i
-        id = novel["id"]
-        frozen = Narou.novel_frozen?(id)
+      novel_decorator = NovelDecorator.new(novel, self)
+      novel_type = novel["novel_type"].to_i
+      id = novel["id"]
+      frozen = Narou.novel_frozen?(id)
 
-        unless filters.empty?
-          next unless test_filter(filters, novel_type, frozen)
-        end
-
-        if @options["tags"]
-          next unless valid_tags?(novel, @options["tags"])
-        end
-        selected_lines[id] = novel_decorator.decorate_line
+      unless filters.empty?
+        return null unless test_filter(filters, novel_type, frozen)
       end
-      grep(selected_lines)
+
+      if @options["tags"] and !valid_tags?(novel, @options["tags"])
+        return nil
+      else
+        return novel_decorator.decorate_line
+      end
     end
 
-    def grep(selected_lines)
-      return selected_lines unless @options["grep"]
+    def grep(line)
+      return true unless @options["grep"]
       @options["grep"].each do |search_word|
-        selected_lines.keep_if { |_, line|
-          if search_word =~ /^-(.+)/
-            # NOT検索
-            !line.include?($1)
-          else
-            line.include?(search_word)
-          end
-        }
+        if search_word =~ /^-(.+)/
+          # NOT検索
+          return true if !line.include?($1)
+        else
+          return true if line.include?(search_word)
+        end
       end
-      selected_lines
+      return false
     end
 
-    def output_lines(took_lines)
+    def output_line(line, id)
       if STDOUT.tty?
-        stream_io.puts header
-        stream_io.puts took_lines.values.join("\n").termcolor
+        stream_io.puts line.termcolor
       elsif @options["echo"]
         # pipeにそのまま出力するときはansicolorコードが邪魔なので削除
-        stream_io.puts header
-        stream_io.puts TermColorLight.strip_tag(took_lines.values.join("\n"))
+        stream_io.puts TermColorLight.strip_tag(line)
       else
         # pipeに接続するときはIDを渡す
-        stream_io.puts took_lines.keys.join(" ")
+        stream_io.print id
+        stream_io.print " "
       end
     end
 
