@@ -163,7 +163,7 @@ module Command
 
     def output_list(novels, limit)
       stream_io.puts header if STDOUT.tty? || @options["echo"]
-      novels.each{ |novel|
+      novels.each { |novel|
         line = decorate_line(novel)
         output_line(line, novel["id"]) unless line.nil? || !grep(line)
       }
