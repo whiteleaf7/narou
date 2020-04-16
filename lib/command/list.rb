@@ -163,10 +163,10 @@ module Command
 
     def output_list(novels, limit)
       stream_io.puts header if STDOUT.tty? || @options["echo"]
-      for novel in novels do
+      novels.each{ |novel|
         line = decorate_line(novel)
         output_line(line, novel["id"]) unless line.nil? || !grep(line)
-      end
+      }
       stream_io.puts unless STDOUT.tty? || @options["echo"]
     end
 
@@ -181,11 +181,8 @@ module Command
         return null unless test_filter(filters, novel_type, frozen)
       end
 
-      if @options["tags"] and !valid_tags?(novel, @options["tags"])
-        return nil
-      else
-        return novel_decorator.decorate_line
-      end
+      return nil if @options["tags"] && !valid_tags?(novel, @options["tags"])
+      novel_decorator.decorate_line
     end
 
     def grep(line)
@@ -193,12 +190,12 @@ module Command
       @options["grep"].each do |search_word|
         if search_word =~ /^-(.+)/
           # NOT検索
-          return true if !line.include?($1)
-        else
-          return true if line.include?(search_word)
+          return true unless line.include?($1)
+        elsif line.include?(search_word)
+          return true
         end
       end
-      return false
+      false
     end
 
     def output_line(line, id)
