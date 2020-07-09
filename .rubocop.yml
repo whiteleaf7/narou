@@ -176,7 +176,7 @@ Style/StringLiterals:
 Style/SymbolProc:
   Enabled: true
 
-Layout/Tab:
+Layout/IndentationStyle:
   Enabled: true
 
 Layout/TrailingEmptyLines:
