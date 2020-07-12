@@ -27,6 +27,7 @@ def File.write(path, string, *options, mode: nil)
   return super if mode
 
   dirpath = File.dirname(path)
+  FileUtils.makedirs(dirpath) unless Dir.exist?(dirpath)
   temp_path = File.join(dirpath, SecureRandom.hex(15))
   if File.extname(path) == ".yaml" && File.basename(dirpath) != Downloader::SECTION_SAVE_DIR_NAME
     backup = "#{path}.backup"
