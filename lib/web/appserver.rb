@@ -835,8 +835,10 @@ class Narou::AppServer < Sinatra::Base
 
   # ダウンロード登録すると同時にグレーのボタン画像を返す
   get "/api/download4ssl" do
+    target = params["target"] or error("need a parameter: `target'")
+    opt_mail = "--mail" if query_to_boolean(params["mail"])
     Narou::WebWorker.push do
-      CommandLine.run!("download", params["target"])
+      CommandLine.run!("download", target, opt_mail)
       @@push_server.send_all(:"table.reload")
     end
     redirect "/resources/images/dl_button1.gif"
