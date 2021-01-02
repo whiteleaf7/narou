@@ -32,12 +32,10 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 60}
 
-3.5.1: 2020/03/21
+3.6.0: 2021/01/02
 -----------------
 #### 修正内容
-- 小説家になろう系列の挿絵をダウンロード時に、サムネイル画像を取得するように
-  なってしまっていたのを修正
-- Ruby 2.7 で narou setting -l を実行時に警告が大量に出ていたのを修正
+- Ruby 3.0 に対応
 
 #{"*" * 60}
   EOS
@@ -56,7 +54,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'sinatra', '~> 2.0', '>= 2.0.8.1'
   gem.add_runtime_dependency 'sinatra-contrib', '~> 2.0', '>= 2.0.8.1'
   gem.add_runtime_dependency 'tilt', '~> 2.0', '>= 2.0.10'
-  gem.add_runtime_dependency 'sass', '~> 3.4', '>= 3.4.18'
+  gem.add_runtime_dependency 'sassc', '~> 2.4'
   gem.add_runtime_dependency 'haml', '>= 5.1.2', '< 6'
   gem.add_runtime_dependency 'memoist', '~> 0.11.0'
   gem.add_runtime_dependency 'systemu', '~> 2.6', '>= 2.6.5'
@@ -64,6 +62,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'open_uri_redirections', '~> 0.2', '>= 0.2.1'
   gem.add_runtime_dependency 'activesupport', '>= 5.2', '< 7.0'
   gem.add_runtime_dependency 'unicode-display_width', '~> 1.4'
+  gem.add_runtime_dependency 'webrick', '~> 1.7'
 
   gem.add_development_dependency 'rspec', '~> 3.9'
   gem.add_development_dependency 'rspec-retry', '~> 0.6'
@@ -72,6 +71,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'pry', '~> 0.12'
   gem.add_development_dependency 'pry-byebug', '~> 3.8'
   gem.add_development_dependency 'awesome_print', '~> 1.8'
-  gem.add_development_dependency 'simplecov', '~> 0.18'
+  gem.add_development_dependency 'simplecov', '~> 0.20'
 end
 
