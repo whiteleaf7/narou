@@ -537,8 +537,8 @@ module Command
         "webui.theme" => {
           type: :select, help: "WEB UI 用テーマ選択",
           invisible: true,
-          select_keys: Narou.get_theme_names,
-          select_summaries: Narou.get_theme_names,
+          select_keys: Narou.theme_names,
+          select_summaries: Narou.theme_names,
           tab: :webui
         },
         "webui.table.reload-timing" => {

@@ -32,10 +32,12 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 60}
 
-3.6.0: 2021/01/02
+3.7.0: 2021/01/23
 -----------------
 #### 修正内容
-- Ruby 3.0 に対応
+- Apple Silicon 搭載 Mac でも動く様にライブラリをアップデート
+- device を kobo に設定し、_ebook-filename-length-limit でファイル名が制限され
+  た場合に send コマンドが正常に実行できない不具合を修正
 
 #{"*" * 60}
   EOS
@@ -55,16 +57,17 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'sinatra-contrib', '~> 2.0', '>= 2.0.8.1'
   gem.add_runtime_dependency 'tilt', '~> 2.0', '>= 2.0.10'
   gem.add_runtime_dependency 'sassc', '~> 2.4'
+  gem.add_runtime_dependency 'ffi', '>= 1.4.2'
   gem.add_runtime_dependency 'haml', '>= 5.1.2', '< 6'
   gem.add_runtime_dependency 'memoist', '~> 0.11.0'
   gem.add_runtime_dependency 'systemu', '~> 2.6', '>= 2.6.5'
   gem.add_runtime_dependency 'erubis', '~> 2.7'
   gem.add_runtime_dependency 'open_uri_redirections', '~> 0.2', '>= 0.2.1'
-  gem.add_runtime_dependency 'activesupport', '>= 5.2', '< 7.0'
+  gem.add_runtime_dependency 'activesupport', '>= 6.1', '< 8.0'
   gem.add_runtime_dependency 'unicode-display_width', '~> 1.4'
   gem.add_runtime_dependency 'webrick', '~> 1.7'
 
-  gem.add_development_dependency 'rspec', '~> 3.9'
+  gem.add_development_dependency 'rspec', '~> 3.10'
   gem.add_development_dependency 'rspec-retry', '~> 0.6'
   gem.add_development_dependency 'rspec_junit_formatter', '~> 0.4'
   gem.add_development_dependency 'timecop', '~> 0.9'
