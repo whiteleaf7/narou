@@ -187,7 +187,7 @@ class Narou::AppServer < Sinatra::Base
     headers "Cache-Control" => "no-cache" if $development
     @bootstrap_theme = case params["webui.theme"]
                        when nil
-                         Narou.get_theme
+                         Narou.theme
                        when ""   # 環境設定画面で未設定が選択された時
                          nil
                        else
