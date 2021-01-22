@@ -5,7 +5,7 @@
 -----------------
 #### 修正内容
 - Apple Silicon 搭載 Mac でも動く様にライブラリをアップデート
-- device を kobo に設定し、_ebook-filename-length-limit でファイル名が制限され
+- device を kobo に設定し、ebook-filename-length-limit でファイル名が制限され
   た場合に send コマンドが正常に実行できない不具合を修正
 
 3.6.0: 2021/01/02
