@@ -203,6 +203,8 @@ module Narou
   # convert.filename-to-ncode を設定している場合に novel_data に ncode、domain を
   # 設定しない場合は id カラムが必須
   #
+  # rubocop:disable Metrics/CyclomaticComplexity
+  # rubocop:disable Metrics/PerceivedComplexity
   def create_novel_filename(novel_data, ext = "")
     filename_to_ncode = Inventory.load("local_setting")["convert.filename-to-ncode"]
     novel_setting =
@@ -240,6 +242,8 @@ module Narou
       length_limit ? Helper.truncate_path(filename, length_limit, extname: ext) : filename
     end
   end
+  # rubocop:enable Metrics/CyclomaticComplexity
+  # rubocop:enable Metrics/PerceivedComplexity
 
   def get_mobi_paths(target)
     get_ebook_file_paths(target, ".mobi")
