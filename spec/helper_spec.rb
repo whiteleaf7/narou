@@ -87,4 +87,22 @@ describe Helper do
       expect(Helper.date_string_to_time("2012年 11月22日 17時00分")).to eq(Time.parse("2012/11/22 17:00"))
     end
   end
+
+  describe ".truncate_path" do
+    context "if ext is mobi" do
+      subject do
+        described_class.truncate_path(filename, 10)
+      end
+      let(:filename) { "[作者名] 長い文字列ほげほげ.mobi" }
+      it { is_expected.to eq "[作者名] 長い文字.mobi" }
+    end
+
+    context "if ext is kepub.epub with extname" do
+      subject do
+        described_class.truncate_path(filename, 10, extname: ".kepub.epub")
+      end
+      let(:filename) { "[作者名] 長い文字列ほげほげ.kepub.epub" }
+      it { is_expected.to eq "[作者名] 長い文字.kepub.epub" }
+    end
+  end
 end

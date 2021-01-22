@@ -350,10 +350,10 @@ module Helper
   # 長過ぎるファイルパスを詰める
   # ファイル名部分のみを詰める。拡張子は維持する
   #
-  def truncate_path(path, limit = Inventory.load["filename-length-limit"])
+  def truncate_path(path, limit = Inventory.load["filename-length-limit"], extname: nil)
     limit ||= FILENAME_LENGTH_LIMIT
     dirname = File.dirname(path)
-    extname = File.extname(path)
+    extname ||= File.extname(path)
     basename = File.basename(path, extname)
     if basename.length > limit
       basename = basename[0...limit]

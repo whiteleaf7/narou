@@ -237,7 +237,7 @@ module Narou
       )
       filename = "[#{author}] #{title}#{ext}"
       length_limit = Inventory.load["ebook-filename-length-limit"]
-      length_limit ? Helper.truncate_path(filename, length_limit) : filename
+      length_limit ? Helper.truncate_path(filename, length_limit, extname: ext) : filename
     end
   end
 
@@ -248,6 +248,7 @@ module Narou
   def get_ebook_file_paths(target, ext)
     data = Downloader.get_data_by_target(target)
     return nil unless data
+
     dir = Downloader.get_novel_data_dir_by_target(target)
     fname = create_novel_filename(data, ext)
     base = File.basename(fname, ext)
