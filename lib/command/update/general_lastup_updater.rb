@@ -4,6 +4,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require "net/http"
 require_relative "../../narou/api"
 
 module Command
@@ -63,7 +64,7 @@ module Command
           interval.wait
           begin
             downloader = Downloader.new(id)
-            next unless downloader.get_latest_table_of_contents(through_error: true)
+            next unless downloader.get_latest_table_of_contents(downloader.load_toc_file, through_error: true)
             dates = {
               "novelupdated_at" => downloader.get_novelupdated_at,
               "general_lastup" => downloader.get_general_lastup,
