@@ -801,6 +801,7 @@ class Downloader
     raise if through_error   # エラー処理はしなくていいからそのまま例外を受け取りたい時用
     if e.message.include?("404")
       @stream.error "小説が削除されているか非公開な可能性があります"
+      sleep_for_download
       if database.novel_exists?(@id)
         Command::Tag.execute!(%W(#{@id} --add 404 --color white --no-overwrite-color), io: Narou::NullIO.new)
         Command::Freeze.execute!(@id, "--on")
