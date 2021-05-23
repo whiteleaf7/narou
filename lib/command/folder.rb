@@ -23,7 +23,12 @@ module Command
     narou folder musyoku
     narou folder 0
     narou f 0
+
+  Options:
       EOS
+      @opt.on("-n", "--no-open", "フォルダを開かずにパスだけ表示する") {
+        @options["no-open"] = true
+      }
     end
 
     def execute(argv)
@@ -33,7 +38,7 @@ module Command
       argv.each do |target|
         dir = Downloader.get_novel_data_dir_by_target(target)
         if dir
-          Helper.open_directory(dir)
+          Helper.open_directory(dir) unless @options["no-open"]
           puts dir
         else
           error "#{target} は存在しません"
