@@ -893,10 +893,8 @@ class Narou::AppServer < Sinatra::Base
   post "/api/eject" do
     do_eject = proc do
       device = Narou.get_device
-      if device
-        device.eject do
-          puts "<bold><green>端末を取り外しました</green></bold>".termcolor
-        end
+      device&.eject do
+        puts "<bold><green>端末を取り外しました</green></bold>".termcolor
       end
     end
     if params["enqueue"] == "true"
