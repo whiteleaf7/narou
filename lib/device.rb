@@ -91,13 +91,12 @@ class Device
   end
 
   def eject
-    if ejectable?
-      begin
-        Device.eject(@device_module::VOLUME_NAME)
-      rescue CantEject => e
-        error e.message
-      end
-    end
+    return unless ejectable?
+
+    Device.eject(@device_module::VOLUME_NAME)
+    yield if block_given?
+  rescue CantEject => e
+    error e.message
   end
 
   def self.support_eject?
