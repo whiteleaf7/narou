@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/circleci-narou
     docker:
-      - image: circleci/ruby:2.5
+      - image: circleci/ruby:3.0
         environment:
           BUNDLE_JOBS: 1
           BUNDLE_RETRY: 3
