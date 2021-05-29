@@ -32,7 +32,7 @@ correct_#{basename} を用意して下さい。
   true
 }
 Dir.chdir(pwd)
-result = ERB.new(DATA.read, nil, "-").result(binding)
+result = ERB.new(DATA.read, trim_mode: "-").result(binding)
 output_path = File.join(spec_dir, "convert_spec.rb")
 File.write(output_path, result)
 puts "#{output_path} を出力しました"

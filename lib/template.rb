@@ -50,7 +50,7 @@ class Template
       path = dir.join(TEMPLATE_DIR, src_filename + ".erb")
       next unless path.exist?
       src = Helper::CacheLoader.load(path)
-      result = ERB.new(src, nil, "-").result(_binding)
+      result = ERB.new(src, trim_mode: "-").result(_binding)
       return result
     end
     raise LoadError, "テンプレートファイルが見つかりません。(#{src_filename}.erb)"

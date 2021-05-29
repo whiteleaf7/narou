@@ -375,7 +375,7 @@ module Helper
   #
   def erb_copy(src, dst, _binding)
     data = File.read(src, mode: "r:BOM|UTF-8")
-    result = ERB.new(data, nil, "-").result(_binding)
+    result = ERB.new(data, trim_mode: "-").result(_binding)
     File.write(dst, result)
   end
 
