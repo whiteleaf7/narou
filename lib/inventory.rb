@@ -44,13 +44,13 @@ module Inventory
     return unless File.exist?(@inventory_file_path)
     self.merge!(Helper::CacheLoader.memo(@inventory_file_path) { |yaml|
       begin
-        YAML.load(yaml)
+        YAML.unsafe_load(yaml)
       rescue Psych::SyntaxError
         unless restore(@inventory_file_path)
           error "#{@inventory_file_path} が壊れてるっぽい"
           raise
         end
-        YAML.load_file(@inventory_file_path)
+        YAML.unsafe_load_file(@inventory_file_path)
       end
     })
   end

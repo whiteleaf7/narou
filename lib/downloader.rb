@@ -157,7 +157,7 @@ class Downloader
   # toc 読込
   #
   def self.get_toc_data(archive_path)
-    YAML.load_file(File.join(archive_path, TOC_FILE_NAME))
+    YAML.unsafe_load_file(File.join(archive_path, TOC_FILE_NAME))
   end
 
   def self.get_toc_by_target(target)
@@ -1043,7 +1043,7 @@ class Downloader
   def different_section?(old_relative_path, new_subtitle_info)
     path = get_novel_data_dir.join(old_relative_path)
     return true unless path.exist?
-    YAML.load_file(path)["element"] != new_subtitle_info["element"]
+    YAML.unsafe_load_file(path)["element"] != new_subtitle_info["element"]
   end
 
   #
@@ -1268,7 +1268,7 @@ class Downloader
   #
   # 小説データの格納ディレクトリから読み込む
   def load_novel_data(filename)
-    YAML.load_file(get_novel_data_dir.join(filename))
+    YAML.unsafe_load_file(get_novel_data_dir.join(filename))
   rescue Errno::ENOENT
     nil
   end
