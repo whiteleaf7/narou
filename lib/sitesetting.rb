@@ -72,7 +72,7 @@ class SiteSetting
 
   def initialize(path)
     @match_values = {}
-    @yaml = YAML.load_file(path)
+    @yaml = YAML.unsafe_load_file(path)
     @path = path
   end
 

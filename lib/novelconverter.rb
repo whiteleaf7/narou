@@ -436,7 +436,7 @@ class NovelConverter
   def load_novel_section(subtitle_info, section_save_dir)
     file_subtitle = subtitle_info["file_subtitle"] || subtitle_info["subtitle"]   # 互換性維持のため
     path = section_save_dir.join("#{subtitle_info["index"]} #{file_subtitle}.yaml")
-    YAML.load_file(path)
+    YAML.unsafe_load_file(path)
   rescue Errno::ENOENT => e
     stream_io.puts
     stream_io.error(<<~MSG.termcolor)

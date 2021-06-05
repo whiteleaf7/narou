@@ -45,7 +45,7 @@ module Command
         if @options["vote"]
           # TODO: 最新話の場所をAPIで取得する
           data_dir = Downloader.get_novel_data_dir_by_target(data["id"])
-          latest_index = YAML.load_file(File.join(data_dir, Downloader::TOC_FILE_NAME))["subtitles"].last["index"]
+          latest_index = YAML.unsafe_load_file(File.join(data_dir, Downloader::TOC_FILE_NAME))["subtitles"].last["index"]
           open_url = "#{toc_url + latest_index}/#my_novelpoint"
         else
           open_url = toc_url

@@ -212,8 +212,8 @@ module Command
       cache_sections = []
       cache_section_list.each do |path|
         match_latest_path = File.join(novel_dir, File.basename(path))
-        latest_novel_sections << YAML.load_file(match_latest_path) if File.exist?(match_latest_path)
-        cache_sections << YAML.load_file(path)
+        latest_novel_sections << YAML.unsafe_load_file(match_latest_path) if File.exist?(match_latest_path)
+        cache_sections << YAML.unsafe_load_file(path)
       end
 
       novel_info = Database.instance[id]

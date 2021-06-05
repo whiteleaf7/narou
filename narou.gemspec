@@ -72,6 +72,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'activesupport', '>= 6.1', '< 8.0'
   gem.add_runtime_dependency 'unicode-display_width', '~> 1.4'
   gem.add_runtime_dependency 'webrick', '~> 1.7'
+  gem.add_runtime_dependency 'psych', '~> 4.0'
 
   gem.add_development_dependency 'rspec', '~> 3.10'
   gem.add_development_dependency 'rspec-retry', '~> 0.6'

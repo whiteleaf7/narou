@@ -422,7 +422,7 @@ class Narou::AppServer < Sinatra::Base
     postscripts_count = 0
     toc["subtitles"].each do |sub|
       begin
-        element = YAML.load_file(downloader.section_file_path(sub))["element"]
+        element = YAML.unsafe_load_file(downloader.section_file_path(sub))["element"]
         data_type = element["data_type"] || "text"
         introduction = element["introduction"] || ""
         postscript = element["postscript"] || ""
