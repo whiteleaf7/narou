@@ -1,14 +1,7 @@
 # -*- coding: utf-8 -*-
 <% Template.target_binary_version(1.0) -%>
 
-=begin
-対象小説情報
-タイトル: <%= @setting["title"] %>
-作者: <%= @setting["author"] %>
-URL: <%= @setting["toc_url"] %>
-
-詳細については http://bit.ly/1vTEH04 を参照して下さい
-=end
+# 詳細については http://bit.ly/1vTEH04 を参照して下さい
 converter do
   # 各種変換処理がされる「前」の生データに対しての変換処理を記述
   def before(io, text_type)
