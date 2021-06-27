@@ -778,6 +778,7 @@ class Downloader
       @setting["story"] = story_html.to_aozora
     end
     @setting["info"] = info
+    replace_external_properties_of_setting
 
     @setting["title"] = get_title
     if series_novel?
@@ -1302,5 +1303,10 @@ class Downloader
       end
       Template.write(filename, novel_dir_path, binding, binary_version)
     end
+  end
+
+  def replace_external_properties_of_setting
+    @setting["title"] = @setting["title"].delete("\r\n")
+    @setting["author"] = @setting["author"].delete!("\r\n")
   end
 end
