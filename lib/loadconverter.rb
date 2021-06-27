@@ -10,7 +10,7 @@ BlankConverter = Class.new(ConverterBase) {}
 
 $latest_converter = nil
 
-def converter(title, &block)
+def converter(_title = nil, &block)
   $latest_converter = Class.new(ConverterBase, &block)
 end
 
@@ -58,7 +58,7 @@ end
 #     buffer
 #   end
 # end
-def load_converter(title, archive_path)
+def load_converter(archive_path)
   converter_path = File.join(archive_path, "converter.rb")
   if File.exist?(converter_path)
     $latest_converter = nil
@@ -71,9 +71,8 @@ def load_converter(title, archive_path)
   if conv
     return conv
   else
-    title_for_converter = (title =~ /.txt\z/ ? title : File.basename(archive_path))
     error "converter.rbは見つかりましたが、`converter'で登録されていないようです。" +
-          "変換処理は converter \"#{title_for_converter.gsub('"', '\\"')}\" として登録する必要があります"
+          "変換処理は converter do ... end として登録する必要があります"
     return BlankConverter
   end
 end

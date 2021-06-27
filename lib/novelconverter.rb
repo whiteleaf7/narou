@@ -568,7 +568,7 @@ class NovelConverter
   # 各小説用の converter.rb 変換オブジェクトを生成
   #
   def create_converter
-    load_converter(@novel_title, @setting.archive_path).new(@setting, @inspector, @illustration)
+    load_converter(@setting.archive_path).new(@setting, @inspector, @illustration)
   end
 
   #
