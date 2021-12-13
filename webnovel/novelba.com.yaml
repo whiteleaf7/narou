@@ -1,0 +1,94 @@
+# ------------------------------------------------------------
+# 小説サイト定義
+# ※投稿作品以外は非対応です。
+name: &name ノベルバ投稿作品
+scheme: https
+domain: novelba.com
+top_url: \\k<scheme>://\\k<domain>
+url: \\k<top_url>/indies/works/(?<ncode>\d+)
+encoding: UTF-8
+confirm_over18: no
+append_title_to_folder_name: yes
+title_strip_pattern: null
+sitename: *name
+version: 1.0
+
+# ------------------------------------------------------------
+# 書籍情報取得設定
+title: &title |-
+  <h1 class="title">(?<title>.+?)</h1>
+author: |-
+  <p class="author"><a href=".+?"><span.*?>(?<author>.+?)</span></a></p>
+story: &story |-
+  \s+<div class="summary_box">
+  \s+<div class="title_box">
+  \s+<h3>あらすじ</h3>
+  \s+</div>
+  \s+<p class="detail">(?<story>.+?)</p>
+  \s+</div>
+
+# ------------------------------------------------------------
+# 目次取得設定
+toc_url: \\k<top_url>/indies/works/\\k<ncode>
+subtitles: |-
+  \s+<li>
+  \s+<a href="(?<href>/indies/works/\d+/episodes/(?<index>\d+))".*?>
+  \s+(?<subtitle>.+?)\s+<p class="update">更新日：<time>(?<subdate>.+?)</time></p>
+  \s+</a>
+  \s+</li>
+
+# ------------------------------------------------------------
+# 本文取得設定
+
+body_pattern: |-
+  \s+<div class="episode_box".*?>
+  \s+<div class="title_info">
+  \s+<p class="title">.*?</p>
+  \s+<p class="author">.*?</p>
+  \s+<h1 class="episode">.*?</h1>
+  \s+</div>
+  \s+<div class="detail">
+  \s+(?<body>.+?)\s+</div>
+  \s+</div>
+introduction_pattern: null
+postscript_pattern: null
+
+# ------------------------------------------------------------
+# 小説情報からパースするための設定
+novel_info_url: \\k<toc_url>
+
+# タイトル
+t: *title
+
+# novel_type 小説種別
+nt: '<p class="story">(?<novel_type>[^：]+?)：.*?</p>'
+novel_type_string:
+  連載中: 1
+  完結: 3
+
+# general_all_no 掲載話数
+ga: '<p class="story">[^：]+：(?<general_all_no>\d+?)話</p>'
+
+# story あらすじ
+s: *story
+
+# general_firstup 初回掲載日。記載なし。
+gf: null
+
+# novelupdated_at 小説の更新時刻
+nu: '<p class="story">.*?</p><p class="update">更新日：<time>(?<novelupdated_at>.+?)</time></p>'
+
+# general_lastup 最新話掲載日
+gl: null
+
+# writer 作者名
+w: |-
+  \s+<p class="author">
+  \s+<a href=".*?">
+  \s+<img src=".*?">
+  \s+<span>(?<writer>.+?)</span>
+  \s+</a>
+  \s+</p>
+
+# length 文字数
+l: null
