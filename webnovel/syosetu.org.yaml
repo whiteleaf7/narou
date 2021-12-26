@@ -30,9 +30,9 @@ error_message: 投稿者が削除、もしくは間違ったアドレスを指�
 body_pattern: |-
   <span style="font-size:120%">.+?</span><BR><BR>
   (?<body>.+?)
-  (?:<div id=atogaki><BR><HR><BR>(?<postscript>.+?)</div>)?
+  (?:<div id="atogaki"><br><hr><br>(?<postscript>.+?)</div>)?
 
-introduction_pattern: <div id=maegaki>(?<introduction>.+)<BR><HR><BR></div>
+introduction_pattern: <div id="maegaki">(?<introduction>.+)<br><hr><br></div><
 postscript_pattern: null
 
 illust_current_url: null
