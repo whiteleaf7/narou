@@ -12,7 +12,7 @@ module Command
   class Tag < CommandBase
     COLORS = %w(green yellow blue magenta cyan red white)
     # 禁止文字
-    BAN_CHAR = /[:;"'><$@&^\\\|%'\/`]/
+    BAN_CHAR = /[:;"'><$@&^\\\|%\/`]/
     # 禁止ワード
     BAN_WORD = %w(hotentry)
 

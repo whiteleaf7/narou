@@ -15,7 +15,7 @@ require_relative "inspector"
 
 class ConverterBase
   KANJI_NUM = "〇一二三四五六七八九"
-  ENGLISH_SENTENCES_CHARACTERS = /[\w.,!?'" &:;_-]+/
+  ENGLISH_SENTENCES_CHARACTERS = /[\w.,!?'" &:;-]+/
   ENGLISH_SENTENCES_MIN_LENGTH = 8   # この文字数以上アルファベットが続くと半角のまま
 
   attr_reader :use_dakuten_font
