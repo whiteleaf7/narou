@@ -100,6 +100,7 @@ class NovelConverter
       if DAKUTEN_ERB[i]
         Helper.erb_copy(src, dst, binding)
       else
+        FileUtils.mkdir_p(File.dirname(dst))
         FileUtils.copy(src, dst)
       end
     end
