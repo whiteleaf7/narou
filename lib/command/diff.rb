@@ -250,7 +250,7 @@ module Command
         list: []
       }
       cache_list = get_sorted_cache_list(id)
-      return list if cache_list.empty?
+      return list if cache_list.blank?
       cache_list.each.with_index(1) do |cache_path, i|
         objects = []
         version_string = File.basename(cache_path)
