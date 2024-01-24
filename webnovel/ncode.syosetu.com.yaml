@@ -25,6 +25,8 @@ subtitles: |-
   <dt class="long_update">
   (?<subdate>.+?)(?:<span title="(?<subupdate>.+?) 改稿">（<u>改</u>）</span>)?</dt>
   </dl>
+next_toc: <a href="/(?<next_page>[^"]+)" class="novelview_pager-next">
+next_url: https://\\k<domain>/\\k<next_page>/
 
 # ------------------------------------------------------------
 # 本文取得設定

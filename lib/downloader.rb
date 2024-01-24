@@ -783,7 +783,20 @@ class Downloader
     @setting["title"] = get_title
     if series_novel?
       # 連載小説
-      subtitles = get_subtitles(toc_source, old_toc)
+      subtitles = []
+      toc_url = @setting["toc_url"]
+      source = toc_source
+      100.times do
+        subtitles.concat(get_subtitles(source, old_toc))
+        break unless @setting.multi_match(source, "next_toc")
+        sleep_for_download
+        @setting["toc_url"] = @setting["next_url"]
+        begin
+          source = get_toc_source
+        ensure
+          @setting["toc_url"] = toc_url
+        end
+      end
     else
       # 短編小説
       subtitles = create_short_story_subtitles(info)
