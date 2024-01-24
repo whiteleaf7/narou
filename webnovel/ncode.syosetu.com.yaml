@@ -17,7 +17,7 @@ version: 2.0
 toc_url: https://\\k<domain>/\\k<ncode>/
 subtitles: |-
   (?:<div class="chapter_title">(?<chapter>.+?)</div>
-   
+  
   )?<dl class="novel_sublist2">
   <dd class="subtitle">
   <a href="(?<href>/.+?/(?<index>\d+?)/)">(?<subtitle>.+?)</a>
