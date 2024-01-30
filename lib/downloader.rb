@@ -725,6 +725,7 @@ class Downloader
     toc_source = ""
     cookie = @setting["cookie"] || ""
     open_uri_options = make_open_uri_options("Cookie" => cookie, allow_redirections: :safe)
+    sleep_for_download
     begin
       URI.open(toc_url, open_uri_options) do |toc_fp|
         if toc_fp.base_uri.to_s != toc_url
@@ -833,7 +834,6 @@ class Downloader
       progressbar&.output(i + 1)
       subtitles.concat(get_subtitles(toc_source, old_toc))
       break unless @setting.multi_match(toc_source, "next_toc")
-      sleep_for_download
       # 得られたURLをセットしてページ内容を取得する
       @setting["toc_url"] = @setting["next_url"]
       toc_source = get_toc_source
