@@ -40,6 +40,7 @@ class Downloader
 
   class InvalidTarget < StandardError; end
   class SuspendDownload < StandardError; end
+  class IO::TimeoutError; end # for 3.1 or earlier
 
   def initialize(target, options = {})
     id = Downloader.get_id_by_target(target)
@@ -798,7 +799,7 @@ class Downloader
       "subtitles" => subtitles
     }
     toc_objects
-  rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout => e
+  rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout, IO::TimeoutError => e
     raise if through_error   # エラー処理はしなくていいからそのまま例外を受け取りたい時用
     if e.message.include?("404")
       @stream.error "小説が削除されているか非公開な可能性があります"
@@ -1137,7 +1138,7 @@ class Downloader
       URI.open(url, "r:#{@setting["encoding"]}", open_uri_options) do |fp|
         raw = Helper.pretreatment_source(fp.read, @setting["encoding"])
       end
-    rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout => e
+    rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout, IO::TimeoutError => e
       case e.message
       when /^503/
         # 503 はアクセス規制やメンテ等でリトライしてもほぼ意味がないことが多いため一度で諦める
