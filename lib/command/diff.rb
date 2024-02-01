@@ -70,7 +70,7 @@ module Command
     # 引数の中の -数字 オプション(-n 数字の省略形)を -n 数字 に変換する
     def short_number_option_parse(argv)
       argv.map! { |arg|
-        if arg =~ /^-(\d+)$/
+        if arg.to_s =~ /^-(\d+)$/
           ["-n", $1.to_s]
         else
           arg
@@ -250,7 +250,7 @@ module Command
         list: []
       }
       cache_list = get_sorted_cache_list(id)
-      return list if cache_list.empty?
+      return list if cache_list.blank?
       cache_list.each.with_index(1) do |cache_path, i|
         objects = []
         version_string = File.basename(cache_path)
