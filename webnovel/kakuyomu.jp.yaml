@@ -10,33 +10,87 @@ confirm_over18: no
 append_title_to_folder_name: yes
 title_strip_pattern: null
 sitename: *name
-version: 1.0
+version: 2.0
+
+# ------------------------------------------------------------
+# 前処理設定
+# jsonを処理して正規表現で取得可能なデータへ変換し挿入する
+code: &code
+  eval: |-
+    magicword = "KakuyomuPreprocessEvalMagicWord"
+    # magicwordがある場合、既にこの前処理が行われているので何もしない
+    unless source.include?(magicword)
+      require "json"
+      source.match(%r|<script id="__NEXT_DATA__" type="application/json">(.*)</script>|) do |m|
+        json = JSON.parse($1)
+        # data: 各データが収められたハッシュ
+        data = json["props"]["pageProps"]["__APOLLO_STATE__"]
+        # work: この作品のデータ
+        work = data["Work:#{json["query"]["workId"]}"]
+        # まずTOCを処理する
+        toc = work["tableOfContents"]
+        # workのTOCはTableOfContentsChapterの参照の配列となっているので、それを解決する
+        toc.map! {|v| data[v["__ref"]]}
+        # TableOfContentsChapterにはChapterと各話の配列があるのでそれを取り出し
+        toc.map! {|v| [v["chapter"], v["episodeUnions"]]}
+        # Chapterと各話を一つの配列にフラットにし
+        toc.flatten!
+        # Chapterが使われていない場合にあるnilを排除し
+        toc.compact!
+        # Chapterと各話は参照なので、それを解決し
+        toc.map! {|v| data[v["__ref"]]}
+        # 必要な属性値を取り出して「;」でつないでまとめる
+        # __typename: ChapterかEpisodeかの判別用
+        # level: Chapterにあり1か2かでchapterかsubchapterか判別する
+        # id: Episodeならindex値として必要。Chapterなら必要ないが処理の簡略化のため付加している
+        # publishedAt: Episodeにありsubupdateとして利用する
+        # title: Chapter、Episode共にタイトルとなる
+        # 最後のtitle以外で「;」を含む事は無いはず
+        toc_attr = %w(__typename level id publishedAt title)
+        toc.map! {|v| v.slice(*toc_attr).values.join(";")}
+        # 続いてworkの著者を処理する
+        # 著者の参照から表示用の名前 activityName を取得する
+        work["author"] = data[work["author"]["__ref"]]["activityName"]
+        # alternateAuthorName がある場合は、それも使う。
+        work["author"] = work["alternateAuthorName"] + "／" + work["author"] if work["alternateAuthorName"]
+        # あらすじの改行を<br>に変換し、正規表現を単純化する。<br>はnarourb側で再変換される
+        work["introduction"].gsub!("\n", "<br>")
+        # workからTOC以外に利用する属性を列挙している
+        work_attr = %w(author title serialStatus publicEpisodeCount publishedAt
+            editedAt lastEpisodePublishedAt totalCharacterCount introduction)
+        # HTMLコメントの開始、前処理済みか検知するためのmagicword、
+        # TOC以外のworkの利用する属性値、TOC、HTMLコメントの終了を生成し
+        str = ["<!---", magicword,
+          work.slice(*work_attr).map {|v| v.join("::")},
+          toc, "--->"].join("\n")
+        # 元のページデータに挿入する。デバッグ時用に元々のデータはすべて残す。
+        source.insert(m.begin(0), str)
+        # 元々のデータは基本必要ないのでreplaceを使えば元々のデータはすべて消える。
+        #source.replace(str)
+      end
+    end
+    nil
 
 # ------------------------------------------------------------
 # 書籍情報取得設定
-title: &title |-
-  <h1 id="workTitle"><a href=".+?">(?<title>.+?)</a></h1>
-author: |-
-  (?:<span class="activityName" itemprop="author">(?<author>.+?)</span>)|(?:<span class="screenName.*?">(?<author>.+?)</span>)
-story: &story |-
-  <p id="introduction" class="ui-truncateTextButton js-work-introduction">(?<story>.+?)(?:[\n ]*?</span>|[\n ]*?</p>)
+title: &title
+  - *code
+  - ^title::(?<title>.+?)$
+author:
+  - ^author::(?<author>.+?)$
+story: &story
+  - ^introduction::(?<story>.+?)$
 
 # ------------------------------------------------------------
 # 目次取得設定
 toc_url: \\k<top_url>/works/\\k<ncode>
-subtitles: |-2
-            (?:<li class="widget-toc-chapter widget-toc-level1.*?">
-              <span>(?<chapter>.+?)</span>
-            </li>
-            )?(?:<li class="widget-toc-chapter widget-toc-level2.*?">
-              <span>(?<subchapter>.+?)</span>
-            </li>
-            )?<li class="widget-toc-episode">
-              <a href="(?<href>/works/\d+/episodes/(?<index>\d+))".*?>
-                <span class="widget-toc-episode-titleLabel.*?">(?<subtitle>.+?)</span>
-                <time class="widget-toc-episode-datePublished" datetime="(?<subupdate>.+?)">.+?</time>
-              </a>
-            </li>
+subtitles:
+  - *code
+  - (?x)
+    ^(?:Chapter;1;\d+;(?<chapter>.+?)\n)?
+    (?:Chapter;2;\d+;(?<subchapter>.+?)\n)?
+    Episode;(?<index>\d+);(?<subupdate>.+?);(?<subtitle>.+?)$
+href: /works/\\k<ncode>/episodes/\\k<index>
 
 # ------------------------------------------------------------
 # 本文取得設定
@@ -53,29 +107,28 @@ novel_info_url: \\k<toc_url>
 t: *title
 
 # novel_type 小説種別
-nt: '<dt><span>執筆状況</span></dt>\n *?<dd>(?<novel_type>.+?)</dd>'
+nt: ^serialStatus::(?<novel_type>.+?)$
 novel_type_string:
-  連載中: 1
-  完結済: 3
+  RUNNING: 1
+  COMPLETED: 3
 
 # general_all_no 掲載話数
-ga: '<dt><span>エピソード</span></dt>\n *?<dd>(?<general_all_no>\d+)話</dd>'
+ga: ^publicEpisodeCount::(?<general_all_no>.+?)$
 
 # story あらすじ
 s: *story
 
 # general_firstup 初回掲載日
-gf: '<dt><span>公開日</span></dt>\n *?<dd><time itemprop="datePublished" datetime="(?<general_firstup>.+?)">.+?</time>'
+gf: ^publishedAt::(?<general_firstup>.+?)$
 
-# novelupdated_at 小説の更新時刻。最終掲載日で代用
-nu: '<dt><span>最終更新日</span></dt>\n *?<dd><time itemprop="dateModified" datetime="(?<novelupdated_at>.+?)">.+?</time>'
+# novelupdated_at 小説の更新時刻
+nu: ^editedAt::(?<novelupdated_at>.+?)$
 
 # general_lastup 最新話掲載日
-gl: null
+gl: ^lastEpisodePublishedAt::(?<general_lastup>.+?)$
 
 # writer 作者名
-w: |-
-  (?:<span class="activityName" itemprop="author">(?<writer>.+?)</span>)|(?:<span class="screenName.*?">(?<writer>.+?)</span>)
+w: ^author::(?<writer>.+?)$
 
 # length 文字数
-l: '<dt><span>総文字数</span></dt>\n *?<dd>(?<length>.+?)文字</dd>'
+l: ^totalCharacterCount::(?<length>.+?)$
