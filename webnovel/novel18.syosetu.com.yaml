@@ -31,7 +31,7 @@ subtitles: |-
   (?<subdate>.+?)(?:<span title="(?<subupdate>.+?) 改稿">（<u>改</u>）</span>)?</dt>
   </dl>
 next_toc: <a href="/(?<next_page>[^"]+)" class="novelview_pager-next">
-next_url: https://\\k<domain>/\\k<next_page>/
+next_url: https://\\k<domain>/\\k<next_page>
 # 最大のページ数を得る。固定の数字でも可。
 toc_page_max: <a href="/[^"]+p=(?<toc_page_max>\d+)" class="novelview_pager-last">
 
