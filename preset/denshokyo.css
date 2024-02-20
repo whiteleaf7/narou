@@ -1,22 +1,18 @@
 @charset "utf-8";
 @namespace "http://www.w3.org/1999/xhtml";
 
-body {
+.vrtl body, .hltr body {
 	font-family: "@ＭＳ 明朝", "@MS Mincho", "ヒラギノ明朝 ProN W3", "HiraMinProN-W3", serif, sans-serif;
 	line-height: <%= line_height %>em !important;
 }
 
-.gtc, .b {
+.vrtl .gtc, .hltr .gtc, .b {
 	font-family: '@ＭＳ ゴシック','@MS Gothic',sans-serif !important;
 }
 
-.b { font-weight: bold; }
-.i { font-style: italic; }
-
-rt { font-size: 0.6em; }
+.vrtl rt, .hltr rt { font-size: 0.6em; }
 
 /* カスタム注記用 */
-
 /* 柱（もどき） */
 .running_head {
 	position: absolute !important;
@@ -24,17 +20,32 @@ rt { font-size: 0.6em; }
 	left: 10px;
 	font-size: 0.8em;
 }
-
+<% if tategaki %>
+/* ページ左右中央 調整 */
+.main.block-align-center div.mt3 {
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+.main.block-align-center > div {
+	margin-top: 4em !important;
+}
+div.main.block-align-center div.running_head {
+	position: absolute !important;
+	top: 2em;
+	left: 10px;
+	font-size: 0.8em;
+}
+<% end %>
+<% if use_dakuten_font %>
 /* 濁点フォント */
 @font-face {
 	font-family: "DakutenAokinMincho";
 	src: url(../fonts/DMincho.ttf) format("truetype");
 }
-
-.dakuten {
+.vrtl .dakuten, .hltr .dakuten {
 	font-family: "DakutenAokinMincho" !important;
 }
-
+<% end %>
 /* 二分アキ */
 .half_em_space { padding-top: 0.5em; }
 
@@ -52,15 +63,15 @@ rt { font-size: 0.6em; }
 	box-shadow: 3px 3px 3px #bbb;
 	-webkit-box-shadow: 3px 3px 3px #bbb;
 }
-.jzm .custom_parameter_block {
+.vrtl .jzm .custom_parameter_block, .hltr .jzm .custom_parameter_block {
 	display: block;
 }
-.jzm .p .custom_parameter_block {
+.vrtl .jzm .p .custom_parameter_block, .hltr .jzm .p .custom_parameter_block {
 	display: inline-block;
 }
 
 /* 前書き */
-.introduction {
+.vrtl .introduction {
 	float: right;
 	font-size: 83%;
 	line-height: 1.5em !important;
@@ -74,15 +85,15 @@ rt { font-size: 0.6em; }
 	text-align: left !important;
 	height: 70%;
 }
-.jzm .introduction {
+.vrtl .jzm .introduction, .hltr .jzm .introduction {
 	display: block;
 }
-.jzm .p .introduction {
+.vrtl .jzm .p .introduction, .hltr .jzm .p .introduction {
 	display: inline-block;
 }
 
 /* 後書き */
-.postscript {
+.vrtl .postscript {
 	float: right;
 	font-size: 83%;
 	line-height: 1.5em !important;
@@ -96,13 +107,13 @@ rt { font-size: 0.6em; }
 	text-align: left !important;
 	height: 70%;
 }
-.jzm .postscript {
+.vrtl .jzm .postscript, .hltr .jzm .postscript {
 	display: block;
 }
-.jzm .p .postscript {
+.vrtl .jzm .p .postscript, .hltr .jzm .p .postscript {
 	display: inline-block;
 }
 
-div.clear {
+.vrtl div.clear, .hltr div.clear {
 	clear: both;
 }

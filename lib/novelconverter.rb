@@ -6,6 +6,7 @@
 
 require "fileutils"
 require "stringio"
+require_relative "aozoraepub3"
 require_relative "novelsetting"
 require_relative "inspector"
 require_relative "illustration"
@@ -85,36 +86,6 @@ class NovelConverter
     }
   end
 
-  DAKUTEN_FROM = ["vertical_font_with_dakuten.css", "DMincho.ttf"]
-  DAKUTEN_TO = ["template/OPS/css_custom/vertical_font.css", "template/OPS/fonts/DMincho.ttf"]
-  DAKUTEN_ERB = [true, false]
-
-  def self.activate_dakuten_font_files
-    preset_dir = Narou.preset_dir
-    aozora_dir = File.dirname(Narou.aozoraepub3_path)
-    line_height = Narou.line_height
-
-    DAKUTEN_FROM.each_with_index do |name, i|
-      src = File.join(preset_dir, name)
-      dst = File.join(aozora_dir, DAKUTEN_TO[i])
-      if DAKUTEN_ERB[i]
-        Helper.erb_copy(src, dst, binding)
-      else
-        FileUtils.copy(src, dst)
-      end
-    end
-  end
-
-  def self.inactivate_dakuten_font_files
-    preset_dir = Narou.preset_dir
-    aozora_dir = File.dirname(Narou.aozoraepub3_path)
-    path_normal_vertical_css = File.join(preset_dir, "vertical_font.css")
-    line_height = Narou.line_height
-
-    Helper.erb_copy(path_normal_vertical_css, File.join(aozora_dir, DAKUTEN_TO[0]), binding)
-    FileUtils.remove(File.join(aozora_dir, DAKUTEN_TO[1]))
-  end
-
   #
   # AozoraEpub3でEPUBファイル作成
   #
@@ -126,6 +97,9 @@ class NovelConverter
   # 返り値：正常終了 :success、エラー終了 :error、AozoraEpub3が見つからなかった nil
   #
   def self.txt_to_epub(filename, dst_dir: nil, device: nil, verbose: false, yokogaki: false, use_dakuten_font: false, stream_io: $stdout2)
+    # AozoraEpub3のリソース更新
+    AozoraEpub3.update_resources(yokogaki, use_dakuten_font)
+
     abs_srcpath = File.expand_path(filename)
     src_dir = File.dirname(abs_srcpath)
 
@@ -178,7 +152,7 @@ class NovelConverter
     if Helper.os_windows?
       command = "cmd /c #{command}".encode(Encoding::Windows_31J)
     end
-    activate_dakuten_font_files if use_dakuten_font
+
     stream_io.print "AozoraEpub3でEPUBに変換しています"
     begin
       res = Helper::AsyncCommand.exec(command) do
@@ -186,7 +160,6 @@ class NovelConverter
       end
     ensure
       Dir.chdir(pwd)
-      inactivate_dakuten_font_files if use_dakuten_font
     end
 
     # AozoraEpub3はエラーだとしてもexitコードは0なので、
