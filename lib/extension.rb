@@ -6,13 +6,16 @@
 
 require "open-uri"
 require "openssl"
+require "open_uri_redirections"
 
 # open-uri で http → https へのリダイレクトを有効にする
 require "open_uri_redirections"
 
 # open-uri に渡すオプションを生成（必要に応じて extensions/*.rb でオーバーライドする）
 def make_open_uri_options(add)
+  ua = Inventory.load("local_setting")["user-agent"] || "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
   add.merge(ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
+  add.merge("User-Agent" => ua)
 end
 
 #
