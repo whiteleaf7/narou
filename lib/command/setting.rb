@@ -534,6 +534,10 @@ module Command
                 "エラーは出ないが読めなくなる）",
           tab: :detail
         },
+        "user-agent" => {
+          type: :string, help:  "User-Agent 設定\n未指定時 Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+          tab: :detail
+        },
         "webui.theme" => {
           type: :select, help: "WEB UI 用テーマ選択",
           invisible: true,
