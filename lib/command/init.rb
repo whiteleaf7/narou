@@ -4,6 +4,7 @@
 # Copyright 2013 whiteleaf. All rights reserved.
 #
 
+require_relative "../aozoraepub3"
 require_relative "../inventory"
 require_relative "../commandbase"
 
@@ -103,39 +104,22 @@ module Command
       end
       line_height = @options["line_height"] || ask_line_height
       puts
-      rewrite_aozoraepub3_files(aozora_path, line_height)
       @global_setting["aozoraepub3dir"] = aozora_path
       @global_setting["line-height"] = line_height
+      AozoraEpub3.setup(@global_setting) { |copied_file_paths, updated_file_paths|
+        puts "(次のファイルを書き換えました)"
+        updated_file_paths.each do |path|
+          puts path
+        end
+        puts
+
+        puts "(次のファイルをコピーor上書きしました)"
+        copied_file_paths.each do |path|
+          puts path
+        end
+      }
       @global_setting.save
       puts "<bold><green>AozoraEpub3の設定を終了しました</green></bold>".termcolor
-    end
-
-    def rewrite_aozoraepub3_files(aozora_path, line_height)
-      # chuki_tag.txt の書き換え
-      custom_chuki_tag_path = File.join(Narou.preset_dir, "custom_chuki_tag.txt")
-      chuki_tag_path = File.join(aozora_path, "chuki_tag.txt")
-      custom_chuki_tag = File.read(custom_chuki_tag_path, mode: "r:BOM|UTF-8")
-      chuki_tag = File.read(chuki_tag_path, mode: "r:BOM|UTF-8")
-      embedded_mark = "### Narou.rb embedded custom chuki ###"
-      if chuki_tag =~ /#{embedded_mark}/
-        chuki_tag.gsub!(/#{embedded_mark}.+#{embedded_mark}/m, custom_chuki_tag)
-      else
-        chuki_tag << "\n" + custom_chuki_tag
-      end
-      File.write(chuki_tag_path, chuki_tag)
-      puts "(次のファイルを書き換えました)"
-      puts chuki_tag_path
-      puts
-      # ファイルコピー
-      src = ["AozoraEpub3.ini", "vertical_font.css"]
-      dst = ["AozoraEpub3.ini", "template/OPS/css_custom/vertical_font.css"]
-      puts "(次のファイルをコピーor上書きしました)"
-      src.size.times do |i|
-        src_full_path = File.join(Narou.preset_dir, src[i])
-        dst_full_path = File.join(aozora_path, dst[i])
-        Helper.erb_copy(src_full_path, dst_full_path, binding)
-        puts dst_full_path
-      end
     end
 
     def ask_aozoraepub3_path
