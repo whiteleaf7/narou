@@ -127,8 +127,12 @@ module AozoraEpub3
     end
     attr_reader :updated_file_paths, :copied_file_paths
 
-    def self.get_custom_file_path(file_path)
-      File.join(File.dirname(file_path) + "_custom", File.basename(file_path))
+    def self.get_custom_file_path(file_path, should_create_directory)
+      dir_path = File.dirname(file_path) + "_custom" 
+      if should_create_directory
+        FileUtils.mkdir_p(dir_path)
+      end
+      File.join(dir_path, File.basename(file_path))
     end
 
     # iniファイルのコピー
@@ -197,7 +201,7 @@ module AozoraEpub3
 
     # カスタムCSSファイルの配置
     def create_custom_css_file(dst_css_file_path, css)
-      custom_css_file_path = AozoraResourceUpdater.get_custom_file_path(dst_css_file_path)
+      custom_css_file_path = AozoraResourceUpdater.get_custom_file_path(dst_css_file_path, true)
       file_write(custom_css_file_path, css)
       @copied_file_paths << custom_css_file_path
     end
