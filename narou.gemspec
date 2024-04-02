@@ -32,10 +32,13 @@ Gem::Specification.new do |gem|
   install_message = <<-EOS
 #{"*" * 60}
 
-3.8.2: 2022/09/10
+3.9.0: 2024-04-02
 -----------------
 #### 修正内容
-- フォルダが存在しない場合に自動で作成する様に修正
+- 小説家になろうの目次修正に対応
+- カクヨムの目次修正に対応
+
+thanks for contributors: @topstone, @rogenobl, @happynow, @etg-lt
 
 #{"*" * 60}
   EOS
