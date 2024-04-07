@@ -100,6 +100,7 @@ class NovelConverter
       if DAKUTEN_ERB[i]
         Helper.erb_copy(src, dst, binding)
       else
+        FileUtils.mkdir_p(File.dirname(dst))
         FileUtils.copy(src, dst)
       end
     end
@@ -165,7 +166,9 @@ class NovelConverter
     aozoraepub3_basename = File.basename(aozoraepub3_path)
     aozoraepub3_dir = File.dirname(aozoraepub3_path)
 
-    java_encoding = "-Dfile.encoding=UTF-8"
+    java_encoding = "-Dfile.encoding=UTF-8" +
+                    " -Dstdout.encoding=UTF-8 -Dstderr.encoding=UTF-8" +
+                    " -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8"
 
     if Helper.os_cygwin?
       abs_srcpath = Helper.convert_to_windows_path(abs_srcpath)

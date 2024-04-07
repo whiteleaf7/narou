@@ -11,6 +11,7 @@ require_relative "narou"
 require_relative "helper"
 require_relative "sitesetting"
 require_relative "template"
+require_relative "progressbar"
 require_relative "database"
 require_relative "inventory"
 require_relative "eventable"
@@ -40,6 +41,7 @@ class Downloader
 
   class InvalidTarget < StandardError; end
   class SuspendDownload < StandardError; end
+  class IO::TimeoutError; end # for 3.1 or earlier
 
   def initialize(target, options = {})
     id = Downloader.get_id_by_target(target)
@@ -724,6 +726,7 @@ class Downloader
     toc_source = ""
     cookie = @setting["cookie"] || ""
     open_uri_options = make_open_uri_options("Cookie" => cookie, allow_redirections: :safe)
+    sleep_for_download
     begin
       URI.open(toc_url, open_uri_options) do |toc_fp|
         if toc_fp.base_uri.to_s != toc_url
@@ -783,7 +786,7 @@ class Downloader
     @setting["title"] = get_title
     if series_novel?
       # 連載小説
-      subtitles = get_subtitles(toc_source, old_toc)
+      subtitles = get_subtitles_multipage(toc_source, old_toc)
     else
       # 短編小説
       subtitles = create_short_story_subtitles(info)
@@ -798,7 +801,7 @@ class Downloader
       "subtitles" => subtitles
     }
     toc_objects
-  rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout => e
+  rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout, IO::TimeoutError => e
     raise if through_error   # エラー処理はしなくていいからそのまま例外を受け取りたい時用
     if e.message.include?("404")
       @stream.error "小説が削除されているか非公開な可能性があります"
@@ -811,6 +814,40 @@ class Downloader
       @stream.error "何らかの理由により目次が取得できませんでした(#{e.message})"
     end
     false
+  end
+
+  def get_subtitles_multipage(toc_source, old_toc)
+    subtitles = []
+    # 元々のURLを保存する
+    toc_url_orig = @setting["toc_url"]
+    # 全ページ数を得る
+    @setting.multi_match(toc_source, "toc_page_max")
+    toc_page_max = @setting["toc_page_max"].to_i
+    # toc_page_maxが設定されていない、正規表現にマッチしない場合などでも最低限は1にする
+    toc_page_max = 1 unless toc_page_max > 0
+    # 5ページ以上でプログレスバーを表示する
+    progressbar =  nil
+    if toc_page_max >= 5
+      @stream.puts "#{@setting["title"]} の目次ページを取得中..."
+      progressbar = ProgressBar.new(toc_page_max, io: @stream)
+    end
+    ret = toc_page_max.times do |i|
+      progressbar&.output(i + 1)
+      subtitles.concat(get_subtitles(toc_source, old_toc))
+      break unless @setting.multi_match(toc_source, "next_toc")
+      # 得られたURLをセットしてページ内容を取得する
+      @setting["toc_url"] = @setting["next_url"]
+      toc_source = get_toc_source
+    end
+    progressbar&.clear
+    if ret
+      # 通常ならbreakでループを抜けるはず
+      # breakでループを抜けなかったら例外を出す
+      raise "目次ページが多すぎます"
+    end
+    subtitles
+  ensure
+    @setting["toc_url"] = toc_url_orig
   end
 
   def __search_index_in_subtitles(subtitles, index)
@@ -1137,7 +1174,7 @@ class Downloader
       URI.open(url, "r:#{@setting["encoding"]}", open_uri_options) do |fp|
         raw = Helper.pretreatment_source(fp.read, @setting["encoding"])
       end
-    rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout => e
+    rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout, IO::TimeoutError => e
       case e.message
       when /^503/
         # 503 はアクセス規制やメンテ等でリトライしてもほぼ意味がないことが多いため一度で諦める
