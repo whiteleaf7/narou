@@ -54,7 +54,7 @@ thanks for contributors: @topstone, @rogenobl, @happynow, @etg-lt
   gem.add_runtime_dependency 'mail', '~> 2.6.0', '>= 2.6.6'
   gem.add_runtime_dependency 'pony', '~> 1', '>= 1.11'
   gem.add_runtime_dependency 'diff-lcs', '~> 1.2', '>= 1.2.5'
-  gem.add_runtime_dependency 'sinatra', '~> 2.0', '>= 2.0.8.1'
+  gem.add_runtime_dependency 'sinatra', '>= 2.0.8.1', '< 4'
   gem.add_runtime_dependency 'sinatra-contrib', '~> 2.0', '>= 2.0.8.1'
   gem.add_runtime_dependency 'tilt', '~> 2.0', '>= 2.0.10'
   gem.add_runtime_dependency 'sassc', '~> 2.4'
