@@ -27,7 +27,6 @@ jobs:
     - name: Get gemspec version
       id: get_gemspec_ver
       run: |
-        echo 'require "gemspec"' >> check_gemspec_version.rb
         echo 'print("version=")' >> check_gemspec_version.rb
         echo 'puts((Gem::Specification::load("narou.gemspec")).version)' >> check_gemspec_version.rb
         ruby check_gemspec_version.rb >> "$GITHUB_OUTPUT"
@@ -42,14 +41,19 @@ jobs:
       env:
         GEM_HOST_API_KEY: "Bearer ${{secrets.GITHUB_TOKEN}}"
 
+    - name: Build Gem
+      run: |
+        gem build *.gemspec
+        
     - name: Remove old gem
       if: github.event_name != 'pull_request'
+      continue-on-error: true
       run: |
         gem yank -v ${TO_PUSH_GEMSPEC_VER} --KEY github --host https://rubygems.pkg.github.com/${OWNER} narou
       env:
         OWNER: ${{ github.repository_owner }}
         TO_PUSH_GEMSPEC_VER: ${{ steps.get_gemspec_ver.outputs.test }}
-
+        
     - name: Publish to GPR
       if: github.event_name != 'pull_request'
       run: |
