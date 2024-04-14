@@ -9,11 +9,12 @@ on:
   schedule:
     - cron: '33 9 * * *'
   push:
-    branches: [ "mkaraki/master" ]
+    branches: [ "mkaraki/master", "dependabot/**" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "mkaraki/master" ]
+  workflow_dispatch:
 
 env:
   # Use docker.io for Docker Hub if empty
