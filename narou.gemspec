@@ -73,7 +73,7 @@ thanks for contributors: @topstone, @rogenobl, @happynow, @etg-lt
   gem.add_development_dependency 'rspec-retry', '~> 0.6'
   gem.add_development_dependency 'rspec_junit_formatter', '~> 0.4'
   gem.add_development_dependency 'timecop', '~> 0.9'
-  gem.add_development_dependency 'pry', '~> 0.12'
+  gem.add_development_dependency 'pry', '~> 0.14'
   gem.add_development_dependency 'pry-byebug', '~> 3.8'
   gem.add_development_dependency 'awesome_print', '~> 1.8'
   gem.add_development_dependency 'simplecov', '~> 0.20'
