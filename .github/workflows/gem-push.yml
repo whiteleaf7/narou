@@ -49,7 +49,7 @@ jobs:
       if: github.event_name != 'pull_request'
       continue-on-error: true
       run: |
-        gem yank -v ${TO_PUSH_GEMSPEC_VER} --KEY github --host https://rubygems.pkg.github.com/${OWNER} narou
+        gem yank -v ${TO_PUSH_GEMSPEC_VER} --key github --host https://rubygems.pkg.github.com/${OWNER} narou
       env:
         OWNER: ${{ github.repository_owner }}
         TO_PUSH_GEMSPEC_VER: ${{ steps.get_gemspec_ver.outputs.test }}
