@@ -50,7 +50,8 @@ class NovelConverter
       novel_converter = new(setting, options[:output_filename], options[:display_inspector])
       return {
         converted_txt_paths: novel_converter.convert_main,
-        use_dakuten_font: novel_converter.use_dakuten_font
+        use_dakuten_font: novel_converter.use_dakuten_font,
+        setting: setting,
       }
     end
     nil
@@ -81,7 +82,8 @@ class NovelConverter
     end
     {
       converted_txt_paths: novel_converter.convert_main(text),
-      use_dakuten_font: novel_converter.use_dakuten_font
+      use_dakuten_font: novel_converter.use_dakuten_font,
+      setting: setting,
     }
   end
 
