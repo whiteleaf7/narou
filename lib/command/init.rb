@@ -6,6 +6,7 @@
 
 require_relative "../inventory"
 require_relative "../commandbase"
+require_relative "../aozora"
 
 module Command
   class Init < CommandBase
@@ -127,8 +128,10 @@ module Command
       puts chuki_tag_path
       puts
       # ファイルコピー
-      src = ["AozoraEpub3.ini", "vertical_font.css"]
-      dst = ["AozoraEpub3.ini", "template/OPS/css_custom/vertical_font.css"]
+      type = AozoraEpub3.aozoraepub3_type_with_path(Pathname(aozora_path))
+      src = ["AozoraEpub3.ini", type[:css][:src]]
+      dst = ["AozoraEpub3.ini", type[:css][:dst]]
+      use_dakuten_font = false
       puts "(次のファイルをコピーor上書きしました)"
       src.size.times do |i|
         src_full_path = File.join(Narou.preset_dir, src[i])

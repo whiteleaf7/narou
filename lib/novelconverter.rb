@@ -17,6 +17,7 @@ require_relative "helper"
 require_relative "inventory"
 require_relative "html"
 require_relative "eventable"
+require_relative "aozora"
 
 class NovelConverter
   include Narou::Eventable
@@ -85,22 +86,20 @@ class NovelConverter
     }
   end
 
-  DAKUTEN_FROM = ["vertical_font_with_dakuten.css", "DMincho.ttf"]
-  DAKUTEN_TO = ["template/OPS/css_custom/vertical_font.css", "template/OPS/fonts/DMincho.ttf"]
-  DAKUTEN_ERB = [true, false]
-
   def self.activate_dakuten_font_files
     preset_dir = Narou.preset_dir
-    aozora_dir = File.dirname(Narou.aozoraepub3_path)
+    aozora_dir = Narou.aozoraepub3_path.dirname
+    type = AozoraEpub3.aozoraepub3_type
     line_height = Narou.line_height
+    use_dakuten_font = true
 
-    DAKUTEN_FROM.each_with_index do |name, i|
-      src = File.join(preset_dir, name)
-      dst = File.join(aozora_dir, DAKUTEN_TO[i])
-      if DAKUTEN_ERB[i]
+    type[:dakuten].each do |name|
+      src = preset_dir.join(type[name][:src])
+      dst = aozora_dir.join(type[name][:dst])
+      if type[name][:mode] == :erb
         Helper.erb_copy(src, dst, binding)
       else
-        FileUtils.mkdir_p(File.dirname(dst))
+        dst.dirname.mkpath
         FileUtils.copy(src, dst)
       end
     end
@@ -108,12 +107,14 @@ class NovelConverter
 
   def self.inactivate_dakuten_font_files
     preset_dir = Narou.preset_dir
-    aozora_dir = File.dirname(Narou.aozoraepub3_path)
-    path_normal_vertical_css = File.join(preset_dir, "vertical_font.css")
+    aozora_dir = Narou.aozoraepub3_path.dirname
+    type = AozoraEpub3.aozoraepub3_type
+    path_normal_css = preset_dir.join(type[:css][:src])
     line_height = Narou.line_height
+    use_dakuten_font = false
 
-    Helper.erb_copy(path_normal_vertical_css, File.join(aozora_dir, DAKUTEN_TO[0]), binding)
-    FileUtils.remove(File.join(aozora_dir, DAKUTEN_TO[1]))
+    Helper.erb_copy(path_normal_css, aozora_dir.join(type[:css][:dst]), binding)
+    aozora_dir.join(type[:font][:dst]).delete
   end
 
   #
