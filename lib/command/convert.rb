@@ -240,9 +240,9 @@ module Command
                 ignore_default: @options["ignore-default"],
               })
         @novel_data = Downloader.get_data_by_target(target)
-        @options["yokogaki"] = NovelSetting.load(target)["enable_yokogaki"]
       end
       return unless res
+      @options["yokogaki"] = res[:setting]["enable_yokogaki"]
       array_of_converted_txt_path = res[:converted_txt_paths]
       ebook_file = nil
       array_of_converted_txt_path.each do |converted_txt_path|
