@@ -12,7 +12,7 @@ require "sinatra/base"
 require "sinatra/json"
 require "sinatra/reloader" if $development
 # require "better_errors" if $debug
-require "tilt/erubis"
+require "tilt/erubi"
 require "tilt/haml"
 require "tilt/sass"
 require_relative "../commandline"
