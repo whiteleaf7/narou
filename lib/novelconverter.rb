@@ -639,7 +639,7 @@ class NovelConverter
     end
     if is_hotentry == false && @setting.slice_size > 0 && subtitles.length > @setting.slice_size
       stream_io.puts "#{@setting.slice_size}話ごとに分割して変換します"
-      array_of_subtitles = subtitles.each_slice(@setting.slice_size).to_a
+      array_of_subtitles = slice_subtitles(subtitles, @setting.slice_size)
     else
       array_of_subtitles = [subtitles]
     end
@@ -686,6 +686,30 @@ class NovelConverter
   end
 
   #
+  # subtitleをslice_sizeごとに分割する
+  # 分割先頭のchapter/subchapterが空なら更新する
+  #
+  def slice_subtitles(subtitles, slice_size)
+    result = subtitles.each_slice(slice_size).to_a
+
+    last_chapter = ''
+    last_subchapter = ''
+
+    result.each do |sliced_subtitles|
+      sliced_subtitles[0]['chapter'] = last_chapter if ! last_chapter.empty?
+      sliced_subtitles[0]['subchapter'] = last_subchapter if ! last_subchapter.empty?
+
+      sliced_subtitles.each do |chapter|
+        last_chapter = chapter['chapter'] if ! chapter['chapter'].empty?
+        last_subchapter = chapter['subchapter'] if ! chapter['subchapter'].empty?
+      end
+    end
+
+    result
+
+  end
+
+  #
   # subtitle info から変換処理をする
   #
   def subtitles_to_sections(subtitles, html)
@@ -700,6 +724,8 @@ class NovelConverter
       section = load_novel_section(subinfo, section_save_dir)
       if section["chapter"].length > 0
         section["chapter"] = @converter.convert(section["chapter"], "chapter")
+      elsif ! subinfo["chapter"].empty?
+        section["chapter"] = @converter.convert(subinfo["chapter"], "chapter")
       end
 
       @inspector.subtitle = section["subtitle"]
