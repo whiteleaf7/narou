@@ -10,7 +10,7 @@ append_title_to_folder_name: yes
 title_strip_pattern: null
 cookie: CakeCookie[ALLOWED_ADULT_NOVEL]=on
 sitename: *name
-version: 1.0
+version: 1.1
 
 # ------------------------------------------------------------
 # 書籍情報取得設定
@@ -24,6 +24,11 @@ story: |-
 toc_url: \\k<top_url>/stories/index/novel_id~\\k<ncode>
 subtitles: |-
   (?:<tr><td style="border: 0; padding: 0;word-break:break-all;" colspan=\\"2\\"><b>(?<chapter>.+?)</b></td></tr>)*<tr><td>(  )?<a href="(?<href>/stories/view/(?<index>\d+)/novel_id\~\d+)">(?<subtitle>.+?)</a> </td><td class="font-s">(?<subupdate>.+?) </td></tr>
+
+next_toc: <span class="next"><a href="/(?<next_page>[^"]+)" rel="next">
+next_url: https://\\k<domain>/\\k<next_page>
+# 最大のページ数を得る。固定の数字でも可。
+toc_page_max: <span class="table_of_contents"><a href="/stories/index/page~(?<toc_page_max>\d+)/novel_id~\\k<ncode>" rel="table_of_contents">
 
 # subdate(初投稿日)がない場合、一番最初のsubupdateで代用する
 subdate: no

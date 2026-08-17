@@ -983,8 +983,8 @@ class Downloader
       subtitles << {
         "index" => @setting["index"],
         "href" => @setting["href"],
-        "chapter" => @setting["chapter"].to_s,
-        "subchapter" => @setting["subchapter"].to_s,
+        "chapter" => slim_subtitle(@setting["chapter"]).to_s,
+        "subchapter" => slim_subtitle(@setting["subchapter"]).to_s,
         "subtitle" => slim_subtitle(@setting["subtitle"]),
         "file_subtitle" => title_to_filename(@setting["subtitle"]),
         "subdate" => subdate,

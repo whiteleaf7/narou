@@ -1,22 +1,22 @@
 # ------------------------------------------------------------
 # 小説サイト定義
-name: &name ハーメルン
-domain: syosetu.org
+name: &name ハーメルンR18
+domain: h.syosetu.org
 top_url: https?://\\k<domain>
 url:
   - \\k<top_url>/novel/(?<ncode>\d+)
-  - https?://novel.syosetu.org/(?<ncode>\d+)
+  - https?://h.syosetu.org/(?<ncode>\d+)
 encoding: UTF-8
 confirm_over18: no
 append_title_to_folder_name: yes
 title_strip_pattern: null
 cookie: over18=off
-sitename: *name
+sitename: ハーメルン
 version: 1.3
 
 # ------------------------------------------------------------
 # 目次取得設定
-toc_url: https://syosetu.org/novel/\\k<ncode>/
+toc_url: https://h.syosetu.org/novel/\\k<ncode>/
 subtitles: |-
   (?:<li class="episode-list__chapter">\s*<div class="episode-list__chapter-title">(?<chapter>.+?)</div>\s*</li>\s*
   )?\s*<li class="episode-list__item.*?">
@@ -46,7 +46,7 @@ illust_grep_pattern: <a href="(?<src>.+?)" alt="挿絵" name='img'>【挿絵表�
 
 # ------------------------------------------------------------
 # 小説情報からパースするための設定
-novel_info_url: https://syosetu.org/?mode=ss_detail&nid=\\k<ncode>
+novel_info_url: https://h.syosetu.org/?mode=ss_detail&nid=\\k<ncode>
 
 # タイトル
 t: タイトル</td><td.*?><a href=.+?>(?<title>.+?)</a>

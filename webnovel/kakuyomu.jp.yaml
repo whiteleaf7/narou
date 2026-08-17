@@ -10,7 +10,7 @@ confirm_over18: no
 append_title_to_folder_name: yes
 title_strip_pattern: null
 sitename: *name
-version: 2.0
+version: 2.1
 
 # ------------------------------------------------------------
 # 前処理設定
@@ -28,7 +28,7 @@ code: &code
         # work: この作品のデータ
         work = data["Work:#{json["query"]["workId"]}"]
         # まずTOCを処理する
-        toc = work["tableOfContents"]
+        toc = work["tableOfContentsV2"]
         # workのTOCはTableOfContentsChapterの参照の配列となっているので、それを解決する
         toc.map! {|v| data[v["__ref"]]}
         # TableOfContentsChapterにはChapterと各話の配列があるのでそれを取り出し
