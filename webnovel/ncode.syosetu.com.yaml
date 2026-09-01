@@ -61,44 +61,39 @@ narou_api_url: https://api.syosetu.com/novelapi/api/
 novel_info_url: \\k<top_url>/novelview/infotop/ncode/\\k<ncode>/
 
 # タイトル
-t: <h1><a href=".+?">(?<title>.+?)</a></h1>
+t: |-
+  <h1 class="p-infotop-title">\s*<a href=".+?">(?<title>.+?)</a>\s*</h1>
 
 # novel_type 小説種別
-nt: <span id="noveltype(?:.*?)">(?<novel_type>.+?)</span>
+nt: <span class="p-infotop-type__type[^"]*">(?<novel_type>.+?)</span>
 novel_type_string:
   連載中: 1
   完結済: 3
   短編: 2
 
 # general_all_no 掲載話数
-ga: </span>全(?<general_all_no>\d+)エピソード
+ga: 全(?<general_all_no>\d+)エピソード
 
 # story あらすじ
-s: <td class="ex">(?<story>.+?)</td>
+s: |-
+  <dt class="p-infotop-data__title">あらすじ</dt>\s*<dd class="p-infotop-data__value">(?<story>.+?)</dd>
 
 # general_firstup 初回掲載日
 gf: |-
-  <th>掲載日</th>
-  <td>(?<general_firstup>.+?)</td>
+  <dt class="p-infotop-data__title">掲載日</dt>\s*<dd class="p-infotop-data__value">(?<general_firstup>.+?)</td>|<dt class="p-infotop-data__title">掲載日</dt>\s*<dd class="p-infotop-data__value">(?<general_firstup>.+?)</dd>
 
 # novelupdated_at 小説の更新時刻。連載小説だと書いてないので最終掲載日で代用
 nu: |-
-  <th>(?:最終更新日|最新掲載日|最終掲載日)</th>
-  <td>(?:
-  )?(?<novelupdated_at>.+?)(?:
-  )?</td>
+  <dt class="p-infotop-data__title">(?:最終更新日|最新掲載日|最終掲載日)</dt>\s*<dd class="p-infotop-data__value">(?<novelupdated_at>.+?)</dd>
 
 # general_lastup 最終掲載日
 gl: |-
-  <th>(?:最新掲載日|最終掲載日)</th>
-  <td>(?<general_lastup>.+?)</td>
+  <dt class="p-infotop-data__title">(?:最新掲載日|最終掲載日)</dt>\s*<dd class="p-infotop-data__value">(?<general_lastup>.+?)</dd>
 
 # writer 作者名
 w: |-
-  <th>作者名</th>
-  <td>(?:<a href=".+?">)?(?<writer>.+?)(?:</a>)?.?</td>
+  <dt class="p-infotop-data__title">作者名</dt>\s*<dd class="p-infotop-data__value">\s*(?:<a href=".+?">)?(?<writer>.+?)(?:</a>)?\s*</dd>
 
 # length 文字数
 l: |-
-  <th>文字数</th>
-  <td>(?<length>.+?)文字</td>
+  <dt class="p-infotop-data__title">文字数</dt>\s*<dd class="p-infotop-data__value">(?<length>.+?)文字</dd>
