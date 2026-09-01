@@ -400,28 +400,34 @@ module Helper
   # end
   #
   class AsyncCommand
-    def self.exec(command, sleep_time = 0.5, &block)
+    def self.exec(*command, &block)
       looper = nil
       _pid = nil
-      status, stdout, stderr = systemu(command) do |pid|
-        _pid = pid
-        looper = Thread.new(pid) do |pid|
+      require "open3"
+      stdout_str = +""
+      stderr_str = +""
+      status = nil
+      Open3.popen3(*command) do |_stdin, stdout, stderr, wait_thr|
+        _pid = wait_thr.pid
+        looper = Thread.new(_pid) do |pid|
           loop do
             block.call if block
-            sleep(sleep_time)
+            sleep(0.5)
             next unless Narou::Worker.canceled?
             next unless Narou::WebWorker.canceled?
-            Process.kill("KILL", pid)
-            Process.detach(pid)
+            Process.kill("KILL", pid) rescue nil
+            Process.detach(pid) rescue nil
             break
           end
         end
-        looper.join
-        looper = nil
+        t_out = Thread.new { stdout.set_encoding(Encoding::UTF_8, Encoding::UTF_8, invalid: :replace, undef: :replace); stdout_str = stdout.read }
+        t_err = Thread.new { stderr.set_encoding(Encoding::UTF_8, Encoding::UTF_8, invalid: :replace, undef: :replace); stderr_str = stderr.read }
+        t_out.join
+        t_err.join
+        status = wait_thr.value
+        looper&.kill rescue nil
       end
-      stdout.force_encoding(Encoding::UTF_8)
-      stderr.force_encoding(Encoding::UTF_8)
-      return [stdout, stderr, status]
+      return [stdout_str, stderr_str, status]
     rescue RuntimeError => e
       raise unless e.message.include?("interrupted")
       process_kill(_pid)
@@ -430,7 +436,7 @@ module Helper
       process_kill(_pid)
       raise
     ensure
-      looper&.kill
+      looper&.kill rescue nil
     end
 
     def self.process_kill(pid)

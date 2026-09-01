@@ -173,20 +173,47 @@ class NovelConverter
     if Helper.os_cygwin?
       abs_srcpath = Helper.convert_to_windows_path(abs_srcpath)
     end
-    Dir.chdir(aozoraepub3_dir)
-    command = %!java #{java_encoding} -cp #{aozoraepub3_basename} AozoraEpub3 -enc UTF-8 -of #{device_option} ! +
-              %!#{cover_option} #{dst_option} #{ext_option} #{yokogaki_option} "#{abs_srcpath}"!
-    if Helper.os_windows?
-      command = "cmd /c #{command}".encode(Encoding::Windows_31J)
-    end
+    temp_txt_name = "__temp_narou__.txt"
+    temp_epub_name = "__temp_narou__.epub"
+    temp_txt_path = File.join(src_dir, temp_txt_name)
+    temp_epub_path = File.join(src_dir, temp_epub_name)
+    target_epub_basename = File.basename(abs_srcpath, ".txt") + (device&.name == "Kobo" ? device.ebook_file_ext : ".epub")
+    target_epub_path = dst_dir ? File.join(File.expand_path(dst_dir), target_epub_basename) : File.join(src_dir, target_epub_basename)
+    FileUtils.cp(abs_srcpath, temp_txt_path)
+
+    java_cmd = File.exist?(File.join(aozoraepub3_dir, "jre", "bin", "java.exe")) ? File.join(aozoraepub3_dir, "jre", "bin", "java.exe") : "java"
+    command = [
+      java_cmd,
+      "-Dfile.encoding=UTF-8",
+      "-Dsun.jnu.encoding=UTF-8",
+      "-Dstdout.encoding=UTF-8",
+      "-Dstderr.encoding=UTF-8",
+      "-Dsun.stdout.encoding=UTF-8",
+      "-Dsun.stderr.encoding=UTF-8",
+      "-cp", aozoraepub3_path.to_s,
+      "AozoraEpub3",
+      "-enc", "UTF-8",
+      "-of"
+    ]
+    command.concat(["-device", "kindle"]) if device&.name == "Kindle"
+    command.concat(["-ext", device.ebook_file_ext]) if device&.name == "Kobo"
+    command.concat(["-c", "0"]) if cover_filename
+    command << "-hor" if yokogaki
+    command << temp_txt_name
+
+    Dir.chdir(src_dir)
     activate_dakuten_font_files if use_dakuten_font
     stream_io.print "AozoraEpub3でEPUBに変換しています"
     begin
-      res = Helper::AsyncCommand.exec(command) do
+      res = Helper::AsyncCommand.exec(*command) do
         stream_io.print "."
+      end
+      if File.exist?(temp_epub_path)
+        FileUtils.mv(temp_epub_path, target_epub_path)
       end
     ensure
       Dir.chdir(pwd)
+      FileUtils.rm_f(temp_txt_path)
       inactivate_dakuten_font_files if use_dakuten_font
     end
 
