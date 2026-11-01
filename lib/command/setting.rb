@@ -107,7 +107,15 @@ module Command
       else
         casted_value = Helper.string_cast_to_type(value, variable_definition[:type])
       end
+      validate_variable_value(name, casted_value)
       [scope, casted_value]
+    end
+
+    def validate_variable_value(name, value)
+      return unless name == "download.interval-by-domain" && value
+      Downloader.parse_interval_by_domain(value)
+    rescue ArgumentError => e
+      raise InvalidSelectValue, e.message
     end
 
     def output_setting_list
@@ -459,6 +467,12 @@ module Command
         },
         "download.interval" => {
           type: :float, help: "各話DL時に指定秒数待機する。デフォルト#{Downloader::DEFAULT_INTERVAL_WAIT}秒",
+          tab: :detail
+        },
+        "download.interval-by-domain" => {
+          type: :string,
+          help: "サイトごとに各話DL時の待機秒数を指定する(download.intervalより優先)\n" \
+                "      例：ncode.syosetu.com=4.0,novel18.syosetu.com=4.0",
           tab: :detail
         },
         "download.wait-steps" => {
