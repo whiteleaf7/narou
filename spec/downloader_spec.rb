@@ -46,8 +46,12 @@ describe Downloader do
       expect(Downloader.resolve_interval(domain, setting)).to eq 2.0
     end
 
-    it "負数は0になる" do
-      expect(Downloader.resolve_interval(domain, { "download.interval" => -1 })).to eq 0
+    it "download.interval が負数ならデフォルト値になる" do
+      expect(Downloader.resolve_interval(domain, { "download.interval" => -1 })).to eq Downloader::DEFAULT_INTERVAL_WAIT
+    end
+
+    it "0 は有効な値として扱われる" do
+      expect(Downloader.resolve_interval(domain, { "download.interval" => 0 })).to eq 0
     end
   end
 

@@ -71,8 +71,9 @@ class Downloader
       rescue ArgumentError
         {}
       end
-    interval = by_domain[domain] || local_setting["download.interval"] || DEFAULT_INTERVAL_WAIT
-    interval < 0 ? 0 : interval
+    interval = by_domain[domain] || local_setting["download.interval"]
+    # 未設定、または負の値の場合はデフォルト値を使う
+    interval.nil? || interval < 0 ? DEFAULT_INTERVAL_WAIT : interval
   end
 
   class InvalidTarget < StandardError; end
