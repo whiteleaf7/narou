@@ -39,6 +39,42 @@ class Downloader
 
   attr_reader :id, :setting
 
+  #
+  # download.interval-by-domain の設定文字列を { ドメイン => 秒数 } に変換する
+  #
+  # 書式: "ncode.syosetu.com=4.0,novel18.syosetu.com=4.0"
+  # 不正な書式の場合は ArgumentError を投げる
+  #
+  def self.parse_interval_by_domain(value)
+    result = {}
+    value.to_s.split(",").each do |entry|
+      entry = entry.strip
+      next if entry.empty?
+      domain, seconds = entry.split("=", 2).map(&:strip)
+      if domain.to_s.empty? || seconds.to_s !~ /\A\d+(\.\d+)?\z/
+        raise ArgumentError, "#{entry.inspect} は「ドメイン=秒数」の形式で指定して下さい"
+      end
+      result[domain] = seconds.to_f
+    end
+    result
+  end
+
+  #
+  # 指定ドメインの各話DL間隔(秒)を返す
+  #
+  # 優先順位: download.interval-by-domain > download.interval > DEFAULT_INTERVAL_WAIT
+  #
+  def self.resolve_interval(domain, local_setting)
+    by_domain =
+      begin
+        parse_interval_by_domain(local_setting["download.interval-by-domain"])
+      rescue ArgumentError
+        {}
+      end
+    interval = by_domain[domain] || local_setting["download.interval"] || DEFAULT_INTERVAL_WAIT
+    interval < 0 ? 0 : interval
+  end
+
   class InvalidTarget < StandardError; end
   class SuspendDownload < StandardError; end
   class IO::TimeoutError; end # for 3.1 or earlier
@@ -292,8 +328,7 @@ class Downloader
       @@__wait_counter = 0
       @@__last_download_time = Time.now - 20
     end
-    @@interval_sleep_time = Inventory.load("local_setting")["download.interval"] || DEFAULT_INTERVAL_WAIT
-    @@interval_sleep_time = 0 if @@interval_sleep_time < 0
+    @@interval_sleep_time = Downloader.resolve_interval(@setting["domain"], Inventory.load("local_setting"))
     @@max_steps_wait_time = [STEPS_WAIT_TIME, @@interval_sleep_time].max
   end
 
@@ -1140,6 +1175,22 @@ class Downloader
     element
   end
 
+  def display_connection_refused_hint(domain)
+    @stream.puts <<~HINT
+      ヒント:
+      接続が拒否されました。短時間に連続してアクセスしたことで、一時的に
+      アクセスを制限されている可能性があります。
+      自動リトライはサーバーへの負荷を増やすため行いません。
+      しばらく時間を置いてから、ウェイトを長くして再度試してください。
+
+      # 当該サイトだけ1話ごとのウェイトを長くする(単位：秒)
+      narou s download.interval-by-domain=#{domain}=4.0
+
+      # 全サイト共通で長くする場合
+      narou s download.interval=4.0
+    HINT
+  end
+
   def display_hint
     @stream.puts <<~HINT
       ヒント:
@@ -1153,6 +1204,9 @@ class Downloader
 
       # 1話ごとに入るウェイトを変更する(単位：秒)
       narou s download.interval=1.0
+
+      # サイトごとにウェイトを変える(例：なろうだけ4秒)
+      narou s download.interval-by-domain=ncode.syosetu.com=4.0
 
       # 10話ごとに通常より長いウェイトを入れる
       narou s download.wait-steps=10
@@ -1174,6 +1228,11 @@ class Downloader
       URI.open(url, "r:#{@setting["encoding"]}", open_uri_options) do |fp|
         raw = Helper.pretreatment_source(fp.read, @setting["encoding"])
       end
+    rescue Errno::ECONNREFUSED => e
+      # 接続拒否はアクセス規制の可能性があるため、リトライせず中断する
+      @stream.error "server message: #{e.message}"
+      display_connection_refused_hint(@setting["domain"])
+      raise SuspendDownload
     rescue OpenURI::HTTPError, Errno::ECONNRESET, Errno::ETIMEDOUT, Net::OpenTimeout, IO::TimeoutError => e
       case e.message
       when /^503/
